@@ -109,7 +109,7 @@ masterCheckbox.addEventListener("change", () => {
 optionCheckboxes.forEach((input) => input.addEventListener("change", syncMasterCheckbox));
 syncMasterCheckbox();
 
-const tabs = [...document.querySelectorAll('[role="tab"]')];
+const tabs = [...document.querySelectorAll('#view-tabs [role="tab"]')];
 function activateTab(tab) {
   tabs.forEach((item) => {
     const selected = item === tab;

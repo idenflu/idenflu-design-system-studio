@@ -21,13 +21,13 @@ python3 -m http.server 4173 --bind 127.0.0.1
 
 ## 문서 탐색
 
-접고 펼칠 수 있는 고정 사이드 메뉴에서 32개 페이지를 이동할 수 있습니다. 모바일에서는 메뉴 버튼으로 열고 닫습니다.
+접고 펼칠 수 있는 고정 사이드 메뉴에서 각 페이지를 이동할 수 있습니다. 모바일에서는 메뉴 버튼으로 열고 닫습니다.
 각 페이지는 고유 주소를 가지며 새로고침과 브라우저 뒤로·앞으로 가기를 지원합니다.
 
 - 개요: `#/overview`
 - 기초: `#/foundations/colors`, `#/foundations/typography`, `#/foundations/sizes`, `#/foundations/icons`, `#/foundations/states`
 - 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
-- 패턴: `#/patterns/empty-state`, `#/patterns/profile`
+- 패턴: `#/patterns/empty-state`, `#/patterns/form/profile`, `#/patterns/layout/app-shell`, `#/patterns/layout/dashboard`, `#/patterns/layout/list-detail`, `#/patterns/layout/tabs`, `#/patterns/layout/focused`, `#/patterns/page/list`, `#/patterns/page/detail`, `#/patterns/page/settings`, `#/patterns/page/login`
 
 기존 `#overview`, `#foundations`, `#components`, `#states`, `#/components/empty-state` 주소도 해당 페이지로 연결됩니다.
 
@@ -94,6 +94,8 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - `additional.css`, `additional.js`: 추가 컴포넌트 스타일과 예제 동작
 - `multi-select.js`: 멀티 셀렉트 선택·초기화 및 키보드 탐색
 - `datepicker.js`: 날짜 직접 입력, 검증 및 단일·기간 달력 선택
+- `layout-patterns.css`, `layout-tabs.js`: 레이아웃 예시의 스타일과 탭 전환
+- `page-patterns.css`, `page-patterns.js`, `page-list-filters.js`: 페이지 예시의 스타일과 검색·입력 검증
 - `navigation.js`: 페이지 전환·브라우저 기록·모바일 메뉴 포커스 관리
 - `script.js`, `components.js`: 컴포넌트별 동작
 

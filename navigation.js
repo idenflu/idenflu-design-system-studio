@@ -16,6 +16,7 @@
     states: "foundations/states",
     components: "components/buttons",
     "components/empty-state": "patterns/empty-state",
+    "patterns/profile": "patterns/form/profile",
   };
   let menuOpen = false;
 
