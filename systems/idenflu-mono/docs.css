@@ -137,3 +137,8 @@
   .page-pagination { margin-top: 40px; gap: 16px; padding-bottom: 32px; }
   .docs-footer { flex-wrap: wrap; gap: 4px 24px; margin-inline: 24px; padding-block: 16px 24px; }
 }
+
+/* Return to the design system gallery. */
+.nav-gallery { display:flex; align-items:center; justify-content:space-between; min-height:38px; margin:0 0 16px; padding:8px 12px; color:var(--text-secondary); font-size:12px; line-height:20px; }
+.nav-gallery:hover { background:var(--surface); color:var(--text); }
+.nav-gallery:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }

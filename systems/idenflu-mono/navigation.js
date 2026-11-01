@@ -2,7 +2,7 @@
   "use strict";
 
   const views = [...document.querySelectorAll(".route-view")];
-  const links = [...document.querySelectorAll(".docs-navigation a")];
+  const links = [...document.querySelectorAll(".docs-navigation a:not(.nav-gallery)")];
   const sidebar = document.querySelector("#sidebar");
   const surface = document.querySelector("#docs-main");
   const menuButton = document.querySelector("#open-menu");
