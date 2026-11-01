@@ -1,0 +1,62 @@
+/* One size contract for all controls. md is the default; data-size also scopes children. */
+:root {
+  --size-sm-height: 32px;
+  --size-md-height: 38px;
+  --size-lg-height: 44px;
+  --size-sm-padding: 10px;
+  --size-md-padding: 12px;
+  --size-lg-padding: 16px;
+  --size-sm-icon: 14px;
+  --size-md-icon: 16px;
+  --size-lg-icon: 18px;
+  --control-height: var(--size-md-height);
+  --control-px: var(--size-md-padding);
+  --control-gap: 8px;
+  --icon-size: var(--size-md-icon);
+  --range-thumb-width: 18px;
+  --range-thumb-height: 22px;
+  --choice-size: 18px;
+  --switch-width: 48px;
+  --switch-height: 28px;
+  --switch-thumb: 20px;
+  --badge-height: 24px;
+}
+[data-size="sm"] {
+  --control-height: var(--size-sm-height);
+  --control-px: var(--size-sm-padding);
+  --control-gap: 6px;
+  --icon-size: var(--size-sm-icon);
+  --range-thumb-width: 16px;
+  --range-thumb-height: 20px;
+  --choice-size: 16px;
+  --switch-width: 40px;
+  --switch-height: 24px;
+  --switch-thumb: 16px;
+  --badge-height: 20px;
+}
+[data-size="md"] {
+  --control-height: var(--size-md-height);
+  --control-px: var(--size-md-padding);
+  --control-gap: 8px;
+  --icon-size: var(--size-md-icon);
+  --range-thumb-width: 18px;
+  --range-thumb-height: 22px;
+  --choice-size: 18px;
+  --switch-width: 48px;
+  --switch-height: 28px;
+  --switch-thumb: 20px;
+  --badge-height: 24px;
+}
+[data-size="lg"] {
+  --control-height: var(--size-lg-height);
+  --control-px: var(--size-lg-padding);
+  --control-gap: 10px;
+  --icon-size: var(--size-lg-icon);
+  --range-thumb-width: 20px;
+  --range-thumb-height: 24px;
+  --choice-size: 20px;
+  --switch-width: 56px;
+  --switch-height: 32px;
+  --switch-thumb: 24px;
+  --badge-height: 28px;
+}

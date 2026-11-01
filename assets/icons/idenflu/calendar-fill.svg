@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <mask id="nova-icon-calendar-fill-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+    <rect x="3" y="3" width="18" height="18" rx="1" fill="white" stroke="none" />
+    <path d="M8 2v3" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="butt" />
+    <path d="M16 2v3" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="butt" />
+    <path d="M3 9h18" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" />
+  </mask>
+  <rect width="24" height="24" mask="url(#nova-icon-calendar-fill-mask)" />
+</svg>
