@@ -11,6 +11,7 @@
     const valueContainer = picker.querySelector('[data-multi-values]');
     const options = [...listbox.querySelectorAll('[role="option"]')];
     const enabled = options.filter((option) => option.getAttribute('aria-disabled') !== 'true');
+    const initialSelected = new Set(enabled.filter((option) => option.getAttribute('aria-selected') === 'true').map((option) => option.dataset.value));
     const selectedContainer = document.getElementById(picker.dataset.selected);
     const clear = document.getElementById(picker.dataset.clear);
     const feedback = document.getElementById(picker.dataset.feedback);
@@ -215,6 +216,12 @@
     document.addEventListener('select-open', (event) => { if (event.detail !== picker) close(); });
     picker.addEventListener('focusout', () => { setTimeout(() => { if (!picker.contains(document.activeElement)) close(); }, 0); });
     window.addEventListener('hashchange', () => close());
+    picker.closest('form')?.addEventListener('reset', () => queueMicrotask(() => {
+      enabled.forEach((option) => option.setAttribute('aria-selected', String(initialSelected.has(option.dataset.value))));
+      render();
+      close();
+      feedback.textContent = '';
+    }));
     render();
   });
 })();

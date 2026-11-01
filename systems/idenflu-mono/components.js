@@ -6,6 +6,7 @@
     const popup = picker.querySelector(".select-popup");
     const display = picker.querySelector("[data-select-label]");
     const valueInput = picker.querySelector('input[type="hidden"]');
+    const initialValue = valueInput.value;
     const options = [...picker.querySelectorAll('[role="option"]')];
     const enabled = options.filter((option) => option.getAttribute("aria-disabled") !== "true");
     let active = enabled.findIndex((option) => option.dataset.value === valueInput.value);
@@ -92,6 +93,15 @@
     document.addEventListener("select-open", (event) => { if (event.detail !== picker) close(); });
     picker.addEventListener("focusout", (event) => { if (!picker.contains(event.relatedTarget)) close(); });
     window.addEventListener("hashchange", close);
+    picker.closest('form')?.addEventListener('reset', () => queueMicrotask(() => {
+      const option = options.find((item) => item.dataset.value === initialValue);
+      if (!option) return;
+      valueInput.value = initialValue;
+      trigger.value = initialValue;
+      display.textContent = option.querySelector('.option-label').textContent.trim();
+      options.forEach((item) => item.setAttribute('aria-selected', String(item === option)));
+      close();
+    }));
   });
 
   document.querySelectorAll(".segmented-control").forEach((group) => {

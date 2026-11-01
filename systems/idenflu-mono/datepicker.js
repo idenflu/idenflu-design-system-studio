@@ -232,5 +232,9 @@
     document.addEventListener('click', (event) => { if (!event.composedPath().includes(picker)) close(); });
     document.addEventListener('select-open', (event) => { if (event.detail !== picker) close(); });
     window.addEventListener('hashchange', () => close());
+    picker.closest('form')?.addEventListener('reset', () => setTimeout(() => {
+      close();
+      sync(false, true);
+    }, 0));
   });
 })();

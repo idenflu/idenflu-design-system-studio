@@ -18,7 +18,9 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - 버튼·입력창·색상칩 radius 0px
 - 토글은 둥근 트랙과 원형 손잡이 유지
 - 포커스는 밝은 안쪽 2px 테두리
-- 프로필 입력·검증·저장 피드백 및 토글 동작
+- 기본 정보·환경설정·비밀번호·문의·프로젝트 등록·일정 예약 폼과 검증 피드백
+- 아이콘·프리픽스/서픽스 입력, 선택·태그·날짜·슬라이더를 조합한 폼 예시
+- 라이트·다크 모드: 시스템 설정을 기본으로 사용하고, 상단 모드 버튼의 선택을 저장
 - 모바일·태블릿 반응형 지원
 
 ## 문서 탐색
@@ -30,7 +32,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - 개요: `#/overview`
 - 기초: `#/foundations/colors`, `#/foundations/typography`, `#/foundations/sizes`, `#/foundations/icons`, `#/foundations/states`
 - 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
-- 패턴: `#/patterns/empty-state`, `#/patterns/form/profile`, `#/patterns/layout/app-shell`, `#/patterns/layout/dashboard`, `#/patterns/layout/list-detail`, `#/patterns/layout/tabs`, `#/patterns/layout/focused`, `#/patterns/page/list`, `#/patterns/page/detail`, `#/patterns/page/settings`, `#/patterns/page/login`
+- 패턴: `#/patterns/empty-state`, `#/patterns/form/profile`, `#/patterns/form/project`, `#/patterns/form/booking`, `#/patterns/layout/app-shell`, `#/patterns/layout/dashboard`, `#/patterns/layout/list-detail`, `#/patterns/layout/tabs`, `#/patterns/layout/focused`, `#/patterns/page/list`, `#/patterns/page/detail`, `#/patterns/page/settings`, `#/patterns/page/login`
 
 기존 `#overview`, `#foundations`, `#components`, `#states`, `#/components/empty-state` 주소도 해당 페이지로 연결됩니다.
 
@@ -94,6 +96,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - `systems/idenflu-mono/`: idenflu mono의 문서, 스타일, 스크립트와 에셋
 - `systems/idenflu-mono/navigation.js`: 문서 페이지 전환과 모바일 메뉴 관리
 - `systems/idenflu-mono/tokens.css`: sm/md/lg 사이즈 토큰
+- `systems/idenflu-mono/theme.css`, `theme-components.css`, `theme.js`: 테마 색상과 모드 전환
 
 새 문서는 `systems/idenflu-mono/index.html`의 `.route-view`에 `data-route`, `data-title`, `data-group`, `data-description`을 지정하고 사이드 메뉴에 링크를 추가합니다.
 페이지 제목·현재 위치·이전/다음 링크는 메타데이터와 페이지 순서에 따라 자동으로 갱신됩니다.

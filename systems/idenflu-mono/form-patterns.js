@@ -17,6 +17,7 @@
     else input.removeAttribute("aria-describedby");
     error.textContent = message;
     error.hidden = !message;
+    input.closest('.input-group')?.classList.toggle('is-invalid', Boolean(message));
   }
 
   function setGroupError(inputs, errorId, message) {
@@ -91,6 +92,7 @@
       else if (contactError) contacts[0]?.focus();
       else showResult(result, "선택한 설정을 확인했습니다.");
     });
+    form.addEventListener("input", () => clearResult(result));
     form.addEventListener("change", () => clearResult(result));
     form.addEventListener("selectchange", () => clearResult(result));
     channels.forEach((input) => input.addEventListener("change", () => {
@@ -183,10 +185,12 @@
       if (message.hasAttribute("aria-invalid")) setError(message, "form-message-error", validate());
     });
     attachment.addEventListener("change", () => { clearResult(result); updateAttachment(); });
+    form.addEventListener("input", () => clearResult(result));
+    form.addEventListener("selectchange", () => clearResult(result));
     form.addEventListener("reset", () => {
       setError(message, "form-message-error", "");
       clearResult(result);
-      queueMicrotask(() => { updateCount(); updateAttachment(); });
+      setTimeout(() => { updateCount(); updateAttachment(); }, 0);
     });
     updateCount();
     updateAttachment();

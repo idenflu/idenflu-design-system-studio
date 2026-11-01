@@ -11,6 +11,7 @@ function setFieldError(input, message) {
   else input.removeAttribute("aria-invalid");
   error.textContent = message;
   error.hidden = !message;
+  input.closest('.input-group')?.classList.toggle('is-invalid', Boolean(message));
 }
 
 function validateProfile() {

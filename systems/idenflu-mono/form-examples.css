@@ -1,0 +1,47 @@
+/* Form examples compose existing controls without changing their shared states. */
+.form-example-group { min-width:0; margin:0; padding:0; border:0; }
+.form-example-group + .form-example-group { margin-top:32px; padding-top:24px; border-top:1px solid var(--divider); }
+.form-example-group > legend { margin:0 0 16px; padding:0; font-size:16px; font-weight:600; line-height:24px; }
+.form-example-group > h3 { margin:0 0 16px; font-size:16px; font-weight:600; line-height:24px; }
+.form-example-group > .component-helper { margin:-8px 0 16px; }
+.form-example-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 24px; }
+.form-example-grid > * { min-width:0; }
+.form-example-grid > div > .component-helper { margin-top:6px; }
+.form-example-wide { grid-column:1 / -1; }
+.form-example-unit, .form-example-password { min-width:0; width:100%; }
+.form-example-unit input, .form-example-password input { flex:1 1 auto; min-width:0; }
+.form-example-unit .input-suffix { flex:0 0 auto; white-space:nowrap; }
+.form-example-password .input-action { flex-shrink:0; }
+.form-example-slider { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:4px 16px; min-width:0; }
+.form-example-slider .field-label { margin-bottom:0; }
+.form-example-slider output { color:var(--text-secondary); font-size:14px; line-height:20px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.form-example-slider .range-input, .form-example-slider > .component-helper { grid-column:1 / -1; }
+.form-example-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:var(--control-height); }
+.form-example-toggle-row > div { min-width:0; }
+.form-example-toggle-row .field-label { margin-bottom:0; }
+.form-example-toggle-row .component-helper { margin-top:4px; word-break:keep-all; }
+.form-example-toggle-row .switch { flex-shrink:0; }
+.form-example-toggle-row + .form-example-toggle-row { margin-top:20px; }
+.form-example-divider-after { margin-top:24px; }
+.form-example-divider { height:1px; margin:32px 0; border:0; background:var(--divider); }
+.form-example-choice-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.form-example-choice-cards .choice { align-items:flex-start; width:100%; min-width:0; min-height:var(--control-height); padding:16px; border:1px solid var(--border); }
+.form-example-choice-cards .choice-input { top:16px; left:16px; }
+.form-example-choice-cards .choice:hover:not(:has(.choice-input:disabled)) { background:var(--surface); }
+.form-example-choice-cards .choice:has(.choice-input:checked) { border-color:var(--primary); background:var(--info-surface); }
+.form-example-choice-cards .choice:has(.choice-input:focus-visible) { box-shadow:inset 0 0 0 2px var(--focus-on-light); }
+.form-example-choice-cards .choice:has(.choice-input[aria-invalid="true"]) { border-color:var(--danger); }
+.form-example-choice-cards .choice > span:last-child { min-width:0; }
+.form-example-choice-cards strong { display:block; font-size:14px; font-weight:500; line-height:20px; }
+.form-example-choice-cards small { display:block; margin-top:4px; color:var(--text-secondary); font-size:12px; line-height:18px; word-break:keep-all; }
+.form-example-upload { min-width:0; }
+.form-example-upload .form-pattern-upload { width:100%; }
+.form-example-upload > .component-helper { margin-top:6px; overflow-wrap:anywhere; }
+.form-example-note { margin-top:12px; color:var(--text-secondary); font-size:12px; line-height:18px; word-break:keep-all; }
+.form-example-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:24px; }
+.form-example-actions .button { width:auto; }
+@media (max-width:600px) {
+  .form-example-grid, .form-example-choice-cards { grid-template-columns:minmax(0,1fr); }
+  .form-example-wide { grid-column:auto; }
+  .form-example-toggle-row { gap:16px; }
+}
