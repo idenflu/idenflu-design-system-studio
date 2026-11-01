@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>SWISS / MONO — Design System</title>
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="./assets/fonts/Pretendard-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/Pretendard-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문 바로가기</a>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="wordmark" href="#overview" aria-label="Swiss Mono 홈">SWISS / MONO</a>
+        <nav class="navigation" aria-label="주요 메뉴">
+          <a href="#overview" aria-current="page">Overview</a>
+          <a href="#foundations">Foundations</a>
+          <a href="#components">Components</a>
+        </nav>
+      </header>
+
+      <main id="main">
+        <section class="hero" id="overview" aria-labelledby="page-title">
+          <p class="eyebrow">DESIGN SYSTEM</p>
+          <h1 id="page-title">Form follows<br />function.</h1>
+          <p class="hero-description">A precise foundation for everyday interfaces.</p>
+        </section>
+
+        <div class="system-grid">
+          <section class="system-column foundations" id="foundations" aria-labelledby="foundations-title">
+            <header class="section-header">
+              <h2 id="foundations-title"><span class="section-index" aria-hidden="true">01 /</span>Foundations</h2>
+              <p>명확한 구조와 일관된 사용 경험을 만듭니다.</p>
+            </header>
+
+            <section class="palette" aria-labelledby="color-title">
+              <h3 id="color-title">Color</h3>
+              <ul class="palette-list">
+                <li><span class="color-swatch swatch-primary" aria-hidden="true"></span><div><span>Primary</span><span class="token-value">#4263CC</span></div></li>
+                <li><span class="color-swatch swatch-secondary" aria-hidden="true"></span><div><span>Text Secondary</span><span class="token-value">#626A77</span></div></li>
+                <li><span class="color-swatch swatch-surface" aria-hidden="true"></span><div><span>Surface</span><span class="token-value">#F5F6F8</span></div></li>
+                <li><span class="color-swatch swatch-border" aria-hidden="true"></span><div><span>Border</span><span class="token-value">#C6C6CC</span></div></li>
+              </ul>
+            </section>
+
+            <section class="typography" aria-labelledby="type-title">
+              <h3 id="type-title">Typography</h3>
+              <p class="type-specimen" aria-hidden="true">Aa</p>
+              <p class="type-name">Pretendard</p>
+              <p class="type-description">간결한 인터페이스의 기준</p>
+              <dl class="type-scale">
+                <div><dt>본문</dt><dd>14 / 22</dd></div>
+                <div><dt>보조</dt><dd>12 / 18</dd></div>
+                <div><dt>제목</dt><dd>24 / 32</dd></div>
+              </dl>
+            </section>
+          </section>
+
+          <section class="system-column states" id="components" aria-labelledby="states-title">
+            <header class="section-header">
+              <h2 id="states-title"><span class="section-index" aria-hidden="true">02 /</span>States</h2>
+              <p>동작과 상태를 같은 규칙으로 표현합니다.</p>
+            </header>
+
+            <section class="button-states" aria-labelledby="button-states-title">
+              <h3 id="button-states-title">버튼 상태</h3>
+              <div class="button-grid">
+                <div class="state-example"><span class="state-caption">기본</span><button class="button demo-button" type="button" aria-label="기본 상태 저장 버튼">저장</button></div>
+                <div class="state-example"><span class="state-caption">호버</span><button class="button demo-button is-hovered" type="button" aria-label="호버 상태 저장 버튼">저장</button></div>
+                <div class="state-example"><span class="state-caption">눌림</span><button class="button demo-button is-pressed" type="button" aria-label="눌림 상태 저장 버튼">저장</button></div>
+                <div class="state-example"><span class="state-caption">포커스</span><button class="button demo-button is-focused" type="button" aria-label="포커스 상태 저장 버튼">저장</button></div>
+                <div class="state-example state-wide"><span class="state-caption">비활성</span><button class="button" type="button" disabled>저장</button></div>
+              </div>
+            </section>
+
+            <section class="input-states" aria-labelledby="input-states-title">
+              <h3 id="input-states-title">입력 상태</h3>
+              <div class="input-example"><label class="state-caption" for="example-default">기본</label><input class="text-input" id="example-default" type="text" value="김민수" autocomplete="off" /></div>
+              <div class="input-example"><label class="state-caption" for="example-focus">포커스</label><input class="text-input is-focused" id="example-focus" type="text" value="김민수" autocomplete="off" /></div>
+              <div class="input-example"><label class="state-caption" for="example-disabled">비활성</label><input class="text-input" id="example-disabled" type="email" placeholder="이메일 주소" disabled /></div>
+              <div class="input-example"><label class="state-caption" for="example-error">오류</label><input class="text-input" id="example-error" type="email" value="minsu@" aria-invalid="true" aria-describedby="example-error-message" autocomplete="off" /><p class="field-error" id="example-error-message">올바른 이메일 주소를 입력해주세요.</p></div>
+            </section>
+          </section>
+
+          <section class="system-column context" aria-labelledby="context-title">
+            <header class="section-header">
+              <h2 id="context-title"><span class="section-index" aria-hidden="true">03 /</span>In context</h2>
+              <p>실제 화면에 적용한 기본 프로필 폼입니다.</p>
+            </header>
+
+            <form id="profile-form" class="profile-form" novalidate>
+              <div class="profile-heading"><h3>프로필</h3><p>기본 정보를 확인하고 수정하세요.</p></div>
+              <div class="form-field">
+                <label for="profile-name">이름</label>
+                <input class="text-input" id="profile-name" name="name" value="김민수" autocomplete="name" required maxlength="60" aria-describedby="name-error" />
+                <p class="field-error" id="name-error" hidden></p>
+              </div>
+              <div class="form-field">
+                <label for="profile-email">이메일</label>
+                <input class="text-input" id="profile-email" name="email" type="email" value="minsu@example.com" autocomplete="email" required aria-describedby="email-error" />
+                <p class="field-error" id="email-error" hidden></p>
+              </div>
+              <div class="preference-row">
+                <div class="preference-copy"><label for="product-updates">제품 소식 받기</label><p id="updates-description">새로운 기능과 소식을 이메일로 받아요.</p></div>
+                <label class="switch"><input id="product-updates" name="updates" type="checkbox" role="switch" checked aria-describedby="updates-description" /><span class="switch-track" aria-hidden="true"></span></label>
+              </div>
+              <button class="button save-button" type="submit">변경사항 저장</button>
+              <p class="save-feedback" id="save-feedback" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+        </div>
+      </main>
+
+      <footer class="site-footer"><p>40px height / 0px radius / 8px spacing</p></footer>
+    </div>
+    <div class="sr-only" id="demo-feedback" role="status" aria-live="polite"></div>
+  </body>
+</html>
