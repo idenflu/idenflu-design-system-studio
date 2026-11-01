@@ -31,7 +31,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - 갤러리: `#/gallery`
 - 개요: `#/overview`
 - 기초: `#/foundations/colors`, `#/foundations/typography`, `#/foundations/sizes`, `#/foundations/icons`, `#/foundations/states`
-- 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
+- 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `number-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
 - 패턴: `#/patterns/empty-state`, `#/patterns/form/profile`, `#/patterns/form/project`, `#/patterns/form/booking`, `#/patterns/layout/app-shell`, `#/patterns/layout/dashboard`, `#/patterns/layout/list-detail`, `#/patterns/layout/tabs`, `#/patterns/layout/focused`, `#/patterns/page/list`, `#/patterns/page/detail`, `#/patterns/page/settings`, `#/patterns/page/login`
 
 기존 `#overview`, `#foundations`, `#components`, `#states`, `#/components/empty-state` 주소도 해당 페이지로 연결됩니다.
@@ -68,6 +68,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - 라디오, 둥근 토글
 - 탭: 클릭 및 방향키·Home·End 탐색
 - 입력 그룹: 텍스트 프리픽스, 검색·이메일 아이콘, 단위 서픽스, 검색 지우기와 비밀번호 표시·숨기기
+- Number fields: 정수·소수 허용 자릿수와 천 단위 콤마, 포커스 시 전체 선택 옵션, 1·10·0.1·0.5 증감, 최소·최대와 sm/md/lg
 - 글자 수가 표시되는 텍스트 영역
 - 배지, 인라인 알림
 - 아코디언

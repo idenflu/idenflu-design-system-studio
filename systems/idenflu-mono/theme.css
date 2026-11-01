@@ -27,6 +27,7 @@
   --text-secondary:#b0b5bf;
   --text-muted:#939aa5;
   --border:#646d78;
+  --border-hover:#828a96;
   --border-subtle:#41464e;
   --divider:#343941;
   --disabled:#272a2f;
@@ -124,11 +125,11 @@
 :root[data-theme="dark"] textarea::placeholder { color:var(--disabled-text); opacity:1; }
 :root[data-theme="dark"] .text-input:disabled,
 :root[data-theme="dark"] .select-trigger:disabled { background:var(--disabled); }
-:root[data-theme="dark"] .text-input:hover:not(:disabled):not(:focus):not(.is-focused):not([aria-invalid="true"]),
+:root[data-theme="dark"] .text-input:hover:not(:disabled):not([readonly]):not(:focus):not(.is-focused):not([aria-invalid="true"]),
 :root[data-theme="dark"] .custom-select:not(.is-open) > .select-trigger:hover:not(:disabled):not(:focus-visible),
 :root[data-theme="dark"] .multi-inline-control:hover:not(:focus-within),
 :root[data-theme="dark"] .search-select-control:hover:not(:focus-within),
-:root[data-theme="dark"] .custom-select[data-multiselect] .multi-search-field:hover:not(:focus-within) { border-color:#828a96; }
+:root[data-theme="dark"] .custom-select[data-multiselect] .multi-search-field:hover:not(:focus-within) { border-color:var(--border-hover); }
 :root[data-theme="dark"] .custom-select.is-open > .select-trigger,
 :root[data-theme="dark"] .custom-select.is-open > .multi-inline-control,
 :root[data-theme="dark"] .search-select.is-open > .search-select-control { border-color:transparent; }

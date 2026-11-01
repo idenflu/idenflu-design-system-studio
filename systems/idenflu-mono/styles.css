@@ -15,6 +15,7 @@
   --text-muted: #909299;
   --surface: #f5f6f8;
   --border: #c6c6cc;
+  --border-hover: #a9a9b2;
   --border-subtle: #dadadd;
   --divider: #e2e2e5;
   --disabled: #ececef;
@@ -105,7 +106,7 @@ h3 { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -.2px
 .input-example .state-caption { margin-bottom: 3px; }
 .text-input { display: block; width: 100%; height: var(--control-height); padding: calc((var(--control-height) - 22px) / 2) var(--control-px, 12px); border: 1px solid var(--border); border-radius: 0; background: #fff; color: var(--text); font-size: 14px; line-height: 20px; font-weight: 400; appearance: none; transition: border-color 120ms ease; }
 .text-input::placeholder { color: var(--disabled-text); opacity: 1; }
-.text-input:hover:not(:disabled):not(:focus):not(.is-focused):not([aria-invalid="true"]) { border-color: #b1b1b8; }
+.text-input:hover:not(:disabled):not([readonly]):not(:focus):not(.is-focused):not([aria-invalid="true"]) { border-color: var(--border-hover); }
 .text-input:focus { outline: none; }
 .text-input:focus, .text-input.is-focused { border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .text-input:disabled { background: var(--surface); color: var(--disabled-text); border-color: var(--border); box-shadow: none; cursor: not-allowed; }
@@ -208,8 +209,9 @@ h3 { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -.2px
 .input-group input { width: 100%; min-width: 0; padding: 8px 12px; border: 0; outline: none; background: transparent; color: var(--text); }
 .input-group:focus-within { box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .field-stack > div > .component-helper { margin-top: 6px; }
-.text-area { display: block; width: 100%; min-height: 104px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 0; background: #fff; color: var(--text); font-size: 14px; line-height: 22px; resize: vertical; }
+.text-area { display: block; width: 100%; min-height: 104px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 0; background: #fff; color: var(--text); font-size: 14px; line-height: 22px; resize: vertical; transition: border-color 120ms ease; }
 .text-area::placeholder { color: var(--disabled-text); }
+.text-area:hover:not(:disabled):not([readonly]):not(:focus):not([aria-invalid="true"]) { border-color: var(--border-hover); }
 .text-area:focus { outline: none; border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .field-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 6px; }
 .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }

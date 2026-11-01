@@ -133,6 +133,9 @@
 .date-field .date-text { flex:1; height:100%; border:0; background:transparent; }
 .date-field .date-text:focus { box-shadow:none; }
 .date-range-fields { position:relative; display:grid; grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr) calc(var(--control-height) - 2px); align-items:center; height:var(--control-height); border:1px solid var(--border); background:#fff; }
+.date-field, .date-range-fields { transition:border-color 120ms ease; }
+.date-field:hover:not(:focus-within):not(.has-error):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])),
+.date-range-fields:hover:not(:focus-within):not(.has-error):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])) { border-color:var(--border-hover); }
 .date-range-fields.has-error { border-color:var(--danger); }
 .date-range-fields .date-range-input { height:100%; padding-inline:4px; border:0; background:transparent; text-align:center; }
 .date-range-fields .date-range-input:focus { box-shadow:none; }
