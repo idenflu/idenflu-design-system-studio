@@ -1,0 +1,14 @@
+/* Searchable select shares the field and select size and interaction tokens. */
+.search-select-control { position:relative; display:flex; align-items:center; width:100%; height:var(--control-height); border:1px solid var(--border); border-radius:0; background:#fff; }
+.search-select-control:hover { border-color:#a9a9b2; }
+.search-select-control:focus-within, .search-select.is-open > .search-select-control { border-color:transparent; }
+.search-select-control:focus-within::after, .search-select.is-open > .search-select-control::after { content:""; position:absolute; inset:-1px; z-index:2; box-shadow:inset 0 0 0 2px var(--focus-on-light); pointer-events:none; }
+.search-select-input { display:block; flex:1 1 auto; min-width:0; width:100%; height:100%; margin:0; padding:0 var(--control-px); border:0; border-radius:0; outline:none; background:transparent; color:var(--text); font:inherit; font-size:14px; line-height:20px; }
+.search-select-input::placeholder { color:var(--disabled-text); opacity:1; }
+.search-select .search-select-clear, .search-select .search-select-toggle { flex:0 0 calc(var(--control-height) - 2px); }
+.search-select.is-open .search-select-toggle .icon-caret { transform:rotate(180deg); }
+.search-select > .select-popup { top:calc(var(--control-height) + 6px); }
+.search-select.opens-up > .select-popup { top:auto; bottom:calc(100% + 6px); }
+.search-select-empty { margin:0; padding:10px var(--control-px); color:var(--text-secondary); font-size:14px; line-height:20px; }
+.search-select-help { margin-top:8px; }
+.search-select-example > .component-helper { margin-top:8px; }
