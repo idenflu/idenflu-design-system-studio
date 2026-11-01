@@ -1,6 +1,6 @@
 /* Search within either multi-select presentation using the shared field tokens. */
-.custom-select[data-multiselect] .multi-search-field { position:relative; display:flex; align-items:center; gap:8px; min-width:0; height:var(--control-height); margin:4px 4px 8px; padding-left:var(--control-px); border:1px solid var(--border); background:#fff; }
-.custom-select[data-multiselect] .multi-search-field:hover { border-color:#a9a9b2; }
+.custom-select[data-multiselect] .multi-search-field { position:relative; display:flex; align-items:center; gap:8px; min-width:0; height:var(--control-height); margin:4px 4px 8px; padding-left:var(--control-px); border:1px solid var(--border); background:#fff; transition:border-color 120ms ease; }
+.custom-select[data-multiselect] .multi-search-field:hover:not(:focus-within):not(.is-invalid):not([aria-invalid="true"]):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])) { border-color:var(--border-hover); }
 .custom-select[data-multiselect] .multi-search-field:focus-within { border-color:transparent; }
 .custom-select[data-multiselect] .multi-search-field:focus-within::after { content:""; position:absolute; inset:-1px; box-shadow:inset 0 0 0 2px var(--focus-on-light); pointer-events:none; }
 .custom-select[data-multiselect] .multi-search-field > .ui-icon { flex:0 0 var(--icon-size); color:var(--text-secondary); }
