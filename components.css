@@ -59,6 +59,27 @@
 .select-option[aria-disabled="true"], .select-option[aria-disabled="true"] .option-description { color: var(--disabled-text); cursor: not-allowed; }
 .select-option[aria-selected="true"].is-active { box-shadow: inset 0 0 0 1px #d6def7; }
 
+/* Multi-select shares the single-select surface and size tokens. */
+.select-options[aria-multiselectable="true"]:focus { outline: none; }
+.select-options[aria-multiselectable="true"] .select-option.is-active { box-shadow: inset 0 0 0 2px var(--focus-on-light); }
+.select-options[aria-multiselectable="true"] .select-option[aria-disabled="true"] { background: transparent; box-shadow: none; }
+.multi-help { margin-top: 8px; }
+.multi-selection-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.multi-selected { display: flex; flex-wrap: wrap; gap: 8px; }
+.multi-clear { color: var(--text-secondary); }
+
+/* Selected tags live inside the field without nesting interactive controls. */
+.multi-inline-control { position: relative; display: flex; align-items: center; min-height: var(--control-height); border: 1px solid var(--border); background: #fff; }
+.multi-inline-control:hover { border-color: #a9a9b2; }
+.multi-inline-control:focus-within, .custom-select.is-open > .multi-inline-control { border-color: transparent; }
+.multi-inline-control:focus-within::after, .custom-select.is-open > .multi-inline-control::after { content: ""; position: absolute; inset: -1px; z-index: 2; box-shadow: inset 0 0 0 2px var(--focus-on-light); pointer-events: none; }
+.multi-inline-tags { display: flex; flex: 1 1 auto; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; min-height: calc(var(--control-height) - 2px); padding: 5px 6px; }
+.multi-inline-placeholder { color: var(--text-muted); padding-inline: 5px; }
+.multi-inline-tags .multi-inline-chip { min-height: 24px; max-width: 100%; padding: 1px 6px 1px 8px; gap: 4px; background: var(--surface); border: 1px solid var(--divider); }
+.multi-inline-tags .multi-inline-chip:hover { background: #e9e9ed; }
+.multi-inline-tags .multi-inline-chip img { width: 14px; height: 14px; flex: 0 0 14px; }
+.custom-select.is-open .multi-inline-trigger .icon-caret { transform: rotate(180deg); }
+
 /* Prefixes, suffixes and inline field actions share the control size. */
 .route-text-fields .field-examples-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 32px; max-width: 960px; }
 .field-example--wide { grid-column: 1 / -1; }

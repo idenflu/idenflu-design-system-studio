@@ -64,7 +64,7 @@
     const refresh = () => {
       const percent = (Number(range.value) - Number(range.min)) / (Number(range.max) - Number(range.min)) * 100;
       range.style.setProperty("--fill", `${percent}%`);
-      const thumbWidth = parseFloat(getComputedStyle(range).getPropertyValue("--range-thumb-width")) || 18;
+      const thumbWidth = parseFloat(getComputedStyle(range).getPropertyValue("--range-thumb-width")) || 12;
       const offset = thumbWidth * (0.5 - percent / 100);
       range.style.setProperty("--fill-position", `calc(${percent}% + ${offset}px)`);
       update(range.value);
@@ -85,6 +85,12 @@
     document.querySelector("#step-slider").setAttribute("aria-valuetext", `${value}%`);
   });
   connectRange("#disabled-slider", () => {});
+  ["sm", "md", "lg"].forEach((size) => {
+    connectRange(`#slider-size-${size}`, (value) => {
+      document.querySelector(`#slider-size-${size}-value`).textContent = `${value}%`;
+      document.querySelector(`#slider-size-${size}`).setAttribute("aria-valuetext", `${value}%`);
+    });
+  });
 
   const slides = [
     ["명확한 위계", "중요한 정보를 먼저 보여주고, 나머지는 자연스럽게 이어갑니다."],

@@ -13,8 +13,8 @@
   --control-px: var(--size-md-padding);
   --control-gap: 8px;
   --icon-size: var(--size-md-icon);
-  --range-thumb-width: 18px;
-  --range-thumb-height: 22px;
+  --range-thumb-width: 12px;
+  --range-thumb-height: 20px;
   --choice-size: 18px;
   --switch-width: 48px;
   --switch-height: 28px;
@@ -26,8 +26,8 @@
   --control-px: var(--size-sm-padding);
   --control-gap: 6px;
   --icon-size: var(--size-sm-icon);
-  --range-thumb-width: 16px;
-  --range-thumb-height: 20px;
+  --range-thumb-width: 10px;
+  --range-thumb-height: 18px;
   --choice-size: 16px;
   --switch-width: 40px;
   --switch-height: 24px;
@@ -39,8 +39,8 @@
   --control-px: var(--size-md-padding);
   --control-gap: 8px;
   --icon-size: var(--size-md-icon);
-  --range-thumb-width: 18px;
-  --range-thumb-height: 22px;
+  --range-thumb-width: 12px;
+  --range-thumb-height: 20px;
   --choice-size: 18px;
   --switch-width: 48px;
   --switch-height: 28px;
@@ -52,8 +52,8 @@
   --control-px: var(--size-lg-padding);
   --control-gap: 10px;
   --icon-size: var(--size-lg-icon);
-  --range-thumb-width: 20px;
-  --range-thumb-height: 24px;
+  --range-thumb-width: 14px;
+  --range-thumb-height: 22px;
   --choice-size: 20px;
   --switch-width: 56px;
   --switch-height: 32px;

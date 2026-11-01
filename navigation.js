@@ -15,6 +15,7 @@
     foundations: "foundations/colors",
     states: "foundations/states",
     components: "components/buttons",
+    "components/empty-state": "patterns/empty-state",
   };
   let menuOpen = false;
 

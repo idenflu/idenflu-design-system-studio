@@ -26,10 +26,10 @@ python3 -m http.server 4173 --bind 127.0.0.1
 
 - 개요: `#/overview`
 - 기초: `#/foundations/colors`, `#/foundations/typography`, `#/foundations/sizes`, `#/foundations/icons`, `#/foundations/states`
-- 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `empty-state`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
-- 화면 예시: `#/patterns/profile`
+- 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
+- 패턴: `#/patterns/empty-state`, `#/patterns/profile`
 
-기존 `#overview`, `#foundations`, `#components`, `#states` 주소도 새 페이지로 연결됩니다.
+기존 `#overview`, `#foundations`, `#components`, `#states`, `#/components/empty-state` 주소도 해당 페이지로 연결됩니다.
 
 ## 일관된 사이즈
 
@@ -42,7 +42,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 | lg | 44px | 16px | 18px |
 
 컴포넌트 하나 또는 컨테이너에 `data-size`를 적용하면 하위 버튼·입력창·셀렉트·날짜 선택기·아이콘이 같은 사이즈를 사용합니다.
-체크박스·라디오·토글·배지는 각 컨트롤의 형태에 맞춰 함께 조정됩니다. 칩은 sm/md/lg에서 각각 높이 32/38/44px로 적용됩니다.
+체크박스·라디오·토글·배지는 각 컨트롤의 형태에 맞춰 함께 조정됩니다. 칩과 슬라이더는 sm/md/lg에서 각각 높이 32/38/44px로 적용됩니다.
 
 ```html
 <button class="button" data-size="sm">저장</button>
@@ -56,6 +56,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 
 - 버튼: Primary, Secondary, Outline, Ghost, Danger, Loading, 버튼 그룹
 - 커스텀 셀렉트: 설명·선택 표시·비활성 옵션, 방향키·Home·End·Enter·Escape·Tab, 바깥 클릭 닫기
+- 멀티 셀렉트: 여러 항목 선택·해제, 입력 영역 안팎의 선택 칩과 전체 초기화, 키보드 목록 탐색
 - 아이콘 포함 버튼, 아이콘 전용 버튼, 단일 선택 및 연관 행동 버튼 그룹
 - 체크박스: 전체 선택과 부분 선택
 - 라디오, 둥근 토글
@@ -68,12 +69,12 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - 닫을 수 있는 토스트 알림
 - 테이블과 3페이지 페이지네이션
 - 접고 펼치는 트리와 항목 선택, 선택 및 삭제 가능한 칩
-- 기본·선택 목록, 진행률, 범위 슬라이더와 콘텐츠 슬라이드
+- 기본·선택 목록, 진행률(두께·상태색·분할형·원형), 범위 슬라이더와 콘텐츠 슬라이드
 - 슬라이더: 연속·10단계·비활성 예제, 방향키 및 Home/End 조작
 - 날짜 선택: 직접 입력과 날짜 검증, 단일 날짜·기간 선택, 달력 월 이동과 초기화
 - 달력 키보드 조작: Alt+방향키 아래로 열기, 방향키·Home·End·Page Up/Down 이동, Enter 선택, Esc 닫기
 - 툴팁, 드롭다운 메뉴, 팝오버, 드로어
-- 빈 상태, 스켈레톤·스피너, 파일 선택, 아바타, 스테퍼, 카드
+- 스켈레톤, 다양한 스피너(링·듀얼 링·도트·막대), 파일 선택, 사각형·원형 아바타, 스테퍼, 카드
 - 파일 선택 예제는 로컬에서 파일 정보를 확인하며 서버로 전송하지 않습니다.
 
 서버나 외부 서비스로 데이터를 보내지 않으며 새로고침하면 폼이 초기화됩니다.
@@ -91,6 +92,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - `components.css`: 커스텀 셀렉트, 아이콘, 입력창과 사이즈별 스타일
 - `extras.css`, `extras.js`: 트리, 칩, 리스트, 진행률, 슬라이더, 날짜 선택 예제
 - `additional.css`, `additional.js`: 추가 컴포넌트 스타일과 예제 동작
+- `multi-select.js`: 멀티 셀렉트 선택·초기화 및 키보드 탐색
 - `datepicker.js`: 날짜 직접 입력, 검증 및 단일·기간 달력 선택
 - `navigation.js`: 페이지 전환·브라우저 기록·모바일 메뉴 포커스 관리
 - `script.js`, `components.js`: 컴포넌트별 동작
