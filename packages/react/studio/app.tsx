@@ -130,7 +130,7 @@ export function LoadingExample() {
   'components/feedback':'<Badge variant="success">완료</Badge>\n<Alert><strong>안내</strong><p>내용을 확인하세요.</p></Alert>',
   'components/accordion':'<Accordion><AccordionItem title="제목">내용</AccordionItem></Accordion>',
   'components/overlays':`import { useState } from 'react';
-import { Button, Dialog, Toast } from '@idenflu/mono-react';
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Toast } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function OverlayExample() {
@@ -138,13 +138,15 @@ export function OverlayExample() {
   const [notice, setNotice] = useState(false);
   return <>
     <Button onClick={() => setOpen(true)}>안내 열기</Button>
-    <Dialog open={open} onOpenChange={setOpen} closeOnBackdrop
+    <Dialog variant="divided" open={open} onOpenChange={setOpen} closeOnBackdrop
             aria-labelledby="notice-title" aria-describedby="notice-description">
-      <h2 id="notice-title">공유 범위 안내</h2>
-      <p id="notice-description">초대한 팀원만 프로젝트를 볼 수 있습니다.</p>
-      <div className="dialog-actions">
+      <DialogHeader><h2 id="notice-title">공유 범위 안내</h2></DialogHeader>
+      <DialogBody>
+        <p id="notice-description">초대한 팀원만 프로젝트를 볼 수 있습니다.</p>
+      </DialogBody>
+      <DialogFooter>
         <Button onClick={() => { setOpen(false); setNotice(true); }}>확인</Button>
-      </div>
+      </DialogFooter>
     </Dialog>
     {notice && <Toast variant="success" onDismiss={() => setNotice(false)}>
       공유 범위를 확인했습니다.

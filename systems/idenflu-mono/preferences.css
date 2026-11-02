@@ -53,15 +53,20 @@
 }
 #studio-settings-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
 #studio-settings-dialog::backdrop { background: var(--overlay-backdrop); }
-.studio-preferences-header { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding: 24px; border-bottom: 1px solid var(--divider); }
+.studio-preferences-header { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--divider); }
 .studio-preferences-header h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -.3px; }
-.studio-preferences-header p { margin-top: 6px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
+.studio-preferences-header p { margin-top: 2px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
 .studio-preferences-header .studio-preferences-hint { margin: 0 0 4px; }
 #studio-preferences-close { flex: 0 0 32px; width: 32px; height: 32px; padding: 8px; }
-.studio-preferences-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-gutter: stable; }
-.studio-preferences-body > section { margin-top: 24px; }
-.studio-preferences-field + .studio-preferences-field { margin-top: 20px; }
-.studio-preferences-label { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.studio-preferences-body { min-height: 0; padding: 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.studio-preferences-body > section + section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--divider); }
+.studio-preferences-section-title { margin: 0 0 8px; font-size: 14px; line-height: 22px; font-weight: 600; }
+.studio-preferences-field { display: grid; grid-template-columns: 88px minmax(0, 1fr) 48px; align-items: center; gap: 12px; min-height: 40px; }
+.studio-preferences-field + .studio-preferences-field { margin-top: 8px; }
+.studio-preferences-label { display: contents; }
+.studio-preferences-label label { grid-column: 1; grid-row: 1; }
+.studio-preferences-label output { grid-column: 3; grid-row: 1; text-align: end; }
+.studio-preferences-field .range-input { grid-column: 2; grid-row: 1; min-width: 0; }
 .studio-preferences-label label { color: var(--text); font-size: 14px; line-height: 22px; font-weight: 500; }
 .studio-preferences-label output { color: var(--text-secondary); font-size: 14px; line-height: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .studio-preferences-hint { margin-top: 2px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
@@ -75,10 +80,10 @@
 #studio-preferences-preview .button { justify-self: start; width: auto; }
 #studio-preview-feedback:empty { display: none; }
 #studio-preview-feedback { color: var(--text-secondary); }
-.studio-preferences-footer { padding: 16px 24px 20px; border-top: 1px solid var(--divider); }
-.studio-preferences-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.studio-preferences-footer { padding: 12px 20px; border-top: 1px solid var(--divider); }
+.studio-preferences-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .studio-preferences-actions .button { flex: 1 1 auto; width: auto; font-size: 14px; line-height: 20px; }
-#studio-preferences-status { min-height: 18px; margin-top: 12px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
+#studio-preferences-status { min-height: 18px; margin-top: 6px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
 #studio-preferences-storage-note { margin-top: 4px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
 
 /* Documentation chrome remains usable at the largest body settings. */
@@ -101,9 +106,10 @@
 }
 @media (max-width: 380px) {
   .docs-topbar { padding-inline: 16px; }
-  .studio-preferences-header { padding: 20px; }
-  .studio-preferences-body { padding: 20px; }
-  .studio-preferences-footer { padding-inline: 20px; }
+  .studio-preferences-header { padding-inline: 16px; }
+  .studio-preferences-body { padding-inline: 16px; }
+  .studio-preferences-field { grid-template-columns: 76px minmax(0, 1fr) 44px; gap: 8px; }
+  .studio-preferences-footer { padding-inline: 16px; }
 }
 @media (max-height: 520px) {
   .studio-preferences-header { padding-block: 12px; }
@@ -133,6 +139,7 @@
   --primary-control-pressed: var(--color-blue-600);
   --text-on-primary: var(--color-white);
   --focus-on-light: var(--color-blue-450);
+  --info-surface: var(--color-blue-50);
   --field-background: var(--canvas);
 }
 :root[data-theme="dark"] #studio-settings-dialog {
@@ -150,20 +157,28 @@
   --primary-control-hover: var(--color-blue-700);
   --primary-control-pressed: var(--color-blue-750);
   --focus-on-light: var(--color-blue-250);
+  --info-surface: var(--color-blue-850);
 }
-.studio-preferences-colors h3 { margin: 0 0 12px; font-size: 16px; line-height: 24px; }
-.studio-preferences-themes { display: flex; gap: 8px; margin-bottom: 8px; }
-.studio-preferences-themes .button { flex: 1; }
-.studio-preferences-themes [aria-pressed="true"] { border-color: var(--primary); color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
-.studio-preferences-color-group { min-width: 0; padding: 0; margin: 24px 0 0; border: 0; }
-.studio-preferences-color-group legend { margin-bottom: 12px; font-size: 14px; font-weight: 600; }
-.studio-preferences-color-field + .studio-preferences-color-field { margin-top: 16px; }
-.studio-preferences-color-field > label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin-bottom: 6px; font-weight: 500; }
-.studio-preferences-color-field small { color: var(--text-secondary); font-size: 12px; font-weight: 400; }
-.studio-preferences-color-inputs { display: grid; grid-template-columns: 38px minmax(0, 1fr) 32px; align-items: center; gap: 8px; }
-.studio-preferences-color-inputs input[type="color"] { display: block; width: 38px; height: 38px; padding: 3px; border: 1px solid var(--border); background: var(--canvas); cursor: pointer; }
-.studio-preferences-color-inputs .text-input { min-width: 0; font-variant-numeric: tabular-nums; }
-.studio-preferences-color-inputs .icon-button { width: 32px; height: 32px; padding: 0; font-size: 20px; }
+.studio-preferences-theme-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.studio-preferences-theme-row .studio-preferences-section-title { margin: 0; }
+.studio-preferences-color-group { min-width: 0; padding: 0; margin: 16px 0 0; border: 0; }
+.studio-preferences-color-group legend { width: 100%; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--divider); font-size: 12px; line-height: 18px; font-weight: 600; color: var(--text-secondary); }
+.studio-preferences-color-field { display: grid; grid-template-columns: minmax(0, 1fr) 160px; align-items: center; gap: 12px; min-height: 40px; }
+.studio-preferences-color-field + .studio-preferences-color-field { margin-top: 4px; }
+.studio-preferences-color-field > label { display: flex; flex-direction: column; min-width: 0; font-weight: 500; font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.studio-preferences-color-field small { color: var(--text-secondary); font-size: 11px; line-height: 16px; font-weight: 400; }
+.studio-preferences-color-inputs { --control-height: 32px; display: grid; grid-template-columns: 28px minmax(0, 1fr) 28px; align-items: center; gap: 6px; }
+.studio-preferences-color-inputs input[type="color"] { display: block; width: 28px; height: 28px; padding: 2px; border: 1px solid var(--border); background: var(--canvas); cursor: pointer; }
+.studio-preferences-color-inputs .text-input { min-width: 0; padding-inline: 8px; font-variant-numeric: tabular-nums; }
+.studio-preferences-color-inputs .icon-button { width: 28px; height: 32px; padding: 0; font-size: 18px; }
+@media (max-width: 380px) {
+  .studio-preferences-color-field { grid-template-columns: minmax(0, 1fr) 144px; gap: 8px; }
+  .studio-preferences-color-field > label { font-size: 12px; line-height: 18px; }
+  .studio-preferences-color-field small { font-size: 10px; line-height: 14px; }
+  .studio-preferences-color-inputs { grid-template-columns: 24px minmax(0, 1fr) 24px; gap: 4px; }
+  .studio-preferences-color-inputs input[type="color"] { width: 24px; height: 28px; }
+  .studio-preferences-color-inputs .icon-button { width: 24px; }
+}
 @media (forced-colors: active) {
   :root #studio-settings-dialog, :root[data-theme="dark"] #studio-settings-dialog { --canvas: Canvas; --surface: Canvas; --field-background: Canvas; --text: CanvasText; --text-secondary: CanvasText; --border: CanvasText; --divider: CanvasText; --primary: LinkText; --primary-control: Highlight; --text-on-primary: HighlightText; --focus-on-light: Highlight; }
 }

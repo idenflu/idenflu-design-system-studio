@@ -172,6 +172,22 @@ import { Icon, Select } from '@idenflu/mono-react';
 
 `Dialog`는 `open`과 `onOpenChange`로 제어하며, 제목과 설명을 `aria-labelledby`·`aria-describedby`로 연결합니다. `closeOnBackdrop`은 배경 클릭으로 닫을지 정하며 기본값은 `false`입니다. Escape는 취소로 처리합니다.
 
+`variant="divided"`는 `DialogHeader`·`DialogBody`·`DialogFooter` 사이에 구분선을 표시합니다. 세 영역을 `Dialog`의 직접 자식으로 배치하면 긴 내용은 본문에서만 스크롤되고 헤더와 하단 버튼은 유지됩니다. `DialogBody`는 키보드 스크롤을 위해 기본 `tabIndex={0}`을 제공하며 필요한 경우 재정의할 수 있습니다. 하단에서 본문의 폼을 제출할 때는 버튼의 `form` 속성을 본문 폼의 `id`에 연결합니다.
+
+```tsx
+import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu/mono-react';
+
+<Dialog variant="divided" open={open} onOpenChange={setOpen}
+        aria-labelledby="project-title">
+  <DialogHeader><h2 id="project-title">프로젝트 안내</h2></DialogHeader>
+  <DialogBody><p>프로젝트의 공유 범위를 확인해주세요.</p></DialogBody>
+  <DialogFooter>
+    <Button variant="outline" onClick={() => setOpen(false)}>취소</Button>
+    <Button onClick={() => setOpen(false)}>확인</Button>
+  </DialogFooter>
+</Dialog>
+```
+
 `Toast`의 `variant`에는 `info`·`success`·`warning`·`danger`를 지정하고, `action`에 재시도·실행 취소 버튼을 넣을 수 있습니다. 기본 알림 역할은 `status`이며 `danger`는 `alert`입니다. 자동으로 닫히지 않으므로 표시 상태와 닫기 동작을 앱에서 연결합니다.
 
 ```tsx

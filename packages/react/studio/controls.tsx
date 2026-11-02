@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, Icon, Slider, Tooltip } from '../src';
+import { Button, Dialog, Icon, Segmented, Slider, Tooltip } from '../src';
 
 type PreferenceKey = 'fontSize' | 'lineHeight' | 'spacing' | 'controlHeight' | 'radius';
 type Theme = 'light' | 'dark';
@@ -87,10 +87,11 @@ export function StudioSettings() {
   return <>
     <Tooltip content="화면 조정"><button type="button" className="icon-button studio-settings-open" aria-label="화면 조정" aria-haspopup="dialog" aria-controls="studio-settings-dialog" onClick={() => setOpen(true)}><Icon name="settings" /></button></Tooltip>
     {createPortal(<Dialog id="studio-settings-dialog" closeOnBackdrop open={open} onOpenChange={setOpen} aria-labelledby="react-settings-title" aria-describedby="react-settings-description">
-      <header className="studio-preferences-header"><h2 id="react-settings-title">화면 조정</h2><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={() => setOpen(false)}><Icon name="close" /></button></header>
+      <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={() => setOpen(false)}><Icon name="close" /></button></header>
       <div className="studio-preferences-body" ref={body}>
-        <p id="react-settings-description" className="component-helper">이 브라우저에 화면 설정을 저장합니다.</p>
-        <section aria-label="조정 항목">{fields.map(([key, label]) => {
+        <section aria-labelledby="studio-layout-title">
+          <h3 id="studio-layout-title" className="studio-preferences-section-title">크기·간격</h3>
+          {fields.map(([key, label]) => {
           const range = window.IdenfluPreferences.ranges[key];
           const min = key === 'lineHeight' ? Math.max(range.min, values.fontSize + 4) : key === 'controlHeight' ? Math.max(range.min, Math.ceil((values.fontSize + 18) / 2) * 2) : range.min;
           const unit = `${values[key]}${key === 'spacing' ? '%' : 'px'}`;
@@ -98,15 +99,12 @@ export function StudioSettings() {
           return <div className="studio-preferences-field" key={key}><div className="studio-preferences-label"><label htmlFor={id}>{label}</label><output htmlFor={id}>{unit}</output></div><Slider id={id} min={min} max={range.max} step={range.step} value={values[key]} aria-valuetext={unit} onValueChange={value => window.IdenfluPreferences.set({[key]:value})} /></div>;
         })}</section>
         <section aria-labelledby="studio-color-title" className="studio-preferences-colors">
-          <h3 id="studio-color-title">색상</h3>
-          <div className="studio-preferences-themes" role="group" aria-label="색상을 조정할 테마">
-            <Button variant="outline" aria-pressed={palette.theme === 'light'} onClick={() => selectTheme('light')}>라이트</Button>
-            <Button variant="outline" aria-pressed={palette.theme === 'dark'} onClick={() => selectTheme('dark')}>다크</Button>
+          <div className="studio-preferences-theme-row">
+            <h3 id="studio-color-title" className="studio-preferences-section-title">색상</h3>
+            <Segmented label="색상을 조정할 테마" size="sm" value={palette.theme} options={[{value:'light',label:'라이트'},{value:'dark',label:'다크'}]} onValueChange={value => selectTheme(value === 'dark' ? 'dark' : 'light')} />
           </div>
-          <p className="studio-preferences-hint">선택한 테마에만 적용됩니다.</p>
           {palette.forcedColors ? <p className="studio-preferences-hint">고대비 모드에서는 시스템 색상을 사용합니다. 색상 조정은 고대비 모드를 해제한 뒤 사용할 수 있습니다.</p> : <>
-          <p id="studio-color-format" className="studio-preferences-hint">색상 선택기를 열거나 HEX 코드(#RRGGBB)를 입력하세요.</p>
-          <p className="studio-preferences-hint">버튼 글자색과 상호작용 색상은 읽기 쉬운 대비로 자동 조정됩니다.</p>
+          <p id="studio-color-format" className="studio-preferences-hint">선택한 테마의 색상 또는 HEX를 수정하세요. 버튼 색상은 읽기 쉬운 대비로 자동 보정됩니다.</p>
           <div id="studio-color-contrast" className="studio-preferences-contrast" role="status" aria-live="polite" aria-atomic="true">
             {palette.warnings.length > 0 && <><p>일부 글자색의 대비가 권장 기준 4.5:1보다 낮습니다.</p><ul>{palette.warnings.map(({label,ratio}) => <li key={label}>{label}: {ratio.toFixed(2)}:1</li>)}</ul><p>글자색이나 배경색을 조정해주세요.</p></>}
           </div>

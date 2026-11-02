@@ -3,9 +3,10 @@ import { useEscapeLayer } from './escape-layer';
 const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
+export type DialogProps = DismissibleProps & { closeOnBackdrop?: boolean; variant?: 'default' | 'divided' } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>;
 
 /** Native modal dialog with keyboard focus wrapping and restoration. */
-export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, onClick, onKeyDown, ...props }: DismissibleProps & { closeOnBackdrop?: boolean } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>) {
+export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, variant = 'default', onClick, onKeyDown, ...props }: DialogProps) {
   const ref = React.useRef<HTMLDialogElement>(null);
   useClientLayoutEffect(() => {
     const dialog = ref.current;
@@ -14,7 +15,7 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     else if (!open && dialog.open) dialog.close();
   }, [open]);
   const isTopLayer = useEscapeLayer(open, ref, () => onOpenChange(false));
-  return <dialog {...props} ref={ref} className={`dialog ${className}`} onKeyDown={event => {
+  return <dialog {...props} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} onKeyDown={event => {
     onKeyDown?.(event);
     if (event.defaultPrevented || event.key !== 'Tab') return;
     const dialog = event.currentTarget;
@@ -25,6 +26,16 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
   }} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); if (isTopLayer()) onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
 }
+
+export const DialogHeader = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DialogHeader({className = '', ...props}, ref) {
+  return <header {...props} ref={ref} className={`dialog-header${className ? ` ${className}` : ''}`} />;
+});
+export const DialogBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function DialogBody({className = '', tabIndex = 0, ...props}, ref) {
+  return <div {...props} ref={ref} tabIndex={tabIndex} className={`dialog-body${className ? ` ${className}` : ''}`} />;
+});
+export const DialogFooter = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DialogFooter({className = '', ...props}, ref) {
+  return <footer {...props} ref={ref} className={`dialog-footer${className ? ` ${className}` : ''}`} />;
+});
 
 export function Drawer({ className = '', closeOnBackdrop = true, ...props }: React.ComponentProps<typeof Dialog>) {
   return <Dialog {...props} closeOnBackdrop={closeOnBackdrop} className={`demo-drawer ${className}`} />;

@@ -208,6 +208,7 @@ test('settings support keyboard adjustment, modal focus and Escape return', asyn
   await page.keyboard.press('Enter');
   await expect(page.locator('#studio-settings-dialog')).toBeVisible();
   const font = page.locator('#react-pref-fontSize');
+  await expect(font).toBeFocused();
   await font.focus();
   await font.press('ArrowRight');
   await expect(font).toHaveValue('15');

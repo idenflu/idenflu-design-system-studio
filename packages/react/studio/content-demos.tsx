@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, Icon, Tabs, TextField, Toast, Tooltip } from '../src';
+import { Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip } from '../src';
 import { Section } from './demo-layout';
 
-function DetailRows({items}: {items:readonly (readonly [string, string])[]}) {
-  return <dl className="detail-list">{items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>;
+function DetailRows({items, style}: {items:readonly (readonly [string, string])[]; style?:React.CSSProperties}) {
+  return <dl className="detail-list" style={style}>{items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>;
 }
 
 export function TabsDemos() {
@@ -57,7 +57,8 @@ export function AccordionDemos() {
 }
 
 export function OverlayDemos() {
-  const [dialog, setDialog] = React.useState<'info' | 'delete' | 'form' | null>(null);
+  const [dialog, setDialog] = React.useState<'info' | 'delete' | 'form' | 'divided' | 'divided-scroll' | null>(null);
+  const [dividedFeedback, setDividedFeedback] = React.useState('');
   const [name, setName] = React.useState('');
   const [error, setError] = React.useState('');
   const [feedback, setFeedback] = React.useState('');
@@ -118,6 +119,34 @@ export function OverlayDemos() {
         </form>
       </Dialog>
       <p className="react-studio-caption">다이얼로그 안에서는 Tab으로 이동하고 Escape로 취소할 수 있습니다. 취소하면 실행 버튼으로 돌아갑니다.</p>
+    </Section>
+    <Section title="구분선이 있는 다이얼로그" description="헤더·본문·하단을 회색 구분선으로 나눕니다. 긴 내용은 본문 안에서만 스크롤되며, 제목과 하단 버튼은 계속 표시됩니다.">
+      <div className="react-studio-field-grid">
+        <div className="react-studio-example"><h3 className="react-studio-example-title">기본 구성</h3><p className="react-studio-caption">제목과 닫기, 상세 내용, 확인 버튼을 세 영역으로 구성합니다.</p><div className="react-studio-row"><Button variant="outline" onClick={() => setDialog('divided')}>구분선 타입 열기</Button></div></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">긴 본문</h3><p className="react-studio-caption">본문을 스크롤해도 헤더와 하단 버튼의 위치는 유지됩니다.</p><div className="react-studio-row"><Button variant="outline" onClick={() => setDialog('divided-scroll')}>스크롤 타입 열기</Button></div></div>
+      </div>
+      <p role="status" className="component-helper">{dividedFeedback}</p>
+      <Dialog variant="divided" open={dialog === 'divided'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-divided-title" aria-describedby="studio-divided-description">
+        <DialogHeader><div><h2 id="studio-divided-title">프로젝트 상세</h2><p id="studio-divided-description">프로젝트의 기본 정보와 공유 범위를 확인합니다.</p></div><button type="button" className="icon-button" aria-label="프로젝트 상세 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button></DialogHeader>
+        <DialogBody><div className="react-studio-stack"><div><Badge variant="primary">진행 중</Badge></div><DetailRows style={{margin:0}} items={[["프로젝트", "디자인 시스템 고도화"], ["담당 팀", "프로덕트 디자인"], ["공유 범위", "초대한 팀원만"], ["최근 수정", "2026-11-03"]]} /><p>공통 컴포넌트와 패턴을 정리하고, 제품 전반에 일관된 사용 경험을 적용합니다.</p></div></DialogBody>
+        <DialogFooter><Button variant="outline" onClick={() => setDialog(null)}>취소</Button><Button onClick={() => { setDialog(null); setDividedFeedback('프로젝트 상세를 확인했습니다.'); }}>확인</Button></DialogFooter>
+      </Dialog>
+      <Dialog variant="divided" style={{maxHeight:'min(640px, calc(100dvh - 32px))'}} open={dialog === 'divided-scroll'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-divided-scroll-title" aria-describedby="studio-divided-scroll-description">
+        <DialogHeader><div><h2 id="studio-divided-scroll-title">프로젝트 운영 안내</h2><p id="studio-divided-scroll-description">본문을 스크롤해 항목별 안내를 확인하세요.</p></div><button type="button" className="icon-button" aria-label="운영 안내 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button></DialogHeader>
+        <DialogBody aria-label="운영 안내 본문"><div className="react-studio-stack">{[
+          ['프로젝트 개요', '프로젝트의 목적과 작업 범위를 팀원에게 공유합니다. 목표와 완료 기준을 먼저 정리하면 작업 과정에서 같은 기준으로 의사결정할 수 있습니다.'],
+          ['팀원과 역할', '프로젝트에 필요한 팀원을 초대하고 담당 역할을 정합니다. 새로운 팀원이 참여하면 진행 중인 작업과 필요한 자료를 함께 안내해주세요.'],
+          ['공유 범위', '초대된 팀원만 프로젝트 내용을 확인할 수 있습니다. 외부에 자료를 전달하기 전에는 공유 대상과 공개할 정보의 범위를 확인해주세요.'],
+          ['작업 상태', '시작 전, 진행 중, 검토 중, 완료 상태를 사용해 작업 흐름을 관리합니다. 상태를 변경할 때는 다음 작업자가 확인할 내용을 함께 남겨주세요.'],
+          ['일정 관리', '시작일과 마감일을 등록하고 변경사항을 팀원과 공유합니다. 일정이 조정되면 연결된 작업의 마감일과 검토 시간도 함께 확인해주세요.'],
+          ['검토와 피드백', '검토가 필요한 부분과 원하는 피드백을 구체적으로 적습니다. 결정을 마친 뒤에는 반영한 내용과 남은 작업을 기록해 다음 단계를 이어갑니다.'],
+          ['파일과 문서', '최신 문서를 쉽게 찾을 수 있도록 파일명과 저장 위치를 정리합니다. 확정된 자료와 작업 중인 자료를 구분하고 관련 작업에 링크를 연결해주세요.'],
+          ['변경 기록', '주요 결정과 변경 이유를 기록해 이후에 맥락을 확인할 수 있도록 합니다. 영향을 받는 화면이나 컴포넌트가 있다면 함께 기재해주세요.'],
+          ['알림 설정', '필요한 채널에서 중요한 변경사항을 받아보세요. 담당자가 바뀌거나 검토 요청이 생겼을 때 필요한 사람이 안내를 받을 수 있도록 설정합니다.'],
+          ['프로젝트 완료', '완료 기준을 확인하고 남아 있는 작업과 전달할 자료를 정리합니다. 운영 중 참고할 문서를 남기고 후속 작업의 담당자를 명확하게 안내해주세요.'],
+        ].map(([title,description], index) => <section key={title}><h3 className="react-studio-example-title">{index + 1}. {title}</h3><p>{description}</p></section>)}</div></DialogBody>
+        <DialogFooter><Button variant="outline" onClick={() => setDialog(null)}>취소</Button><Button onClick={() => { setDialog(null); setDividedFeedback('프로젝트 운영 안내를 확인했습니다.'); }}>확인</Button></DialogFooter>
+      </Dialog>
     </Section>
     <Section title="토스트" description="작업 결과를 짧게 알립니다. 아래 예시는 화면 오른쪽 아래에 하나씩 표시되며, 직접 닫을 때까지 유지됩니다.">
       <div className="react-studio-sample-grid">
