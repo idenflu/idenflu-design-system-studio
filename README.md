@@ -15,6 +15,7 @@ python3 -m http.server 4173 --bind 127.0.0.1
 기본 화면은 디자인 시스템 갤러리입니다. idenflu mono 문서는 `systems/idenflu-mono/index.html`에 있으며, 기존 루트 해시 주소도 해당 문서로 연결됩니다.
 
 - [프로젝트 적용과 API](docs/consumer-guide.md)
+- [React 패키지와 GitHub Packages 배포](packages/react/README.md)
 - [변경·검증·릴리스 기준](CONTRIBUTING.md)
 - [변경 이력](CHANGELOG.md)
 - 문서 검색: 한글·영문 동의어, `/`로 검색 포커스, Escape 초기화, Enter 첫 결과 이동

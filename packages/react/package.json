@@ -1,0 +1,61 @@
+{
+  "name": "@idenflu/mono-react",
+  "version": "0.3.0",
+  "description": "React components for the idenflu mono design system",
+  "license": "UNLICENSED",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idenflu/idenflu-design-system-studio.git",
+    "directory": "packages/react"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./dist/styles.css",
+    "./assets/*": "./dist/assets/*",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "example:build": "npm run build && esbuild examples/app.tsx --bundle --format=esm --outfile=examples/dist/app.js",
+    "studio:build": "npm run build && node scripts/build-studio.mjs",
+    "studio:check": "tsc -p tsconfig.studio.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1 || ^19.0.0",
+    "react-dom": "^18.3.1 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "esbuild": "0.27.7",
+    "jsdom": "^16.7.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

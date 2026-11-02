@@ -1,0 +1,156 @@
+import * as React from 'react';
+const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
+type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
+
+/** Native modal dialog; the browser manages focus trapping and restoration. */
+export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, onClick, ...props }: DismissibleProps & { closeOnBackdrop?: boolean } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>) {
+  const ref = React.useRef<HTMLDialogElement>(null);
+  React.useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    else if (!open && dialog.open) dialog.close();
+  }, [open]);
+  return <dialog {...props} ref={ref} className={`dialog ${className}`} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
+}
+
+export function Drawer({ className = '', closeOnBackdrop = true, ...props }: React.ComponentProps<typeof Dialog>) {
+  return <Dialog {...props} closeOnBackdrop={closeOnBackdrop} className={`demo-drawer ${className}`} />;
+}
+
+/** Tooltip content is exposed as the trigger's accessible description. */
+export function Tooltip({ content, children }: { content: React.ReactNode; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
+  const id = React.useId();
+  const [dismissed, setDismissed] = React.useState(false);
+  const wrap = React.useRef<HTMLSpanElement>(null);
+  React.useEffect(() => {
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || dismissed || !wrap.current || !(wrap.current.matches(':hover') || wrap.current.contains(document.activeElement))) return;
+      setDismissed(true); event.preventDefault(); event.stopPropagation();
+    };
+    document.addEventListener('keydown', escape, true);
+    return () => document.removeEventListener('keydown', escape, true);
+  }, [dismissed]);
+  const existing = children.props['aria-describedby'];
+  return <span ref={wrap} className={`tooltip-wrap${dismissed ? ' tooltip-dismissed' : ''}`}
+    onMouseEnter={() => setDismissed(false)} onMouseLeave={() => setDismissed(false)}
+    onFocus={() => setDismissed(false)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}>
+    {React.cloneElement(children, { 'aria-describedby': [existing, id].filter(Boolean).join(' ') })}
+    <span id={id} role="tooltip" className="tooltip-content">{content}</span>
+  </span>;
+}
+
+export type PopoverProps = { trigger: React.ReactNode; children: React.ReactNode; label?: string; open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void };
+export function Popover({ trigger, children, label, open: controlledOpen, defaultOpen = false, onOpenChange }: PopoverProps) {
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = (next: boolean) => { if (controlledOpen === undefined) setInternalOpen(next); onOpenChange?.(next); };
+  const wrap = React.useRef<HTMLDivElement>(null);
+  const button = React.useRef<HTMLButtonElement>(null);
+  const id = React.useId();
+  const previouslyOpen = React.useRef(open);
+  useClientLayoutEffect(() => {
+    if (previouslyOpen.current && !open && wrap.current?.contains(document.activeElement)) button.current?.focus();
+    previouslyOpen.current = open;
+  }, [open]);
+  React.useEffect(() => {
+    if (!open) return;
+    const outside = (event: PointerEvent) => { if (!wrap.current?.contains(event.target as Node)) setOpen(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); button.current?.focus(); } };
+    document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+  }, [open, controlledOpen, onOpenChange]);
+  return <div className="popover-wrap" ref={wrap}><button ref={button} type="button" className="button button--outline button-inline" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{trigger}</button><div id={id} className="popover-content" role="region" aria-label={label} hidden={!open}>{children}</div></div>;
+}
+
+export type MenuItem = { label: string; value: string; disabled?: boolean };
+export function DropdownMenu({ trigger, items, onSelect, label }: { trigger: React.ReactNode; items: MenuItem[]; onSelect: (value: string) => void; label?: string }) {
+  const [open, setOpen] = React.useState(false);
+  const wrap = React.useRef<HTMLDivElement>(null);
+  const button = React.useRef<HTMLButtonElement>(null);
+  const menu = React.useRef<HTMLDivElement>(null);
+  const initialFocus = React.useRef<'first' | 'last'>('first');
+  const id = React.useId();
+  const focusItem = (index: number) => { const all = menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'); if (all?.length) all[(index + all.length) % all.length].focus(); };
+  React.useEffect(() => {
+    if (!open) return;
+    focusItem(initialFocus.current === 'last' ? -1 : 0);
+    const outside = (event: PointerEvent) => { if (!wrap.current?.contains(event.target as Node)) setOpen(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); button.current?.focus(); } };
+    document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+  }, [open]);
+  return <div className="action-menu" ref={wrap} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}><button ref={button} type="button" className="button button--outline button-inline" aria-haspopup="menu" aria-expanded={open} aria-controls={id}
+    onClick={() => { initialFocus.current = 'first'; setOpen(!open); }} onKeyDown={(event) => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); initialFocus.current = event.key === 'ArrowDown' ? 'first' : 'last'; if (open) focusItem(initialFocus.current === 'first' ? 0 : -1); else setOpen(true); } }}>{trigger}</button>
+    <div ref={menu} id={id} role="menu" aria-label={label} className="action-options" hidden={!open} onKeyDown={(event) => {
+      const all = [...(menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') || [])]; const index = all.indexOf(document.activeElement as HTMLButtonElement);
+      if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) { event.preventDefault(); focusItem(event.key === 'Home' ? 0 : event.key === 'End' ? -1 : index + (event.key === 'ArrowDown' ? 1 : -1)); }
+    }}>{items.map((item) => <button key={item.value} type="button" role="menuitem" tabIndex={-1} className="action-option" disabled={item.disabled} onClick={() => { setOpen(false); onSelect(item.value); button.current?.focus(); }}>{item.label}</button>)}</div></div>;
+}
+
+export function Slider({ value, defaultValue = 0, onValueChange, min = 0, max = 100, style, ...props }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'defaultValue' | 'onChange'> & { value?: number; defaultValue?: number; onValueChange?: (value: number) => void }) {
+  const [internal, setInternal] = React.useState(defaultValue);
+  const input = React.useRef<HTMLInputElement>(null);
+  const initial = React.useRef(defaultValue);
+  React.useEffect(() => {
+    const form = input.current?.form;
+    if (!form || value !== undefined) return;
+    let active = true;
+    const reset = (event: Event) => { queueMicrotask(() => { if (active && !event.defaultPrevented) setInternal(initial.current); }); };
+    form.addEventListener('reset', reset);
+    return () => { active = false; form.removeEventListener('reset', reset); };
+  }, [value]);
+  const current = value ?? internal;
+  const low = Number(min), high = Number(max);
+  const percent = high > low ? Math.max(0, Math.min(100, (current - low) / (high - low) * 100)) : 0;
+  return <input {...props} ref={input} type="range" className={`range-input ${props.className || ''}`} min={min} max={max} value={current} style={{ ...style, '--fill': `${percent}%`, '--fill-position': `calc(${percent}% + ${12 * (0.5 - percent / 100)}px)` } as React.CSSProperties} onChange={(event) => { const next = event.currentTarget.valueAsNumber; if (value === undefined) setInternal(next); onValueChange?.(next); }} />;
+}
+
+export function FileUpload({ label = '파일 선택', onFilesChange, onInvalidFiles, maxSizeBytes, disabled, id: providedId, ...props }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> & { label?: string; onFilesChange?: (files: File[]) => void; onInvalidFiles?: (message: string) => void; maxSizeBytes?: number }) {
+  const generated = React.useId();
+  const id = providedId || generated;
+  const input = React.useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = React.useState(false);
+  const [files, setFiles] = React.useState<File[]>([]);
+  const [error, setError] = React.useState('');
+  React.useEffect(() => {
+    const form = input.current?.form;
+    if (!form) return;
+    let active = true;
+    const reset = (event: Event) => { queueMicrotask(() => { if (active && !event.defaultPrevented) { input.current?.setCustomValidity(''); setFiles([]); setError(''); } }); };
+    form.addEventListener('reset', reset);
+    return () => { active = false; form.removeEventListener('reset', reset); };
+  }, []);
+  const validate = (next: File[]) => {
+    const accept = (props.accept || '').split(',').map(token => token.trim().toLowerCase()).filter(Boolean);
+    const matches = (file: File) => !accept.length || accept.some(token => token.startsWith('.') ? file.name.toLowerCase().endsWith(token) : token.endsWith('/*') ? file.type.toLowerCase().startsWith(token.slice(0, -1)) : file.type.toLowerCase() === token);
+    const message = next.some(file => !matches(file)) ? '지원하지 않는 파일 형식입니다.' : maxSizeBytes != null && next.some(file => file.size > maxSizeBytes) ? '파일 크기가 허용 범위를 초과합니다.' : '';
+    setError(message);
+    input.current?.setCustomValidity(message);
+    if (message) { if (input.current) input.current.value = ''; setFiles([]); onInvalidFiles?.(message); onFilesChange?.([]); return false; }
+    setFiles(next); onFilesChange?.(next); return true;
+  };
+  return <div className={`upload-area${dragging ? ' is-dragging' : ''}`} onDragOver={(event) => { if (!disabled) { event.preventDefault(); setDragging(true); } }} onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }} onDrop={(event) => {
+    event.preventDefault(); setDragging(false);
+    if (disabled || !input.current) return;
+    const dropped = Array.from(event.dataTransfer.files);
+    const next = props.multiple ? dropped : dropped.slice(0, 1);
+    if (!validate(next)) return;
+    const transfer = new DataTransfer(); next.forEach(file => transfer.items.add(file)); input.current.files = transfer.files;
+  }}><label className="button button--outline button-inline upload-button" htmlFor={id}>{label}</label><input {...props} ref={input} id={id} type="file" disabled={disabled} className="upload-input" aria-describedby={[props['aria-describedby'], error && `${id}-error`].filter(Boolean).join(' ') || undefined} aria-invalid={error ? true : props['aria-invalid']} onChange={(event) => validate(Array.from(event.currentTarget.files || []))} />
+    {error && <p id={`${id}-error`} className="field-error" role="alert">{error}</p>}
+    {files.length > 0 && <div className="upload-result"><div>{files.map((file, index) => <strong key={`${file.name}-${index}`}>{file.name}</strong>)}</div><button type="button" className="button button--ghost button-inline" disabled={disabled} onClick={() => { if (input.current) { input.current.value = ''; input.current.setCustomValidity(''); } setFiles([]); setError(''); onFilesChange?.([]); }}>제거</button></div>}
+  </div>;
+}
+
+export function Toast({ children, onDismiss, ...props }: React.HTMLAttributes<HTMLDivElement> & { onDismiss?: () => void }) {
+  return <div {...props} role={props.role || 'status'} className={`toast ${props.className || ''}`}><p>{children}</p>{onDismiss && <button type="button" className="icon-button" aria-label="알림 닫기" onClick={onDismiss}><span className="ui-icon icon-close" aria-hidden="true" /></button>}</div>;
+}
+
+export function Slides({ slides, label = '슬라이드', initialIndex = 0 }: { slides: React.ReactNode[]; label?: string; initialIndex?: number }) {
+  const [index, setIndex] = React.useState(initialIndex);
+  const safe = Math.max(0, Math.min(index, slides.length - 1));
+  if (!slides.length) return null;
+  return <section className="slide-example" aria-label={label} aria-roledescription="슬라이드 모음"><div className="slide-index" aria-live="polite">{safe + 1} / {slides.length}</div><div className="slide-content">{slides[safe]}</div><div className="slide-actions"><button type="button" className="button button--outline button-inline" disabled={safe === 0} onClick={() => setIndex(safe - 1)}>이전</button><button type="button" className="button button--outline button-inline" disabled={safe === slides.length - 1} onClick={() => setIndex(safe + 1)}>다음</button></div></section>;
+}

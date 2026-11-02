@@ -1,0 +1,51 @@
+.react-studio-menu-button { display:none; }
+.react-studio .docs-topbar { --control-height:32px; --control-px:8px; --control-gap:6px; --font-size-body:14px; --line-height-control:20px; --radius-control:0px; }
+.react-studio .docs-topbar .icon-button { flex:0 0 32px; width:32px; height:32px; padding:7px; }
+.react-studio .studio-settings-open .ui-icon { width:18px; height:18px; }
+.react-studio .docs-topbar-tools { gap:12px; }
+.react-studio .docs-navigation > .nav-group { margin-top:var(--space-2); }
+.react-studio .docs-navigation > .nav-group > summary { border-left:2px solid transparent; }
+.react-studio .docs-navigation .nav-children a { padding-left:var(--space-4); }
+.react-studio .nav-group > summary .ui-icon { flex:none; width:16px; height:16px; transition:transform var(--motion-fast) var(--motion-easing); }
+.react-studio .nav-group[open] > summary .ui-icon { transform:rotate(180deg); }
+.react-studio .sidebar .nav-children a[aria-current="page"], .react-studio .nav-overview[aria-current="page"] { background:transparent; }
+.react-studio .overview-links { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+.react-studio .react-studio-section:first-child { margin-top:0; padding-top:0; border-top:0; }
+.react-studio-section { margin-top:var(--space-10); padding-top:var(--space-7); border-top:1px solid var(--divider); }
+.react-studio-section h2 { font-size:var(--font-size-title); font-weight:var(--font-weight-semibold); }
+.react-studio-demo { display:grid; gap:var(--space-5); margin-top:var(--space-6); }
+.react-studio-row { display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+.react-studio-size-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--space-6); }
+.react-studio-field-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--space-7) var(--space-8); }
+.react-studio-field-wide { grid-column:1 / -1; }
+.react-studio-code { overflow:auto; margin-top:var(--space-5); padding:var(--space-4); background:var(--surface); }
+.react-studio-swatches, .react-studio-icons { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap:var(--space-4); }
+.react-studio-swatches > div, .react-studio-icons > li { display:grid; gap:var(--space-2); min-width:0; }
+.react-studio-swatches small { color:var(--text-secondary); overflow-wrap:anywhere; }
+.react-studio-swatches .token-value { font:inherit; font-variant-numeric:tabular-nums; }
+.react-studio-swatch { display:block; height:64px; border:1px solid var(--border); }
+.react-studio-icons { list-style:none; padding:0; }
+.react-studio-icons > li { display:flex; align-items:center; padding:var(--space-2); border-bottom:1px solid var(--divider); overflow-wrap:anywhere; }
+.react-studio-icons .ui-icon { flex:none; }
+.react-studio-size { display:flex; align-items:center; gap:var(--space-4); flex-wrap:wrap; }
+.react-studio-note { margin-top:var(--space-6); color:var(--text-secondary); }
+@media (min-width:901px) {
+  .react-studio { --docs-header-height:64px; }
+  .react-studio .sidebar-brand { display:flex; flex-direction:column; justify-content:center; height:var(--docs-header-height); padding-block:0; }
+  .react-studio .sidebar-brand p { margin-top:0; }
+  .react-studio .docs-topbar { min-height:var(--docs-header-height); padding-block:12px; }
+}
+@media (max-width:900px) {
+  .react-studio .docs-topbar { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:var(--space-3); }
+  .react-studio .mobile-brand { margin-bottom:0; }
+  .react-studio .mobile-brand > a { min-width:0; font-size:16px; line-height:24px; letter-spacing:.3px; white-space:nowrap; }
+  .react-studio .docs-topbar-tools { display:flex; grid-column:2; grid-row:1; gap:6px; }
+  .react-studio .breadcrumb { grid-row:2; grid-column:1 / -1; }
+  .react-studio-menu-button { display:inline-flex; min-height:32px; padding:6px 8px; font-size:14px; line-height:20px; }
+  .react-studio .topbar-gallery { display:inline-grid; place-items:center; width:32px; min-height:32px; padding:6px; }
+  .react-studio .gallery-label { display:none; }
+  .react-studio .theme-toggle { width:32px; height:32px; flex-basis:32px; }
+}
+@media (max-width:600px) {
+  .react-studio-field-grid, .react-studio-size-grid, .react-studio .overview-links { grid-template-columns:minmax(0, 1fr); }
+}

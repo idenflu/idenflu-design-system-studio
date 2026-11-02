@@ -1,0 +1,246 @@
+import { test, after } from 'node:test';
+import assert from 'node:assert/strict';
+import { JSDOM } from 'jsdom';
+
+const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost/', pretendToBeVisual: true });
+for (const name of ['window', 'document', 'navigator', 'HTMLElement', 'HTMLInputElement', 'HTMLSelectElement', 'Node', 'Event', 'MouseEvent', 'KeyboardEvent', 'CustomEvent']) {
+  Object.defineProperty(globalThis, name, { configurable: true, value: dom.window[name] });
+}
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+const React = await import('react');
+const { createRoot } = await import('react-dom/client');
+const { act } = React;
+const { TextField, Checkbox, Switch, Select, MultiSelect, Tabs, Tree, Segmented, Spinner, CircleProgress, SegmentedProgress } = await import('../dist/index.js');
+const h = React.createElement;
+
+function fixture() {
+  const container = document.createElement('div');
+  document.body.append(container);
+  const root = createRoot(container);
+  return {
+    container,
+    async render(element) { await act(async () => root.render(element)); },
+    async dispose() { await act(async () => root.unmount()); container.remove(); },
+  };
+}
+async function click(element) { assert.ok(element, 'expected a clickable element'); await act(async () => element.click()); }
+async function key(element, value) { await act(async () => element.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }))); }
+after(() => dom.window.close());
+
+test('inline MultiSelect removes chips and clears the remaining values', async () => {
+  const f = fixture();
+  try {
+    await f.render(h('form', null, h(MultiSelect, { label:'팀', name:'team', presentation:'inline', clearable:true, defaultValue:['a','b'], options:[{value:'a',label:'디자인'},{value:'b',label:'개발'}] })));
+    const form = f.container.querySelector('form');
+    await click(f.container.querySelector('[aria-label="디자인 제거"]'));
+    assert.deepEqual(new dom.window.FormData(form).getAll('team'), ['b']);
+    await click(f.container.querySelector('[aria-label="팀 모두 지우기"]'));
+    assert.deepEqual(new dom.window.FormData(form).getAll('team'), []);
+  } finally { await f.dispose(); }
+});
+
+test('loading and progress variants expose their status and actual value', async () => {
+  const f = fixture();
+  try {
+    await f.render(h('div', null, h(Spinner, {kind:'dots',label:'동기화 중'}), h(Spinner, {kind:'bars',label:'처리 중'}), h(CircleProgress,{value:25,max:50,label:'업로드'}), h(SegmentedProgress,{value:3,total:5,label:'단계'})));
+    assert.equal(f.container.querySelectorAll('.spinner-dots > span').length, 3);
+    assert.equal(f.container.querySelectorAll('.spinner-bars > span').length, 3);
+    const [circle, segmented] = f.container.querySelectorAll('[role=progressbar]');
+    assert.equal(circle.getAttribute('aria-valuenow'), '25');
+    assert.equal(circle.textContent, '50%');
+    assert.equal(segmented.getAttribute('aria-valuenow'), '3');
+    assert.equal(segmented.querySelectorAll('.is-complete').length, 3);
+  } finally { await f.dispose(); }
+});
+
+test('TextField links its label and descriptions and reflects controlled value', async () => {
+  const f = fixture();
+  try {
+    const render = (value) => h(TextField, { id: 'website', label: '웹사이트', value, onChange() {}, prefix: 'https://', helperText: '주소 입력', error: '주소 확인', labelPosition: 'left' });
+    await f.render(render('one.test'));
+    const input = f.container.querySelector('input');
+    assert.equal(f.container.querySelector('label').control, input);
+    assert.equal(input.value, 'one.test');
+    assert.equal(input.getAttribute('aria-invalid'), 'true');
+    const descriptions = input.getAttribute('aria-describedby').split(' ').map(id => document.getElementById(id)?.textContent);
+    assert.deepEqual(descriptions, ['https://', '주소 입력', '주소 확인']);
+    await f.render(render('two.test'));
+    assert.equal(input.value, 'two.test');
+  } finally { await f.dispose(); }
+});
+
+test('TextField supports an accessible action without treating it as descriptive text', async () => {
+  const f = fixture(); let called = 0;
+  try {
+    await f.render(h(TextField, {label:'검색', action:h('button', {type:'button', 'aria-label':'검색어 지우기', onClick:() => called++}, '지우기')}));
+    assert.equal(f.container.querySelector('label').control, f.container.querySelector('input'));
+    assert.equal(f.container.querySelector('input').getAttribute('aria-describedby'), null);
+    await click(f.container.querySelector('button'));
+    assert.equal(called, 1);
+  } finally { await f.dispose(); }
+});
+
+test('controlled TextField reports edits and updates through React state', async () => {
+  const f = fixture(); const edits = [];
+  function Form() {
+    const [value, setValue] = React.useState('초기');
+    return h(TextField, { label: '이름', value, onChange: event => { edits.push(event.target.value); setValue(event.target.value); } });
+  }
+  try {
+    await f.render(h(Form));
+    const input = f.container.querySelector('input');
+    await act(async () => {
+      const setter = Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, 'value').set;
+      setter.call(input, '변경');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    assert.deepEqual(edits, ['변경']);
+    assert.equal(input.value, '변경');
+  } finally { await f.dispose(); }
+});
+
+test('Checkbox and Switch expose native checked state and respond to their labels', async () => {
+  const f = fixture(); const changes = [];
+  try {
+    await f.render(h('div', null, h(Checkbox, { label: '동의', indeterminate: true, onChange: event => changes.push(event.target.checked) }), h(Switch, { label: '알림' })));
+    const [checkbox, toggle] = f.container.querySelectorAll('input');
+    assert.equal(checkbox.indeterminate, true);
+    assert.equal(toggle.getAttribute('role'), 'switch');
+    await click(checkbox);
+    assert.deepEqual(changes, [true]);
+    assert.equal(checkbox.checked, true);
+    assert.equal(checkbox.indeterminate, true);
+    await click(toggle);
+    assert.equal(toggle.checked, true);
+  } finally { await f.dispose(); }
+});
+
+test('required Select validates, submits its selected value and restores default on reset', async () => {
+  const f = fixture();
+  try {
+    const options = [{ value: 'a', label: '알파' }, { value: 'b', label: '베타' }];
+    await f.render(h('form', null, h(Select, { label: '프로젝트', name: 'project', required: true, options })));
+    const form = f.container.querySelector('form');
+    let valid;
+    await act(async () => { valid = form.checkValidity(); });
+    assert.equal(valid, false);
+    assert.equal(f.container.querySelector('[role=combobox]').getAttribute('aria-invalid'), 'true');
+    assert.match(f.container.querySelector('[role=alert]').textContent, /선택/);
+    await click(f.container.querySelector('[role=combobox]'));
+    await click([...f.container.querySelectorAll('[role=option]')].find(option => option.textContent.includes('베타')));
+    assert.equal(form.checkValidity(), true);
+    assert.equal(new dom.window.FormData(form).get('project'), 'b');
+    await act(async () => form.reset());
+    assert.equal(new dom.window.FormData(form).get('project'), '');
+    assert.notEqual(f.container.querySelector('[role=combobox]').getAttribute('aria-invalid'), 'true');
+  } finally { await f.dispose(); }
+});
+
+test('MultiSelect submits repeated values and reset restores its initial selection', async () => {
+  const f = fixture();
+  try {
+    const options = [{ value: 'a', label: '알파' }, { value: 'b', label: '베타' }];
+    await f.render(h('form', null, h(MultiSelect, { label: '태그', name: 'tags', options, defaultValue: ['a'] })));
+    const form = f.container.querySelector('form');
+    assert.deepEqual(new dom.window.FormData(form).getAll('tags'), ['a']);
+    await click(f.container.querySelector('[role=combobox]'));
+    await click([...f.container.querySelectorAll('[role=option]')].find(option => option.textContent.includes('베타')));
+    assert.deepEqual(new dom.window.FormData(form).getAll('tags'), ['a', 'b']);
+    await act(async () => form.reset());
+    assert.deepEqual(new dom.window.FormData(form).getAll('tags'), ['a']);
+  } finally { await f.dispose(); }
+});
+
+test('controlled Select reports selection and follows the parent value on form reset', async () => {
+  const f = fixture(); const changes = [];
+  function Form() {
+    const [value, setValue] = React.useState('a');
+    return h('form', null, h(Select, { label: '선택', name: 'choice', value, onValueChange: next => { changes.push(next); setValue(next); }, options: [{ value: 'a', label: '알파' }, { value: 'b', label: '베타' }] }));
+  }
+  try {
+    await f.render(h(Form));
+    const form = f.container.querySelector('form');
+    await click(f.container.querySelector('[role=combobox]'));
+    await click([...f.container.querySelectorAll('[role=option]')].find(option => option.textContent.includes('베타')));
+    assert.deepEqual(changes, ['b']);
+    assert.equal(new dom.window.FormData(form).get('choice'), 'b');
+    await act(async () => form.reset());
+    assert.equal(new dom.window.FormData(form).get('choice'), 'b');
+  } finally { await f.dispose(); }
+});
+
+test('canceled form reset preserves selection and tree expansion', async () => {
+  const f = fixture();
+  const options = [{ value: 'a', label: '알파' }, { value: 'b', label: '베타' }];
+  try {
+    await f.render(h('form', { onReset: event => event.preventDefault() },
+      h(Select, { label: '선택', name: 'select', options, defaultValue: 'a' }),
+      h(Segmented, { label: '구분', name: 'segment', options, defaultValue: 'a' }),
+      h(Tree, { label: '트리', name: 'tree', items: [{ value: 'root', label: '폴더', children: [{ value: 'leaf', label: '파일' }] }] }),
+    ));
+    await click(f.container.querySelector('[role=combobox]'));
+    await click([...f.container.querySelectorAll('[role=option]')][1]);
+    await click(f.container.querySelectorAll('.segmented-control button')[1]);
+    await click(f.container.querySelector('summary'));
+    await click(f.container.querySelector('.tree-item'));
+    const form = f.container.querySelector('form');
+    await act(async () => form.reset());
+    assert.deepEqual([...new dom.window.FormData(form).entries()], [['select', 'b'], ['segment', 'b'], ['tree', 'leaf']]);
+    assert.equal(f.container.querySelector('details').open, true);
+  } finally { await f.dispose(); }
+});
+
+test('Tabs keyboard navigation skips disabled tabs and activates the matching panel', async () => {
+  const f = fixture(); const changes = [];
+  try {
+    await f.render(h(Tabs, { label: '설정', items: [{ value: 'a', label: '일반', content: '일반 내용' }, { value: 'b', label: '비활성', content: '비활성 내용', disabled: true }, { value: 'c', label: '보안', content: '보안 내용' }], onValueChange: value => changes.push(value) }));
+    const tabs = [...f.container.querySelectorAll('[role=tab]')];
+    tabs[0].focus();
+    await key(tabs[0], 'ArrowRight');
+    assert.equal(document.activeElement, tabs[2]);
+    assert.equal(tabs[2].getAttribute('aria-selected'), 'true');
+    assert.deepEqual(changes, ['c']);
+    const panel = document.getElementById(tabs[2].getAttribute('aria-controls'));
+    assert.equal(panel.hidden, false);
+    assert.equal(panel.textContent, '보안 내용');
+  } finally { await f.dispose(); }
+});
+
+test('Select scrolls keyboard-active options into view', async () => {
+  const f = fixture(); const calls = [];
+  const previous = dom.window.HTMLElement.prototype.scrollIntoView;
+  dom.window.HTMLElement.prototype.scrollIntoView = function (options) { calls.push([this.textContent, options]); };
+  try {
+    const options = Array.from({ length: 30 }, (_, index) => ({ value: String(index), label: `옵션 ${index}` }));
+    await f.render(h(Select, { label: '목록', options }));
+    const trigger = f.container.querySelector('[role=combobox]');
+    await click(trigger);
+    await key(trigger, 'End');
+    assert.equal(calls.at(-1)[0], '옵션 29');
+    assert.equal(calls.at(-1)[1].block, 'nearest');
+    assert.equal(trigger.getAttribute('aria-activedescendant'), f.container.querySelectorAll('[role=option]')[29].id);
+  } finally {
+    if (previous) dom.window.HTMLElement.prototype.scrollIntoView = previous;
+    else delete dom.window.HTMLElement.prototype.scrollIntoView;
+    await f.dispose();
+  }
+});
+
+test('Tree expands branches, selects a leaf and resets the initial state', async () => {
+  const f = fixture(); const changes = [];
+  try {
+    const items = [{ value: 'design', label: '디자인', children: [{ value: 'system', label: '시스템' }, { value: 'brand', label: '브랜드' }] }];
+    await f.render(h('form', null, h(Tree, { label: '프로젝트', items, name: 'item', onValueChange: value => changes.push(value) })));
+    const form = f.container.querySelector('form'), branch = f.container.querySelector('details');
+    assert.equal(branch.open, false);
+    await click(branch.querySelector('summary'));
+    assert.equal(branch.open, true);
+    await click([...branch.querySelectorAll('button')].find(button => button.textContent === '브랜드'));
+    assert.deepEqual(changes, ['brand']);
+    assert.equal(new dom.window.FormData(form).get('item'), 'brand');
+    assert.equal(branch.querySelector('[aria-current=true]').textContent, '브랜드');
+    await act(async () => form.reset());
+    assert.equal(branch.open, false);
+    assert.equal(new dom.window.FormData(form).get('item'), '');
+  } finally { await f.dispose(); }
+});

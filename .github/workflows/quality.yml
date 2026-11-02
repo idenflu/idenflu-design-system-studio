@@ -3,6 +3,26 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
+  react-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: packages/react/package-lock.json
+      - run: npm ci
+        working-directory: packages/react
+      - run: npm run typecheck
+        working-directory: packages/react
+      - run: npm test
+        working-directory: packages/react
+      - run: npm run studio:build
+        working-directory: packages/react
+      - run: npm run studio:check
+        working-directory: packages/react
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -16,8 +36,13 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+      - run: npm ci
+        working-directory: packages/react
+      - run: npm run studio:build
+        working-directory: packages/react
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - run: npx playwright test --config packages/react/studio/playwright.config.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

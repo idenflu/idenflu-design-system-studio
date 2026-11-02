@@ -1,0 +1,10 @@
+/* React markup uses the same mask icons as the portable CSS bundle. */
+.choice-mark .ui-icon { display:none; width:calc(var(--choice-size) - 4px); height:calc(var(--choice-size) - 4px); flex:0 0 auto; color:var(--text-on-primary); }
+.choice-mark .minus-icon { --icon:url('./assets/icons/idenflu/remove.svg'); }
+.choice-input:checked + .choice-mark .check-icon,
+.choice-input:indeterminate + .choice-mark .minus-icon { display:block; }
+.choice-input:indeterminate + .choice-mark .check-icon { display:none; }
+.accordion summary .ui-icon { width:16px; height:16px; flex:0 0 16px; transition:transform var(--motion-fast) var(--motion-easing); }
+.accordion details[open] summary .ui-icon { transform:rotate(180deg); }
+.spinner-dots.spinner--neutral > span, .spinner-bars.spinner--neutral > span { background:var(--text-secondary); }
+.spinner-dots.spinner--inverse > span, .spinner-bars.spinner--inverse > span { background:var(--text-on-primary); }
