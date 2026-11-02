@@ -22,6 +22,31 @@
 .react-studio-demo > :is(.button,.icon-button,.segmented-control,.button-group,.popover-wrap,.action-menu,.tooltip-wrap) { justify-self:start; }
 .react-studio-demo > p:empty { display:none; }
 .react-studio-row { display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+.react-studio-progress-section .react-studio-demo { max-width:800px; }
+.react-studio-progress-example { display:grid; gap:var(--space-3); min-width:0; }
+.react-studio-progress-meta { display:flex; align-items:baseline; justify-content:space-between; gap:var(--space-3); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.react-studio-progress-meta > span { min-width:0; font-weight:var(--font-weight-medium); }
+.react-studio-progress-meta > strong { flex:none; font-weight:var(--font-weight-medium); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.react-studio-progress-playground { min-width:0; border:1px solid var(--divider); }
+.react-studio-progress-preview { padding:var(--space-6); }
+.react-studio-progress-controls { display:grid; grid-template-columns:auto minmax(0,1fr) 40px; align-items:center; gap:var(--space-4); padding:var(--space-3) var(--space-6); border-top:1px solid var(--divider); background:var(--surface); }
+.react-studio-progress-controls label, .react-studio-progress-controls output { font-size:var(--font-size-caption); line-height:var(--line-height-caption); color:var(--text-secondary); }
+.react-studio-progress-controls output { text-align:end; font-variant-numeric:tabular-nums; }
+.react-studio-progress-controls .range-input { min-width:0; }
+.react-studio-progress-thickness { gap:var(--space-4); }
+.react-studio-progress-thickness-row { display:grid; grid-template-columns:100px minmax(0,1fr); align-items:center; gap:var(--space-5); min-height:40px; }
+.react-studio-progress-thickness-row > div { display:flex; align-items:baseline; justify-content:space-between; gap:var(--space-2); }
+.react-studio-progress-thickness-row small { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); font-variant-numeric:tabular-nums; }
+.react-studio-progress-shape { display:flex; flex-direction:column; justify-content:center; min-width:0; min-height:112px; }
+.react-studio-progress-circles { flex-direction:row; align-items:center; flex-wrap:wrap; gap:var(--space-8); }
+.react-studio-progress-circle-sample { display:grid; justify-items:center; gap:var(--space-2); }
+.react-studio-progress-circle-sample > span { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+@media (max-width:600px) {
+  .react-studio-progress-preview { padding:var(--space-4); }
+  .react-studio-progress-controls { grid-template-columns:auto minmax(0,1fr) 32px; gap:var(--space-2); padding-inline:var(--space-4); }
+  .react-studio-progress-thickness-row { grid-template-columns:80px minmax(0,1fr); gap:var(--space-4); }
+  .react-studio-progress-circles { gap:var(--space-5); }
+}
 .react-studio-table-toolbar, .react-studio-table-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3) var(--space-4); min-width:0; }
 .react-studio-table-toolbar .segmented-control, .react-studio-table-footer .pagination { flex:0 0 auto; margin-inline-start:auto; }
 .react-studio-table-footer .component-helper { margin:0; }

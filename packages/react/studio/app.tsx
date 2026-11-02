@@ -115,7 +115,13 @@ export function IconExample() {
   'components/date-picker':'<DatePicker label="시작일" />\n<DateRangePicker label="기간" />',
   'components/tree':'<Tree label="메뉴" items={items} />',
   'components/tabs':'<Tabs label="설정" items={items} />',
-  'components/progress':'<Progress value={60} max={100} aria-label="진행률" />\n<CircleProgress value={60} label="진행률" />',
+  'components/progress':`import { Progress, SegmentedProgress, CircleProgress } from '@idenflu/mono-react';
+
+<Progress value={60} max={100} aria-label="파일 업로드" />
+<Progress value={100} max={100} variant="success" aria-label="업로드 완료" />
+<Progress value={60} max={100} thickness="thin" aria-label="얇은 진행률" />
+<SegmentedProgress value={3} total={5} label="프로젝트 설정 진행률" />
+<CircleProgress value={60} label="진행률" />`,
   'components/loading':`import { NovaSpinner, Spinner } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 

@@ -36,29 +36,35 @@ export function SliderDemos() {
   </>;
 }
 
-function ProgressExample({label, value, thickness = 'normal', variant = 'primary'}: {label:string; value:number; thickness?:'thin'|'normal'|'thick'; variant?:'primary'|'success'|'warning'|'danger'}) {
-  return <div className="react-studio-stack"><div className="slider-label"><span>{label}</span><strong>{value}%</strong></div><Progress value={value} max={100} thickness={thickness} variant={variant} aria-label={label} /></div>;
+function ProgressExample({label, value, variant = 'primary', description}: {label:string; value:number; variant?:'primary'|'success'|'warning'|'danger'; description?:string}) {
+  return <div className="react-studio-progress-example"><div className="react-studio-progress-meta"><span>{label}</span><strong>{value}%</strong></div><Progress value={value} max={100} variant={variant} aria-label={label} />{description && <p className="react-studio-caption">{description}</p>}</div>;
 }
 
 export function ProgressDemos() {
   const [value, setValue] = React.useState(60);
   return <>
-    <Section title="진행 상태" description="전체 작업량을 알 수 있을 때 진행률을 숫자와 함께 표시합니다.">
-      <ProgressExample label="프로젝트 준비 진행률" value={value} />
-      <div className="react-studio-stack"><label htmlFor="progress-example">진행률 조정</label><Slider id="progress-example" value={value} onValueChange={setValue} aria-valuetext={`${value}%`} /></div>
+    <Section title="기본 사용" className="react-studio-progress-section" description="전체 작업량을 알 수 있을 때 사용합니다. 작업 이름, 진행률, 보조 설명을 함께 표시합니다.">
+      <div className="react-studio-progress-playground">
+        <div className="react-studio-progress-preview"><ProgressExample label="파일 업로드" value={value} variant={value === 100 ? 'success' : 'primary'} description={value === 0 ? '업로드를 시작하기 전입니다.' : value === 100 ? '모든 파일의 업로드가 완료되었습니다.' : `전체 100MB 중 ${value}MB를 업로드했습니다.`} /></div>
+        <div className="react-studio-progress-controls"><label htmlFor="progress-example">진행률 조정</label><Slider id="progress-example" value={value} onValueChange={setValue} aria-valuetext={`${value}%`} /><output htmlFor="progress-example">{value}%</output></div>
+      </div>
     </Section>
-    <Section title="완료 상태"><ProgressExample label="업로드 완료" value={100} variant="success" /></Section>
-    <Section title="두께" description="표시 공간에 따라 4px·8px·12px 중 하나를 선택합니다.">
-      <div className="react-studio-stack">{([{value:'thin', label:'얇게 · 4px'}, {value:'normal', label:'기본 · 8px'}, {value:'thick', label:'두껍게 · 12px'}] as const).map(item => <ProgressExample key={item.value} label={item.label} thickness={item.value} value={60} />)}</div>
+    <Section title="상태별 표현" className="react-studio-progress-section" description="같은 크기의 예시에서 상태를 비교합니다. 색상과 함께 현재 상황을 문구로 설명합니다.">
+      <div className="react-studio-field-grid">{([
+        {label:'파일 업로드 중', value:60, variant:'primary', description:'작업이 정상적으로 진행되고 있습니다.'},
+        {label:'업로드 완료', value:100, variant:'success', description:'모든 파일이 업로드되었습니다.'},
+        {label:'저장 공간 주의', value:80, variant:'warning', description:'전체 용량의 80%를 사용하고 있습니다.'},
+        {label:'동기화 중단', value:35, variant:'danger', description:'연결을 확인한 뒤 다시 시도해주세요.'},
+      ] as const).map(item => <div className="react-studio-example" key={item.variant}><ProgressExample {...item} /></div>)}</div>
     </Section>
-    <Section title="색상과 상태" description="색상만으로 구분하지 않고 작업 상태를 문구로 함께 설명합니다.">
-      <div className="react-studio-field-grid"><ProgressExample label="프로젝트 준비 중" value={60} /><ProgressExample label="업로드 완료" value={100} variant="success" /><ProgressExample label="저장 공간 주의" value={80} variant="warning" /><ProgressExample label="동기화 중단" value={35} variant="danger" /></div>
+    <Section title="두께 비교" className="react-studio-progress-section" description="모두 60%로 표시해 두께를 비교합니다. 기본은 8px이며, 표시 공간에 따라 선택합니다.">
+      <div className="react-studio-example react-studio-progress-thickness">{([{value:'thin', label:'얇게', height:4}, {value:'normal', label:'기본', height:8}, {value:'thick', label:'두껍게', height:12}] as const).map(item => <div className="react-studio-progress-thickness-row" key={item.value}><div><span>{item.label}</span><small>{item.height}px</small></div><Progress value={60} max={100} thickness={item.value} aria-label={`${item.label} ${item.height}px 진행률`} /></div>)}</div>
     </Section>
-    <Section title="분할형" description="전체 단계 중 완료한 단계 수를 표시합니다.">
-      <div className="slider-label"><span>프로젝트 설정</span><strong>3 / 5 단계</strong></div><SegmentedProgress value={3} total={5} label="단계 진행률" />
-    </Section>
-    <Section title="원형" description="제한된 공간에 진행 상태를 표시합니다.">
-      <div className="react-studio-row"><div className="progress-circle-item"><CircleProgress value={60} label="진행률" /><span>진행 중</span></div><div className="progress-circle-item"><CircleProgress value={100} label="완료" variant="success" /><span>완료</span></div></div>
+    <Section title="형태별 사용" className="react-studio-progress-section" description="단계 수를 보여줄 때는 분할형, 작은 영역에 비율을 보여줄 때는 원형을 사용합니다.">
+      <div className="react-studio-field-grid">
+        <div className="react-studio-example"><div><h3 className="react-studio-example-title">분할형</h3><p className="react-studio-caption">단계가 정해진 설정이나 등록 과정</p></div><div className="react-studio-progress-shape"><div className="react-studio-progress-example"><div className="react-studio-progress-meta"><span>프로젝트 설정</span><strong>3 / 5 단계</strong></div><SegmentedProgress value={3} total={5} label="프로젝트 설정 진행률" /></div></div></div>
+        <div className="react-studio-example"><div><h3 className="react-studio-example-title">원형</h3><p className="react-studio-caption">카드나 요약 영역의 진행 상태</p></div><div className="react-studio-progress-shape react-studio-progress-circles"><div className="react-studio-progress-circle-sample"><CircleProgress value={60} label="원형 진행률" /><span>진행 중</span></div><div className="react-studio-progress-circle-sample"><CircleProgress value={100} label="원형 완료" variant="success" /><span>완료</span></div></div></div>
+      </div>
     </Section>
   </>;
 }
