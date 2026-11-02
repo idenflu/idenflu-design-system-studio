@@ -89,7 +89,13 @@ export function IconExample() {
 />
 <TextField label="웹사이트" labelPosition="left"
            prefix="https://" defaultValue="idenflu.app" />`,
-  'components/selection':'<Checkbox label="이메일 알림" defaultChecked />',
+  'components/selection':`import { Checkbox, Switch } from '@idenflu/mono-react';
+
+<Checkbox label="이메일 알림" defaultChecked />
+<Switch size="sm" label="이메일 알림" defaultChecked />
+<Switch size="md" label="자동 저장" />
+<Switch size="lg" label="활동 알림" defaultChecked />
+<Switch label="비활성 설정" disabled />`,
   'components/select':'<Select label="담당 팀" options={[{ value: "design", label: "디자인", description: "제품 경험을 설계합니다.", icon: <Icon name="grid" /> }]} />',
   'components/number-fields':`import { Icon, NumberField } from '@idenflu/mono-react';
 

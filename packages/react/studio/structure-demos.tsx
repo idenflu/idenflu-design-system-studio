@@ -41,7 +41,21 @@ export function SelectionDemos() {
       <fieldset className="choice-group react-studio-example react-studio-stack"><legend>라디오</legend><Radio label="개인" name="plan" defaultChecked /><Radio label="팀" name="plan" /><Radio label="조직" name="plan" /><Radio label="비활성" name="plan" disabled /></fieldset>
       <fieldset className="choice-group react-studio-example react-studio-stack"><legend>스위치</legend><Switch label="알림" defaultChecked /><Switch label="자동 저장" /><Switch label="비활성 스위치" disabled /><Switch label="켜진 비활성 스위치" disabled defaultChecked /></fieldset>
     </div>
-  </Section><Section title="선택 예시" description="알림 수신 여부를 선택합니다."><div className="react-studio-row"><Checkbox label="메일로 받기" /><Switch label="일정 알림" /></div></Section></>;
+  </Section>
+    <Section title="스위치 사이즈" description="기본 크기는 md입니다. 트랙은 작고 가볍게, 클릭 영역은 같은 사이즈의 입력 컨트롤 높이로 유지합니다. 라벨을 누르거나 Tab·Space로 조작해보세요.">
+      <div className="react-studio-size-grid">
+        {([{size:'sm', track:'28 × 16', thumb:12, target:32}, {size:'md', track:'36 × 20', thumb:16, target:38}, {size:'lg', track:'44 × 24', thumb:20, target:44}] as const).map(item => <fieldset key={item.size} className="choice-group react-studio-example react-studio-stack" aria-label={`${item.size.toUpperCase()} 스위치 예시`}>
+          <legend>{item.size.toUpperCase()}{item.size === 'md' ? ' · 기본' : ''}</legend>
+          <div><p className="react-studio-caption">트랙 {item.track}px · 핸들 {item.thumb}px</p><p className="react-studio-caption">클릭 영역 높이 {item.target}px</p></div>
+          <Switch size={item.size} label="이메일 알림" defaultChecked />
+          <Switch size={item.size} label="자동 저장" />
+          <Switch size={item.size} label="비활성 · 꺼짐" disabled />
+          <Switch size={item.size} label="비활성 · 켜짐" disabled defaultChecked />
+        </fieldset>)}
+      </div>
+    </Section>
+    <Section title="선택 예시" description="알림 수신 여부를 선택합니다."><div className="react-studio-row"><Checkbox label="메일로 받기" /><Switch label="일정 알림" /></div></Section>
+  </>;
 }
 
 const treeLabels: Record<string,string> = {system:'디자인 시스템',brand:'브랜드 가이드',components:'컴포넌트',docs:'문서',about:'프로젝트 소개'};

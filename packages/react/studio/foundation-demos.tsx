@@ -3,9 +3,9 @@ import { Button, Icon, Select, Spinner, Switch, Table, TableContainer, TextField
 import { Section } from './demo-layout';
 
 const sizes = [
-  {value:'sm', name:'Small', height:32, padding:10, icon:14},
-  {value:'md', name:'Medium', height:38, padding:12, icon:16},
-  {value:'lg', name:'Large', height:44, padding:16, icon:18},
+  {value:'sm', name:'Small', height:32, padding:10, icon:14, switchTrack:'28 × 16'},
+  {value:'md', name:'Medium', height:38, padding:12, icon:16, switchTrack:'36 × 20'},
+  {value:'lg', name:'Large', height:44, padding:16, icon:18, switchTrack:'44 × 24'},
 ] as const;
 
 export function IconDemos() {
@@ -93,8 +93,8 @@ export function SizeDemos() {
     <Section title="사이즈 토큰" description="sm·md·lg에 같은 크기 규칙을 적용합니다. 표의 수치는 기본 설정 기준이며 화면 조정 값에 따라 실제 크기가 달라집니다.">
       <TableContainer label="사이즈 토큰">
         <Table>
-          <thead><tr><th scope="col">Size</th><th scope="col">높이</th><th scope="col">좌우 패딩</th><th scope="col">아이콘</th></tr></thead>
-          <tbody>{sizes.map(size => <tr key={size.value}><td>{size.value}{size.value === 'md' ? ' · 기본' : ''}</td><td>{size.height}px</td><td>{size.padding}px</td><td>{size.icon}px</td></tr>)}</tbody>
+          <thead><tr><th scope="col">Size</th><th scope="col">높이</th><th scope="col">좌우 패딩</th><th scope="col">아이콘</th><th scope="col">스위치 트랙</th></tr></thead>
+          <tbody>{sizes.map(size => <tr key={size.value}><td>{size.value}{size.value === 'md' ? ' · 기본' : ''}</td><td>{size.height}px</td><td>{size.padding}px</td><td>{size.icon}px</td><td>{size.switchTrack}px</td></tr>)}</tbody>
         </Table>
       </TableContainer>
     </Section>
