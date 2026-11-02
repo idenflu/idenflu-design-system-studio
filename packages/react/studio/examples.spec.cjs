@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 test('text fields mark required and optional labels and validate only the required input', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const form = page.locator('form').filter({has:page.getByRole('button', {name:'입력 확인', exact:true})});
   const name = form.getByRole('textbox', {name:'이름 필수', exact:true});
   const company = form.getByRole('textbox', {name:'회사명 선택', exact:true});
@@ -23,7 +23,7 @@ test('text fields mark required and optional labels and validate only the requir
 });
 
 test('number prefix examples keep keyboard steps and units', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/number-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/number-fields');
   const people = page.getByRole('spinbutton', {name:'참여 인원', exact:true});
   const prefix = people.locator('..').locator('.number-field-prefix');
   await expect(prefix).toHaveAttribute('aria-hidden', 'true');
@@ -39,7 +39,7 @@ test('number prefix examples keep keyboard steps and units', async ({ page }) =>
 });
 
 test('Divider is discoverable in Korean and its examples fit the viewport', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/overview');
+  await page.goto('/systems/idenflu-mono/index.html#/overview');
   await page.keyboard.press('/');
   const search = page.getByRole('searchbox', {name:'문서 검색'});
   await search.fill('구분선');
@@ -59,7 +59,7 @@ test('Divider is discoverable in Korean and its examples fit the viewport', asyn
 });
 
 test('save example prevents duplicate clicks and reports completion', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/buttons');
+  await page.goto('/systems/idenflu-mono/index.html#/components/buttons');
   await page.getByRole('button', {name:'저장하기', exact:true}).click();
   const saving = page.getByRole('button', {name:'저장 중', exact:true});
   await expect(saving).toBeDisabled();
@@ -70,7 +70,7 @@ test('save example prevents duplicate clicks and reports completion', async ({ p
 });
 
 test('required team selection validates, submits and resets', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/select');
+  await page.goto('/systems/idenflu-mono/index.html#/components/select');
   const form = page.locator('form').filter({has:page.getByRole('button', {name:'선택 확인', exact:true})});
   const team = form.getByRole('combobox', {name:/^필수 담당 팀:/});
   await form.getByRole('button', {name:'선택 확인', exact:true}).click();
@@ -87,7 +87,7 @@ test('required team selection validates, submits and resets', async ({ page }) =
 });
 
 test('select examples show option descriptions and decorative icons while choosing values', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/select');
+  await page.goto('/systems/idenflu-mono/index.html#/components/select');
   const described = page.getByRole('combobox', {name:/^담당 팀 · 설명:/});
   await expect(described.locator('.select-prefix-icon')).toHaveAttribute('aria-hidden', 'true');
   await expect(described.locator('.icon-person')).toBeVisible();
@@ -110,7 +110,7 @@ test('select examples show option descriptions and decorative icons while choosi
 });
 
 test('project dialog rejects whitespace and creates a named project with dismissible feedback', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/overlays');
+  await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   await page.getByRole('button', {name:'다이얼로그 열기', exact:true}).click();
   const dialog = page.getByRole('dialog', {name:'새 프로젝트', exact:true});
   const name = dialog.getByRole('textbox', {name:'프로젝트 이름', exact:true});
@@ -130,7 +130,7 @@ test('project dialog rejects whitespace and creates a named project with dismiss
 });
 
 test('informational and destructive dialogs cancel safely and restore sample data', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/overlays');
+  await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const infoTrigger = page.getByRole('button', {name:'안내 열기', exact:true});
   await infoTrigger.click();
   const info = page.getByRole('dialog', {name:'공유 범위 안내', exact:true});
@@ -159,7 +159,7 @@ test('informational and destructive dialogs cancel safely and restore sample dat
 });
 
 test('toast retry, replacement and undo actions update the examples', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/overlays');
+  await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const errorTrigger = page.getByRole('button', {name:'오류 알림 표시', exact:true});
   await errorTrigger.click();
   const toast = page.locator('.toast');
@@ -186,7 +186,7 @@ test('toast retry, replacement and undo actions update the examples', async ({ p
 });
 
 test('project tabs skip unavailable categories during keyboard navigation', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/tabs');
+  await page.goto('/systems/idenflu-mono/index.html#/components/tabs');
   const tabs = page.getByRole('tablist', {name:'프로젝트 분류', exact:true});
   const active = tabs.getByRole('tab', {name:'진행 중 · 3', exact:true});
   const completed = tabs.getByRole('tab', {name:'완료 · 2', exact:true});
@@ -202,7 +202,7 @@ test('project tabs skip unavailable categories during keyboard navigation', asyn
 });
 
 test('file example rejects unsupported types and displays removable PDF selection', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/file-upload');
+  await page.goto('/systems/idenflu-mono/index.html#/components/file-upload');
   const upload = page.getByLabel('첨부 파일', {exact:true});
   await upload.setInputFiles({name:'notes.txt', mimeType:'text/plain', buffer:Buffer.from('unsupported')});
   await expect(page.getByRole('alert')).toHaveText('지원하지 않는 파일 형식입니다.');
@@ -219,11 +219,11 @@ test('file example rejects unsupported types and displays removable PDF selectio
 });
 
 test('document contents omit titles belonging to closed dialogs', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/drawer');
+  await page.goto('/systems/idenflu-mono/index.html#/components/drawer');
   const contents = page.getByRole('navigation', {name:'이 페이지 목차', exact:true});
   await expect(contents.getByRole('link', {name:'사이드 패널', exact:true})).toBeVisible();
   await expect(contents.getByRole('link', {name:'프로젝트 설정', exact:true})).toHaveCount(0);
-  await page.goto('/packages/react/studio/index.html#/components/overlays');
+  await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   await expect(page.getByRole('heading', {level:1})).toHaveText('Dialog & toast');
   await expect(contents.getByRole('link', {name:'다이얼로그', exact:true})).toBeVisible();
   await expect(contents.getByRole('link', {name:'새 프로젝트', exact:true})).toHaveCount(0);

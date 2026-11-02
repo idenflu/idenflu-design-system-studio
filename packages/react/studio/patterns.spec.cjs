@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 test('Patterns restores the nested Form menu and omits Layout and Page', async ({page,isMobile}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/basic');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/basic');
   if (isMobile) await page.getByRole('button',{name:'메뉴',exact:true}).click();
   const nav = page.locator('#react-studio-nav');
   const patterns = nav.locator('.nav-group').filter({has:page.locator('summary', {hasText:/^Patterns$/})});
@@ -17,7 +17,7 @@ test('Patterns restores the nested Form menu and omits Layout and Page', async (
 });
 
 test('notification preferences validate groups and reset choices and Select state', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/preferences');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/preferences');
   await page.getByRole('button',{name:'설정 확인',exact:true}).click();
   const channel = page.getByRole('group',{name:'알림 채널 필수',exact:true});
   const contact = page.getByRole('group',{name:'선호 연락 방법 필수',exact:true});
@@ -37,7 +37,7 @@ test('notification preferences validate groups and reset choices and Select stat
 });
 
 test('password form checks length, confirmation and reset visibility', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/password');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/password');
   const current = page.getByLabel('현재 비밀번호 필수',{exact:true});
   const password = page.getByLabel('새 비밀번호 필수',{exact:true});
   const confirm = page.getByLabel('새 비밀번호 확인 필수',{exact:true});
@@ -59,7 +59,7 @@ test('password form checks length, confirmation and reset visibility', async ({p
 });
 
 test('inquiry form validates content and resets its count and attachment', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/inquiry');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/inquiry');
   const message = page.getByRole('textbox',{name:'문의 내용 필수',exact:true});
   await message.fill('짧은 문의');
   await page.getByRole('button',{name:'내용 확인',exact:true}).click();
@@ -76,7 +76,7 @@ test('inquiry form validates content and resets its count and attachment', async
 });
 
 test('project form validates slug and exact budget and resets selected teams and progress', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/project');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/project');
   await page.getByRole('textbox',{name:'프로젝트명 필수',exact:true}).fill('프로젝트');
   const slug = page.getByRole('textbox',{name:'프로젝트 주소 필수',exact:true});
   await slug.fill('Wrong Address');
@@ -100,7 +100,7 @@ test('project form validates slug and exact budget and resets selected teams and
 });
 
 test('booking form validates dates, attendee bounds and attendance format', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/booking');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/booking');
   const date = page.getByRole('textbox',{name:'날짜 필수',exact:true});
   await page.getByRole('button',{name:'입력 확인',exact:true}).click();
   await expect(date).toBeFocused(); await expect(date).toHaveAttribute('aria-invalid','true');
@@ -122,7 +122,7 @@ test('booking form validates dates, attendee bounds and attendance format', asyn
 });
 
 test('profile saves edited data and readonly patterns expose their original states', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/profile');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/profile');
   const name = page.getByRole('textbox',{name:'이름 필수',exact:true});
   await expect(name).toHaveValue('김민수'); await name.fill('');
   await page.getByRole('button',{name:'변경사항 저장',exact:true}).click(); await expect(name).toBeFocused();
@@ -130,7 +130,7 @@ test('profile saves edited data and readonly patterns expose their original stat
   await expect(page.locator('form').getByRole('status')).toHaveText('변경사항을 저장했습니다.');
   await page.getByRole('switch',{name:'제품 소식 받기',exact:true}).uncheck();
   await expect(page.locator('form .form-pattern-result')).toBeEmpty();
-  await page.goto('/packages/react/studio/index.html#/patterns/form/states');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/states');
   await expect(page.getByRole('textbox',{name:'계정 ID · 읽기 전용',exact:true})).toHaveAttribute('readonly','');
   await expect(page.getByRole('textbox',{name:'팀 · 비활성',exact:true})).toBeDisabled();
   await expect(page.getByRole('switch',{name:'알림 · 비활성',exact:true})).toBeDisabled();
@@ -138,7 +138,7 @@ test('profile saves edited data and readonly patterns expose their original stat
 });
 
 test('data patterns distinguish loading, error, empty and filtered results and ignore obsolete requests', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/data-states');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/data-states');
   const region = page.locator('[data-state]');
   await page.getByRole('button',{name:'조회 실패',exact:true}).click();
   await expect(region).toHaveAttribute('aria-busy','true');
@@ -156,7 +156,7 @@ test('data patterns distinguish loading, error, empty and filtered results and i
 });
 
 test('empty patterns offer working search reset and project registration navigation', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/empty-state');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/empty-state');
   await expect(page.getByRole('heading',{name:'검색 결과가 없습니다',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'검색 초기화',exact:true}).click();
   await expect(page.getByRole('searchbox',{name:'프로젝트 검색',exact:true})).toHaveValue('');

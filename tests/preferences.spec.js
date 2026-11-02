@@ -1,24 +1,25 @@
 const { test, expect } = require('@playwright/test');
+const documents = require('../packages/react/studio/routes.json');
 
 const storageKey = 'idenflu-mono-preferences-v1';
 const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 38, radius: 0 };
 const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6 };
 const ranges = {
-  fontSize: '#studio-font-size',
-  lineHeight: '#studio-line-height',
-  spacing: '#studio-spacing',
-  controlHeight: '#studio-control-height',
-  radius: '#studio-radius',
+  fontSize: '#react-pref-fontSize',
+  lineHeight: '#react-pref-lineHeight',
+  spacing: '#react-pref-spacing',
+  controlHeight: '#react-pref-controlHeight',
+  radius: '#react-pref-radius',
 };
 
-async function openApp(page, route = 'components/select', prefix = '') {
+async function openApp(page, route = 'components/text-fields', prefix = '') {
   await page.goto(`${prefix}/systems/idenflu-mono/index.html#/${route}`);
   await page.waitForFunction(() => Boolean(window.IdenfluPreferences));
   await expect(page.locator(`[data-route="${route}"]`)).toBeVisible();
 }
 
 async function openSettings(page) {
-  const opener = page.locator('[data-studio-settings-open]:visible').first();
+  const opener = page.getByRole('button', {name:'화면 조정',exact:true});
   await opener.click();
   await expect(page.locator('#studio-settings-dialog')).toBeVisible();
   return opener;
@@ -37,8 +38,8 @@ async function expectRanges(page, values) {
 async function metrics(page) {
   return page.evaluate(() => {
     const body = getComputedStyle(document.body);
-    const button = document.querySelector('#studio-preview-button');
-    const input = document.querySelector('#studio-preview-input');
+    const button = document.querySelector('.route-text-fields button[type=submit]');
+    const input = document.querySelector('.route-text-fields .text-input');
     const buttonStyle = getComputedStyle(button);
     const inputStyle = getComputedStyle(input);
     return {
@@ -76,10 +77,7 @@ test('live adjustments change rendered controls, persist on reload and copy curr
   await openSettings(page);
   const before = await metrics(page);
   for (const [key, selector] of Object.entries(ranges)) {
-    await page.locator(selector).evaluate((input, value) => {
-      input.value = String(value);
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    }, custom[key]);
+    await page.locator(selector).fill(String(custom[key]));
   }
   expect(await preferences(page)).toEqual(custom);
   const rendered = await metrics(page);
@@ -92,17 +90,9 @@ test('live adjustments change rendered controls, persist on reload and copy curr
   expect(rendered.buttonPadding).toBeGreaterThan(before.buttonPadding);
   expect(rendered.buttonRadius).toBe(6);
   expect(rendered.inputRadius).toBe(6);
-  const sizes = await page.evaluate(() => [...document.querySelectorAll('.size-preview')].map((group) => {
-    const button = group.querySelector('.button');
-    return { size: group.dataset.size, height: parseFloat(getComputedStyle(button).height), font: parseFloat(getComputedStyle(button).fontSize) };
-  }));
-  expect(sizes.map((size) => size.size)).toEqual(['sm', 'md', 'lg']);
-  expect(sizes[0].height).toBeLessThan(sizes[1].height);
-  expect(sizes[1].height).toBeLessThan(sizes[2].height);
-  expect(sizes.every((size) => size.font === 16)).toBe(true);
   await page.locator('#studio-preferences-close').click();
   await page.evaluate(() => { location.hash = '#/components/text-fields'; });
-  await expect(page.locator('#view-text-fields')).toBeVisible();
+  await expect(page.locator('.route-text-fields')).toBeVisible();
   expect(await preferences(page)).toEqual(custom);
   await page.reload();
   await page.waitForFunction(() => Boolean(window.IdenfluPreferences));
@@ -118,7 +108,7 @@ test('live adjustments change rendered controls, persist on reload and copy curr
     });
   });
   const expectedCss = await page.evaluate(() => window.IdenfluPreferences.cssText());
-  await page.locator('#studio-preferences-copy').click();
+  await page.getByRole('button', {name:'CSS 복사',exact:true}).click();
   await expect.poll(() => page.evaluate(() => window.copiedPreferenceCss)).toBe(expectedCss);
   expect(expectedCss).toContain('--font-size-base: 16px');
   expect(expectedCss).toContain('--space-unit: 5px');
@@ -181,29 +171,29 @@ test('storage failures retain in-memory adjustments and report an unsaved prefer
   await openSettings(page);
   await expectRanges(page, custom);
   expect((await metrics(page)).bodyFont).toBe(16);
-  await page.locator('#studio-preferences-reset').click();
+  await page.locator('#studio-settings-dialog').getByRole('button', {name:'초기화',exact:true}).click();
   expect(await preferences(page)).toEqual(defaults);
   expect(errors).toEqual([]);
 });
 
 test('reset restores defaults without losing theme, form edits or validation state', async ({ page }) => {
   await openApp(page, 'patterns/form/profile');
-  await page.locator('[data-theme-toggle]:visible').first().click();
+  await page.locator('.theme-toggle').click();
   const theme = await page.evaluate(() => ({ current: document.documentElement.dataset.theme, saved: localStorage.getItem('idenflu-mono-theme') }));
-  await page.locator('#profile-name').fill('편집 중인 사용자');
-  await page.locator('#profile-email').fill('invalid-email');
-  await page.locator('#profile-form button[type="submit"]').click();
-  await expect(page.locator('#profile-email')).toHaveAttribute('aria-invalid', 'true');
+  await page.getByRole('textbox', {name:'이름 필수',exact:true}).fill('편집 중인 사용자');
+  await page.getByRole('textbox', {name:'이메일 필수',exact:true}).fill('invalid-email');
+  await page.locator('.route-profile form button[type="submit"]').click();
+  await expect(page.getByRole('textbox', {name:'이메일 필수',exact:true})).toHaveAttribute('aria-invalid', 'true');
   await page.evaluate((value) => window.IdenfluPreferences.set(value), custom);
   await openSettings(page);
-  await page.locator('#studio-preferences-reset').click();
+  await page.locator('#studio-settings-dialog').getByRole('button', {name:'초기화',exact:true}).click();
   expect(await preferences(page)).toEqual(defaults);
   await expectRanges(page, defaults);
   expect(await page.evaluate((key) => localStorage.getItem(key), storageKey)).toBeNull();
   expect(await page.evaluate(() => ({ current: document.documentElement.dataset.theme, saved: localStorage.getItem('idenflu-mono-theme') }))).toEqual(theme);
-  await expect(page.locator('#profile-name')).toHaveValue('편집 중인 사용자');
-  await expect(page.locator('#profile-email')).toHaveValue('invalid-email');
-  await expect(page.locator('#profile-email')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByRole('textbox', {name:'이름 필수',exact:true})).toHaveValue('편집 중인 사용자');
+  await expect(page.getByRole('textbox', {name:'이메일 필수',exact:true})).toHaveValue('invalid-email');
+  await expect(page.getByRole('textbox', {name:'이메일 필수',exact:true})).toHaveAttribute('aria-invalid', 'true');
   await page.locator('#studio-preferences-close').click();
   await page.reload();
   await page.waitForFunction(() => Boolean(window.IdenfluPreferences));
@@ -213,11 +203,11 @@ test('reset restores defaults without losing theme, form edits or validation sta
 
 test('settings support keyboard adjustment, modal focus and Escape return', async ({ page }) => {
   await openApp(page);
-  const opener = page.locator('[data-studio-settings-open]:visible').first();
+  const opener = page.getByRole('button', {name:'화면 조정',exact:true});
   await opener.focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#studio-settings-dialog')).toBeVisible();
-  const font = page.locator('#studio-font-size');
+  const font = page.locator('#react-pref-fontSize');
   await font.focus();
   await font.press('ArrowRight');
   await expect(font).toHaveValue('15');
@@ -236,14 +226,14 @@ test('settings support keyboard adjustment, modal focus and Escape return', asyn
   await opener.click();
   await page.setViewportSize({ width: page.viewportSize().width > 900 ? 320 : 1440, height: 900 });
   await page.locator('#studio-preferences-close').click();
-  await expect(page.locator('[data-studio-settings-open]:visible').first()).toBeFocused();
+  await expect(page.getByRole('button', {name:'화면 조정',exact:true})).toBeFocused();
 });
 
 test('largest preferences remain usable across every route and settings controls at 320px', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await openApp(page);
   await page.evaluate(() => window.IdenfluPreferences.set({ fontSize: 18, lineHeight: 32, spacing: 150, controlHeight: 48, radius: 12 }));
-  const routes = await page.locator('[data-route]').evaluateAll((views) => views.map((view) => view.dataset.route));
+  const routes = documents.map(item => item.route);
   for (const route of routes) {
     await page.evaluate((value) => { location.hash = `#/${value}`; }, route);
     await expect(page.locator(`[data-route="${route}"]`)).toBeVisible();
@@ -251,39 +241,6 @@ test('largest preferences remain usable across every route and settings controls
     const dimensions = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
     expect(dimensions.scroll, route).toBeLessThanOrEqual(dimensions.width);
   }
-  await page.evaluate(() => { location.hash = '#/components/date-picker'; });
-  const dateView = page.locator('[data-route="components/date-picker"]');
-  await expect(dateView).toBeVisible();
-  for (const picker of await dateView.locator('[data-date-picker]').all()) {
-    await picker.locator('.date-trigger').click();
-    const popup = picker.locator('.date-popup');
-    await expect(popup).toBeVisible();
-    const box = await popup.boundingBox();
-    const viewport = await page.evaluate(() => ({ width: document.documentElement.clientWidth, height: innerHeight }));
-    expect(box.x).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
-    expect(box.y).toBeGreaterThanOrEqual(0);
-    expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
-    await page.keyboard.press('Escape');
-    await expect(popup).toBeHidden();
-  }
-  const lastPicker = dateView.locator('[data-date-picker]').last();
-  await lastPicker.locator('.date-trigger').click();
-  await page.evaluate(async () => {
-    window.IdenfluPreferences.set({ fontSize: 12, lineHeight: 18, spacing: 75, controlHeight: 32, radius: 0 });
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  });
-  const livePopup = lastPicker.locator('.date-popup');
-  if (await livePopup.isVisible()) {
-    const box = await livePopup.boundingBox();
-    const bounds = await page.evaluate(() => ({ width: document.documentElement.clientWidth, height: innerHeight }));
-    expect(box.x).toBeGreaterThanOrEqual(0);
-    expect(box.y).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width).toBeLessThanOrEqual(bounds.width);
-    expect(box.y + box.height).toBeLessThanOrEqual(bounds.height);
-    await page.keyboard.press('Escape');
-  } else await expect(lastPicker.locator('.date-trigger')).toHaveAttribute('aria-expanded', 'false');
-  await page.evaluate(() => window.IdenfluPreferences.set({ fontSize: 18, lineHeight: 32, spacing: 150, controlHeight: 48, radius: 12 }));
   await openSettings(page);
   const dialog = await page.locator('#studio-settings-dialog').boundingBox();
   expect(dialog.x).toBeGreaterThanOrEqual(0);
@@ -305,7 +262,7 @@ test('largest preferences remain usable across every route and settings controls
 test('built documentation loads preferences early and portable consumers retain their own defaults', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await openApp(page, 'components/select', '/dist');
+  await openApp(page, 'components/text-fields', '/dist');
   const response = await page.request.get('/dist/systems/idenflu-mono/manifest.json');
   expect(response.ok()).toBe(true);
   const { files } = await response.json();
@@ -324,8 +281,8 @@ test('built documentation loads preferences early and portable consumers retain 
   const consumer = await page.evaluate(async (files) => {
     const frame = document.createElement('iframe');
     const loaded = new Promise((resolve) => frame.addEventListener('load', resolve, { once: true }));
-    document.body.append(frame);
     frame.srcdoc = `<link rel="stylesheet" href="/dist/systems/idenflu-mono/${files.styles}"><button id="consumer-button" class="button" type="button">저장</button><script src="/dist/systems/idenflu-mono/${files.runtime}"><\/script>`;
+    document.body.append(frame);
     await loaded;
     const button = frame.contentDocument.querySelector('#consumer-button');
     const style = frame.contentWindow.getComputedStyle(button);

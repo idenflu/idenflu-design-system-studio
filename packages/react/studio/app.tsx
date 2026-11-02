@@ -11,14 +11,8 @@ import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from
 import { DocumentShell, Overview, useDocumentRoute } from './shell';
 import { DividerDemos } from './divider-demos';
 import { patternPages, patternSnippets } from './patterns';
-import extraRoutes from './extra-routes.json';
 import icons from './dist/icons.json';
 
-const prototyped = new Set(['components/buttons', 'components/text-fields', 'components/selection', 'components/select', 'components/number-fields', 'components/date-picker', 'components/tree', 'components/tabs', 'components/progress', 'components/loading', 'components/file-upload', 'components/feedback', 'components/accordion', 'components/overlays', 'components/table', 'components/chips', 'components/list', 'components/slider', 'components/tooltip', 'components/dropdown-menu', 'components/popover', 'components/drawer', 'components/avatar', 'components/stepper', 'components/card']);
-['overview', 'foundations/colors', 'foundations/typography', 'foundations/sizes', 'foundations/icons', 'foundations/states'].forEach(route => prototyped.add(route));
-extraRoutes.forEach(item => prototyped.add(item.route));
-Object.keys(patternPages).forEach(route => prototyped.add(route));
-const reactOnly = new Set(extraRoutes.map(item => item.route));
 const snippets: Record<string, string> = {
   'components/divider':`import { Divider } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
@@ -140,7 +134,12 @@ export function OverlayExample() {
   </>;
 }`,
   'components/table':'<Table><thead><tr><th>이름</th></tr></thead><tbody><tr><td>프로젝트</td></tr></tbody></Table>',
-  'components/chips':'<Chip aria-pressed={selected} onClick={() => setSelected(!selected)}>디자인</Chip>',
+  'components/chips':`import { Chip } from '@idenflu/mono-react';
+
+<Chip interactive={false}>디자인</Chip>
+<Chip interactive={false} variant="secondary">보조 정보</Chip>
+<Chip interactive={false} rounded variant="success">완료</Chip>
+<Chip rounded variant="primary" aria-pressed={selected} onClick={() => setSelected(!selected)}>프로젝트 필터</Chip>`,
   'components/list':'<List><ListItem>디자인 시스템</ListItem></List>',
   'components/slider':'<Slider aria-label="진행률" defaultValue={50} />',
   'components/tooltip':'<Tooltip content="도움말"><Button>정보</Button></Tooltip>',
@@ -153,7 +152,6 @@ export function OverlayExample() {
   'patterns/form/basic':'<TextField label="이름" name="name" required error={errors.name} />\n<TextField label="이메일" name="email" type="email" required error={errors.email} />',
   ...patternSnippets,
 };
-const legacy = (route: string) => `../../../systems/idenflu-mono/index.html#/${route}`;
 function CodeExample({ code }: { code:string }) {
   const [message, setMessage] = React.useState('');
   return <Section title="React 사용 예시" description="패키지에서 컴포넌트를 가져와 사용합니다."><div className="react-studio-code"><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
@@ -161,7 +159,7 @@ function CodeExample({ code }: { code:string }) {
 function FoundationIcons() {
   const [query, setQuery] = React.useState('');
   const visible = icons.filter(name => name.includes(query.trim().toLowerCase()));
-  return <><div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: search, calendar, close" /></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 다른 이름으로 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><span className="ui-icon" aria-hidden="true" style={{'--icon':`url('../../../systems/idenflu-mono/assets/icons/idenflu/${name}.svg')`} as React.CSSProperties} /><span>{name}</span></li>)}</ul></>;
+  return <><div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: search, calendar, close" /></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 다른 이름으로 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><span className="ui-icon" aria-hidden="true" style={{'--icon':`url('${new URL(`./assets/icons/idenflu/${name}.svg`, document.baseURI).href}')`} as React.CSSProperties} /><span>{name}</span></li>)}</ul></>;
 }
 function ComponentPage({ route }: { route:string }) {
   const Pattern = patternPages[route as keyof typeof patternPages];
@@ -205,7 +203,8 @@ function ComponentPage({ route }: { route:string }) {
 function App() {
   const current = useDocumentRoute();
   return <DocumentShell current={current}>
-    {prototyped.has(current.route) ? <><ComponentPage key={`page-${current.route}`} route={current.route} />{snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} />}{current.route !== 'overview' && !reactOnly.has(current.route) && <p className="react-studio-note">React 패키지 컴포넌트로 구현한 예시입니다. 기존 문서의 모든 변형과 동작을 대조하는 중입니다. <a href={legacy(current.route)}>기존 문서 보기</a></p>}</> : <p className="react-studio-note">이 문서는 React 전환 전입니다. <a href={legacy(current.route)}>기존 문서에서 확인</a></p>}
+    <ComponentPage key={`page-${current.route}`} route={current.route} />
+    {snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} />}
   </DocumentShell>;
 }
 createRoot(document.getElementById('root')!).render(<App />);

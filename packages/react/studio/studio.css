@@ -121,3 +121,5 @@
 @media (max-width:600px) {
   .react-studio-field-grid, .react-studio-size-grid, .react-studio .overview-links { grid-template-columns:minmax(0, 1fr); }
 }
+
+.react-studio-chip-palette .react-studio-example-title { display:grid; gap:var(--space-1); }

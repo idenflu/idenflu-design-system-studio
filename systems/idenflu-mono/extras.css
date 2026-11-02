@@ -32,11 +32,22 @@
 .tree-item:disabled { color:var(--disabled-text); cursor:not-allowed; }
 .tree-feedback { margin-top:var(--space-4); }
 .chip-row { display:flex; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-5); }
-.chip { border-radius:var(--radius-control); display:inline-flex; align-items:center; gap:var(--control-gap); min-height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--border); background:var(--field-background); color:var(--text); font:inherit; line-height:var(--line-height-control); }
-.chip:hover:not(:disabled) { background:var(--surface); }
+.chip { --chip-accent:var(--primary); --chip-background:var(--field-background); border-radius:var(--radius-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--control-gap); max-width:100%; min-height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--chip-border,var(--border)); background:var(--chip-background); color:var(--text); font:inherit; line-height:var(--line-height-control); overflow-wrap:anywhere; }
+.chip:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) { background:var(--surface); }
+.chip:not(:disabled):not(.chip--static) { cursor:pointer; }
+.chip--rounded { border-radius:999px; }
+.chip--static { cursor:default; }
+.chip--colored { --chip-border:color-mix(in srgb,var(--chip-accent) 22%,var(--chip-background)); color:var(--chip-accent); }
+.chip--primary { --chip-accent:var(--primary); --chip-background:var(--info-surface); }
+.chip--secondary { --chip-border:var(--border); --chip-accent:var(--text); --chip-background:var(--surface-hover); --chip-hover-background:var(--surface-pressed); --chip-selected-background:var(--surface-pressed); --chip-selected-text:var(--text); }
+.chip--success { --chip-accent:var(--success); --chip-background:var(--success-surface); }
+.chip--warning { --chip-accent:var(--warning); --chip-background:var(--warning-surface); }
+.chip--danger { --chip-accent:var(--danger-text); --chip-background:var(--danger-surface); }
+.chip--colored:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) { background:var(--chip-hover-background,var(--chip-background)); border-color:var(--chip-accent); }
 .chip[aria-pressed="true"] { border-color:var(--primary); background:var(--info-surface); color:var(--primary); }
+.chip--colored[aria-pressed="true"] { border-color:var(--chip-accent); background:var(--chip-selected-background,var(--chip-accent)); color:var(--chip-selected-text,var(--canvas)); }
 .chip:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
-.chip:disabled { background:var(--surface); color:var(--disabled-text); }
+.chip:disabled { background:var(--surface); border-color:var(--border); color:var(--disabled-text); cursor:not-allowed; }
 .chip img { width:var(--icon-size); height:var(--icon-size); }
 .chip-size-examples { display:grid; gap:var(--space-4); margin-top:var(--space-6); }
 .chip-size-row { display:grid; grid-template-columns:72px minmax(0,1fr); align-items:center; gap:var(--space-4); }

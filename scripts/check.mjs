@@ -12,9 +12,13 @@ if (unique.size !== ids.length) throw new Error('Duplicate HTML IDs');
 for (const match of html.matchAll(/\b(?:for|aria-controls|aria-labelledby|aria-describedby|aria-errormessage)="([^"]+)"/g)) {
   for (const id of match[1].split(/\s+/)) if (!unique.has(id)) throw new Error(`Missing ARIA/label target: ${id}`);
 }
-for (const match of html.matchAll(/(?:src|href)="\.\/([^"?#]+)(?:[?#][^"]*)?"/g)) await access(resolve(system, match[1]));
+for (const match of html.matchAll(/(?:src|href)="\.\/([^"?#]+)(?:[?#][^"]*)?"/g)) {
+  if (!match[1].startsWith('docs-dist/')) await access(resolve(system, match[1]));
+}
+if (!html.includes('id="root"') || !html.includes('type="module" src="./docs-dist/app.js"')) throw new Error('Missing canonical React entry');
 const cssFiles = (await readdir(system)).filter((file) => file.endsWith('.css'));
-const css = (await Promise.all(cssFiles.map((file) => readFile(resolve(system, file), 'utf8')))).join('\n');
+const cssPaths = [...cssFiles.map(file => resolve(system, file)), resolve(root, 'packages/react/src/react.css'), resolve(root, 'packages/react/studio/studio.css')];
+const css = (await Promise.all(cssPaths.map(file => readFile(file, 'utf8')))).join('\n');
 for (const match of (html + '\n' + css).matchAll(/url\(\s*(['"]?)([^'"\)]+)\1\s*\)/g)) {
   const url = match[2].trim();
   if (!url || /^(?:data:|https?:|#)/.test(url)) continue;
@@ -25,10 +29,12 @@ const dynamic = new Set(['--fill', '--fill-position']);
 for (const match of css.matchAll(/var\((--[\w-]+)\s*([,)])/g)) {
   if (match[2] !== ',' && !declared.has(match[1]) && !dynamic.has(match[1])) throw new Error(`Undefined token: ${match[1]}`);
 }
-const routes = [...html.matchAll(/data-route="([^"]+)"/g)].map((match) => match[1]);
-if (new Set(routes).size !== routes.length) throw new Error('Duplicate routes');
-const links = [...html.matchAll(/href="#\/([^"]+)"/g)].map((match) => match[1]);
-for (const link of links) if (!routes.includes(link)) throw new Error(`Missing route: ${link}`);
+const routes = JSON.parse(await readFile(resolve(root, 'packages/react/studio/routes.json'), 'utf8'));
+if (routes[0]?.route !== 'overview' || new Set(routes.map(item => item.route)).size !== routes.length) throw new Error('Invalid document routes');
+for (const item of routes) {
+  if (!item.route || !item.title || !item.group || !item.description) throw new Error(`Incomplete route: ${item.route}`);
+  if (/^patterns\/(layout|page)\//.test(item.route)) throw new Error(`Excluded pattern: ${item.route}`);
+}
 let scripts = 0;
 for (const directory of [system, resolve(root, 'tests'), resolve(root, 'scripts')]) {
   for (const file of await readdir(directory)) if (/\.(?:m?js)$/.test(file)) { execFileSync(process.execPath, ['--check', resolve(directory, file)]); scripts++; }

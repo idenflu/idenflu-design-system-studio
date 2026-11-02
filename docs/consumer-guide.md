@@ -12,7 +12,7 @@
 
 폰트·아이콘은 CSS 파일 기준 `./assets/`에 있어야 합니다. 테마 스크립트는 시스템 색상 설정과 저장된 모드 선택을 적용합니다. 호스트 앱이 테마를 직접 관리한다면 생략하고 `<html data-theme="light|dark">`를 설정할 수 있습니다.
 
-소스 파일을 직접 사용할 때는 `runtime.js`를 어댑터들보다 먼저 읽습니다. 실제 최소 구성은 [독립 소비 예제](../tests/runtime-fixture.html)를 참고하세요. `component-demos.js`, `additional.js`, 폼·페이지 예제, 문서 내비게이션은 소비 런타임에 포함되지 않습니다.
+소스 파일을 직접 사용할 때는 `runtime.js`를 어댑터들보다 먼저 읽습니다. 실제 최소 구성은 [독립 소비 예제](../tests/runtime-fixture.html)를 참고하세요. 정식 모노 문서는 React로 동작하며, React 문서 번들과 화면 조정 UI는 이 소비 런타임에 포함되지 않습니다. React 프로젝트에는 [React 패키지](../packages/react/README.md)를 사용합니다.
 
 ## 초기화와 해제
 

@@ -33,13 +33,11 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm ci
+        working-directory: packages/react
       - run: npm run check
       - run: npm test
       - run: npm run build
-      - run: npm ci
-        working-directory: packages/react
-      - run: npm run studio:build
-        working-directory: packages/react
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - run: npx playwright test --config packages/react/studio/playwright.config.cjs

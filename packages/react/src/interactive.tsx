@@ -3,8 +3,8 @@ const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : 
 
 type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
 
-/** Native modal dialog; the browser manages focus trapping and restoration. */
-export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, onClick, ...props }: DismissibleProps & { closeOnBackdrop?: boolean } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>) {
+/** Native modal dialog with keyboard focus wrapping and restoration. */
+export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, onClick, onKeyDown, ...props }: DismissibleProps & { closeOnBackdrop?: boolean } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>) {
   const ref = React.useRef<HTMLDialogElement>(null);
   useClientLayoutEffect(() => {
     const dialog = ref.current;
@@ -12,7 +12,16 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     if (open && !dialog.open) dialog.showModal();
     else if (!open && dialog.open) dialog.close();
   }, [open]);
-  return <dialog {...props} ref={ref} className={`dialog ${className}`} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
+  return <dialog {...props} ref={ref} className={`dialog ${className}`} onKeyDown={event => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented || event.key !== 'Tab') return;
+    const dialog = event.currentTarget;
+    const focusable = [...dialog.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')].filter(element => element.tabIndex >= 0 && element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden' && !element.closest('[inert]'));
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (!first) { event.preventDefault(); dialog.focus(); }
+    else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
+  }} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
 }
 
 export function Drawer({ className = '', closeOnBackdrop = true, ...props }: React.ComponentProps<typeof Dialog>) {
@@ -24,6 +33,25 @@ export function Tooltip({ content, children }: { content: React.ReactNode; child
   const id = React.useId();
   const [dismissed, setDismissed] = React.useState(false);
   const wrap = React.useRef<HTMLSpanElement>(null);
+  const bubble = React.useRef<HTMLSpanElement>(null);
+  const position = React.useCallback(() => {
+    const element = bubble.current;
+    if (!element?.getClientRects().length) return;
+    element.style.transform = '';
+    const bounds = element.getBoundingClientRect();
+    const width = element.ownerDocument.documentElement.clientWidth;
+    const shift = Math.max(12 - bounds.left, Math.min(0, width - 12 - bounds.right));
+    element.style.transform = shift ? `translateX(${shift}px)` : '';
+  }, []);
+  useClientLayoutEffect(() => {
+    position();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(position);
+    if (wrap.current) observer?.observe(wrap.current);
+    if (bubble.current) observer?.observe(bubble.current);
+    window.addEventListener('resize', position);
+    window.addEventListener('scroll', position, true);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', position); window.removeEventListener('scroll', position, true); };
+  }, [position, content]);
   React.useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || dismissed || !wrap.current || !(wrap.current.matches(':hover') || wrap.current.contains(document.activeElement))) return;
@@ -36,11 +64,11 @@ export function Tooltip({ content, children }: { content: React.ReactNode; child
   }, [dismissed]);
   const existing = children.props['aria-describedby'];
   return <span ref={wrap} className={`tooltip-wrap${dismissed ? ' tooltip-dismissed' : ''}`}
-    onMouseEnter={() => setDismissed(false)}
-    onFocus={event => { if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}
+    onMouseEnter={() => { position(); setDismissed(false); }}
+    onFocus={event => { position(); if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}
     onClickCapture={() => setDismissed(true)}>
     {React.cloneElement(children, { 'aria-describedby': [existing, id].filter(Boolean).join(' ') })}
-    <span id={id} role="tooltip" className="tooltip-content">{content}</span>
+    <span ref={bubble} id={id} role="tooltip" className="tooltip-content">{content}</span>
   </span>;
 }
 

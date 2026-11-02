@@ -6,7 +6,7 @@ module.exports = defineConfig({
   globalTimeout: 10 * 60 * 1000,
   workers: process.env.CI ? 2 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
-  use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+  use: { ...(process.env.IDENFLU_TEST_CHROMIUM ? { launchOptions: { executablePath: process.env.IDENFLU_TEST_CHROMIUM } } : {}), baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   projects: [
     { name: 'desktop-light', use: { browserName: 'chromium', viewport: { width: 1440, height: 1000 }, colorScheme: 'light' } },
     { name: 'desktop-dark', use: { browserName: 'chromium', viewport: { width: 1440, height: 1000 }, colorScheme: 'dark' } },

@@ -37,6 +37,7 @@ img[src*="/icons/"] { filter:var(--icon-filter); }
     --primary-control-pressed:Highlight;
     --text-on-primary:HighlightText;
     --danger:CanvasText;
+    --danger-text:CanvasText;
     --danger-control:Highlight;
     --danger-control-hover:Highlight;
     --danger-control-pressed:Highlight;

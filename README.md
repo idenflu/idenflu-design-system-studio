@@ -1,169 +1,76 @@
 # idenflu mono
 
-HTML·CSS·JavaScript 디자인 시스템과 문서 스튜디오입니다. 문서 데모와 분리된 브라우저용 컴포넌트 런타임을 제공합니다.
+React 기반 디자인 시스템과 문서 스튜디오입니다. 컴포넌트는 `@idenflu/mono-react` 패키지로 제공하며, 기존 HTML 소비자를 위한 독립 런타임도 유지합니다.
 
-Node.js 20 이상에서 `npm ci`, `npm run dev`로 실행할 수 있습니다. 패키지를 설치하지 않고 미리보기만 확인하려면 아래 Python 서버도 사용할 수 있습니다.
+## 실행
 
-`index.html`을 브라우저로 열거나, 프로젝트 폴더에서 다음 명령으로 실행하세요.
+Node.js 20 이상에서 루트와 React 패키지의 의존성을 설치합니다.
 
 ```sh
-python3 -m http.server 4173 --bind 127.0.0.1
+npm ci
+npm --prefix packages/react ci
+npm run dev
 ```
 
-미리보기: http://127.0.0.1:4173
+- 갤러리: `http://127.0.0.1:4173/`
+- 모노 문서: `http://127.0.0.1:4173/systems/idenflu-mono/index.html#/overview`
+- 이전 `/packages/react/studio/index.html` 주소는 쿼리와 문서 해시를 유지해 모노 문서로 이동합니다.
 
-기본 화면은 디자인 시스템 갤러리입니다. idenflu mono 문서는 `systems/idenflu-mono/index.html`에 있으며, 기존 루트 해시 주소도 해당 문서로 연결됩니다.
+`npm run dev`는 React 패키지와 문서를 먼저 빌드합니다. 소스를 수정한 뒤에는 `npm --prefix packages/react run studio:build`를 다시 실행하고 새로고침합니다.
 
-- [프로젝트 적용과 API](docs/consumer-guide.md)
-- [React 패키지와 GitHub Packages 배포](packages/react/README.md)
+## 문서와 사용
+
+Overview, Foundations 5개, 컴포넌트 26개 분류, Form 8개와 데이터 상태·빈 상태까지 42개 문서를 제공합니다. Patterns의 Layout과 Page는 제외합니다. 폼 검증·초기화·파일 선택·로딩·재시도는 로컬 예시이며 서버 저장·전송·예약은 앱에서 연결합니다.
+
+- [React 설치·사용·GitHub Packages 배포](packages/react/README.md)
+- [기존 HTML 소비자 런타임과 API](docs/consumer-guide.md)
 - [변경·검증·릴리스 기준](CONTRIBUTING.md)
+- [문서 전환 현황](packages/react/studio/MIGRATION.md)
 - [변경 이력](CHANGELOG.md)
-- 문서 검색: 한글·영문 동의어, `/`로 검색 포커스, Escape 초기화, Enter 첫 결과 이동
-- 25개 컴포넌트의 사용 기준·구조·키보드·상태·API·HTML 복사 예제
-- `#/patterns/data-states`: 로딩·실패/재시도·빈 목록·검색 0건·정상 목록의 실제 전환
 
-## 화면 조정
+문서 검색은 한글·영문 동의어를 지원합니다. `/`로 검색하고 Escape로 초기화하며 Enter로 첫 결과로 이동합니다. 테마 버튼은 라이트·다크 모드를 바꾸고 이 브라우저에 저장합니다.
 
-상단 **화면 조정**에서 본문 글자 크기·행간·여백 배율·기본 컨트롤 높이·모서리를 실시간으로 바꿀 수 있습니다. 패널의 미리보기와 문서 전체에 반영하고 이 브라우저에 저장합니다.
+상단 **화면 조정**에서 글자 크기·행간·여백·컨트롤 높이·모서리를 바꿀 수 있습니다. 설정은 경로 이동과 새로고침 후에도 유지하며, **초기화**는 작성 중인 폼과 테마를 유지합니다. **CSS 복사**로 현재 설정을 가져옵니다.
 
-| 항목 | 기본값 | 조정 범위 |
+| 항목 | 기본값 | 범위 |
 | --- | --- | --- |
-| 본문 크기 | 14px | 12–18px |
-| 본문 행간 | 22px | 18–32px |
+| 글자 크기 | 14px | 12–18px |
+| 행간 | 22px | 18–32px |
 | 여백 배율 | 100% | 75–150% |
-| 기본 컨트롤 높이 | 38px | 32–48px |
+| 컨트롤 높이 | 38px | 32–48px |
 | 모서리 | 0px | 0–12px |
 
-큰 글자가 잘리지 않도록 최소 행간과 높이를 자동 보정합니다. **기본값으로 초기화**는 화면 조정만 복원하며 테마와 작성 중인 폼은 유지합니다. **CSS 복사**로 현재 설정을 프로젝트에 적용할 수 있습니다. 저장소를 사용할 수 없으면 현재 화면에 적용하고 안내합니다.
+큰 글자가 잘리지 않도록 최소 행간과 컨트롤 높이를 함께 보정합니다. 기본 Primary는 `#4263CC`이고 글꼴은 Pretendard입니다. 크기 토큰과 컴포넌트의 상태·키보드 예시는 문서에서 확인합니다.
 
-- 본문 Pretendard 14px / 행간 22px
-- 기본 버튼·입력창·셀렉트 높이 38px
-- Primary `#4263CC`, 기본 보더는 중성 회색 `#C6C6CC`
-- 버튼·입력창·색상칩 radius 0px
-- 토글은 둥근 트랙과 원형 손잡이 유지
-- 포커스는 밝은 안쪽 2px 테두리
-- 기본 정보·환경설정·비밀번호·문의·프로젝트 등록·일정 예약 폼과 검증 피드백
-- 아이콘·프리픽스/서픽스 입력, 선택·태그·날짜·슬라이더를 조합한 폼 예시
-- 라이트·다크 모드: 시스템 설정을 기본으로 사용하고, 상단 모드 버튼의 선택을 저장
-- 모바일·태블릿 반응형 지원
-
-## 문서 탐색
-
-접고 펼칠 수 있는 고정 사이드 메뉴에서 각 페이지를 이동할 수 있습니다. 모바일에서는 메뉴 버튼으로 열고 닫습니다.
-각 페이지는 고유 주소를 가지며 새로고침과 브라우저 뒤로·앞으로 가기를 지원합니다.
-
-- 갤러리: `#/gallery`
-- 개요: `#/overview`
-- 기초: `#/foundations/colors`, `#/foundations/typography`, `#/foundations/sizes`, `#/foundations/icons`, `#/foundations/states`
-- 컴포넌트: `#/components/buttons`, `select`, `selection`, `tabs`, `text-fields`, `number-fields`, `feedback`, `accordion`, `overlays`, `table`, `tree`, `chips`, `list`, `progress`, `slider`, `date-picker`, `tooltip`, `dropdown-menu`, `popover`, `drawer`, `loading`, `file-upload`, `avatar`, `stepper`, `card`
-- 패턴: `#/patterns/empty-state`, `#/patterns/form/profile`, `#/patterns/form/project`, `#/patterns/form/booking`, `#/patterns/layout/app-shell`, `#/patterns/layout/dashboard`, `#/patterns/layout/list-detail`, `#/patterns/layout/tabs`, `#/patterns/layout/focused`, `#/patterns/page/list`, `#/patterns/page/detail`, `#/patterns/page/settings`, `#/patterns/page/login`
-
-기존 `#overview`, `#foundations`, `#components`, `#states`, `#/components/empty-state` 주소도 해당 페이지로 연결됩니다.
-
-## 일관된 사이즈
-
-높이·좌우 패딩·아이콘 크기는 `systems/idenflu-mono/tokens.css`에서 함께 관리합니다. 기본은 md이며 본문과 컨트롤 문구는 모두 14px입니다.
-
-| Size | 높이 | 좌우 패딩 | 아이콘 |
-| --- | --- | --- | --- |
-| sm | 32px | 10px | 14px |
-| md | 38px | 12px | 16px |
-| lg | 44px | 16px | 18px |
-
-컴포넌트 하나 또는 컨테이너에 `data-size`를 적용하면 하위 버튼·입력창·셀렉트·날짜 선택기·아이콘이 같은 사이즈를 사용합니다.
-체크박스·라디오·토글·배지는 각 컨트롤의 형태에 맞춰 함께 조정됩니다. 칩과 슬라이더는 sm/md/lg에서 각각 높이 32/38/44px로 적용됩니다.
-
-```html
-<button class="button" data-size="sm">저장</button>
-<div data-size="lg">
-  <input class="text-input" aria-label="이름" />
-  <button class="button">저장</button>
-</div>
-```
-
-## 컴포넌트
-
-- 버튼: Primary, Secondary, Outline, Ghost, Danger, Loading, 버튼 그룹
-- 커스텀 셀렉트: 설명·선택 표시·비활성 옵션, 방향키·Home·End·Enter·Escape·Tab, 바깥 클릭 닫기
-- 검색 셀렉트: 텍스트 필터, 키보드 선택, 결과 없음과 선택 초기화
-- 멀티 셀렉트: 일반형·태그형의 기본/검색 버전, 여러 항목 선택·해제, 전체 초기화와 키보드 목록 탐색
-- 아이콘 포함 버튼, 아이콘 전용 버튼, 단일 선택 및 연관 행동 버튼 그룹
-- 체크박스: 전체 선택과 부분 선택
-- 라디오, 둥근 토글
-- 탭: 클릭 및 방향키·Home·End 탐색
-- 입력 그룹: 텍스트 프리픽스, 검색·이메일 아이콘, 단위 서픽스, 검색 지우기와 비밀번호 표시·숨기기
-- Number fields: 정수·소수 허용 자릿수와 천 단위 콤마, 포커스 시 전체 선택 옵션, 1·10·0.1·0.5 증감, 최소·최대와 sm/md/lg
-- 글자 수가 표시되는 텍스트 영역
-- 배지, 인라인 알림
-- 아코디언
-- 다이얼로그: 입력 검증, Escape·취소·바깥 영역으로 닫기
-- 닫을 수 있는 토스트 알림
-- 테이블과 3페이지 페이지네이션
-- 접고 펼치는 트리와 항목 선택, 선택 및 삭제 가능한 칩
-- 기본·선택 목록, 진행률(두께·상태색·분할형·원형), 범위 슬라이더와 콘텐츠 슬라이드
-- 슬라이더: 연속·10단계·비활성 예제, 방향키 및 Home/End 조작
-- 날짜 선택: 직접 입력과 날짜 검증, 단일 날짜·기간 선택, 달력 월 이동과 초기화
-- 달력 키보드 조작: Alt+방향키 아래로 열기, 방향키·Home·End·Page Up/Down 이동, Enter 선택, Esc 닫기
-- 툴팁, 드롭다운 메뉴, 팝오버, 드로어
-- 스켈레톤, 다양한 스피너(링·듀얼 링·도트·막대), 파일 선택, 사각형·원형 아바타, 스테퍼, 카드
-- 파일 선택 예제는 로컬에서 파일 정보를 확인하며 서버로 전송하지 않습니다.
-
-서버나 외부 서비스로 데이터를 보내지 않으며 새로고침하면 폼이 초기화됩니다.
-폰트는 로컬 파일로 포함되어 있습니다. 라이선스: `systems/idenflu-mono/assets/fonts/LICENSE.txt`.
-아이콘은 요청한 `idenflu-wes-intro/design-system/icons`의 원본 43개와 같은 Lucide 계열의 보완 4개입니다.
-외곽선은 1.5px / butt / miter로 맞췄으며, 실제 경로는 유지했습니다.
-출처와 라이선스: `systems/idenflu-mono/assets/icons/idenflu/SOURCE.md`, `LICENSE.txt`, `LICENSE-LUCIDE.txt`.
-
-## 검사와 회귀 테스트
+## 검사와 빌드
 
 ```sh
 npm run check
 npm test
+npm --prefix packages/react run typecheck
+npm --prefix packages/react test
+npm --prefix packages/react run studio:check
 npm run build
-```
-
-`check`는 JS 구문, HTML ID·ARIA 참조·경로·로컬 에셋을 확인합니다. `test`는 배포물의 결정성과 런타임·문서 분리를 검사합니다.
-
-브라우저 자동 검증은 다음과 같습니다. GitHub Actions에서도 같은 명령을 실행합니다.
-
-```sh
 npx playwright install chromium
 npm run test:browser
+npx playwright test --config packages/react/studio/playwright.config.cjs
 ```
 
-밝은/어두운 데스크톱과 320px 모바일에서 회귀 시나리오, 전체 문서 경로, 단일 h1, 가로 넘침, 고대비·모션 설정을 확인합니다. 실패 trace와 화면은 `playwright-report/`, `test-results/`에 저장합니다.
+정적 검사, 설정 계약·결정적 빌드, React 단위 테스트와 라이트·다크·320px 브라우저 회귀를 실행합니다. 독립 런타임은 `tests/runtime-fixture.html`에서 별도로 검증합니다.
 
-위의 로컬 서버를 실행한 뒤 `http://127.0.0.1:4173/tests/idenflu-mono-regression.html`을 여세요.
-별도 패키지 설치 없이 실제 문서를 iframe에 불러와 테스트하고, 결과를 화면에 표시합니다.
-`다시 실행` 버튼으로 반복 실행할 수 있습니다.
-
-- 드로어 오류 후 취소·닫기·재진입·저장, 내부 여백과 외부 배경 클릭
-- 예약 날짜 필수 오류 유지, 직접 입력·달력 선택·지우기·폼 초기화
-- 독립 날짜 선택기의 잘못된 날짜·윤년·역전 기간과 인스턴스 간 상태 분리
-
-자동 테스트의 클릭 좌표·취소 이벤트는 합성 이벤트입니다. 실제 Escape 키와 포인터 조작은 브라우저에서 별도로 확인합니다.
-
-## 배포물
-
-`npm run build`는 `dist/`에 정적 사이트와 컴포넌트 번들을 만듭니다. 해시는 내용에서 계산하므로 같은 소스는 같은 파일명을 생성합니다. 에셋·라이선스와 함께 폴더 전체를 복사하고, `systems/idenflu-mono/manifest.json`에서 버전·파일명을 확인하세요.
-
-컴포넌트 CSS·JS와 테마 스크립트는 각각 한 개 진입점입니다. 문서 사이트는 별도 번들로 데모 코드를 포함합니다. 빌드는 외부 서비스에 게시하지 않습니다.
+`npm run build`는 React 패키지를 빌드한 뒤 `dist/`에 갤러리와 정식 모노 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포합니다. React 문서·CSS·테마·설정·독립 런타임은 내용 기반 해시를 사용하며 `dist/systems/idenflu-mono/manifest.json`에서 파일명을 확인합니다. 폰트·아이콘과 라이선스도 함께 복사합니다. 이전 React 미리보기 주소의 리다이렉트도 배포물에 포함합니다.
 
 ## 파일 구성
 
-- `index.html`, `gallery.css`, `gallery-entry.js`: 디자인 시스템 갤러리와 기존 주소 연결
-- `gallery-assets/`: 갤러리에서 사용하는 글꼴
-- `systems/idenflu-mono/`: idenflu mono의 문서, 스타일, 스크립트와 에셋
-- `systems/idenflu-mono/runtime.js`: 컴포넌트 등록·초기화·해제와 공개 API
-- `systems/idenflu-mono/component-demos.js`: 문서 전용 데이터·입력·알림 예제
-- `systems/idenflu-mono/documentation.js`: 적용 가이드·코드 복사·문서 검색·목차
-- `systems/idenflu-mono/data-state.js`: 데이터 상태와 로컬 조회 예제
-- `systems/idenflu-mono/navigation.js`: 문서 페이지 전환과 모바일 메뉴 관리
-- `systems/idenflu-mono/tokens.css`: primitive→semantic→component 토큰과 밝은/어두운 테마 값
-- `systems/idenflu-mono/theme.css`, `theme-components.css`, `theme.js`: 테마 적용·고대비·모션 및 모드 전환
-- `systems/idenflu-mono/preferences.js`, `preferences-ui.js`, `preferences.css`: 화면 조정 저장·복원과 패널
-- `tests/`: 브라우저 회귀 시나리오, 독립 소비 fixture, 배포 검증
-- `scripts/`: 로컬 서버, 정적 검사와 해시 기반 빌드
+- `systems/idenflu-mono/index.html`: 정식 React 진입점
+- `packages/react/src/`: 재사용 React 컴포넌트와 스타일
+- `packages/react/studio/`: 문서 셸, 페이지 샘플과 화면 조정 UI
+- `packages/react/studio/routes.json`: 문서 메타데이터와 메뉴 순서
+- `packages/react/scripts/build-studio.mjs`: 문서와 공유 스타일 번들
+- `systems/idenflu-mono/docs-dist/`: 생성되는 로컬 문서 번들, Git 제외
+- `systems/idenflu-mono/*.css`, `assets/`: 공유 토큰·스타일·폰트·아이콘
+- `systems/idenflu-mono/theme.js`, `preferences.js`: 초기 테마·설정 적용
+- `systems/idenflu-mono/runtime.js`와 어댑터: HTML 소비자용 독립 런타임
+- `scripts/`: 개발 서버·검사·배포 빌드
 
-새 문서는 `systems/idenflu-mono/index.html`의 `.route-view`에 `data-route`, `data-title`, `data-group`, `data-description`을 지정하고 사이드 메뉴에 링크를 추가합니다.
-페이지 제목·현재 위치·이전/다음 링크는 메타데이터와 페이지 순서에 따라 자동으로 갱신됩니다.
+기존 정적 문서 마크업과 문서 전용 바닐라 스크립트는 제거했습니다. 공유 스타일과 HTML 소비자 런타임은 React 패키지·기존 프로젝트의 호환성을 위해 유지합니다.

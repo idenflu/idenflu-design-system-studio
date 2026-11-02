@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -26,6 +26,42 @@ function fixture() {
 async function click(element) { assert.ok(element, 'expected a clickable element'); await act(async () => element.click()); }
 async function key(element, value) { await act(async () => element.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }))); }
 after(() => dom.window.close());
+
+
+test('display Chip uses a span, forwards its ref and ignores activation props', async () => {
+  const f = fixture(), ref = React.createRef(); let clicks = 0;
+  try {
+    await f.render(h(Chip,{interactive:false,ref,variant:'success',rounded:true,id:'saved-chip','data-project':'mono',onClick:() => clicks++,onClickCapture:() => clicks++,tabIndex:0,'aria-pressed':true},'완료'));
+    const chip = f.container.querySelector('#saved-chip');
+    assert.equal(chip.tagName,'SPAN');
+    assert.equal(ref.current,chip);
+    assert.equal(chip.getAttribute('data-project'),'mono');
+    assert.equal(chip.hasAttribute('tabindex'),false);
+    assert.equal(chip.hasAttribute('aria-pressed'),false);
+    assert.equal(chip.tabIndex,-1);
+    await click(chip);
+    assert.equal(clicks,0);
+    await act(async () => chip.focus());
+    assert.notEqual(document.activeElement,chip);
+  } finally { await f.dispose(); }
+});
+
+test('interactive Chip keeps button refs, pressed state and disabled behavior', async () => {
+  const f = fixture(), ref = React.createRef(); let clicks = 0;
+  try {
+    const render = disabled => f.render(h(Chip,{ref,disabled,'aria-pressed':clicks > 0,onClick:() => clicks++},'필터'));
+    await render(false);
+    const chip = f.container.querySelector('button');
+    assert.equal(ref.current,chip);
+    assert.equal(chip.type,'button');
+    assert.equal(chip.getAttribute('aria-pressed'),'false');
+    await click(chip);
+    await render(true);
+    assert.equal(chip.getAttribute('aria-pressed'),'true');
+    await click(chip);
+    assert.equal(clicks,1);
+  } finally { await f.dispose(); }
+});
 
 test('NovaSpinner provides a single accessible status and supports the existing Spinner API', async () => {
   const f = fixture();

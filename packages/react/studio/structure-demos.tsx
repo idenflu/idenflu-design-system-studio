@@ -52,15 +52,47 @@ export function TreeDemos() {
   </Section><Section title="아이콘이 있는 트리" description="각 항목의 종류를 아이콘으로 보조합니다."><div className="react-studio-tree-sample"><Tree label="아이콘 프로젝트 메뉴" defaultExpanded={['workspace']} defaultValue="list" items={[{value:'workspace',label:<span className="react-studio-icon-label"><Icon name="grid" />워크스페이스</span>,children:[{value:'list',label:<span className="react-studio-icon-label"><Icon name="list" />프로젝트 목록</span>},{value:'schedule',label:<span className="react-studio-icon-label"><Icon name="calendar" />프로젝트 일정</span>}]}]} /></div></Section></>;
 }
 
+const chipColors = [
+  {variant:'neutral', label:'기본', example:'문서'},
+  {variant:'primary', label:'강조', example:'진행 중'},
+  {variant:'secondary', label:'보조', example:'참고'},
+  {variant:'success', label:'성공', example:'완료'},
+  {variant:'warning', label:'주의', example:'검토 중'},
+  {variant:'danger', label:'위험', example:'오류'},
+] as const;
 export function ChipDemos() {
   const [selected, setSelected] = React.useState<string[]>(['디자인']);
   const [removable, setRemovable] = React.useState(['프로젝트', '브랜드', '문서']);
   const [iconSelected, setIconSelected] = React.useState(false);
   const [componentSelected, setComponentSelected] = React.useState(false);
+  const [roundSelected, setRoundSelected] = React.useState(false);
+  const [selectedColors, setSelectedColors] = React.useState<string[]>(chipColors.map(item => item.variant));
   return <>
-    <Section title="사이즈" description="짧은 분류나 선택값을 일정한 높이로 표시합니다."><div className="react-studio-row">{sizes.map(size => <Chip key={size} size={size}>{size.toUpperCase()}</Chip>)}</div></Section>
-    <Section title="선택 칩" description="각 칩을 눌러 필터를 선택하거나 해제할 수 있습니다."><div className="react-studio-row">{['디자인','개발','마케팅'].map(name => <Chip key={name} aria-pressed={selected.includes(name)} onClick={() => setSelected(current => current.includes(name) ? current.filter(item => item !== name) : [...current,name])}>{name}</Chip>)}</div><p role="status" className="component-helper">{selected.length ? `선택: ${selected.join(', ')}` : '선택한 항목이 없습니다.'}</p></Section>
-    <Section title="삭제 가능한 칩" description="선택된 값을 제거하고, 초기화로 다시 표시할 수 있습니다."><div className="react-studio-row">{removable.map(name => <Chip key={name} aria-label={`${name} 제거`} onClick={() => setRemovable(current => current.filter(item => item !== name))}>{name}<Icon name="close" /></Chip>)}{!removable.length && <p className="react-studio-caption" role="status">모든 칩을 제거했습니다.</p>}</div><div className="react-studio-row"><Button variant="outline" onClick={() => setRemovable(['프로젝트','브랜드','문서'])}>초기화</Button></div></Section>
+    <Section title="표시용 칩" description="분류와 속성을 텍스트로 표시합니다. 클릭·키보드 선택·호버 효과가 없으며 Tab 이동 대상에 포함되지 않습니다.">
+      <div className="react-studio-row"><Chip interactive={false}>프로젝트</Chip><Chip interactive={false}>디자인 시스템</Chip><Chip interactive={false}><Icon name="calendar" />주간 일정</Chip></div>
+    </Section>
+    <Section title="선택 칩" description="각 칩을 눌러 필터를 선택하거나 해제할 수 있습니다. Enter와 Space로도 동작합니다.">
+      <div className="react-studio-row">{['디자인','개발','마케팅'].map(name => <Chip key={name} aria-pressed={selected.includes(name)} onClick={() => setSelected(current => current.includes(name) ? current.filter(item => item !== name) : [...current,name])}>{name}</Chip>)}<Chip disabled>비활성</Chip></div>
+      <p role="status" className="component-helper">{selected.length ? `선택: ${selected.join(', ')}` : '선택한 항목이 없습니다.'}</p>
+    </Section>
+    <Section title="모서리 스타일" description="기본 모서리와 알약 형태의 라운드를 비교합니다. 표시용·선택형 모두 같은 모양을 사용할 수 있습니다.">
+      <div className="react-studio-field-grid">
+        <div className="react-studio-example"><h3 className="react-studio-example-title">기본</h3><div className="react-studio-row"><Chip interactive={false}>기본 표시</Chip><Chip interactive={false} variant="primary">강조 표시</Chip></div></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">라운드</h3><div className="react-studio-row"><Chip interactive={false} rounded>라운드 표시</Chip><Chip rounded variant="primary" aria-pressed={roundSelected} onClick={() => setRoundSelected(!roundSelected)}>라운드 선택</Chip></div></div>
+      </div>
+    </Section>
+    <Section title="색상" description="각 색상의 기본 표시·라운드 표시·선택 상태를 비교합니다. 선택형을 누르면 상태가 바뀝니다. 색상과 함께 텍스트로 의미를 전달합니다.">
+      <div className="react-studio-size-grid react-studio-chip-palette">{chipColors.map(({variant,label,example}) => <div className="react-studio-example react-studio-stack" key={variant}>
+        <h3 className="react-studio-example-title">{label}<span className="react-studio-caption">{variant}</span></h3>
+        <div className="react-studio-row"><Chip interactive={false} variant={variant}>{example}</Chip></div>
+        <div className="react-studio-row"><Chip interactive={false} variant={variant} rounded>{example}</Chip></div>
+        <div className="react-studio-row"><Chip variant={variant} aria-label={`${label} 색상 선택`} aria-pressed={selectedColors.includes(variant)} onClick={() => setSelectedColors(current => current.includes(variant) ? current.filter(item => item !== variant) : [...current,variant])}>선택</Chip></div>
+      </div>)}</div>
+    </Section>
+    <Section title="사이즈" description="표시용·라운드 칩도 SM·MD·LG 높이와 글자 크기 설정을 따릅니다.">
+      <div className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} size={size}>기본 표시</Chip><Chip interactive={false} rounded variant="primary" size={size}>라운드</Chip></div></div>)}</div>
+    </Section>
+    <Section title="삭제 가능한 칩" description="선택된 값을 제거하고, 초기화로 다시 표시할 수 있습니다."><div className="react-studio-row">{removable.map(name => <Chip key={name} rounded aria-label={`${name} 제거`} onClick={() => setRemovable(current => current.filter(item => item !== name))}>{name}<Icon name="close" /></Chip>)}{!removable.length && <p className="react-studio-caption" role="status">모든 칩을 제거했습니다.</p>}</div><div className="react-studio-row"><Button variant="outline" onClick={() => setRemovable(['프로젝트','브랜드','문서'])}>초기화</Button></div></Section>
     <Section title="아이콘이 있는 칩" description="아이콘은 분류의 의미를 보조하며 칩은 선택 상태를 유지합니다."><div className="react-studio-row"><Chip aria-pressed={iconSelected} onClick={() => setIconSelected(!iconSelected)}><Icon name="calendar" />일정 필터</Chip><Chip aria-pressed={componentSelected} onClick={() => setComponentSelected(!componentSelected)}><Icon name="grid" />컴포넌트</Chip></div></Section>
   </>;
 }

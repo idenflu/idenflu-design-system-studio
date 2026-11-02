@@ -19,10 +19,10 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@idenflu'
       - run: npm ci
-      - run: npm run check
-      - run: npm test
       - run: npm ci
         working-directory: packages/react
+      - run: npm run check
+      - run: npm test
       - run: npm run typecheck
         working-directory: packages/react
       - run: npm test

@@ -99,6 +99,7 @@
   --disabled: var(--color-disabled-light);
   --disabled-text: var(--color-disabled-text-light);
   --danger: var(--color-red-500);
+  --danger-text: var(--color-red-600);
   --danger-surface: var(--color-red-50);
   --danger-control: var(--color-red-500);
   --danger-control-hover: var(--color-red-600);
@@ -193,6 +194,7 @@
   --disabled: var(--color-neutral-825);
   --disabled-text: var(--color-neutral-500);
   --danger: var(--color-red-300);
+  --danger-text: var(--danger);
   --danger-surface: var(--color-red-900);
   --danger-control: var(--color-red-750);
   --danger-control-hover: var(--color-red-800);

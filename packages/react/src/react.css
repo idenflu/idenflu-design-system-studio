@@ -60,3 +60,6 @@
   .nova-spinner { color:CanvasText; }
   .nova-spinner .nova-spinner__facet { fill:CanvasText; filter:none; }
 }
+
+.tabs { min-width:0; }
+.tabs .tab-list { max-width:100%; overflow-x:auto; }

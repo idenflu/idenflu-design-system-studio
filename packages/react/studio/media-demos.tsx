@@ -90,7 +90,7 @@ export function LoadingDemos() {
 const people = [{name:'김민수', initial:'김'}, {name:'이서연', initial:'이'}, {name:'박지훈', initial:'박'}];
 const avatarDimensions = {sm:'32px', md:'38px', lg:'44px'};
 function AvatarExamples({shape}: {shape:'square'|'circle'}) {
-  return <div className="avatar-examples">{sizes.map((size, index) => <div className="avatar-example" key={size}><Avatar size={size} shape={shape} role="img" aria-label={people[index].name}>{people[index].initial}</Avatar><span>{size.toUpperCase()} · {avatarDimensions[size]}</span></div>)}<div className="avatar-example"><Avatar size="lg" shape={shape} variant="neutral" role="img" aria-label="사용자"><span className="ui-icon" style={{'--icon':"url('../../../systems/idenflu-mono/assets/icons/idenflu/person.svg')"} as React.CSSProperties} /></Avatar><span>기본 아이콘</span></div></div>;
+  return <div className="avatar-examples">{sizes.map((size, index) => <div className="avatar-example" key={size}><Avatar size={size} shape={shape} role="img" aria-label={people[index].name}>{people[index].initial}</Avatar><span>{size.toUpperCase()} · {avatarDimensions[size]}</span></div>)}<div className="avatar-example"><Avatar size="lg" shape={shape} variant="neutral" role="img" aria-label="사용자"><span className="ui-icon" style={{'--icon':`url('${new URL('./assets/icons/idenflu/person.svg', document.baseURI).href}')`} as React.CSSProperties} /></Avatar><span>기본 아이콘</span></div></div>;
 }
 
 export function AvatarDemos() {

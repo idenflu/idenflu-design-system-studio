@@ -105,6 +105,18 @@ import { Icon, Select } from '@idenflu/mono-react';
 </Toast>
 ```
 
+`Chip`은 기본적으로 선택·삭제 동작에 사용하는 버튼입니다. `interactive={false}`는 표시 전용 `span`을 렌더링하며 클릭·호버·Tab 포커스가 없습니다. `rounded`로 알약 형태를 선택하고 `variant="neutral | primary | secondary | success | warning | danger"`로 색상을 지정합니다. 색상과 함께 텍스트로 의미를 설명합니다. 표시용 칩은 `HTMLSpanElement`, 기본 칩은 `HTMLButtonElement` ref를 받습니다.
+
+```tsx
+import { Chip } from '@idenflu/mono-react';
+
+<Chip interactive={false}>프론트엔드</Chip>
+<Chip interactive={false} variant="secondary">보조 정보</Chip>
+<Chip interactive={false} rounded variant="success">완료</Chip>
+<Chip rounded variant="primary" aria-pressed={selected}
+  onClick={() => setSelected(!selected)}>프로젝트 필터</Chip>
+```
+
 기존 바닐라 런타임과 React API는 별개입니다. 특히 내부 `datevalidation` DOM 이벤트는 React 컴포넌트에서 제공하지 않으므로 React 콜백과 폼 유효성 검사를 사용하세요.
 
 `Divider`는 기본 가로 구분선이며, `orientation="vertical"`로 세로 구분선을 표시합니다. 세로 구분선은 flex 부모에서 높이에 맞춰 늘어나므로 블록 안에서 사용할 때는 부모 높이나 `style`을 지정합니다. 자식 텍스트는 `align="start | center | end"`로 정렬하고, `variant="dashed"`는 점선을 표시합니다. 의미 있는 구분선은 `separator`로 제공하며 장식용은 `decorative`로 숨깁니다.
@@ -119,7 +131,7 @@ import { Divider } from '@idenflu/mono-react';
 
 ## 로컬 예제
 
-저장소 루트에서 `npm run dev`로 서버를 시작하고, 별도 터미널에서 아래 명령을 실행한 뒤 `/packages/react/examples/index.html`을 엽니다.
+저장소 루트와 이 디렉터리에서 `npm ci`를 실행하고 루트의 `npm run dev`로 서버를 시작합니다. 별도 패키지 예제는 아래 명령으로 빌드한 뒤 `/packages/react/examples/index.html`에서 엽니다.
 
 ```sh
 cd packages/react
@@ -127,11 +139,11 @@ npm ci
 npm run example:build
 ```
 
-문서 전환 작업 화면은 `npm run studio:build` 후 `/packages/react/studio/index.html`에서 확인할 수 있습니다. Overview, Foundations, 26개 컴포넌트 분류와 Patterns의 Form 8개·데이터 상태·빈 상태를 React로 표시합니다. Patterns의 Layout과 Page는 메뉴·검색·이전 다음 문서에서 제외합니다. 폼의 검증·초기화·파일 선택과 데이터 상태 전환은 로컬 예시로 동작하며 실제 저장·전송·예약은 수행하지 않습니다. Divider는 React 문서에서 추가한 컴포넌트이며 `/components/divider`에서 예시를 확인할 수 있습니다.
+정식 모노 문서는 `/systems/idenflu-mono/index.html`에서 React로 동작합니다. `npm run studio:build`로 다시 빌드하며, 이전 `/packages/react/studio/index.html` 주소는 같은 문서로 이동합니다. Overview, Foundations, 26개 컴포넌트 분류와 Patterns의 Form 8개·데이터 상태·빈 상태를 React로 표시합니다. Patterns의 Layout과 Page는 메뉴·검색·이전 다음 문서에서 제외합니다. 폼의 검증·초기화·파일 선택과 데이터 상태 전환은 로컬 예시로 동작하며 실제 저장·전송·예약은 수행하지 않습니다. Divider는 React 문서에서 추가한 컴포넌트이며 `/components/divider`에서 예시를 확인할 수 있습니다.
 
 ## 개발과 배포
 
-저장소 루트에서 기본 검사를 실행하고, 이 디렉터리에서 패키지 의존성을 설치하고 빌드합니다.
+루트와 이 디렉터리의 의존성을 먼저 설치합니다. 루트에서 기본 검사를 실행하고, 이 디렉터리에서 아래 패키지 검사를 실행합니다. 문서를 포함한 정적 배포물은 루트의 `npm run build`로 생성합니다.
 
 ```sh
 npm ci

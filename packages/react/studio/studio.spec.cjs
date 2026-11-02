@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const routes = require('./dist/routes.json');
 
 test('all original routes resolve and React demos stay within the viewport', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   for (const route of routes) {
     await page.evaluate(path => { location.hash = '#/' + path; }, route.route);
     await expect(page.locator('.react-studio-content h1')).toHaveText(route.route === 'overview' ? /Form follows\s*function\./ : route.title);
@@ -12,7 +12,7 @@ test('all original routes resolve and React demos stay within the viewport', asy
 });
 
 test('React text field examples support search clearing and password visibility', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const search = page.getByRole('searchbox', { name: '검색', exact: true });
   await search.fill('텍스트');
   await page.getByRole('button', { name: '검색어 지우기' }).click();
@@ -33,7 +33,7 @@ test('React text field examples support search clearing and password visibility'
 });
 
 test('inline multi-select removes and clears selected values', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/select');
+  await page.goto('/systems/idenflu-mono/index.html#/components/select');
   await page.getByRole('button', { name: '디자인 제거' }).click();
   await expect(page.getByRole('button', { name: '디자인 제거' })).toHaveCount(0);
   const trigger = page.getByRole('combobox', { name: /참여 팀/ });
@@ -45,7 +45,7 @@ test('inline multi-select removes and clears selected values', async ({ page }) 
 });
 
 test('screen settings change and reset the document tokens', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   await page.getByRole('button', { name: '화면 조정' }).click();
   const dialog = page.getByRole('dialog', { name: '화면 조정' });
   await dialog.getByRole('slider', { name: /글자 크기/ }).fill('18');
@@ -60,7 +60,7 @@ test('screen settings change and reset the document tokens', async ({ page }) =>
 });
 
 test('theme toggle updates color codes and persists across reload', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/foundations/colors');
+  await page.goto('/systems/idenflu-mono/index.html#/foundations/colors');
   const initial = await page.locator('html').getAttribute('data-theme');
   const primary = page.locator('[data-color-token="--primary"] code');
   const control = page.locator('[data-color-token="--primary-control"] code');
@@ -79,7 +79,7 @@ test('theme toggle updates color codes and persists across reload', async ({ pag
 });
 
 test('topbar tooltips support keyboard focus and stay within the viewport', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/tooltip');
+  await page.goto('/systems/idenflu-mono/index.html#/components/tooltip');
   const settings = page.getByRole('button', { name: '화면 조정', exact: true });
   const theme = page.locator('.docs-topbar .theme-toggle');
   for (const button of [settings, theme]) {
@@ -107,7 +107,7 @@ test('topbar tooltips support keyboard focus and stay within the viewport', asyn
 });
 
 test('Tooltip closes after pointer and keyboard activation while the trigger keeps focus', async ({ page, isMobile }) => {
-  await page.goto('/packages/react/studio/index.html#/components/tooltip');
+  await page.goto('/systems/idenflu-mono/index.html#/components/tooltip');
   const button = page.getByRole('button',{name:'프로젝트 이름',exact:true});
   const tooltip = button.locator('..').getByRole('tooltip',{includeHidden:true});
   if (!isMobile) {
@@ -139,7 +139,7 @@ test('Tooltip closes after pointer and keyboard activation while the trigger kee
 });
 
 test('basic React form validates, accepts corrected data and resets', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/patterns/form/basic');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/form/basic');
   await page.getByRole('button', { name: '확인', exact: true }).click();
   const name = page.getByRole('textbox', { name: /이름/ });
   const email = page.getByRole('textbox', { name: /이메일/ });
@@ -155,7 +155,7 @@ test('basic React form validates, accepts corrected data and resets', async ({ p
 });
 
 test('Patterns includes forms and data examples while excluding Layout and Page', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/buttons');
+  await page.goto('/systems/idenflu-mono/index.html#/components/buttons');
   await expect(page.locator('#react-studio-nav').getByText('Patterns', { exact:true })).toHaveCount(1);
   await expect(page.locator('#react-studio-nav a[href^="#/patterns/form/"]')).toHaveCount(8);
   await expect(page.locator('#react-studio-nav a[href^="#/patterns/layout/"]')).toHaveCount(0);
@@ -163,7 +163,7 @@ test('Patterns includes forms and data examples while excluding Layout and Page'
 });
 
 test('chip selection and removal update the visible state', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/chips');
+  await page.goto('/systems/idenflu-mono/index.html#/components/chips');
   const selected = page.getByRole('button', { name: '개발', exact: true });
   await selected.click();
   await expect(selected).toHaveAttribute('aria-pressed', 'true');
@@ -174,22 +174,22 @@ test('chip selection and removal update the visible state', async ({ page }) => 
 });
 
 test('pagination changes the displayed rows and stepper moves between steps', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/table');
+  await page.goto('/systems/idenflu-mono/index.html#/components/table');
   await expect(page.locator('tbody tr').first()).toContainText('디자인 시스템');
   await page.getByRole('button', { name: '2페이지' }).click();
   await expect(page.locator('tbody tr').first()).toContainText('디자인 시스템 2');
   await expect(page.locator('.react-studio-demo').getByRole('status')).toContainText('5–8 / 12');
-  await page.goto('/packages/react/studio/index.html#/components/stepper');
+  await page.goto('/systems/idenflu-mono/index.html#/components/stepper');
   await page.getByRole('button', { name: '다음', exact: true }).click();
   await expect(page.getByRole('list', { name: '프로젝트 생성 단계' }).locator('[aria-current="step"]')).toContainText('팀원 초대');
 });
 
 test('menu and popover apply actions report their result', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/dropdown-menu');
+  await page.goto('/systems/idenflu-mono/index.html#/components/dropdown-menu');
   await page.getByRole('button', { name: '더보기' }).click();
   await page.getByRole('menuitem', { name: '수정' }).click();
   await expect(page.locator('.react-studio-demo').getByRole('status')).toHaveText('수정 동작을 선택했습니다.');
-  await page.goto('/packages/react/studio/index.html#/components/popover');
+  await page.goto('/systems/idenflu-mono/index.html#/components/popover');
   const trigger = page.getByRole('button', { name: '표시 설정' });
   await trigger.click();
   await page.getByRole('checkbox', { name: '상태' }).uncheck();
@@ -199,7 +199,7 @@ test('menu and popover apply actions report their result', async ({ page }) => {
 });
 
 test('number examples support keyboard stepping and documented sizes', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/number-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/number-fields');
   const input = page.getByRole('spinbutton', { name: '정수만 입력' });
   await input.press('ArrowUp');
   await expect(input).toHaveValue('13');
@@ -209,7 +209,7 @@ test('number examples support keyboard stepping and documented sizes', async ({ 
 });
 
 test('selection controls synchronize the mixed and all-selected states', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/selection');
+  await page.goto('/systems/idenflu-mono/index.html#/components/selection');
   const all = page.getByRole('checkbox', { name: '전체 선택' });
   await expect(all).toHaveJSProperty('indeterminate', true);
   await all.check();
@@ -221,7 +221,7 @@ test('selection controls synchronize the mixed and all-selected states', async (
 });
 
 test('drawer validates, discards canceled changes, and restores saved settings', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/drawer');
+  await page.goto('/systems/idenflu-mono/index.html#/components/drawer');
   const trigger = page.getByRole('button', { name: '상세 정보 열기' });
   const dialog = page.getByRole('dialog', { name: '프로젝트 설정' });
   await trigger.click();

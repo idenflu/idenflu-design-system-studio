@@ -109,8 +109,8 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> { vari
 export function Badge({ variant = 'neutral', className, ...props }: BadgeProps) { return <span {...props} className={classes('badge', variant !== 'neutral' && `badge--${variant}`, className)} />; }
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> { variant?: 'info' | 'success' }
 export function Alert({ variant = 'info', className, ...props }: AlertProps) { return <div {...props} className={classes('inline-alert', variant === 'success' && 'inline-alert--success', className)} />; }
-export interface ChipProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size'> { size?: Size }
-export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip({ size, className, type = 'button', ...props }, ref) { return <button {...props} ref={ref} type={type} data-size={size} className={classes('chip', className)} />; });
+export { Chip } from './chip';
+export type { ChipProps, InteractiveChipProps, StaticChipProps } from './chip';
 export interface ProgressProps extends React.ProgressHTMLAttributes<HTMLProgressElement> { thickness?: 'thin' | 'normal' | 'thick'; variant?: 'primary' | 'success' | 'warning' | 'danger' }
 export const Progress = React.forwardRef<HTMLProgressElement, ProgressProps>(function Progress({ thickness = 'normal', variant = 'primary', className, ...props }, ref) { return <progress {...props} ref={ref} className={classes('progress-bar', thickness !== 'normal' && `progress-bar--${thickness}`, variant !== 'primary' && `progress-bar--${variant}`, className)} />; });
 export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> { size?: 'small' | 'medium' | 'large'; variant?: 'primary' | 'neutral' | 'inverse'; kind?: 'ring' | 'dual' | 'dots' | 'bars' | 'nova'; label?: string }

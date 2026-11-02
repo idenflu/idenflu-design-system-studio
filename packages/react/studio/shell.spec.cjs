@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const documentCount = require('./dist/navigation.json').filter(route => !/^patterns\/(layout|page)\//.test(route)).length;
 
 test('document chrome includes the original home, breadcrumb and footer', async ({ page, isMobile }) => {
-  await page.goto('/packages/react/studio/index.html#/overview');
+  await page.goto('/systems/idenflu-mono/index.html#/overview');
   await expect(page).toHaveTitle('Overview — idenflu mono');
   await expect(page.getByRole('heading', {level:1})).toHaveText(/Form follows\s*function\./);
   await expect(page.getByRole('navigation', {name:'현재 위치'})).toContainText('Getting started');
@@ -13,14 +13,14 @@ test('document chrome includes the original home, breadcrumb and footer', async 
   if (isMobile) await page.getByRole('button', {name:'메뉴', exact:true}).click();
   await expect(page.locator('.sidebar')).toHaveCSS('position', 'fixed');
   await expect(page.locator('#docs-search-status')).toHaveText(`${documentCount}개 문서`);
-  await expect(page.locator('.topbar-gallery')).toHaveAttribute('href', '../../../index.html#/gallery');
+  await expect(page.locator('.topbar-gallery')).toHaveAttribute('href', '../../index.html#/gallery');
   await expect(page.locator('#react-studio-nav')).toContainText('Patterns');
   await expect(page.locator('#react-studio-nav a[href*="patterns/layout/"]')).toHaveCount(0);
   await expect(page.locator('#react-studio-nav a[href*="patterns/page/"]')).toHaveCount(0);
 });
 
 test('document search supports Korean aliases, Enter, Escape and the slash shortcut', async ({ page, isMobile }) => {
-  await page.goto('/packages/react/studio/index.html#/overview');
+  await page.goto('/systems/idenflu-mono/index.html#/overview');
   await page.keyboard.press('/');
   const search = page.getByRole('searchbox', {name:'문서 검색'});
   await expect(search).toBeFocused();
@@ -42,7 +42,7 @@ test('document search supports Korean aliases, Enter, Escape and the slash short
 });
 
 test('navigation remembers collapsed groups and selected links have no fill', async ({ page, isMobile }) => {
-  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   if (isMobile) await page.getByRole('button', {name:'메뉴', exact:true}).click();
   const foundations = page.locator('.nav-group').filter({has:page.locator('summary', {hasText:'Foundations'})});
   await foundations.locator('summary').click();
@@ -60,7 +60,7 @@ test('navigation remembers collapsed groups and selected links have no fill', as
 
 test('mobile menu traps focus, dismisses on Escape and restores focus', async ({ page, isMobile }) => {
   test.skip(!isMobile, '모바일 메뉴 동작');
-  await page.goto('/packages/react/studio/index.html#/overview');
+  await page.goto('/systems/idenflu-mono/index.html#/overview');
   const trigger = page.getByRole('button', {name:'메뉴', exact:true});
   await trigger.click();
   const sidebar = page.getByRole('dialog', {name:'문서 메뉴'});
@@ -82,7 +82,7 @@ test('mobile menu traps focus, dismisses on Escape and restores focus', async ({
 });
 
 test('TOC and document pagination move focus and use the visible menu order', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const link = page.getByRole('navigation', {name:'이 페이지 목차'}).getByRole('link', {name:'아이콘과 입력 보조'});
   await link.click();
   await expect(page.getByRole('heading', {name:'아이콘과 입력 보조', exact:true})).toBeFocused();
@@ -91,14 +91,14 @@ test('TOC and document pagination move focus and use the visible menu order', as
   await expect(page).toHaveURL(/#\/components\/number-fields$/);
   await expect(page.getByRole('heading', {level:1})).toBeFocused();
   await expect(page.getByRole('navigation', {name:'현재 위치'})).toContainText('Number fields');
-  await page.goto('/packages/react/studio/index.html#/components/card');
+  await page.goto('/systems/idenflu-mono/index.html#/components/card');
   await expect(page.locator('#next-doc')).toHaveAttribute('href','#/patterns/form/basic');
-  await page.goto('/packages/react/studio/index.html#/patterns/empty-state');
+  await page.goto('/systems/idenflu-mono/index.html#/patterns/empty-state');
   await expect(page.locator('#next-doc')).toHaveCount(0);
 });
 
 test('preferences update sidebar, overview and footer summaries together', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/overview');
+  await page.goto('/systems/idenflu-mono/index.html#/overview');
   await page.getByRole('button', {name:'화면 조정', exact:true}).click();
   const dialog = page.getByRole('dialog', {name:'화면 조정'});
   await dialog.getByRole('slider', {name:/글자 크기/}).fill('18');
@@ -113,7 +113,7 @@ test('preferences update sidebar, overview and footer summaries together', async
 });
 
 test('legacy route aliases resolve to a canonical document and history remains usable', async ({ page }) => {
-  await page.goto('/packages/react/studio/index.html#/foundations');
+  await page.goto('/systems/idenflu-mono/index.html#/foundations');
   await expect(page).toHaveURL(/#\/foundations\/colors$/);
   await page.evaluate(() => { location.hash = '#/components'; });
   await expect(page).toHaveURL(/#\/components\/buttons$/);

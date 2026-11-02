@@ -1,0 +1,296 @@
+[
+  {
+    "route": "overview",
+    "title": "Overview",
+    "group": "Getting started",
+    "description": "idenflu mono의 기본 원칙과 구성 요소를 살펴보세요.",
+    "searchTerms": ""
+  },
+  {
+    "route": "foundations/colors",
+    "title": "Colors",
+    "group": "Foundations",
+    "description": "기본 색상과 의미를 전달하는 상태 색상으로 명확한 위계를 만듭니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "foundations/typography",
+    "title": "Typography",
+    "group": "Foundations",
+    "description": "Pretendard와 본문 14px을 기준으로 읽기 편한 위계를 만듭니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "foundations/sizes",
+    "title": "Sizes",
+    "group": "Foundations",
+    "description": "sm, md, lg 세 가지 크기로 높이와 패딩, 아이콘을 일관되게 관리합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "foundations/icons",
+    "title": "Icons",
+    "group": "Foundations",
+    "description": "기존 idenflu 디자인 시스템의 아이콘을 같은 색상과 크기 규칙으로 사용합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "foundations/states",
+    "title": "Interaction states",
+    "group": "Foundations",
+    "description": "기본, 호버, 눌림, 포커스와 오류 상태를 한 가지 규칙으로 표현합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "components/buttons",
+    "title": "Buttons",
+    "group": "Components",
+    "description": "행동의 중요도에 따라 표현을 구분합니다.",
+    "searchTerms": "버튼 저장 취소 액션 button"
+  },
+  {
+    "route": "components/select",
+    "title": "Select",
+    "group": "Components",
+    "description": "하나 또는 여러 개의 항목을 선택합니다.",
+    "searchTerms": "선택 셀렉트 검색 복수 멀티 태그 combobox"
+  },
+  {
+    "route": "components/selection",
+    "title": "Selection controls",
+    "group": "Components",
+    "description": "복수 선택, 단일 선택, 켜고 끄기를 명확하게 구분합니다.",
+    "searchTerms": "체크박스 라디오 토글 스위치 checkbox radio switch"
+  },
+  {
+    "route": "components/text-fields",
+    "title": "Text fields",
+    "group": "Components",
+    "description": "짧은 입력부터 긴 설명까지 자연스럽게 확장합니다.",
+    "searchTerms": "입력 필드 검색 비밀번호 이메일 textarea prefix suffix 프리픽스 서픽스 접두사 접미사 좌측 라벨 가로 텍스트 정렬 가운데 오른쪽"
+  },
+  {
+    "route": "components/number-fields",
+    "title": "Number fields",
+    "group": "Components",
+    "description": "정수와 소수 입력, 증감 단위와 범위를 일관되게 관리합니다.",
+    "searchTerms": "숫자 정수 소수 금액 수량 number"
+  },
+  {
+    "route": "components/chips",
+    "title": "Chips",
+    "group": "Components",
+    "description": "분류와 상태를 표시하거나 필터를 선택합니다.",
+    "searchTerms": "칩 태그 필터 표시 라운드 둥근 색상 세컨드리 chip tag secondary"
+  },
+  {
+    "route": "components/slider",
+    "title": "Slider & slide",
+    "group": "Components",
+    "description": "범위에서 값을 조절하거나 콘텐츠를 순서대로 살펴봅니다.",
+    "searchTerms": "슬라이더 범위 슬라이드 range"
+  },
+  {
+    "route": "components/date-picker",
+    "title": "Date picker",
+    "group": "Components",
+    "description": "날짜를 직접 입력하거나 달력에서 선택합니다.",
+    "searchTerms": "날짜 달력 기간 예약 date calendar"
+  },
+  {
+    "route": "components/tree",
+    "title": "Tree",
+    "group": "Components",
+    "description": "계층으로 묶인 항목을 펼치고 선택합니다.",
+    "searchTerms": "트리 계층 폴더 탐색 tree disclosure"
+  },
+  {
+    "route": "components/tabs",
+    "title": "Tabs",
+    "group": "Components",
+    "description": "같은 맥락의 정보를 나눠 탐색합니다.",
+    "searchTerms": "탭 패널 tab"
+  },
+  {
+    "route": "components/accordion",
+    "title": "Accordion",
+    "group": "Components",
+    "description": "필요한 정보를 펼쳐서 확인합니다.",
+    "searchTerms": "아코디언 접기 펼치기 accordion details"
+  },
+  {
+    "route": "components/feedback",
+    "title": "Badges & alerts",
+    "group": "Components",
+    "description": "상태와 피드백을 색상과 문구로 함께 전달합니다.",
+    "searchTerms": "알림 상태 배지 badge alert"
+  },
+  {
+    "route": "components/progress",
+    "title": "Progress",
+    "group": "Components",
+    "description": "작업의 진행 상황을 숫자와 함께 표시합니다.",
+    "searchTerms": "진행률 진행바 원형 progress"
+  },
+  {
+    "route": "components/overlays",
+    "title": "Dialog & toast",
+    "group": "Components",
+    "description": "집중이 필요한 작업과 짧은 피드백에 사용합니다.",
+    "searchTerms": "다이얼로그 토스트 모달 dialog toast"
+  },
+  {
+    "route": "components/list",
+    "title": "List",
+    "group": "Components",
+    "description": "관련 항목을 읽고 선택할 수 있도록 정렬합니다.",
+    "searchTerms": "목록 리스트 list"
+  },
+  {
+    "route": "components/divider",
+    "title": "Divider",
+    "group": "Components",
+    "description": "관련된 콘텐츠 사이에 구분선을 두어 영역과 흐름을 나눕니다.",
+    "searchTerms": "구분선 디바이더 분리 경계 가로 세로 점선 divider separator"
+  },
+  {
+    "route": "components/table",
+    "title": "Table & pagination",
+    "group": "Components",
+    "description": "정보를 행 단위로 정리하고 페이지로 나눠 탐색합니다.",
+    "searchTerms": "표 테이블 페이지네이션 pagination"
+  },
+  {
+    "route": "components/tooltip",
+    "title": "Tooltip",
+    "group": "Components",
+    "description": "짧은 설명을 포커스하거나 마우스를 올렸을 때 표시합니다.",
+    "searchTerms": "툴팁 도움말 tooltip"
+  },
+  {
+    "route": "components/dropdown-menu",
+    "title": "Dropdown menu",
+    "group": "Components",
+    "description": "관련된 동작을 하나의 메뉴에 모아 보여줍니다.",
+    "searchTerms": "메뉴 액션 드롭다운 menu"
+  },
+  {
+    "route": "components/popover",
+    "title": "Popover",
+    "group": "Components",
+    "description": "현재 맥락에서 부가 정보와 간단한 설정을 보여줍니다.",
+    "searchTerms": "팝오버 설정 popover"
+  },
+  {
+    "route": "components/drawer",
+    "title": "Drawer",
+    "group": "Components",
+    "description": "현재 화면을 유지하면서 상세 정보와 설정을 확인합니다.",
+    "searchTerms": "드로어 패널 상세 drawer"
+  },
+  {
+    "route": "components/loading",
+    "title": "Skeleton & spinner",
+    "group": "Components",
+    "description": "콘텐츠와 작업을 불러오는 동안 진행 상태를 전달합니다.",
+    "searchTerms": "로딩 스켈레톤 스피너 skeleton spinner"
+  },
+  {
+    "route": "components/file-upload",
+    "title": "File upload",
+    "group": "Components",
+    "description": "파일을 선택하고 선택 결과를 확인합니다.",
+    "searchTerms": "파일 첨부 업로드 upload"
+  },
+  {
+    "route": "components/avatar",
+    "title": "Avatar",
+    "group": "Components",
+    "description": "사용자나 팀을 이미지와 이니셜로 표현합니다.",
+    "searchTerms": "아바타 프로필 avatar"
+  },
+  {
+    "route": "components/stepper",
+    "title": "Stepper",
+    "group": "Components",
+    "description": "여러 단계로 이루어진 작업의 현재 위치를 보여줍니다.",
+    "searchTerms": "단계 스텝 진행 stepper"
+  },
+  {
+    "route": "components/card",
+    "title": "Card",
+    "group": "Components",
+    "description": "관련된 내용과 행동을 하나의 영역으로 묶습니다.",
+    "searchTerms": "카드 요약 card"
+  },
+  {
+    "route": "patterns/form/basic",
+    "title": "기본 정보",
+    "group": "Patterns / Form",
+    "description": "필수 항목과 선택 항목을 구분하고 입력값을 확인합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/preferences",
+    "title": "선택과 환경 설정",
+    "group": "Patterns / Form",
+    "description": "체크박스, 라디오와 셀렉트를 조합해 여러 설정을 입력합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/password",
+    "title": "비밀번호 변경",
+    "group": "Patterns / Form",
+    "description": "입력 규칙과 확인값을 함께 검증하는 폼입니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/inquiry",
+    "title": "상세 문의",
+    "group": "Patterns / Form",
+    "description": "긴 내용과 첨부 파일을 함께 입력하는 폼입니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/project",
+    "title": "프로젝트 등록",
+    "group": "Patterns / Form",
+    "description": "기본 정보와 참여 팀, 진행 상태를 조합하는 프로젝트 폼입니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/booking",
+    "title": "일정 예약",
+    "group": "Patterns / Form",
+    "description": "날짜, 시간과 참석 옵션을 함께 입력하는 예약 폼입니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/states",
+    "title": "읽기 전용과 비활성",
+    "group": "Patterns / Form",
+    "description": "수정할 수 없는 정보와 사용할 수 없는 입력을 구분합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/form/profile",
+    "title": "Profile",
+    "group": "Patterns / Form",
+    "description": "기본 정보를 확인하고 수정하는 프로필 폼입니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/data-states",
+    "title": "데이터 상태",
+    "group": "Patterns",
+    "description": "로딩, 조회 실패와 재시도, 최초 빈 데이터와 검색 결과 없음을 구분합니다.",
+    "searchTerms": ""
+  },
+  {
+    "route": "patterns/empty-state",
+    "title": "Empty state",
+    "group": "Patterns",
+    "description": "비어 있는 화면에서 상황과 다음에 할 일을 알려줍니다.",
+    "searchTerms": ""
+  }
+]

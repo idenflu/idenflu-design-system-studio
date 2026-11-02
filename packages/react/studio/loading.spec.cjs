@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 test('NOVA spinners animate at the requested sizes and remain within the viewport', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/components/loading');
+  await page.goto('/systems/idenflu-mono/index.html#/components/loading');
   const orbit = page.getByRole('status',{name:'NOVA 궤도 로딩 중',exact:true});
   const mark = page.getByRole('status',{name:'NOVA 로고 로딩 중',exact:true});
   await expect(orbit).toBeVisible(); await expect(mark).toBeVisible();
@@ -18,7 +18,7 @@ test('NOVA spinners animate at the requested sizes and remain within the viewpor
 
 test('NOVA spinners honor reduced motion while keeping their loading description', async ({page}) => {
   await page.emulateMedia({reducedMotion:'reduce'});
-  await page.goto('/packages/react/studio/index.html#/components/loading');
+  await page.goto('/systems/idenflu-mono/index.html#/components/loading');
   const orbit = page.getByRole('status',{name:'NOVA 궤도 로딩 중',exact:true});
   await expect(orbit).toBeVisible();
   await expect(orbit.locator('.nova-spinner__orbit')).toHaveCSS('animation-name','none');
@@ -31,7 +31,7 @@ test('NOVA spinners honor reduced motion while keeping their loading description
 });
 
 test('NOVA button loading prevents duplicate activation and reports completion', async ({page}) => {
-  await page.goto('/packages/react/studio/index.html#/components/loading');
+  await page.goto('/systems/idenflu-mono/index.html#/components/loading');
   await page.getByRole('button',{name:'예제 작업 시작',exact:true}).click();
   const pending = page.getByRole('button',{name:'처리 중',exact:true});
   await expect(pending).toBeDisabled(); await expect(pending).toHaveAttribute('aria-busy','true');
