@@ -23,4 +23,5 @@ React 컴포넌트는 `packages/react/src/`, 문서 예시는 `packages/react/st
 - 토큰·클래스·속성·값 타입·이벤트 이름/shape·키보드 동작은 소비 계약입니다. 삭제·의미 변경은 breaking change로 기록하고 마이그레이션 예제를 제공합니다.
 - 기능 추가는 minor, 호환 가능한 오류 수정은 patch를 올립니다. 0.x 기간에도 기존 소비자를 임의로 깨지 않습니다.
 - `package.json` 버전과 CHANGELOG를 맞추고 모든 검사를 통과한 뒤 태그/게시를 진행합니다. 저장소의 빌드·CI는 자동 게시나 외부 권한 변경을 수행하지 않습니다.
-- GitHub Actions는 검사·브라우저 검증·배포물 artifact를 생성합니다. [Playwright의 공식 CI 안내](https://playwright.dev/docs/ci-intro)를 따릅니다.
+- `main`·`dev` 푸시·PR에는 자동 Actions를 실행하지 않습니다. 배포할 때 `deploy`에서 `git merge --ff-only dev` 후 푸시합니다. `deploy`에서 코드를 별도로 수정하지 않습니다.
+- GitHub Actions는 `deploy` 푸시 시 검사·브라우저 검증·배포물 artifact를 생성합니다. 수동 실행도 `deploy`를 선택합니다. [Playwright의 공식 CI 안내](https://playwright.dev/docs/ci-intro)를 따릅니다.

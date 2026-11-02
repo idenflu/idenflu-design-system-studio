@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [deploy]
   workflow_dispatch:
 
 permissions:
@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/deploy'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -43,7 +44,7 @@ jobs:
           path: dist
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/deploy'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
