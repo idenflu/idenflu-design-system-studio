@@ -1,17 +1,64 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Accordion, AccordionItem, Alert, Badge, Button, Card, DataState, Dialog, Tabs, TextArea, TextField, Toast, Tooltip } from '../src';
-import { Section, StateDemos, TypographyDemos, ColorDemos, ButtonDemos, SelectionDemos, DrawerDemos, SelectDemos, ChipDemos, TableDemos, StepperDemos, MenuDemos, PopoverDemos, TreeDemos, SliderDemos, NumberDemos, DateDemos, ProgressDemos, LoadingDemos, AvatarDemos, ListDemos, FileDemos } from './demos';
+import { Button, DataState, TextField } from '../src';
+import { Section } from './demo-layout';
+import { ColorDemos } from './color-demos';
+import { TextFields, SelectDemos, NumberDemos, DateDemos } from './form-demos';
+import { IconDemos, TypographyDemos, SizeDemos, StateDemos } from './foundation-demos';
+import { TabsDemos, FeedbackDemos, AccordionDemos, OverlayDemos, TooltipDemos, CardDemos } from './content-demos';
+import { ButtonDemos, SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemos, StepperDemos, MenuDemos, PopoverDemos, DrawerDemos } from './structure-demos';
+import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from './media-demos';
 import { DocumentShell, Overview, useDocumentRoute } from './shell';
 import icons from './dist/icons.json';
 
 const prototyped = new Set(['components/buttons', 'components/text-fields', 'components/selection', 'components/select', 'components/number-fields', 'components/date-picker', 'components/tree', 'components/tabs', 'components/progress', 'components/loading', 'components/file-upload', 'components/feedback', 'components/accordion', 'components/overlays', 'components/table', 'components/chips', 'components/list', 'components/slider', 'components/tooltip', 'components/dropdown-menu', 'components/popover', 'components/drawer', 'components/avatar', 'components/stepper', 'components/card', 'patterns/data-states', 'patterns/form/basic']);
 ['overview', 'foundations/colors', 'foundations/typography', 'foundations/sizes', 'foundations/icons', 'foundations/states'].forEach(route => prototyped.add(route));
 const snippets: Record<string, string> = {
+  'foundations/typography': `import { TextField } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function TypographyExample() {
+  return <>
+    <h2 style={{ fontSize: 'var(--font-size-heading)',
+                 lineHeight: 'var(--line-height-heading)',
+                 fontWeight: 'var(--font-weight-semibold)' }}>프로젝트 설정</h2>
+    <p style={{ fontSize: 'var(--font-size-body)',
+                lineHeight: 'var(--line-height-body)' }}>팀과 함께 작업할 프로젝트 정보를 관리합니다.</p>
+    <p style={{ fontSize: 'var(--font-size-caption)',
+                lineHeight: 'var(--line-height-caption)',
+                color: 'var(--text-secondary)' }}>마지막 수정 · 2026.11.02</p>
+    <TextField label="프로젝트 이름"
+               helperText="팀원이 알아보기 쉬운 이름을 입력해주세요." />
+  </>;
+}`,
+  'foundations/colors': `import { Alert, Badge, Button } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function ColorExample() {
+  return <>
+    <Button>저장하기</Button>
+    <Badge variant="success">완료</Badge>
+    <Badge variant="warning">검토 필요</Badge>
+    <Alert variant="success"><strong>저장 완료</strong><p>변경사항이 적용되었습니다.</p></Alert>
+    <div style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+      프로젝트 설정
+    </div>
+  </>;
+}`,
+  'foundations/icons': `import { Button, Icon, TextField } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function IconExample() {
+  return <>
+    <Button><Icon name="plus" />새로 만들기</Button>
+    <Button iconOnly aria-label="설정"><Icon name="settings" /></Button>
+    <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
+  </>;
+}`,
   'components/buttons':'<Button variant="outline">저장</Button>',
   'components/text-fields':'<TextField label="웹사이트" labelPosition="left" prefix="https://" defaultValue="idenflu.app" />',
   'components/selection':'<Checkbox label="이메일 알림" defaultChecked />',
-  'components/select':'<MultiSelect label="참여 팀" options={options} searchable presentation="inline" clearable />',
+  'components/select':'<Select label="담당 팀" options={[{ value: "design", label: "디자인", description: "제품 경험을 설계합니다.", icon: <Icon name="grid" /> }]} />',
   'components/number-fields':'<NumberField label="금액" defaultValue="12.5" decimals={1} step="0.5" />',
   'components/date-picker':'<DatePicker label="시작일" />\n<DateRangePicker label="기간" />',
   'components/tree':'<Tree label="메뉴" items={items} />',
@@ -39,33 +86,7 @@ const snippets: Record<string, string> = {
 const legacy = (route: string) => `../../../systems/idenflu-mono/index.html#/${route}`;
 function CodeExample({ code }: { code:string }) {
   const [message, setMessage] = React.useState('');
-  return <section className="react-studio-section"><h2>React 사용 예시</h2><p className="react-studio-description">패키지에서 컴포넌트를 가져와 사용합니다.</p><div className="react-studio-code"><pre><code>{code}</code></pre></div><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span role="status"> {message}</span></section>;
-}
-function TextFieldHelpers() {
-  const [search, setSearch] = React.useState('');
-  const [email, setEmail] = React.useState('minsu@idenflu.com');
-  const [emailValid, setEmailValid] = React.useState(true), [emailTouched, setEmailTouched] = React.useState(false);
-  const searchRef = React.useRef<HTMLInputElement>(null);
-  const [visible, setVisible] = React.useState(false);
-  const [description, setDescription] = React.useState('');
-  const validEmail = Boolean(email.trim()) && emailValid;
-  const invalidEmail = emailTouched && Boolean(email.trim()) && !emailValid;
-  return <div className="react-studio-field-grid">
-    <TextField ref={searchRef} label="검색" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="컴포넌트 검색" prefixDecorative prefix={<span className="ui-icon icon-search" />} helperText={search ? `입력한 검색어: ${search}` : '검색 아이콘과 지우기 버튼을 함께 사용합니다.'} action={<button className="input-action" type="button" aria-label="검색어 지우기" disabled={!search} onClick={() => { setSearch(''); searchRef.current?.focus(); }}><span className="ui-icon icon-close" aria-hidden="true" /></button>} />
-    <TextField label="이메일" type="email" value={email} onChange={event => { setEmail(event.target.value); setEmailValid(event.target.validity.valid); setEmailTouched(false); }} onBlur={() => setEmailTouched(true)} prefixDecorative prefix={<span className="ui-icon icon-email" />} helperText={!invalidEmail ? validEmail ? '올바른 이메일 형식입니다.' : '이메일 주소를 입력해주세요.' : undefined} error={invalidEmail ? '올바른 이메일 주소를 입력해주세요.' : undefined} action={validEmail && <span className="input-status" aria-hidden="true"><span className="ui-icon icon-check" /></span>} />
-    <div className="react-studio-field-wide"><TextField label="비밀번호" type={visible ? 'text' : 'password'} defaultValue="idenflu-mono" prefixDecorative prefix={<span className="ui-icon icon-lock" />} action={<button className="input-action" type="button" aria-label={visible ? '비밀번호 숨기기' : '비밀번호 표시'} aria-pressed={visible} onClick={() => setVisible(!visible)}><span className={`ui-icon ${visible ? 'icon-eye-slash' : 'icon-eye'}`} aria-hidden="true" /></button>} /></div>
-    <div className="react-studio-field-wide"><TextArea label="설명" rows={3} maxLength={160} value={description} onChange={event => setDescription(event.target.value)} placeholder="프로젝트에 대해 간단히 적어주세요." helperText={`${description.length} / 160`} /></div>
-  </div>;
-}
-function TextFields() { return <>
-  <Section title="좌측 라벨"><TextField label="웹사이트" labelPosition="left" prefix="https://" defaultValue="idenflu.app" helperText="프로토콜을 제외한 주소를 입력해주세요." /><TextField label="이메일 계정" labelPosition="left" suffix="@idenflu.com" defaultValue="minsu" /></Section>
-  <Section title="텍스트 정렬"><TextField label="왼쪽 정렬" alignment="start" defaultValue="프로젝트 이름" /><TextField label="가운데 정렬" alignment="center" defaultValue="A-1024" /><TextField label="오른쪽 정렬" alignment="end" defaultValue="12,500" /></Section>
-  <Section title="프리픽스와 서픽스"><TextField label="프로젝트 주소" prefix="idenflu.app /" defaultValue="mono" /><TextField label="너비" type="number" suffix="px" defaultValue="100" /></Section>
-  <Section title="아이콘과 입력 보조"><TextFieldHelpers /></Section>
-</>; }
-function OverlayExample() {
-  const [open, setOpen] = React.useState(false), [toast, setToast] = React.useState(false);
-  return <><Button variant="outline" onClick={() => setOpen(true)}>다이얼로그 열기</Button><Dialog open={open} onOpenChange={setOpen} aria-label="변경 확인"><h2>변경사항을 저장할까요?</h2><p>내용을 확인하고 닫을 수 있습니다.</p><Button onClick={() => setOpen(false)}>닫기</Button></Dialog><Button variant="outline" onClick={() => setToast(true)}>알림 표시</Button>{toast && <Toast onDismiss={() => setToast(false)}>변경사항이 저장되었습니다.</Toast>}</>;
+  return <Section title="React 사용 예시" description="패키지에서 컴포넌트를 가져와 사용합니다."><div className="react-studio-code"><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
 }
 function DataStatesExample() { const attempts = React.useRef(0); const load = React.useCallback(async () => { if (attempts.current++ === 0) throw new Error('조회 실패'); return ['디자인 시스템', '브랜드 가이드', '웹사이트 개선']; }, []); return <DataState load={load} matches={(item, query) => item.includes(query)} getKey={item => item} renderItem={item => item} searchLabel="프로젝트 검색" />; }
 function BasicForm() {
@@ -93,15 +114,15 @@ function BasicForm() {
 function FoundationIcons() {
   const [query, setQuery] = React.useState('');
   const visible = icons.filter(name => name.includes(query.trim().toLowerCase()));
-  return <><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} /><p role="status">{visible.length}개 아이콘</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><span className="ui-icon" aria-hidden="true" style={{'--icon':`url('../../../systems/idenflu-mono/assets/icons/idenflu/${name}.svg')`} as React.CSSProperties} /><span>{name}</span></li>)}</ul></>;
+  return <><div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: search, calendar, close" /></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 다른 이름으로 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><span className="ui-icon" aria-hidden="true" style={{'--icon':`url('../../../systems/idenflu-mono/assets/icons/idenflu/${name}.svg')`} as React.CSSProperties} /><span>{name}</span></li>)}</ul></>;
 }
 function ComponentPage({ route }: { route:string }) {
   switch (route) {
     case 'overview': return <Overview />;
     case 'foundations/colors': return <ColorDemos />;
     case 'foundations/typography': return <TypographyDemos />;
-    case 'foundations/sizes': return <Section title="공통 사이즈">{(['sm','md','lg'] as const).map(size => <div key={size} className="react-studio-size"><strong>{size.toUpperCase()}</strong><Button size={size}>새로 만들기</Button><TextField size={size} label={`${size.toUpperCase()} 입력`} defaultValue="idenflu mono" /></div>)}</Section>;
-    case 'foundations/icons': return <Section title="아이콘 목록"><FoundationIcons /></Section>;
+    case 'foundations/sizes': return <SizeDemos />;
+    case 'foundations/icons': return <><IconDemos /><Section title="아이콘 목록" description="목록은 SVG 파일명 기준입니다. React Icon에서 지원하는 이름은 컴포넌트 타입을 확인해주세요."><FoundationIcons /></Section></>;
     case 'foundations/states': return <StateDemos />;
     case 'components/buttons': return <ButtonDemos />;
     case 'components/text-fields': return <TextFields />;
@@ -110,24 +131,24 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/number-fields': return <NumberDemos />;
     case 'components/date-picker': return <DateDemos />;
     case 'components/tree': return <TreeDemos />;
-    case 'components/tabs': return <Section title="탭"><Tabs label="설정" items={[{value:'general',label:'기본 정보',content:'워크스페이스 정보를 확인합니다.'},{value:'notifications',label:'알림',content:'알림 설정을 확인합니다.'},{value:'security',label:'보안',content:'보안 설정을 확인합니다.'}]} /></Section>;
+    case 'components/tabs': return <TabsDemos />;
     case 'components/progress': return <ProgressDemos />;
     case 'components/loading': return <LoadingDemos />;
     case 'components/file-upload': return <FileDemos />;
-    case 'components/feedback': return <Section title="상태와 알림"><div><Badge>기본</Badge> <Badge variant="primary">진행 중</Badge> <Badge variant="success">완료</Badge> <Badge variant="warning">검토</Badge> <Badge variant="danger">오류</Badge></div><Alert><strong>안내</strong><p>프로젝트 정보를 확인해주세요.</p></Alert><Alert variant="success"><strong>완료</strong><p>변경사항이 저장되었습니다.</p></Alert></Section>;
-    case 'components/accordion': return <Section title="아코디언"><Accordion><AccordionItem title="디자인 시스템이란?">일관된 제품 경험을 위한 공통 기준입니다.</AccordionItem><AccordionItem title="어떻게 사용하나요?">컴포넌트와 토큰을 함께 사용합니다.</AccordionItem></Accordion></Section>;
-    case 'components/overlays': return <Section title="다이얼로그와 알림"><OverlayExample /></Section>;
+    case 'components/feedback': return <FeedbackDemos />;
+    case 'components/accordion': return <AccordionDemos />;
+    case 'components/overlays': return <OverlayDemos />;
     case 'components/table': return <TableDemos />;
     case 'components/chips': return <ChipDemos />;
     case 'components/list': return <ListDemos />;
     case 'components/slider': return <SliderDemos />;
-    case 'components/tooltip': return <Section title="툴팁"><Tooltip content="프로젝트를 구분할 이름입니다."><Button variant="outline">프로젝트 이름</Button></Tooltip></Section>;
+    case 'components/tooltip': return <TooltipDemos />;
     case 'components/dropdown-menu': return <MenuDemos />;
     case 'components/popover': return <PopoverDemos />;
     case 'components/drawer': return <DrawerDemos />;
     case 'components/avatar': return <AvatarDemos />;
     case 'components/stepper': return <StepperDemos />;
-    case 'components/card': return <><Section title="기본 카드"><div className="card-grid"><Card><span className="card-label">PROJECT</span><h3>디자인 시스템</h3><p>일관된 제품 경험을 위한 공통 기준을 만듭니다.</p><div className="card-footer"><Badge variant="primary">진행 중</Badge><span>최근 수정 · 오늘</span></div></Card><Card><span className="card-label">GUIDE</span><h3>브랜드 가이드</h3><p>브랜드의 시각 언어와 사용 원칙을 정리합니다.</p><div className="card-footer"><Badge>검토 중</Badge><span>최근 수정 · 어제</span></div></Card></div></Section><Section title="동작이 있는 카드"><Card className="card-action"><div><span className="card-label">RESOURCE</span><h3>컴포넌트 살펴보기</h3><p>자주 쓰는 UI 요소와 사용 예시를 확인합니다.</p></div><a className="button button--outline button-inline" href="#/components/buttons">컴포넌트 보기</a></Card></Section></>;
+    case 'components/card': return <CardDemos />;
     case 'patterns/data-states': return <Section title="목록 상태"><DataStatesExample /></Section>;
     case 'patterns/form/basic': return <Section title="기본 정보 입력"><BasicForm /></Section>;
     default: return null;

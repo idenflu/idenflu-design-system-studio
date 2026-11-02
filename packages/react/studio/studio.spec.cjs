@@ -78,6 +78,31 @@ test('theme toggle updates color codes and persists across reload', async ({ pag
   await expect(primary).toHaveText(expected === 'dark' ? '#9AAFFF' : '#4263CC');
 });
 
+test('topbar tooltips support keyboard focus and stay within the viewport', async ({ page }) => {
+  await page.goto('/packages/react/studio/index.html#/components/tooltip');
+  const settings = page.getByRole('button', { name: '화면 조정', exact: true });
+  const theme = page.locator('.docs-topbar .theme-toggle');
+  for (const button of [settings, theme]) {
+    await button.focus();
+    const tooltip = button.locator('..').getByRole('tooltip');
+    await expect(tooltip).toBeVisible();
+    const bounds = await tooltip.boundingBox();
+    const trigger = await button.boundingBox();
+    expect(bounds.y).toBeGreaterThanOrEqual(trigger.y + trigger.height);
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(page.viewportSize().width);
+    await page.keyboard.press('Escape');
+    await expect(tooltip).toBeHidden();
+    await button.blur();
+  }
+  await theme.focus();
+  await theme.click();
+  await expect(theme.locator('..').getByRole('tooltip')).toHaveText(await theme.getAttribute('aria-label'));
+  await settings.click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: '화면 조정' })).toBeHidden();
+});
+
 test('basic React form validates, accepts corrected data and resets', async ({ page }) => {
   await page.goto('/packages/react/studio/index.html#/patterns/form/basic');
   await page.getByRole('button', { name: '확인', exact: true }).click();
@@ -118,7 +143,7 @@ test('pagination changes the displayed rows and stepper moves between steps', as
   await expect(page.locator('.react-studio-demo').getByRole('status')).toContainText('5–8 / 12');
   await page.goto('/packages/react/studio/index.html#/components/stepper');
   await page.getByRole('button', { name: '다음', exact: true }).click();
-  await expect(page.locator('.stepper [aria-current="step"]')).toContainText('팀원 초대');
+  await expect(page.getByRole('list', { name: '프로젝트 생성 단계' }).locator('[aria-current="step"]')).toContainText('팀원 초대');
 });
 
 test('menu and popover apply actions report their result', async ({ page }) => {
@@ -140,6 +165,8 @@ test('number examples support keyboard stepping and documented sizes', async ({ 
   const input = page.getByRole('spinbutton', { name: '정수만 입력' });
   await input.press('ArrowUp');
   await expect(input).toHaveValue('13');
+  await expect(page.getByRole('spinbutton', { name: '금액', exact: true })).toHaveValue('12,500');
+  await expect(page.getByRole('spinbutton', { name: '소수 금액', exact: true })).toHaveValue('12,500.5');
   for (const size of ['SM', 'MD', 'LG']) await expect(page.getByRole('spinbutton', { name: `${size} 숫자 입력` })).toBeVisible();
 });
 

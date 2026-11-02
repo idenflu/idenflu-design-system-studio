@@ -103,7 +103,7 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
     setExpanded(previous => ({...previous, [current.group]:true}));
     restoreFocus.current = false;
     setMenuOpen(false);
-    const headings = [...(body.current?.querySelectorAll('h2') || [])];
+    const headings = [...(body.current?.querySelectorAll('h2') || [])].filter(heading => !heading.closest('dialog'));
     setToc(headings.map((heading, index) => { heading.id ||= `doc-${current.route.replace(/\//g, '-')}-section-${index + 1}`; return {id:heading.id, title:heading.textContent || ''}; }));
     const moveFocus = !initialRoute.current;
     initialRoute.current = false;

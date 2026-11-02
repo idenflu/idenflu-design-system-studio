@@ -51,6 +51,54 @@ test('NumberField validates precision and controlled edits follow the parent', a
   } finally { await f.dispose(); }
 });
 
+test('grouped NumberField formats its initial value and form reset without losing decimal precision', async () => {
+  const f = fixture(), changes = [];
+  try {
+    await f.render(h('form', null, h(NumberField, {label:'금액', defaultValue:'-9007199254740993.1200', decimals:4, grouping:true, onValueChange:value => changes.push(value)})));
+    const form = f.container.querySelector('form'), input = form.querySelector('input');
+    assert.equal(input.value, '-9,007,199,254,740,993.1200');
+    assert.equal(input.getAttribute('aria-valuenow'), '-9007199254740993.12');
+    await edit(input, '-9007199254740992.3400'); await blur(input);
+    assert.equal(input.value, '-9,007,199,254,740,992.3400');
+    assert.equal(changes.at(-1), '-9007199254740992.34');
+    await act(async () => form.reset());
+    assert.equal(input.value, '-9,007,199,254,740,993.1200');
+  } finally { await f.dispose(); }
+});
+
+test('controlled grouped NumberField keeps editing drafts and formats parent updates and rejected changes', async () => {
+  const f = fixture(), changes = [];
+  const field = value => h(NumberField, {label:'금액', value, decimals:2, grouping:true, step:'0.25', onValueChange:next => changes.push(next)});
+  try {
+    await f.render(field('1234.50'));
+    const input = f.container.querySelector('input');
+    assert.equal(input.value, '1,234.50');
+    input.focus(); await edit(input, '12,34'); input.setSelectionRange(2, 2);
+    await f.render(field('1234.50'));
+    assert.equal(input.value, '12,34'); assert.equal(input.selectionStart, 2);
+    await blur(input);
+    assert.equal(input.value, '12,34'); assert.equal(input.getAttribute('aria-invalid'), 'true');
+    await f.render(field('7654321.00'));
+    assert.equal(input.value, '7,654,321.00'); assert.equal(input.getAttribute('aria-invalid'), null);
+    await edit(input, '1000.05'); await blur(input);
+    assert.equal(changes.at(-1), '1000.05'); assert.equal(input.value, '7,654,321.00');
+    await key(input, 'ArrowUp');
+    assert.equal(changes.at(-1), '7654321.25'); assert.equal(input.value, '7,654,321.00');
+    await f.render(field(null)); assert.equal(input.value, '');
+  } finally { await f.dispose(); }
+});
+
+test('grouped NumberField preserves an invalid default when the form is reset', async () => {
+  const f = fixture();
+  try {
+    await f.render(h('form', null, h(NumberField, {label:'금액', defaultValue:'12,34.00', decimals:2, grouping:true})));
+    const form = f.container.querySelector('form'), input = form.querySelector('input');
+    assert.equal(input.value, '12,34.00');
+    await edit(input, '1234.00'); await blur(input); assert.equal(input.value, '1,234.00');
+    await act(async () => form.reset()); assert.equal(input.value, '12,34.00'); assert.equal(input.checkValidity(), false);
+  } finally { await f.dispose(); }
+});
+
 test('DatePicker validates leap days and normalizes eight-digit input', async () => {
   const f = fixture(), changes = [];
   try { await f.render(h('form', null, h(DatePicker, { label: '날짜', name: 'date', onValueChange: value => changes.push(value) })));

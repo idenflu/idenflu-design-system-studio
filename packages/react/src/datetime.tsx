@@ -27,6 +27,11 @@ function formatNumber(value: bigint, decimals: number, grouping = false, digits 
   fraction = fraction.padEnd(Math.min(digits, decimals), '0');
   return `${value < 0n ? '-' : ''}${integer}${fraction ? `.${fraction}` : ''}`;
 }
+function formatNumberDraft(text: string, decimals: number, grouping: boolean) {
+  if (!grouping) return text;
+  const parsed = parseNumber(text, decimals, true);
+  return parsed.value == null || parsed.error ? text : formatNumber(parsed.value, decimals, true, parsed.digits);
+}
 // ARIA attributes accept decimal text in the DOM; React's TypeScript types only allow number.
 // The type assertion does not convert the string or lose precision at runtime.
 function ariaNumber(value: bigint, decimals: number): number { return formatNumber(value, decimals) as unknown as number; }
@@ -53,23 +58,23 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
   const stepParsed = parseNumber(step, places, false);
   if (minParsed.error || maxParsed.error || stepParsed.error || !stepParsed.value || stepParsed.value <= 0n || (minParsed.value != null && maxParsed.value != null && minParsed.value > maxParsed.value)) throw new RangeError('유효한 숫자 범위와 step을 지정해주세요.');
   const initial = value ?? defaultValue ?? '';
-  const [draft, setDraft] = React.useState(initial);
+  const [draft, setDraft] = React.useState(() => formatNumberDraft(initial, places, grouping));
   const [error, setError] = React.useState('');
   const composing = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const focusPointer = React.useRef<{ x: number; y: number; dragged: boolean } | null>(null);
   const previousValue = React.useRef(value);
   React.useEffect(() => {
-    if (value !== undefined && value !== previousValue.current) { setDraft(value ?? ''); setError(''); }
+    if (value !== undefined && value !== previousValue.current) { setDraft(formatNumberDraft(value ?? '', places, grouping)); setError(''); }
     previousValue.current = value;
   }, [value]);
   React.useEffect(() => {
     const form = inputRef.current?.form;
     if (!form) return;
     let active = true;
-    const reset = (event: Event) => { queueMicrotask(() => { if (!active || event.defaultPrevented) return; if (value === undefined) setDraft(defaultValue ?? ''); setError(''); }); };
+    const reset = (event: Event) => { queueMicrotask(() => { if (!active || event.defaultPrevented) return; if (value === undefined) setDraft(formatNumberDraft(defaultValue ?? '', places, grouping)); setError(''); }); };
     form.addEventListener('reset', reset); return () => { active = false; form.removeEventListener('reset', reset); };
-  }, [defaultValue, value]);
+  }, [defaultValue, value, places, grouping]);
   const parsed = parseNumber(draft, places, grouping);
   const boundsError = (number: Parsed) => number.value != null && minParsed.value != null && number.value < minParsed.value ? `${formatNumber(minParsed.value, places, grouping)} 이상 입력해주세요.` : number.value != null && maxParsed.value != null && number.value > maxParsed.value ? `${formatNumber(maxParsed.value, places, grouping)} 이하로 입력해주세요.` : '';
   const validate = (number: Parsed) => (required && number.empty ? '값을 입력해주세요.' : number.error || boundsError(number));
@@ -81,7 +86,7 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
     setError(message);
     if (message) return;
     const next = result.value == null ? null : formatNumber(result.value, places);
-    setDraft(value !== undefined ? value ?? '' : result.value == null ? '' : formatNumber(result.value, places, grouping, result.digits));
+    setDraft(value !== undefined ? formatNumberDraft(value ?? '', places, grouping) : result.value == null ? '' : formatNumber(result.value, places, grouping, result.digits));
     onValueChange?.(next);
   };
   const adjust = (direction: number, multiplier = 1) => {
@@ -91,7 +96,7 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
     let next = (result.value ?? 0n) + BigInt(direction * multiplier) * stepParsed.value!;
     if (minParsed.value != null && next < minParsed.value) next = minParsed.value;
     if (maxParsed.value != null && next > maxParsed.value) next = maxParsed.value;
-    setDraft(value !== undefined ? value ?? '' : formatNumber(next, places, grouping, result.digits)); setError(''); onValueChange?.(formatNumber(next, places));
+    setDraft(value !== undefined ? formatNumberDraft(value ?? '', places, grouping) : formatNumber(next, places, grouping, result.digits)); setError(''); onValueChange?.(formatNumber(next, places));
   };
   const described = [helperText != null && `${inputId}-help`, unit && `${inputId}-unit`, error && `${inputId}-error`].filter(Boolean).join(' ') || undefined;
   return <div className={className}>

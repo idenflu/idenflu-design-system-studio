@@ -176,5 +176,5 @@ export function Stepper({ steps, currentStep, className, ...props }: StepperProp
 }
 export interface TableContainerProps extends React.HTMLAttributes<HTMLDivElement> { label: string }
 export function TableContainer({ label, className, tabIndex = 0, ...props }: TableContainerProps) { return <div {...props} role="region" aria-label={label} tabIndex={tabIndex} className={classes('table-scroll', className)} />; }
-export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> { name: 'plus' | 'arrow-right' | 'download' | 'copy' | 'settings' | 'trash' | 'list' | 'grid' | 'calendar' | 'search' | 'email' | 'lock' | 'eye' | 'eye-slash' | 'link' | 'check' | 'close' | 'caret' }
+export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> { name: 'plus' | 'arrow-right' | 'download' | 'copy' | 'settings' | 'trash' | 'list' | 'grid' | 'calendar' | 'search' | 'email' | 'person' | 'lock' | 'eye' | 'eye-slash' | 'link' | 'check' | 'close' | 'caret' }
 export function Icon({ name, className, ...props }: IconProps) { return <span {...props} aria-hidden="true" className={classes('ui-icon', `icon-${name}`, className)} />; }

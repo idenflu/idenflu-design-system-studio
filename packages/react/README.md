@@ -60,6 +60,17 @@ function ProjectForm() {
 }
 ```
 
+`Select`, `SearchSelect`, `MultiSelect`에 `prefixIcon`을 지정하면 선택값 앞에 고정 아이콘을 표시합니다. 옵션에는 `description`과 `icon`을 지정할 수 있고, `DropdownMenu` 항목에도 `icon`을 지정할 수 있습니다. 아이콘은 장식으로 처리하므로 의미는 `label`로 전달합니다.
+
+```tsx
+import { Icon, Select } from '@idenflu/mono-react';
+
+<Select label="담당 팀" prefixIcon={<Icon name="person" />} options={[
+  { value: 'design', label: '디자인', description: '제품 경험을 설계합니다.' },
+  { value: 'development', label: '개발', description: '제품을 구현합니다.' },
+]} />
+```
+
 `Tree`는 사이드 메뉴와 같은 disclosure 목록으로, Tab과 Enter·Space를 사용합니다. 파일 탐색기 방식의 ARIA tree 키보드 모델은 제공하지 않습니다. `FileUpload`는 파일 선택과 드롭, 선택적 `accept`·`maxSizeBytes` 검증을 처리하며 실제 업로드는 애플리케이션에서 연결합니다. 제공된 CSS는 전역 기본 요소 스타일을 포함합니다.
 
 기존 바닐라 런타임과 React API는 별개입니다. 특히 내부 `datevalidation` DOM 이벤트는 React 컴포넌트에서 제공하지 않으므로 React 콜백과 폼 유효성 검사를 사용하세요.

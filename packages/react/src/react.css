@@ -8,3 +8,15 @@
 .accordion details[open] summary .ui-icon { transform:rotate(180deg); }
 .spinner-dots.spinner--neutral > span, .spinner-bars.spinner--neutral > span { background:var(--text-secondary); }
 .spinner-dots.spinner--inverse > span, .spinner-bars.spinner--inverse > span { background:var(--text-on-primary); }
+.tabs .tab:disabled { color:var(--disabled-text); background:transparent; cursor:not-allowed; }
+.upload-area:has(.upload-input:disabled) .upload-button { background:var(--disabled); color:var(--disabled-text); box-shadow:inset 0 0 0 1px var(--border); cursor:not-allowed; }
+.custom-select .select-trigger[aria-invalid="true"] { border-color:var(--danger); }
+.select-option-content, .select-value-content { display:flex; align-items:center; gap:var(--space-2); min-width:0; }
+.select-option-copy, .select-value-text { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.select-option-icon, .action-option-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--text-secondary); }
+.icon-person { --icon:url('./assets/icons/idenflu/person.svg'); }
+.select-prefix-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--text-secondary); }
+.search-select-control > .select-prefix-icon, .multi-inline-control > .select-prefix-icon { margin-inline-start:var(--control-px); }
+.search-select-control > .select-prefix-icon + .search-select-input { padding-inline-start:var(--space-2); }
+.select-trigger:disabled .select-prefix-icon, .search-select-control:has(input:disabled) > .select-prefix-icon, .multi-inline-control:has(.multi-inline-trigger:disabled) > .select-prefix-icon { color:var(--disabled-text); }
+.action-option:has(.action-option-icon) { display:flex; align-items:center; gap:var(--space-2); }

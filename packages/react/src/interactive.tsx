@@ -64,7 +64,8 @@ export function Popover({ trigger, children, label, open: controlledOpen, defaul
   return <div className="popover-wrap" ref={wrap}><button ref={button} type="button" className="button button--outline button-inline" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{trigger}</button><div id={id} className="popover-content" role="region" aria-label={label} hidden={!open}>{children}</div></div>;
 }
 
-export type MenuItem = { label: string; value: string; disabled?: boolean };
+/** Menu item icons are decorative; label supplies the accessible name. */
+export type MenuItem = { label: string; value: string; disabled?: boolean; icon?: React.ReactNode };
 export function DropdownMenu({ trigger, items, onSelect, label }: { trigger: React.ReactNode; items: MenuItem[]; onSelect: (value: string) => void; label?: string }) {
   const [open, setOpen] = React.useState(false);
   const wrap = React.useRef<HTMLDivElement>(null);
@@ -86,7 +87,7 @@ export function DropdownMenu({ trigger, items, onSelect, label }: { trigger: Rea
     <div ref={menu} id={id} role="menu" aria-label={label} className="action-options" hidden={!open} onKeyDown={(event) => {
       const all = [...(menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') || [])]; const index = all.indexOf(document.activeElement as HTMLButtonElement);
       if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) { event.preventDefault(); focusItem(event.key === 'Home' ? 0 : event.key === 'End' ? -1 : index + (event.key === 'ArrowDown' ? 1 : -1)); }
-    }}>{items.map((item) => <button key={item.value} type="button" role="menuitem" tabIndex={-1} className="action-option" disabled={item.disabled} onClick={() => { setOpen(false); onSelect(item.value); button.current?.focus(); }}>{item.label}</button>)}</div></div>;
+    }}>{items.map((item) => <button key={item.value} type="button" role="menuitem" tabIndex={-1} className="action-option" disabled={item.disabled} onClick={() => { setOpen(false); onSelect(item.value); button.current?.focus(); }}>{item.icon && <span className="action-option-icon" aria-hidden="true">{item.icon}</span>}{item.label}</button>)}</div></div>;
 }
 
 export function Slider({ value, defaultValue = 0, onValueChange, min = 0, max = 100, style, ...props }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'defaultValue' | 'onChange'> & { value?: number; defaultValue?: number; onValueChange?: (value: number) => void }) {

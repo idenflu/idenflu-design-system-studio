@@ -3,6 +3,8 @@
 .react-studio .docs-topbar .icon-button { flex:0 0 32px; width:32px; height:32px; padding:7px; }
 .react-studio .studio-settings-open .ui-icon { width:18px; height:18px; }
 .react-studio .docs-topbar-tools { gap:12px; }
+.react-studio .docs-topbar .tooltip-content { top:calc(100% + var(--space-2)); right:0; bottom:auto; left:auto; }
+.react-studio .docs-topbar .tooltip-content::after { inset:auto 0 100%; }
 .react-studio .docs-navigation > .nav-group { margin-top:var(--space-2); }
 .react-studio .docs-navigation > .nav-group > summary { border-left:2px solid transparent; }
 .react-studio .docs-navigation .nav-children a { padding-left:var(--space-4); }
@@ -13,17 +15,63 @@
 .react-studio .react-studio-section:first-child { margin-top:0; padding-top:0; border-top:0; }
 .react-studio-section { margin-top:var(--space-10); padding-top:var(--space-7); border-top:1px solid var(--divider); }
 .react-studio-section h2 { font-size:var(--font-size-title); font-weight:var(--font-weight-semibold); }
+.react-studio-section-heading > p { margin-top:var(--space-2); max-width:680px; color:var(--text-secondary); line-height:var(--line-height-body); }
 .react-studio-demo { display:grid; gap:var(--space-5); margin-top:var(--space-6); }
+.react-studio-demo > :is(.button,.icon-button,.segmented-control,.button-group,.popover-wrap,.action-menu,.tooltip-wrap) { justify-self:start; }
+.react-studio-demo > p:empty { display:none; }
 .react-studio-row { display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
-.react-studio-size-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--space-6); }
-.react-studio-field-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--space-7) var(--space-8); }
+.react-studio-icon-label { display:inline-flex; align-items:center; gap:var(--space-2); }
+.react-studio-icon-label > .ui-icon, .react-studio-icon-alert > .ui-icon { flex:0 0 16px; width:16px; height:16px; color:var(--text-secondary); }
+.react-studio-icon-alert { display:flex; align-items:flex-start; gap:var(--space-3); }
+.react-studio-icon-alert > .ui-icon { margin-top:3px; }
+.react-studio-section .badge .ui-icon { flex-basis:12px; width:12px; height:12px; }
+.react-studio-size-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--space-6); align-items:start; }
+.react-studio-field-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--space-6) var(--space-8); align-items:start; }
+.react-studio-field-grid > *, .react-studio-size-grid > *, .react-studio-demo > * { min-width:0; }
+.react-studio-stack { display:grid; gap:var(--space-4); min-width:0; }
+.react-studio-sample-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:var(--space-4); align-items:start; }
+.react-studio-example { min-width:0; display:grid; align-content:start; gap:var(--space-4); padding:var(--space-5); border:1px solid var(--divider); }
+.react-studio-field-grid > .react-studio-example, .react-studio-size-grid > .react-studio-example, .react-studio-sample-grid > .react-studio-example { align-self:stretch; }
+.react-studio-section .choice-group.react-studio-example { gap:0; }
+.react-studio-section .choice-group legend { margin-bottom:0; }
+.react-studio-section .choice-group .choice + .choice { margin-top:0; }
+.react-studio-section .choice-group :is(.choice,.switch-setting) { min-height:var(--control-height); }
+.react-studio-example-title { font-size:var(--font-size-body); line-height:var(--line-height-body); font-weight:var(--font-weight-semibold); }
+.react-studio-caption { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.react-studio-field-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--space-2); }
+.react-studio-horizontal-fields { max-width:760px; }
+.react-studio-tree-sample { max-width:320px; }
+.react-studio-search-field { max-width:440px; }
+.react-studio-inverse { padding:var(--space-5); background:var(--inverse-canvas); color:var(--inverse-text); }
+.react-studio-section .type-specimen { font-size:calc(var(--font-size-base) + 82px); line-height:1.15; letter-spacing:-4px; }
+.react-studio-type-example h4 { margin:0; font-size:var(--font-size-heading); line-height:var(--line-height-heading); font-weight:var(--font-weight-semibold); }
+.react-studio-type-example > p { margin-top:var(--space-2); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.react-studio-type-example > .react-studio-type-meta { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.react-studio-section .detail-list > div { display:grid; grid-template-columns:112px minmax(0,1fr); gap:var(--space-4); padding-block:var(--space-3); border-bottom:1px solid var(--divider); }
+.react-studio-section .detail-list dt { color:var(--text-secondary); }
+.react-studio-section .tab-panel { display:grid; gap:var(--space-2); }
+.react-studio-section .tab-panel[hidden] { display:none; }
+.react-studio-section .tab-panel .detail-list { margin-top:var(--space-2); }
+.react-studio-popover-body { display:grid; gap:var(--space-3); }
+.react-studio-popover-heading p { margin-top:var(--space-1); }
+.react-studio-popover-options { display:grid; }
+.react-studio-section .popover-content .react-studio-popover-options .choice { margin:0; }
+.react-studio-popover-body > .button { justify-self:start; margin-top:0; }
+.react-studio-section .demo-drawer form { display:grid; gap:var(--space-5); }
+.react-studio-section .demo-drawer .drawer-actions { margin-top:var(--space-3); }
+.react-studio-section .simple-list, .react-studio-section .selectable-list, .react-studio-section .step-panel { margin-top:0; }
+.react-studio .docs-toc { max-width:1040px; }
 .react-studio-field-wide { grid-column:1 / -1; }
-.react-studio-code { overflow:auto; margin-top:var(--space-5); padding:var(--space-4); background:var(--surface); }
+.react-studio-code { overflow:auto; padding:var(--space-4); background:var(--surface); }
+.react-studio-code pre { font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; }
 .react-studio-swatches, .react-studio-icons { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 130px), 1fr)); gap:var(--space-4); }
 .react-studio-swatches > div, .react-studio-icons > li { display:grid; gap:var(--space-2); min-width:0; }
 .react-studio-swatches small { color:var(--text-secondary); overflow-wrap:anywhere; }
 .react-studio-swatches .token-value { font:inherit; font-variant-numeric:tabular-nums; }
 .react-studio-swatch { display:block; height:64px; border:1px solid var(--border); }
+.react-studio-color-surface { padding:var(--space-4); border:1px solid var(--border); background:var(--surface); color:var(--text); }
+.react-studio-color-surface p { margin-top:var(--space-1); color:var(--text-secondary); }
+.react-studio-color-link { color:var(--primary); text-decoration:underline; text-underline-offset:2px; }
 .react-studio-icons { list-style:none; padding:0; }
 .react-studio-icons > li { display:flex; align-items:center; padding:var(--space-2); border-bottom:1px solid var(--divider); overflow-wrap:anywhere; }
 .react-studio-icons .ui-icon { flex:none; }

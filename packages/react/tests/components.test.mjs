@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, MultiSelect, Tabs, Tree, Segmented, Spinner, CircleProgress, SegmentedProgress } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, CircleProgress, SegmentedProgress } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -133,6 +133,72 @@ test('required Select validates, submits its selected value and restores default
     await act(async () => form.reset());
     assert.equal(new dom.window.FormData(form).get('project'), '');
     assert.notEqual(f.container.querySelector('[role=combobox]').getAttribute('aria-invalid'), 'true');
+  } finally { await f.dispose(); }
+});
+
+test('Select option descriptions and decorative icons preserve keyboard selection and submitted values', async () => {
+  const f = fixture();
+  try {
+    const options = [
+      {value:'a', label:'디자인', description:'제품을 설계합니다.', icon:h('span', {'aria-label':'장식 이미지'}, '★')},
+      {value:'b', label:'개발', description:'제품을 구현합니다.', icon:h('span', null, '◆')},
+    ];
+    await f.render(h('form', null, h(Select, {label:'팀', name:'team', options, defaultValue:'a'})));
+    const form = f.container.querySelector('form'), trigger = form.querySelector('[role=combobox]');
+    assert.equal(trigger.getAttribute('aria-label'), '팀: 디자인');
+    assert.equal(trigger.querySelector('.select-option-icon').getAttribute('aria-hidden'), 'true');
+    await click(trigger);
+    const items = [...form.querySelectorAll('[role=option]')];
+    assert.match(items[0].textContent, /제품을 설계합니다/);
+    assert.equal(items[0].querySelector('.select-option-icon').getAttribute('aria-hidden'), 'true');
+    await key(trigger, 'ArrowDown');
+    await key(trigger, 'Enter');
+    assert.equal(trigger.getAttribute('aria-label'), '팀: 개발');
+    assert.equal(new dom.window.FormData(form).get('team'), 'b');
+    assert.equal(trigger.querySelector('.select-option-icon').textContent, '◆');
+  } finally { await f.dispose(); }
+});
+
+test('Select prefix icon remains decorative across selection and form reset', async () => {
+  const f = fixture();
+  try {
+    const options = [{value:'a',label:'디자인'}, {value:'b',label:'개발'}];
+    await f.render(h('form', null, h(Select, {label:'팀', name:'team', options, prefixIcon:h('span', {'aria-label':'장식'}, '★')})));
+    const form = f.container.querySelector('form'), trigger = form.querySelector('[role=combobox]');
+    assert.equal(trigger.getAttribute('aria-label'), '팀: 선택하세요');
+    assert.equal(trigger.querySelector('.select-prefix-icon').getAttribute('aria-hidden'), 'true');
+    await click(trigger);
+    await click([...form.querySelectorAll('[role=option]')].find(option => option.textContent.includes('개발')));
+    assert.equal(trigger.getAttribute('aria-label'), '팀: 개발');
+    assert.equal(new dom.window.FormData(form).get('team'), 'b');
+    assert.equal(trigger.querySelector('.select-prefix-icon').textContent, '★');
+    await act(async () => form.reset());
+    assert.equal(trigger.getAttribute('aria-label'), '팀: 선택하세요');
+    assert.equal(trigger.querySelector('.select-prefix-icon').textContent, '★');
+  } finally { await f.dispose(); }
+});
+
+test('prefix icons activate search and inline multi-select without enabling disabled controls', async () => {
+  const f = fixture();
+  try {
+    const options = [{value:'a',label:'디자인'}, {value:'b',label:'개발'}];
+    const prefixIcon = h('span', null, '★');
+    await f.render(h('div', null,
+      h(SearchSelect, {label:'검색', options, prefixIcon}),
+      h(MultiSelect, {label:'팀', options, prefixIcon, presentation:'inline'}),
+      h(SearchSelect, {label:'비활성', options, prefixIcon, disabled:true}),
+    ));
+    const [search, multi, disabled] = f.container.querySelectorAll('.custom-select');
+    await click(search.querySelector('.select-prefix-icon'));
+    assert.equal(document.activeElement, search.querySelector('[role=combobox]'));
+    assert.equal(search.querySelector('[role=combobox]').getAttribute('aria-expanded'), 'true');
+    await click(multi.querySelector('.select-prefix-icon'));
+    assert.equal(multi.querySelector('[role=combobox]').getAttribute('aria-expanded'), 'true');
+    await click(multi.querySelector('[role=option]'));
+    assert.ok(multi.querySelector('[aria-label="디자인 제거"]'));
+    assert.equal(multi.querySelector('.select-prefix-icon').getAttribute('aria-hidden'), 'true');
+    await click(disabled.querySelector('.select-prefix-icon'));
+    assert.equal(disabled.querySelector('[role=combobox]').getAttribute('aria-expanded'), 'false');
   } finally { await f.dispose(); }
 });
 
