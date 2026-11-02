@@ -48,5 +48,6 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            packages/react/test-results/
             dist/
           retention-days: 14
