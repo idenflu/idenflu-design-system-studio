@@ -70,11 +70,88 @@ import { Button, Icon } from '@idenflu/mono-react';
 
 - 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
-- 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
+- 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `DataGrid`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
 - 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `NovaSpinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
 - 데이터 상태: `DataState`, `useDataState` (로딩·실패·빈 목록·검색 결과 없음·정상 목록)
 
 입력과 선택 컴포넌트는 React의 `value`/`onValueChange` 또는 `defaultValue`를 사용합니다. `TextField` 등 네이티브 입력 래퍼는 일반적인 `onChange`를 사용합니다. 날짜와 숫자의 `onValueChange`는 값을 확정하거나 증감할 때 호출하며 숫자는 정밀도를 유지하는 문자열을 전달합니다. `DateRangePicker`의 값은 `[시작일, 종료일]`이며 값은 `YYYY-MM-DD` 또는 `null`입니다.
+
+### DataGrid
+
+`Table`은 읽기 중심의 표를 구성하는 기본 요소입니다. `DataGrid<T>`는 전달한 `rows`를 검색·필터·정렬하고 선택·페이지 이동·열 조작·편집을 조합하는 목록입니다. 기본 본문은 14px이며 기존 테이블의 회색 경계, 상태 색상과 다크 모드 토큰을 사용합니다.
+
+```tsx
+import { useState } from 'react';
+import { DataGrid, type DataGridColumn } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+type Project = { id: string; name: string; hours: number };
+const columns: DataGridColumn<Project>[] = [
+  { id: 'name', header: '프로젝트', accessor: row => row.name,
+    width: 260, pinned: 'start', filter: 'text', editable: true,
+    validate: value => value.trim() ? undefined : '이름을 입력해주세요.' },
+  { id: 'hours', header: '시간', accessor: row => row.hours,
+    align: 'end', filter: 'number', editable: true, editor: 'number',
+    validate: value => value.trim() && Number(value) >= 0
+      ? undefined : '0 이상 입력해주세요.' },
+];
+
+export function ProjectGrid() {
+  const [rows, setRows] = useState<Project[]>([
+    { id: 'p1', name: '디자인 시스템', hours: 24 },
+    { id: 'p2', name: '브랜드 가이드', hours: 16 },
+  ]);
+  const [selected, setSelected] = useState<string[]>([]);
+  return <DataGrid label="프로젝트 목록" rows={rows} columns={columns}
+    getRowId={row => row.id} getRowLabel={row => row.name}
+    selectable selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
+    defaultPageSize={5} pageSizeOptions={[5, 10, 20]}
+    exportable exportFileName="projects.csv" maxHeight={400}
+    onCellEdit={({ rowId, columnId, value }) => {
+      setRows(current => current.map(row => row.id === rowId
+        ? { ...row, [columnId]: columnId === 'hours'
+          ? Number(value) : value.trim() }
+        : row));
+    }} />;
+}
+```
+
+| 영역 | 동작과 옵션 |
+| --- | --- |
+| 열 정의 | `id`·`header`·`accessor`가 필수입니다. `cell`로 표시를 바꿔도 검색·정렬·CSV는 accessor의 원본 값을 사용합니다. |
+| 검색 | 기본 제공. `searchable={false}`로 숨기고 `searchLabel`로 이름을 지정합니다. `query`·`defaultQuery`·`onQueryChange`로 상태를 연결합니다. |
+| 필터 | 열에 `filter="text | number | select"`를 지정합니다. 텍스트 포함·숫자 최솟값/최댓값·선택값 일치를 지원합니다. select의 `filterOptions`는 `{value,label}[]`입니다. 검색과 각 열의 필터는 AND로 적용합니다. |
+| 필터 상태 | `filters`·`defaultFilters`·`onFiltersChange`를 사용합니다. `DataGridFilters`는 열 ID를 키로 텍스트/선택값 문자열 또는 `{min?:string,max?:string}`를 저장합니다. |
+| 정렬 | 기본 정렬 가능. 열의 `sortable={false}`로 해제합니다. 오름차순 → 내림차순 → 정렬 해제 순서이며 빈 값은 항상 마지막입니다. `sort`·`defaultSort`·`onSortChange`는 `{columnId,direction:'asc'|'desc'} | null`을 받습니다. |
+| 행 선택 | `selectable`로 켭니다. `getRowId`는 중복되지 않는 안정적인 ID를 반환해야 합니다. `getRowLabel`은 체크박스 이름에 사용합니다. `isRowSelectable`로 행별 선택을 제한합니다. |
+| 선택 상태 | `selectedRowIds`·`defaultSelectedRowIds`·`onSelectedRowIdsChange`를 사용합니다. 검색·정렬·페이지 이동 후에도 선택을 유지합니다. 전체 선택은 **현재 페이지의 선택 가능한 행**에만 적용합니다. |
+| 페이지 | `page`·`defaultPage`·`onPageChange`, `pageSize`·`defaultPageSize`·`onPageSizeChange`, `pageSizeOptions`를 지원합니다. 검색·필터·정렬·페이지 크기 변경 시 첫 페이지로 이동합니다. 외부 데이터가 줄면 표시 페이지를 유효 범위로 제한합니다. |
+| 열 조작 | 표시 열을 숨길 수 있으며 최소 1개는 유지합니다. `showColumnVisibility={false}`로 UI를 숨기고 `defaultHiddenColumnIds`로 초기 표시를 지정합니다. |
+| 열 너비 | `width`·`minWidth`·`maxWidth`는 px 기준입니다. `width`에는 숫자 또는 `"160px"` 같은 문자열을 사용하며 백분율은 지원하지 않습니다. 기본 리사이즈를 끄려면 `resizable={false}`를 사용합니다. 드래그 또는 열 경계에서 ←/→ 10px, Shift와 함께 1px, Home/End 최소/최대로 조절합니다. |
+| 열 고정 | `pinned="start"`로 왼쪽 식별 열을 고정합니다. 선택 열도 함께 고정되며 작은 화면에서는 본문을 가리지 않도록 고정을 해제합니다. `maxHeight`를 지정하면 그리드 내부 세로 스크롤과 고정 헤더를 사용할 수 있습니다. |
+| 편집 | 열의 `editable`은 boolean 또는 행별 판별 함수입니다. `editor="text | number"`, `validate(value,row)`로 검증합니다. `onCellEdit({row,rowId,columnId,value})`에서 부모 `rows`를 갱신해야 합니다. 전달하는 값은 문자열입니다. |
+| 확정·취소 | 셀의 편집 버튼으로 진입하고 Enter/저장으로 확정, Escape/취소로 원본을 유지합니다. 오류는 셀 안에 표시하며 종료 후 편집 버튼으로 포커스를 복원합니다. blur로 저장하지 않습니다. |
+| 상태 | `loading`·`error`·`onRetry`·`emptyMessage`를 지정합니다. 로딩·오류에서는 이전 행을 정상 데이터처럼 노출하지 않습니다. 데이터 없음과 검색 결과 없음을 구분합니다. |
+| 내보내기 | `exportable`·`exportFileName`으로 CSV 다운로드를 켭니다. 표시 중인 열만 출력합니다. 전체 다운로드는 검색·필터·정렬된 **모든 페이지**, 선택 다운로드는 원본 rows 중 **선택한 행**이 대상입니다. |
+| CSV 형식 | 한글 BOM, 쉼표·따옴표·개행 이스케이프와 문자열 수식 보호를 적용합니다. `createDataGridCsv`·`downloadDataGridCsv`로 동일한 규칙을 직접 사용할 수 있습니다. |
+| 밀도 | `density="default | compact"`로 기존 테이블과 동일한 행 간격을 사용합니다. |
+
+제어형 속성은 부모 상태가 기준입니다. 콜백을 받은 뒤 해당 상태를 갱신하세요. 서버 저장이 필요하면 `onCellEdit`에서 저장 처리와 오류 안내를 연결하고, 성공한 값으로 `rows`를 갱신합니다. 내장 서버 저장·비동기 트랜잭션·재시도 큐는 제공하지 않습니다.
+
+열의 선택형 필터는 `Select`의 `popupStrategy="fixed"`를 사용해 짧은 목록이나 스크롤 영역에서 옵션이 잘리지 않도록 합니다. 일반 `Select`의 기본값은 `absolute`이며 필요한 화면에서 이 옵션을 지정할 수 있습니다.
+
+이 버전은 **전달한 rows 전체를 브라우저에서 처리하는 데이터그리드**입니다. 서버 페이지 이동, 가상 스크롤, 다중 열 정렬, 행 그룹화·피벗, 스프레드시트식 셀 범위 선택은 포함하지 않습니다. 해당 기능이나 큰 데이터의 성능이 필요하면 별도 데이터 어댑터·가상화 구조가 필요합니다.
+
+구조는 native `table`이며 정렬 버튼·필터·체크박스·편집 컨트롤을 Tab으로 탐색합니다. 단일 진입점과 방향키 셀 이동을 전제하는 `role="grid"`를 불완전하게 붙이지 않습니다. 정렬 상태는 `aria-sort`, 부분 선택은 네이티브 `indeterminate`, 조회 상태는 상태 메시지로 전달합니다.
+
+기능 범위와 검증 항목은 다음 공식 문서를 비교해 선정했습니다. 구현의 우선순위와 위 API는 이 디자인 시스템에 맞춘 결정입니다.
+
+- [MUI Data Grid 필터](https://mui.com/x/react-data-grid/filtering/): 열별 연산과 제어 상태 구분
+- [AG Grid 열 크기](https://www.ag-grid.com/react-data-grid/column-sizing/): 드래그와 키보드 리사이즈
+- [TanStack Table 열 고정](https://tanstack.com/table/v8/docs/guide/column-pinning): 고정 열의 너비와 순서 관리
+- [MUI Data Grid 내보내기](https://mui.com/x/react-data-grid/export/): 표시 열·필터 결과·선택 행 구분과 수식 보호
+- [AG Grid 편집 시작·종료](https://www.ag-grid.com/react-data-grid/cell-editing-start-stop/): 확정·취소 계약
+- [WAI APG Grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/): 실제 동작과 접근성 역할 일치
 
 `NumberField`, `DatePicker`, `DateRangePicker`에서 `value`가 `undefined`일 때만 `defaultValue`를 사용합니다. Controlled `null`은 빈 값입니다. 숫자의 `grouping`·`decimals`를 변경하면 현재 입력을 새 형식으로 표시하며, 정밀도를 줄여도 임의로 반올림하지 않고 기존 값을 보존해 검증합니다.
 

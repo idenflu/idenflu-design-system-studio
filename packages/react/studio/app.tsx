@@ -14,9 +14,11 @@ import { DocumentShell, Overview, useDocumentRoute } from './shell';
 import { DividerDemos } from './divider-demos';
 import { patternPages, patternSnippets } from './patterns';
 import { componentUsage } from './component-usage';
+import { DataGridDemos, dataGridUsage } from './data-grid-demos';
 import icons from './dist/icons.json';
 
 const snippets: Record<string, string> = {
+  'components/data-grid': dataGridUsage,
   'components/divider':`import { Divider } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
@@ -226,6 +228,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/accordion': return <AccordionDemos />;
     case 'components/overlays': return <OverlayDemos />;
     case 'components/table': return <TableDemos />;
+    case 'components/data-grid': return <DataGridDemos />;
     case 'components/chips': return <ChipDemos />;
     case 'components/list': return <ListDemos />;
     case 'components/divider': return <DividerDemos />;

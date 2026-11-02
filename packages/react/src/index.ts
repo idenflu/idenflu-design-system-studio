@@ -8,3 +8,5 @@ export * from './datetime-picker';
 export * from './data-state';
 export * from './divider';
 export * from './nova-spinner';
+export * from './data-grid';
+export * from './data-grid-tools';

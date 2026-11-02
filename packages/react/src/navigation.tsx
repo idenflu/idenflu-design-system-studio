@@ -38,6 +38,8 @@ interface SelectShared {
   required?: boolean;
   /** Decorative icon shown before the value or placeholder. */
   prefixIcon?: React.ReactNode;
+  /** Use fixed positioning for option lists inside scrolling or clipped containers. */
+  popupStrategy?: 'absolute' | 'fixed';
   'aria-describedby'?: string;
   'aria-invalid'?: boolean | 'true' | 'false';
 }
@@ -55,11 +57,13 @@ interface SelectCoreProps extends SelectShared {
   onClear?: () => void;
 }
 
-function SelectCore({options, label, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, onClear, ...aria}: SelectCoreProps) {
+function SelectCore({options, label, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, onClear, ...aria}: SelectCoreProps) {
   const id = React.useId();
   const root = React.useRef<HTMLDivElement>(null);
   const trigger = React.useRef<HTMLButtonElement>(null);
   const search = React.useRef<HTMLInputElement>(null);
+  const popupElement = React.useRef<HTMLDivElement>(null);
+  const [popupPosition, setPopupPosition] = React.useState<{top:number; left:number; width:number; maxHeight:number} | null>(null);
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [active, setActive] = React.useState<string | null>(null);
@@ -73,6 +77,38 @@ function SelectCore({options, label, name, disabled, placeholder = '선택하세
   const visible = options.filter(option => !searchable || option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
   const enabled = visible.filter(option => !option.disabled);
   useFormReset(root, () => { onReset(); setOpen(false); setQuery(''); setActive(null); setAttempted(false); queueMicrotask(() => setResetRevision(revision => revision + 1)); });
+
+  React.useEffect(() => {
+    if (!open || popupStrategy !== 'fixed') { setPopupPosition(null); return; }
+    const control = root.current?.querySelector<HTMLElement>('.search-select-control,.multi-inline-control') || trigger.current;
+    const popup = popupElement.current;
+    const win = root.current?.ownerDocument.defaultView;
+    if (!control || !popup || !win) return;
+    const update = () => {
+      const rect = control.getBoundingClientRect();
+      const viewportWidth = win.document.documentElement.clientWidth || win.innerWidth;
+      const viewportHeight = win.innerHeight;
+      if (rect.bottom < 0 || rect.top > viewportHeight || rect.right < 0 || rect.left > viewportWidth) { setOpen(false); return; }
+      const list = popup.querySelector<HTMLElement>('.select-options');
+      const searchHeight = popup.querySelector<HTMLElement>('.multi-search-field')?.getBoundingClientRect().height || 0;
+      const style = win.getComputedStyle(popup);
+      const chromeHeight = ['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth'].reduce((sum, key) => sum + (Number.parseFloat(style[key as 'paddingTop']) || 0), 0);
+      const desiredHeight = Math.min(list?.scrollHeight || popup.scrollHeight, 256) + searchHeight + chromeHeight;
+      const below = Math.max(0, viewportHeight - rect.bottom - 14), above = Math.max(0, rect.top - 14);
+      const opensAbove = below < desiredHeight && above > below;
+      const maxHeight = Math.max(0, opensAbove ? above : below);
+      const width = Math.min(Math.max(1, rect.width), Math.max(1, viewportWidth - 16));
+      const next = {top:opensAbove ? Math.max(8, rect.top - 6 - Math.min(desiredHeight, maxHeight)) : rect.bottom + 6, left:Math.max(8, Math.min(rect.left, viewportWidth - width - 8)), width, maxHeight};
+      setPopupPosition(previous => previous && previous.top === next.top && previous.left === next.left && previous.width === next.width && previous.maxHeight === next.maxHeight ? previous : next);
+    };
+    update();
+    win.addEventListener('resize', update);
+    win.addEventListener('scroll', update, true);
+    const Observer = (win as Window & {ResizeObserver?: typeof ResizeObserver}).ResizeObserver;
+    const observer = Observer ? new Observer(update) : null;
+    observer?.observe(control);
+    return () => { win.removeEventListener('resize', update); win.removeEventListener('scroll', update, true); observer?.disconnect(); };
+  }, [open, popupStrategy, searchable, multiple, presentation, query, visible.length]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -123,7 +159,7 @@ function SelectCore({options, label, name, disabled, placeholder = '선택하세
   React.useEffect(() => {
     if (open && activeIndex >= 0) root.current?.ownerDocument.getElementById(`${id}-option-${activeIndex}`)?.scrollIntoView?.({ block: 'nearest' });
   }, [open, activeIndex, id]);
-  const popup = <div className="select-popup" hidden={!open}>
+  const popup = <div ref={popupElement} className="select-popup" data-popup-strategy={popupStrategy === 'fixed' ? 'fixed' : undefined} hidden={!open} style={popupStrategy === 'fixed' ? {position:'fixed', top:popupPosition?.top ?? 0, left:popupPosition?.left ?? 0, right:'auto', bottom:'auto', width:popupPosition?.width, maxHeight:popupPosition?.maxHeight, visibility:popupPosition ? 'visible' : 'hidden'} : undefined}>
     {multiple && searchable && <div className="multi-search-field"><input ref={search} className="multi-search-input" type="search" role="combobox" aria-label={`${label} 검색`} aria-autocomplete="list" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} value={query} onChange={event => { const next = event.target.value; setQuery(next); setActive(options.find(option => !option.disabled && option.label.toLocaleLowerCase().includes(next.toLocaleLowerCase()))?.value ?? null); }} onKeyDown={onKeyDown} />{query && <button type="button" className="input-action" aria-label="검색어 지우기" onClick={() => { setQuery(''); setActive(options.find(option => !option.disabled)?.value ?? null); search.current?.focus(); }}><span className="ui-icon icon-close" aria-hidden="true" /></button>}</div>}
     <ul id={listId} className="select-options" role="listbox" aria-label={label} aria-multiselectable={multiple || undefined}>
       {visible.map(option => {

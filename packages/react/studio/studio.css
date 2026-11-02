@@ -200,3 +200,15 @@
 }
 
 .react-studio-chip-palette .react-studio-example-title { display:grid; gap:var(--space-1); }
+.studio-grid-demo-toolbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-3); }
+.studio-grid-project { display:grid; gap:var(--space-1); }
+.studio-grid-project strong { font-weight:var(--font-weight-medium); }
+.studio-grid-project small { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.studio-grid-progress { display:grid; gap:var(--space-2); font-variant-numeric:tabular-nums; }
+.studio-grid-progress .progress-bar { width:100%; }
+.studio-grid-guidelines dd { min-width:0; }
+.studio-grid-edit-example { width:100%; max-width:800px; }
+.studio-grid-state-example { width:100%; max-width:560px; }
+@media(max-width:600px) {
+  .react-studio-section .studio-grid-guidelines > div { grid-template-columns:1fr; gap:var(--space-2); }
+}
