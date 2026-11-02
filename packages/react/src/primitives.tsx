@@ -136,8 +136,9 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLSpanE
 export interface AvatarProps extends React.HTMLAttributes<HTMLSpanElement> { size?: Size; shape?: 'square' | 'circle'; variant?: 'primary' | 'neutral' }
 export function Avatar({ size = 'md', shape = 'square', variant = 'primary', className, ...props }: AvatarProps) { return <span {...props} className={classes('avatar', `avatar--${size}`, shape === 'circle' && 'avatar--circle', variant === 'neutral' && 'avatar--neutral', className)} />; }
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLElement>) { return <article {...props} className={classes('demo-card', className)} />; }
-export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> { density?: 'default' | 'compact' }
-export const Table = React.forwardRef<HTMLTableElement, TableProps>(function Table({ density = 'default', className, ...props }, ref) { return <table {...props} ref={ref} data-density={density} className={classes('data-table', className)} />; });
+/** interactive shows row hover for rows that respond to the pointer. Mark selected rows with data-selected="true". */
+export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> { density?: 'default' | 'compact'; interactive?: boolean }
+export const Table = React.forwardRef<HTMLTableElement, TableProps>(function Table({ density = 'default', interactive = false, className, ...props }, ref) { return <table {...props} ref={ref} data-density={density} data-interactive={interactive || undefined} className={classes('data-table', className)} />; });
 export function Accordion({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) { return <div {...props} className={classes('accordion', className)} />; }
 export interface AccordionItemProps extends Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, 'title'> { title: React.ReactNode }
 export function AccordionItem({ title, children, ...props }: AccordionItemProps) { return <details {...props}><summary>{title}<span className="ui-icon icon-caret" aria-hidden="true" /></summary>{children}</details>; }

@@ -196,6 +196,43 @@ test('table density preserves data while pagination changes rows and stepper mov
   await expect(page.getByRole('list', { name: '프로젝트 생성 단계' }).locator('[aria-current="step"]')).toContainText('팀원 초대');
 });
 
+test('table rows highlight only in interactive tables and selection marks the chosen rows', async ({ page, isMobile }) => {
+  await page.goto('/systems/idenflu-mono/index.html#/components/table');
+  const transparent = 'rgba(0, 0, 0, 0)';
+  const projects = page.getByRole('region', { name: '프로젝트 목록', exact: true });
+  await expect(projects.locator('thead th').first()).toHaveCSS('background-color', transparent);
+  const files = page.getByRole('region', { name: '공유 파일 목록', exact: true });
+  const section = page.locator('.react-studio-section').filter({ has: files });
+  const rows = files.locator('tbody tr');
+  await expect(rows.nth(1)).toHaveAttribute('data-selected', 'true');
+  await expect(section.getByRole('status')).toHaveText('1개 파일 선택');
+  if (!isMobile) {
+    const staticRow = projects.locator('tbody tr').first();
+    await staticRow.hover();
+    await expect(staticRow).toHaveCSS('background-color', transparent);
+    await rows.nth(0).hover();
+    await expect(rows.nth(0)).not.toHaveCSS('background-color', transparent);
+  }
+  await rows.nth(0).getByText('브랜드 가이드 v3.pdf', { exact: true }).click();
+  await expect(rows.nth(0)).toHaveAttribute('data-selected', 'true');
+  await expect(section.getByRole('status')).toHaveText('2개 파일 선택');
+  await section.getByRole('checkbox', { name: '브랜드 가이드 v3.pdf 선택' }).uncheck();
+  await expect(rows.nth(0)).not.toHaveAttribute('data-selected');
+  const all = section.getByRole('checkbox', { name: '모든 파일 선택' });
+  await expect.poll(() => all.evaluate(input => input.indeterminate)).toBe(true);
+  await all.check();
+  await expect(files.locator('tbody tr[data-selected="true"]')).toHaveCount(5);
+  await all.focus();
+  await page.keyboard.press('Tab');
+  await expect(section.getByRole('checkbox', { name: '브랜드 가이드 v3.pdf 선택' })).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(rows.nth(0)).not.toHaveAttribute('data-selected');
+  await expect(rows.nth(0)).not.toHaveCSS('background-color', transparent);
+  await section.getByRole('button', { name: '선택 해제' }).click();
+  await expect(files.locator('tbody tr[data-selected="true"]')).toHaveCount(0);
+  await expect(section.getByRole('status')).toHaveText('선택한 파일 없음');
+});
+
 test('menu and popover apply actions report their result', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/dropdown-menu');
   await page.getByRole('button', { name: '더보기' }).click();

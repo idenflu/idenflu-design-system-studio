@@ -186,10 +186,14 @@ import { Divider } from '@idenflu/mono-react';
 <Divider variant="dashed" decorative />
 ```
 
-`Table`은 기본 밀도인 `density="default"`와 행 간격을 줄인 `density="compact"`를 지원합니다. 글자 크기는 두 밀도 모두 본문 기준을 유지하며 첫·마지막 셀까지 같은 좌우 패딩을 적용합니다. 열 너비는 데이터에 맞게 `colgroup`으로 정의하고 숫자 열은 오른쪽 정렬을 권장합니다. `TableContainer`는 좁은 화면에서 표 영역만 가로로 스크롤하도록 감쌉니다.
+`Table`은 기본 밀도인 `density="default"`와 행 간격을 줄인 `density="compact"`를 지원합니다. 글자 크기는 두 밀도 모두 본문 기준을 유지하며 첫·마지막 셀까지 같은 좌우 패딩을 적용합니다. 헤더는 배경 없이 위·아래 진한 구분선으로 표시하고, 행 사이는 연한 구분선, 마지막 행과 합계 행(`tfoot`)은 진한 구분선으로 마감합니다. 열 너비는 데이터에 맞게 `colgroup`으로 정의합니다. `TableContainer`는 좁은 화면에서 표 영역만 가로로 스크롤하도록 감쌉니다.
+
+표 전체에 고정폭 숫자를 적용합니다. 숫자 열은 `table-numeric`(끝 정렬), 날짜는 `table-date`, 두 줄 셀은 `table-primary`·`table-secondary`, 빈 값 안내는 `table-muted` 클래스를 사용합니다. compact에서는 배지 높이를 20px로 맞추고, 표 안의 체크박스는 행 높이를 늘리지 않습니다.
+
+행 hover 배경은 `interactive`를 지정한 표에만 표시합니다. 행 클릭으로 선택하거나 상세를 여는 표에 사용하며, 포인터 커서와 행 안의 키보드 포커스 표시도 함께 적용합니다. 선택한 행에는 `data-selected="true"`를 지정해 배경과 시작선으로 강조합니다. 선택 상태는 체크박스처럼 키보드로 조작할 수 있는 컨트롤로도 제공합니다.
 
 ```tsx
-import { Table, TableContainer } from '@idenflu/mono-react';
+import { Checkbox, Table, TableContainer } from '@idenflu/mono-react';
 
 <TableContainer label="프로젝트 목록">
   <Table density="compact">
@@ -197,6 +201,21 @@ import { Table, TableContainer } from '@idenflu/mono-react';
     <colgroup><col style={{ width: '60%' }} /><col style={{ width: '40%' }} /></colgroup>
     <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th></tr></thead>
     <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td></tr></tbody>
+  </Table>
+</TableContainer>
+
+<TableContainer label="공유 파일 목록">
+  <Table interactive>
+    <caption className="sr-only">공유 파일과 선택 상태</caption>
+    <thead><tr><th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allSelected} onChange={toggleAll} /></th><th scope="col">파일</th><th scope="col" className="table-numeric">크기</th></tr></thead>
+    <tbody>{files.map(file => (
+      <tr key={file.id} data-selected={selected.has(file.id) || undefined}
+        onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggle(file.id); }}>
+        <td><Checkbox label={<span className="sr-only">{file.name} 선택</span>} checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></td>
+        <td>{file.name}</td>
+        <td className="table-numeric">{file.size}MB</td>
+      </tr>
+    ))}</tbody>
   </Table>
 </TableContainer>
 ```

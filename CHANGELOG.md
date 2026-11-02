@@ -2,6 +2,13 @@
 
 ## 미배포
 
+- 테이블 헤더의 회색 배경을 없애고 선 기반으로 정리. 헤더 위·아래와 마지막 행·합계 행은 진한 구분선, 행 사이는 연한 구분선 사용
+- `tbody`·`tfoot`의 `th`에도 헤더 스타일이 적용돼 합계 행 구분선이 끊겨 보이던 문제 수정
+- 테이블 셀 클래스 `table-numeric`·`table-date`·`table-primary`·`table-secondary`·`table-muted`를 공통 CSS로 제공하고 표 전체에 고정폭 숫자 적용
+- compact 테이블의 배지 높이를 20px로 맞추고 표 안의 체크박스가 행 높이를 늘리지 않도록 정렬
+- `Table`에 `interactive` 옵션과 선택 행(`tr[data-selected="true"]`) 스타일 추가. 문서에 행 선택과 멤버 원형 아바타 예시 추가
+- **호환성 변경:** 테이블 행 hover 배경은 `interactive`(`data-interactive`)를 지정한 표에서만 표시. 기존 hover가 필요하면 `<Table interactive>` 또는 `<table class="data-table" data-interactive>`로 지정
+
 - 선택된 칩의 사용자 색상 대비 보정과 흑백 이중 포커스 링 적용
 - 표시용 Chip에 density="compact" 옵션과 SM·MD·LG 24·28·32px 예시 추가
 

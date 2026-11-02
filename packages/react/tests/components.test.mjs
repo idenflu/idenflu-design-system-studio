@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -451,5 +451,24 @@ test('Tree expands branches, selects a leaf and resets the initial state', async
     await act(async () => form.reset());
     assert.equal(branch.open, false);
     assert.equal(new dom.window.FormData(form).get('item'), '');
+  } finally { await f.dispose(); }
+});
+
+test('Table enables row hover only when interactive and keeps selected rows marked', async () => {
+  const f = fixture(), ref = React.createRef();
+  const body = h('tbody', null, h('tr', { 'data-selected': true }, h('td', null, '디자인 시스템')));
+  try {
+    await f.render(h(Table, { ref, className: 'project-table' }, body));
+    const table = f.container.querySelector('table');
+    assert.equal(ref.current, table);
+    assert.equal(table.className, 'data-table project-table');
+    assert.equal(table.dataset.density, 'default');
+    assert.equal(table.hasAttribute('data-interactive'), false);
+    await f.render(h(Table, { ref, density: 'compact', interactive: true }, body));
+    assert.equal(table.dataset.density, 'compact');
+    assert.equal(table.getAttribute('data-interactive'), 'true');
+    assert.equal(table.querySelector('tr').getAttribute('data-selected'), 'true');
+    await f.render(h(Table, { ref, interactive: false }, body));
+    assert.equal(table.hasAttribute('data-interactive'), false);
   } finally { await f.dispose(); }
 });

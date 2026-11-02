@@ -135,17 +135,25 @@ export function OverlayExample() {
     </Toast>}
   </>;
 }`,
-  'components/table':`import { Table, TableContainer } from '@idenflu/mono-react';
+  'components/table':`import { Checkbox, Table, TableContainer } from '@idenflu/mono-react';
 
 <TableContainer label="프로젝트 목록">
   <Table density="compact">
     <colgroup><col style={{ width: '44%' }} /><col /><col /><col /></colgroup>
-    <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col">상태</th></tr></thead>
-    <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td><td>김민수</td><td>진행 중</td></tr></tbody>
+    <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col" className="table-numeric">진행률</th></tr></thead>
+    <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td><td>김민수</td><td className="table-numeric">72%</td></tr></tbody>
   </Table>
 </TableContainer>
 
-// density="default"는 기본 간격, "compact"는 조밀한 간격입니다.`,
+<TableContainer label="공유 파일 목록">
+  <Table interactive>
+    <thead><tr><th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allSelected} onChange={toggleAll} /></th><th scope="col">파일</th></tr></thead>
+    <tbody><tr data-selected={selected || undefined} onClick={toggleOnRowClick}><td><Checkbox label={<span className="sr-only">design-tokens.json 선택</span>} checked={selected} onChange={toggle} /></td><td>design-tokens.json</td></tr></tbody>
+  </Table>
+</TableContainer>
+
+// density="default"는 기본 간격, "compact"는 조밀한 간격입니다.
+// interactive는 행 hover를 표시하고, data-selected="true"는 선택한 행을 강조합니다.`,
   'components/chips':`import { Chip } from '@idenflu/mono-react';
 
 <Chip interactive={false}>디자인</Chip>

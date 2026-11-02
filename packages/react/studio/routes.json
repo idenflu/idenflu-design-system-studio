@@ -165,7 +165,7 @@
     "title": "Table & pagination",
     "group": "Components",
     "description": "정보를 행 단위로 정리하고 페이지로 나눠 탐색합니다.",
-    "searchTerms": "표 테이블 페이지네이션 pagination"
+    "searchTerms": "표 테이블 페이지네이션 pagination 행 선택 selection"
   },
   {
     "route": "components/tooltip",

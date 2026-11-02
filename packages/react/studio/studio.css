@@ -29,7 +29,7 @@
 .react-studio .react-studio-table--projects { min-width:640px; }
 .react-studio .react-studio-table--members { min-width:720px; }
 .react-studio .react-studio-table--billing { min-width:800px; }
-.react-studio-table :is(th,td) { vertical-align:middle; overflow-wrap:anywhere; }
+.react-studio .react-studio-table--files { min-width:760px; }
 .react-studio-table--projects .table-col-project { width:44%; }
 .react-studio-table--projects .table-col-team { width:20%; }
 .react-studio-table--projects :is(.table-col-owner,.table-col-status) { width:18%; }
@@ -40,12 +40,12 @@
 .react-studio-table--billing .table-col-quantity { width:10%; }
 .react-studio-table--billing .table-col-amount { width:20%; }
 .react-studio-table--billing .table-col-status { width:16%; }
-.react-studio-table .table-primary { display:block; font-weight:var(--font-weight-medium); }
-.react-studio-table .table-secondary { display:block; margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-.react-studio-table .table-muted { color:var(--text-secondary); }
-.react-studio-table .table-numeric { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
-.react-studio-table .table-date { white-space:nowrap; font-variant-numeric:tabular-nums; }
-.react-studio-table tfoot :is(th,td) { border-top:1px solid var(--border); background:var(--surface); font-weight:var(--font-weight-semibold); }
+.react-studio-table--files .table-col-select { width:60px; }
+.react-studio-table--files .table-col-file { width:44%; }
+.react-studio-table--files .table-col-owner { width:18%; }
+.react-studio-table--files .table-col-size { width:14%; }
+.react-studio-table-person { display:flex; align-items:center; gap:var(--space-3); min-width:0; }
+.react-studio-table-person > div { min-width:0; }
 .react-studio-icon-label { display:inline-flex; align-items:center; gap:var(--space-2); }
 .react-studio-icon-label > .ui-icon, .react-studio-icon-alert > .ui-icon { flex:0 0 16px; width:16px; height:16px; color:var(--text-secondary); }
 .react-studio-icon-alert { display:flex; align-items:flex-start; gap:var(--space-3); }

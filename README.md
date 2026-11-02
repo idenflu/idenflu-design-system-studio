@@ -64,6 +64,18 @@ npx playwright test --config packages/react/studio/playwright.config.cjs
 
 `npm run build`는 React 패키지를 빌드한 뒤 `dist/`에 갤러리와 정식 모노 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포합니다. React 문서·CSS·테마·설정은 내용 기반 해시를 사용하며 `dist/systems/idenflu-mono/manifest.json`에서 파일명을 확인합니다. 폰트·아이콘과 라이선스도 함께 복사합니다. 이전 React 미리보기 주소의 리다이렉트도 배포물에 포함합니다.
 
+## GitHub Pages 배포
+
+저장소의 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 설정합니다. `Deploy from a branch` 방식은 빌드되지 않은 소스만 올리므로 Git에서 제외한 `docs-dist` 파일이 없어 모노 문서가 표시되지 않습니다.
+
+[Pages 워크플로](.github/workflows/pages.yml)는 `main`에 푸시하거나 **Actions → Deploy GitHub Pages → Run workflow**에서 `main`을 선택하면 실행됩니다. 루트와 React 의존성을 설치하고, 검사·`npm run build`·타입 검사를 통과한 `dist/` 전체를 배포합니다. 생성된 JS·CSS를 직접 커밋할 필요는 없습니다.
+
+- [디자인 시스템 갤러리](https://idenflu.github.io/idenflu-design-system-studio/)
+- [idenflu mono 문서](https://idenflu.github.io/idenflu-design-system-studio/systems/idenflu-mono/index.html#/overview)
+- [Datetime picker](https://idenflu.github.io/idenflu-design-system-studio/systems/idenflu-mono/index.html#/components/datetime-picker)
+
+설정을 바꾸고 워크플로 파일을 푸시한 뒤, Actions에서 build와 deploy가 모두 성공했는지 확인합니다. 문서는 저장소 하위 경로에서도 동작하도록 상대 경로와 해시 라우팅을 사용합니다.
+
 ## 파일 구성
 
 - `systems/idenflu-mono/index.html`: 정식 React 진입점
