@@ -1,113 +1,55 @@
 (() => {
   "use strict";
-
-  const tree = document.querySelector(".demo-tree");
-  tree.addEventListener("click", (event) => {
-    const item = event.target.closest(".tree-item");
-    if (!item) return;
-    tree.querySelectorAll(".tree-item").forEach((node) => {
-      node.classList.toggle("is-selected", node === item);
-      if (node === item) node.setAttribute("aria-current", "true");
-      else node.removeAttribute("aria-current");
+  const runtime = window.IdenfluMono;
+  if (!runtime) return;
+  // Native details/summary supplies disclosure keys; this is not an ARIA tree widget.
+  runtime.register("disclosure-tree", { selector: "[data-disclosure-tree], .demo-tree", init(tree) {
+    const scope = runtime.cleanup();
+    const items = () => [...tree.querySelectorAll(".tree-item, [data-tree-item]")].filter((item) => item.closest("[data-disclosure-tree], .demo-tree") === tree);
+    const enabled = () => items().filter((item) => !item.disabled && item.getAttribute("aria-disabled") !== "true");
+    const initial = items().find((item) => item.classList.contains("is-selected") || item.getAttribute("aria-current") === "true") || null;
+    const disclosures = [...tree.querySelectorAll("details")].map((element) => ({ element, open: element.open }));
+    const valueOf = (item) => item ? item.dataset.value ?? (item.id || item.textContent.trim()) : null;
+    function choose(item, { emit = true } = {}) {
+      if (item && !enabled().includes(item)) return;
+      items().forEach((node) => {
+        node.classList.toggle("is-selected", node === item);
+        if (node === item) node.setAttribute("aria-current", "true");
+        else node.removeAttribute("aria-current");
+      });
+      if (emit) tree.dispatchEvent(new CustomEvent("treechange", { bubbles: true, detail: { value: valueOf(item), label: item?.textContent.trim() || "", item } }));
+    }
+    scope.listen(tree, "click", (event) => {
+      const item = event.target.closest(".tree-item, [data-tree-item]");
+      if (items().includes(item)) choose(item);
     });
-    document.querySelector("#tree-feedback").textContent = `선택: ${item.textContent.trim()}`;
-  });
-
-  document.querySelector("#view-chips").addEventListener("click", (event) => {
-    const chip = event.target.closest('.chip[aria-pressed]');
-    if (chip) chip.setAttribute("aria-pressed", String(chip.getAttribute("aria-pressed") !== "true"));
-  });
-  const sizeExamples = document.querySelector("#chip-size-examples");
-  const initialSizeExamples = sizeExamples.innerHTML;
-  const sizeFeedback = document.querySelector("#chip-size-feedback");
-  const resetSizes = document.querySelector("#reset-size-chips");
-  sizeExamples.addEventListener("click", (event) => {
-    const chip = event.target.closest("[data-size-chip]");
-    if (!chip) return;
-    const next = chip.previousElementSibling || resetSizes;
-    sizeFeedback.textContent = `${chip.getAttribute("aria-label")}했습니다.`;
-    chip.remove();
-    next.focus();
-  });
-  resetSizes.addEventListener("click", () => {
-    sizeExamples.innerHTML = initialSizeExamples;
-    sizeFeedback.textContent = "사이즈 예시를 초기화했습니다.";
-  });
-  const removable = document.querySelector("#removable-chips");
-  const initialChips = removable.innerHTML;
-  const chipFeedback = document.querySelector("#chip-feedback");
-  removable.addEventListener("click", (event) => {
-    const chip = event.target.closest(".chip--removable");
-    if (!chip) return;
-    const next = chip.nextElementSibling || chip.previousElementSibling || document.querySelector("#reset-chips");
-    chipFeedback.textContent = `${chip.textContent.trim()} 항목을 제거했습니다.`;
-    chip.remove();
-    next.focus();
-  });
-  document.querySelector("#reset-chips").addEventListener("click", () => {
-    removable.innerHTML = initialChips;
-    chipFeedback.textContent = "항목을 초기화했습니다.";
-  });
-
-  document.querySelector(".selectable-list").addEventListener("click", (event) => {
-    const selected = event.target.closest("button[aria-pressed]");
-    if (!selected) return;
-    document.querySelectorAll(".selectable-list button[aria-pressed]").forEach((button) => {
-      const active = button === selected;
-      button.setAttribute("aria-pressed", String(active));
-      button.querySelector(".list-state").textContent = active ? "선택됨" : "선택";
-    });
-  });
-
-  function connectRange(id, update) {
-    const range = document.querySelector(id);
-    const refresh = () => {
-      const percent = (Number(range.value) - Number(range.min)) / (Number(range.max) - Number(range.min)) * 100;
-      range.style.setProperty("--fill", `${percent}%`);
-      const thumbWidth = parseFloat(getComputedStyle(range).getPropertyValue("--range-thumb-width")) || 12;
-      const offset = thumbWidth * (0.5 - percent / 100);
-      range.style.setProperty("--fill-position", `calc(${percent}% + ${offset}px)`);
-      update(range.value);
-    };
-    range.addEventListener("input", refresh);
-    refresh();
-  }
-  connectRange("#progress-slider", (value) => {
-    document.querySelector("#demo-progress").value = value;
-    document.querySelector("#progress-value").textContent = `${value}%`;
-  });
-  connectRange("#volume-slider", (value) => {
-    document.querySelector("#volume-value").textContent = `${value}%`;
-    document.querySelector("#volume-slider").setAttribute("aria-valuetext", `${value}%`);
-  });
-  connectRange("#step-slider", (value) => {
-    document.querySelector("#step-value").textContent = `${value}%`;
-    document.querySelector("#step-slider").setAttribute("aria-valuetext", `${value}%`);
-  });
-  connectRange("#disabled-slider", () => {});
-  ["sm", "md", "lg"].forEach((size) => {
-    connectRange(`#slider-size-${size}`, (value) => {
-      document.querySelector(`#slider-size-${size}-value`).textContent = `${value}%`;
-      document.querySelector(`#slider-size-${size}`).setAttribute("aria-valuetext", `${value}%`);
-    });
-  });
-
-  const slides = [
-    ["명확한 위계", "중요한 정보를 먼저 보여주고, 나머지는 자연스럽게 이어갑니다."],
-    ["일관된 구성", "같은 역할을 하는 요소는 같은 규칙과 표현을 사용합니다."],
-    ["편안한 사용", "필요한 동작을 쉽게 찾고 키보드로도 사용할 수 있게 합니다."],
-  ];
-  let slideIndex = 0;
-  const previousSlide = document.querySelector("#slide-prev");
-  const nextSlide = document.querySelector("#slide-next");
-  function renderSlide() {
-    document.querySelector("#slide-index").textContent = `${String(slideIndex + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
-    document.querySelector("#slide-title").textContent = slides[slideIndex][0];
-    document.querySelector("#slide-description").textContent = slides[slideIndex][1];
-    previousSlide.disabled = slideIndex === 0;
-    nextSlide.disabled = slideIndex === slides.length - 1;
-  }
-  previousSlide.addEventListener("click", () => { slideIndex -= 1; renderSlide(); });
-  nextSlide.addEventListener("click", () => { slideIndex += 1; renderSlide(); });
-
+    const reset = () => { disclosures.forEach(({ element, open }) => { element.open = open; }); choose(initial, { emit: false }); };
+    function setValue(value, options) {
+      const item = value == null ? null : enabled().find((node) => valueOf(node) === String(value));
+      if (value != null && !item) throw new RangeError("Unknown or disabled disclosure item.");
+      choose(item, options);
+    }
+    scope.listen(tree.closest("form"), "reset", reset);
+    return { getValue: () => valueOf(items().find((item) => item.getAttribute("aria-current") === "true")), setValue, reset, destroy: scope.destroy };
+  } });
+  runtime.register("tooltip", { selector: ".tooltip-wrap, [data-tooltip]", init(wrap) {
+    const scope = runtime.cleanup();
+    const doc = wrap.ownerDocument;
+    scope.listen(doc, "keydown", (event) => {
+      if (event.key !== "Escape" || wrap.classList.contains("tooltip-dismissed")) return;
+      if (!wrap.matches(":hover") && !wrap.contains(doc.activeElement)) return;
+      const content = wrap.querySelector('.tooltip-content, [role="tooltip"]');
+      if (!content || !content.getClientRects().length) return;
+      const style = doc.defaultView.getComputedStyle(content);
+      if (style.visibility !== "visible" || style.display === "none" || Number(style.opacity) === 0) return;
+      wrap.classList.add("tooltip-dismissed");
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
+    scope.listen(wrap, "mouseleave", () => wrap.classList.remove("tooltip-dismissed"));
+    scope.listen(wrap, "focusout", (event) => { if (!wrap.contains(event.relatedTarget)) wrap.classList.remove("tooltip-dismissed"); });
+    const reset = () => wrap.classList.remove("tooltip-dismissed");
+    return { getValue: () => !wrap.classList.contains("tooltip-dismissed"), setValue(value) { wrap.classList.toggle("tooltip-dismissed", !value); }, reset, destroy() { reset(); scope.destroy(); } };
+  } });
+  runtime.init();
 })();

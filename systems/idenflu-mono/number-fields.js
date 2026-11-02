@@ -35,11 +35,17 @@
     return value;
   }
 
-  document.querySelectorAll("[data-number-field]").forEach((field) => {
+  const runtime = window.IdenfluMono;
+  if (!runtime) return;
+
+  function createNumberField(field) {
+    const scope = runtime.cleanup();
+    const listen = scope.listen;
     const input = field.querySelector(".number-field-input");
-    if (!input) return;
+    if (!input) return null;
     const buttons = [...field.querySelectorAll("[data-number-step]")];
     const feedback = document.getElementById(field.dataset.feedback);
+    const initialValue = input.defaultValue;
     const unit = field.querySelector(".number-field-unit")?.textContent.trim() || "";
     const grouping = field.dataset.grouping === "true";
     const requestedDecimals = Number(field.dataset.decimals || 0);
@@ -121,7 +127,9 @@
       lastCommitted = value;
       field.dispatchEvent(new CustomEvent("numberchange", {
         bubbles: true,
-        detail: { value, numberValue: value === null ? null : Number(value) },
+        // Consumers should persist value; numberValue is only a safe convenience.
+        detail: { value, numberValue: result.value !== undefined && result.value <= BigInt(Number.MAX_SAFE_INTEGER)
+          && result.value >= BigInt(Number.MIN_SAFE_INTEGER) ? Number(value) : null },
       }));
       return true;
     }
@@ -171,18 +179,18 @@
       return !input.disabled && field.dataset.selectOnFocus === "true";
     }
 
-    input.addEventListener("mousedown", (event) => {
+    listen(input, "mousedown", (event) => {
       focusPointer = event.button === 0 && document.activeElement !== input && selectOnFocus()
         ? { x: event.clientX, y: event.clientY, dragged: false }
         : null;
     });
-    input.addEventListener("mousemove", (event) => {
+    listen(input, "mousemove", (event) => {
       if (focusPointer && Math.hypot(event.clientX - focusPointer.x, event.clientY - focusPointer.y) > 3) focusPointer.dragged = true;
     });
-    input.addEventListener("focus", () => {
+    listen(input, "focus", () => {
       if (selectOnFocus()) input.select();
     });
-    input.addEventListener("mouseup", (event) => {
+    listen(input, "mouseup", (event) => {
       const pointer = focusPointer;
       focusPointer = null;
       // The first mouse click normally collapses the selection made on focus.
@@ -192,12 +200,12 @@
         input.select();
       }
     });
-    input.addEventListener("compositionstart", () => { composing = true; });
-    input.addEventListener("compositionend", () => { composing = false; onInput({}); });
-    input.addEventListener("input", onInput);
-    input.addEventListener("change", () => commit());
-    input.addEventListener("blur", () => { focusPointer = null; commit(); });
-    input.addEventListener("keydown", (event) => {
+    listen(input, "compositionstart", () => { composing = true; });
+    listen(input, "compositionend", () => { composing = false; onInput({}); });
+    listen(input, "input", onInput);
+    listen(input, "change", () => commit());
+    listen(input, "blur", () => { focusPointer = null; commit(); });
+    listen(input, "keydown", (event) => {
       if (composing || event.isComposing || event.keyCode === 229 || input.disabled || input.readOnly) return;
       const keys = { ArrowUp: [1, 1], ArrowDown: [-1, 1], PageUp: [1, 10], PageDown: [-1, 10] };
       if (keys[event.key]) {
@@ -210,10 +218,11 @@
     });
     buttons.forEach((button) => {
       // Keep the editing caret in place when a pointer adjusts the value.
-      button.addEventListener("mousedown", (event) => event.preventDefault());
-      button.addEventListener("click", () => changeBy(button.dataset.numberStep === "up" ? 1 : -1));
+      listen(button, "mousedown", (event) => event.preventDefault());
+      listen(button, "click", () => changeBy(button.dataset.numberStep === "up" ? 1 : -1));
     });
-    input.closest("form")?.addEventListener("reset", () => setTimeout(() => {
+    listen(input.closest("form"), "reset", () => setTimeout(() => {
+      if (!scope.active) return;
       composing = false;
       const result = currentValue();
       if (!result.error && !result.empty) {
@@ -224,7 +233,9 @@
       sync(result);
     }, 0));
     if (typeof MutationObserver !== "undefined") {
-      new MutationObserver(() => sync()).observe(input, { attributes: true, attributeFilter: ["disabled", "readonly"] });
+      const observer = new MutationObserver(() => { if (scope.active) sync(); });
+      observer.observe(input, { attributes: true, attributeFilter: ["disabled", "readonly"] });
+      scope.onCleanup(() => observer.disconnect());
     }
 
     const initial = currentValue();
@@ -234,15 +245,55 @@
     }
     setError(initial.error || "");
     sync(initial);
-  });
 
-  document.querySelectorAll("[data-number-focus-option]").forEach((option) => {
+    function getValue() {
+      const result = currentValue();
+      return result.value === undefined || result.error ? null : formatNumber(result.value, decimals);
+    }
+    function setValue(value, { emit = true } = {}) {
+      const text = value === null || value === undefined ? "" : String(value);
+      const parsed = parseNumber(text, decimals, grouping);
+      if (parsed.error || (typeof value === 'number' && (!Number.isFinite(value) || parsed.value > BigInt(Number.MAX_SAFE_INTEGER) || parsed.value < BigInt(Number.MIN_SAFE_INTEGER)))) {
+        throw new RangeError(parsed.error || '정확한 숫자는 문자열로 지정해주세요.');
+      }
+      if (parsed.value !== undefined && ((minimum !== null && parsed.value < minimum) || (maximum !== null && parsed.value > maximum))) throw new RangeError('허용 범위 안의 값을 지정해주세요.');
+      input.value = parsed.empty ? "" : displayNumber(parsed.value, parsed.fractionDigits);
+      setError(parsed.empty && input.required ? '값을 입력해주세요.' : '');
+      sync(parsed);
+      if (emit) {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        notify(parsed);
+      } else lastCommitted = parsed.value === undefined ? null : formatNumber(parsed.value, decimals);
+      return getValue();
+    }
+    function reset() {
+      composing = false;
+      input.value = initialValue;
+      const result = currentValue();
+      if (!result.error && !result.empty) input.value = displayNumber(result.value, result.fractionDigits);
+      lastCommitted = result.value === undefined ? null : formatNumber(result.value, decimals);
+      setError('');
+      sync(result);
+      return getValue();
+    }
+    return { getValue, setValue, reset, destroy: scope.destroy };
+  }
+
+  function createFocusOption(option) {
+    const scope = runtime.cleanup();
+    const listen = scope.listen;
     const input = document.getElementById(option.getAttribute("aria-controls"));
     const field = input?.closest("[data-number-field]");
     if (!field) return;
     option.checked = field.dataset.selectOnFocus === "true";
     const update = () => { field.dataset.selectOnFocus = String(option.checked); };
-    option.addEventListener("change", update);
-    option.closest("form")?.addEventListener("reset", () => setTimeout(update, 0));
-  });
+    listen(option, "change", update);
+    listen(option.closest("form"), "reset", () => setTimeout(() => { if (scope.active) update(); }, 0));
+    return { destroy: scope.destroy };
+  }
+
+  runtime.register('number-field', { selector: '[data-number-field]', init: createNumberField });
+  runtime.register('number-focus-option', { selector: '[data-number-focus-option]', init: createFocusOption });
+  runtime.init(document);
 })();

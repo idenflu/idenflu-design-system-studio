@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <script>
+      window.fixtureErrors = [];
+      window.addEventListener("error", (event) => window.fixtureErrors.push(event.message || `Resource error: ${event.target?.src || event.target?.href || "unknown"}`), true);
+      window.addEventListener("unhandledrejection", (event) => window.fixtureErrors.push(String(event.reason)));
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>idenflu mono standalone runtime fixture</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="../systems/idenflu-mono/styles.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/tokens.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/components.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/extras.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/search-select.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/multi-select-search.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/number-fields.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/theme.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/theme-components.css" />
+    <link rel="stylesheet" href="../systems/idenflu-mono/data-state.css" />
+    <style>
+      main { max-width: 960px; margin: 0 auto; padding: 24px; }
+      form { display: grid; gap: 24px; }
+      section { min-width: 0; }
+      .fixture-control { max-width: 420px; }
+      .fixture-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+      .fixture-section-title { margin: 0 0 12px; font-size: 18px; }
+      [hidden] { display: none !important; }
+    </style>
+    <script src="../systems/idenflu-mono/runtime.js" defer></script>
+    <script src="../systems/idenflu-mono/components.js" defer></script>
+    <script src="../systems/idenflu-mono/script.js" defer></script>
+    <script src="../systems/idenflu-mono/search-select.js" defer></script>
+    <script src="../systems/idenflu-mono/multi-select.js" defer></script>
+    <script src="../systems/idenflu-mono/extras.js" defer></script>
+    <script src="../systems/idenflu-mono/datepicker.js" defer></script>
+    <script src="../systems/idenflu-mono/number-fields.js" defer></script>
+    <script src="../systems/idenflu-mono/data-state.js" defer></script>
+  </head>
+  <body>
+    <main id="fixture-root">
+      <h1>독립 소비자 테스트</h1>
+      <form id="fixture-form" novalidate>
+        <div class="fixture-grid">
+          <section class="fixture-control">
+            <h2 class="fixture-section-title" id="fixture-select-a-label">Select A</h2>
+            <div class="custom-select" id="fixture-select-a" data-select>
+              <input type="hidden" name="select-a" value="a" />
+              <button class="select-trigger" id="fixture-select-a-trigger" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="fixture-select-a-options" aria-labelledby="fixture-select-a-label fixture-select-a-current"><span id="fixture-select-a-current" data-select-label>Alpha</span></button>
+              <div class="select-popup" hidden>
+                <ul class="select-options" id="fixture-select-a-options" role="listbox" aria-labelledby="fixture-select-a-label">
+                  <li class="select-option" id="fixture-select-a-option-a" role="option" data-value="a" aria-selected="true"><span class="option-label">Alpha</span></li>
+                  <li class="select-option" id="fixture-select-a-option-b" role="option" data-value="b" aria-selected="false"><span class="option-label">Beta</span></li>
+                  <li class="select-option" id="fixture-select-a-option-c" role="option" data-value="c" aria-selected="false" aria-disabled="true"><span class="option-label">Gamma</span></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section class="fixture-control">
+            <h2 class="fixture-section-title" id="fixture-select-b-label">Select B</h2>
+            <div class="custom-select" id="fixture-select-b" data-select>
+              <input type="hidden" name="select-b" value="a" />
+              <button class="select-trigger" id="fixture-select-b-trigger" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="fixture-select-b-options" aria-labelledby="fixture-select-b-label fixture-select-b-current"><span id="fixture-select-b-current" data-select-label>Alpha</span></button>
+              <div class="select-popup" hidden>
+                <ul class="select-options" id="fixture-select-b-options" role="listbox" aria-labelledby="fixture-select-b-label">
+                  <li class="select-option" id="fixture-select-b-option-a" role="option" data-value="a" aria-selected="true"><span class="option-label">Alpha</span></li>
+                  <li class="select-option" id="fixture-select-b-option-b" role="option" data-value="b" aria-selected="false"><span class="option-label">Beta</span></li>
+                  <li class="select-option" id="fixture-select-b-option-c" role="option" data-value="c" aria-selected="false" aria-disabled="true"><span class="option-label">Gamma</span></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="fixture-grid">
+          <section class="tabs">
+            <h2 class="fixture-section-title">Tabs A</h2>
+            <div class="tab-list" id="fixture-tabs-a" role="tablist" aria-label="첫 번째 분류">
+              <button class="tab" id="fixture-tab-a-a" type="button" role="tab" data-value="a" aria-selected="true" aria-controls="fixture-panel-a-a" tabindex="0">Alpha</button>
+              <button class="tab" id="fixture-tab-a-b" type="button" role="tab" data-value="b" aria-selected="false" aria-controls="fixture-panel-a-b" tabindex="-1" disabled>Beta</button>
+              <button class="tab" id="fixture-tab-a-c" type="button" role="tab" data-value="c" aria-selected="false" aria-controls="fixture-panel-a-c" tabindex="-1">Gamma</button>
+            </div>
+            <div class="tab-panel" id="fixture-panel-a-a" role="tabpanel" aria-labelledby="fixture-tab-a-a" tabindex="0">첫 번째 Alpha 패널</div>
+            <div class="tab-panel" id="fixture-panel-a-b" role="tabpanel" aria-labelledby="fixture-tab-a-b" tabindex="0" hidden>첫 번째 Beta 패널</div>
+            <div class="tab-panel" id="fixture-panel-a-c" role="tabpanel" aria-labelledby="fixture-tab-a-c" tabindex="0" hidden>첫 번째 Gamma 패널</div>
+          </section>
+          <section class="tabs">
+            <h2 class="fixture-section-title">Tabs B</h2>
+            <div class="tab-list" id="fixture-tabs-b" role="tablist" aria-label="두 번째 분류">
+              <button class="tab" id="fixture-tab-b-a" type="button" role="tab" data-value="a" aria-selected="true" aria-controls="fixture-panel-b-a" tabindex="0">Alpha</button>
+              <button class="tab" id="fixture-tab-b-b" type="button" role="tab" data-value="b" aria-selected="false" aria-controls="fixture-panel-b-b" tabindex="-1">Beta</button>
+            </div>
+            <div class="tab-panel" id="fixture-panel-b-a" role="tabpanel" aria-labelledby="fixture-tab-b-a" tabindex="0">두 번째 Alpha 패널</div>
+            <div class="tab-panel" id="fixture-panel-b-b" role="tabpanel" aria-labelledby="fixture-tab-b-b" tabindex="0" hidden>두 번째 Beta 패널</div>
+          </section>
+        </div>
+        <section class="fixture-control">
+          <h2 class="fixture-section-title"><label id="fixture-search-label" for="fixture-search-input">Search select</label></h2>
+          <div class="custom-select search-select" id="fixture-search" data-search-select>
+            <input type="hidden" name="search" value="" />
+            <div class="search-select-control">
+              <input class="search-select-input" id="fixture-search-input" type="text" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="false" aria-controls="fixture-search-options" aria-labelledby="fixture-search-label" autocomplete="off" placeholder="항목 검색" />
+              <button class="input-action search-select-clear" type="button" aria-label="검색 선택 지우기" hidden>×</button>
+              <button class="input-action search-select-toggle" type="button" tabindex="-1" aria-label="옵션 목록 열기">⌄</button>
+            </div>
+            <div class="select-popup" hidden>
+              <ul class="select-options" id="fixture-search-options" role="listbox" aria-labelledby="fixture-search-label">
+                <li class="select-option" id="fixture-search-option-a" role="option" data-value="a" aria-selected="false"><span class="option-label">Alpha</span></li>
+                <li class="select-option" id="fixture-search-option-b" role="option" data-value="b" aria-selected="false"><span class="option-label">Beta</span></li>
+                <li class="select-option" id="fixture-search-option-c" role="option" data-value="c" aria-selected="false" aria-disabled="true"><span class="option-label">Gamma</span></li>
+              </ul>
+              <p class="search-select-empty" role="status" hidden>검색 결과가 없습니다.</p>
+            </div>
+          </div>
+        </section>
+        <section class="fixture-control">
+          <h2 class="fixture-section-title" id="fixture-multi-label">Multiselect</h2>
+          <div class="custom-select" id="fixture-multi" data-multiselect data-name="multi[]">
+            <div data-multi-values><input type="hidden" name="multi[]" value="a" /></div>
+            <button class="select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="fixture-multi-options" aria-labelledby="fixture-multi-label fixture-multi-current"><span id="fixture-multi-current" data-select-label>Alpha</span></button>
+            <div class="select-popup" hidden>
+              <label class="sr-only" for="fixture-multi-search">복수 선택 검색</label>
+              <input class="multi-search-input" id="fixture-multi-search" type="search" autocomplete="off" placeholder="항목 검색" />
+              <ul class="select-options" id="fixture-multi-options" role="listbox" aria-labelledby="fixture-multi-label" aria-multiselectable="true" tabindex="0">
+                <li class="select-option" id="fixture-multi-option-a" role="option" data-value="a" aria-selected="true"><span class="option-label">Alpha</span></li>
+                <li class="select-option" id="fixture-multi-option-b" role="option" data-value="b" aria-selected="false"><span class="option-label">Beta</span></li>
+                <li class="select-option" id="fixture-multi-option-c" role="option" data-value="c" aria-selected="false" aria-disabled="true"><span class="option-label">Gamma</span></li>
+              </ul>
+              <p class="multi-search-empty" role="status" hidden>검색 결과가 없습니다.</p>
+            </div>
+            <div class="chip-row" data-multi-selected></div>
+            <button class="button button--ghost" type="button" data-multi-clear>전체 선택 해제</button>
+            <p class="sr-only" data-multi-feedback role="status" aria-live="polite"></p>
+          </div>
+        </section>
+        <section class="fixture-control">
+          <h2 class="fixture-section-title"><label for="fixture-date-input">Date picker</label></h2>
+          <div class="date-picker" id="fixture-date" data-date-picker="single">
+            <div class="date-field">
+              <input class="date-text" id="fixture-date-input" type="text" inputmode="numeric" placeholder="YYYY-MM-DD" autocomplete="off" aria-describedby="fixture-date-help" />
+              <input type="hidden" name="date" />
+              <button class="date-trigger" type="button" aria-label="날짜 달력 열기" aria-haspopup="dialog" aria-expanded="false" aria-controls="fixture-date-popup">달력</button>
+            </div>
+            <div class="date-popup" id="fixture-date-popup" role="dialog" aria-label="날짜 선택 달력" hidden>
+              <div class="calendar-header">
+                <button class="calendar-nav" type="button" data-calendar-prev aria-label="이전 달">‹</button>
+                <strong id="fixture-date-month" data-calendar-month aria-live="polite"></strong>
+                <button class="calendar-nav" type="button" data-calendar-next aria-label="다음 달">›</button>
+              </div>
+              <div class="calendar-weekdays" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+              <div class="calendar-grid" data-calendar-grid role="grid" aria-labelledby="fixture-date-month"></div>
+              <div class="calendar-footer"><button class="button button--ghost" type="button" data-calendar-today>오늘</button><button class="button button--ghost" type="button" data-calendar-clear>지우기</button></div>
+            </div>
+          </div>
+          <p class="component-helper date-help" id="fixture-date-help" role="status">YYYY-MM-DD 또는 숫자 8자리로 입력해주세요.</p>
+        </section>
+        <section class="fixture-control">
+          <h2 class="fixture-section-title"><label for="fixture-number-input">Number field</label></h2>
+          <div class="number-field" id="fixture-number" data-number-field data-decimals="1" data-step="0.1" data-feedback="fixture-number-feedback">
+            <input class="number-field-input" id="fixture-number-input" name="number" type="text" role="spinbutton" inputmode="decimal" value="0.1" autocomplete="off" />
+            <div class="number-field-stepper">
+              <button class="number-field-step" type="button" data-number-step="up" aria-controls="fixture-number-input" aria-label="0.1 증가">+</button>
+              <button class="number-field-step" type="button" data-number-step="down" aria-controls="fixture-number-input" aria-label="0.1 감소">−</button>
+            </div>
+          </div>
+          <p class="number-field-feedback" id="fixture-number-feedback" role="status" hidden></p>
+        </section>
+        <section>
+          <h2 class="fixture-section-title">Tooltip</h2>
+          <span class="tooltip-wrap" id="fixture-tooltip"><button class="button button--outline" id="fixture-tooltip-trigger" type="button" aria-describedby="fixture-tooltip-text">도움말</button><span class="tooltip-content" id="fixture-tooltip-text" role="tooltip">독립 소비자 도움말</span></span>
+        </section>
+        <section>
+          <h2 class="fixture-section-title" id="fixture-tree-label">Disclosure tree</h2>
+          <div class="demo-tree" id="fixture-tree" data-disclosure-tree aria-labelledby="fixture-tree-label">
+            <details open><summary>프로젝트</summary><div class="tree-children"><button class="tree-item is-selected" type="button" data-tree-item data-value="a" aria-current="true">Alpha</button><button class="tree-item" type="button" data-tree-item data-value="b">Beta</button><button class="tree-item" type="button" data-tree-item data-value="c" disabled>Gamma</button></div></details>
+          </div>
+        </section>
+        <section id="fixture-data" data-data-state data-mock-data aria-labelledby="fixture-data-title">
+          <h2 class="fixture-section-title" id="fixture-data-title">Data state</h2>
+          <div class="data-state-controls"><label class="sr-only" for="fixture-data-query">프로젝트 검색</label><input class="text-input" id="fixture-data-query" type="search" data-data-query placeholder="프로젝트 검색" /><button class="button button--outline" type="button" data-data-load="success">정상 조회</button><button class="button button--outline" type="button" data-data-load="empty">빈 목록</button><button class="button button--outline" type="button" data-data-load="error">오류 조회</button></div>
+          <p data-data-status role="status" aria-live="polite"></p>
+          <div class="data-state-panel" data-data-loading hidden>불러오는 중입니다.</div>
+          <div class="data-state-panel" data-data-error hidden><strong>조회 실패</strong><p data-data-error-message></p><button class="button" type="button" data-data-retry>다시 시도</button></div>
+          <div class="data-state-panel" data-data-empty hidden>등록된 프로젝트가 없습니다.</div>
+          <div class="data-state-panel" data-data-no-results hidden><p>검색 결과가 없습니다.</p><button class="button button--outline" type="button" data-data-clear>검색 초기화</button></div>
+          <div data-data-success><table><caption class="sr-only">프로젝트 목록</caption><thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">상태</th></tr></thead><tbody data-data-rows></tbody></table></div>
+        </section>
+        <div><button class="button button--outline" id="fixture-reset" type="reset">폼 초기화</button></div>
+      </form>
+    </main>
+  </body>
+</html>

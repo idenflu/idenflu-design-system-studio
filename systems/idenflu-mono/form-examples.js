@@ -8,6 +8,15 @@
     if (!error) return;
     error.textContent = message;
     error.hidden = !message;
+    if (input.closest('[data-date-picker]')) {
+      // Internal contract: a picker that cancels owns the combined form/date error state.
+      const validation = new CustomEvent('datevalidation', {
+        bubbles: true,
+        cancelable: true,
+        detail: { message, errorId },
+      });
+      if (!input.dispatchEvent(validation)) return;
+    }
     if (message) {
       input.setAttribute("aria-invalid", "true");
       input.setAttribute("aria-errormessage", errorId);
@@ -94,10 +103,15 @@
 
   function numberMessage(input, label, minimum, maximum, required) {
     if (input.validity.badInput) return `${label} 숫자로 입력해주세요.`;
-    if (!input.value.trim()) return required ? `${label} 입력해주세요.` : "";
-    const value = Number(input.value);
-    if (!Number.isFinite(value) || !Number.isInteger(value)) return `${label} 정수로 입력해주세요.`;
-    if (value < minimum || value > maximum) return Number.isFinite(maximum) ? `${minimum}~${maximum} 사이로 입력해주세요.` : `${minimum} 이상 입력해주세요.`;
+    const text = input.value.trim();
+    if (!text) return required ? `${label} 입력해주세요.` : "";
+    // Plain decimal integer text only. Never round a fractional or unsafe value through Number.
+    if (!/^[+-]?\d+$/.test(text)) return `${label} 소수·지수 표기 없이 정수로 입력해주세요.`;
+    const value = BigInt(text);
+    const safeMaximum = BigInt(Number.MAX_SAFE_INTEGER);
+    if (value > safeMaximum || value < -safeMaximum) return "안전한 정수 범위(-9,007,199,254,740,991~9,007,199,254,740,991)로 입력해주세요.";
+    if (value < BigInt(minimum) || (Number.isFinite(maximum) && value > BigInt(maximum))) return Number.isFinite(maximum) ? `${minimum}~${maximum} 사이로 입력해주세요.` : `${minimum} 이상 입력해주세요.`;
+    if (input.validity.stepMismatch) return `${label} 허용된 증감 단위로 입력해주세요.`;
     return "";
   }
 

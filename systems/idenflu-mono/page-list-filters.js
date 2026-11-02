@@ -30,24 +30,9 @@
   }
 
   function resetPicker(picker) {
-    const input = picker.querySelector('input[type="hidden"]');
-    const trigger = picker.querySelector(".select-trigger");
-    const display = picker.querySelector("[data-select-label]");
-    const popup = picker.querySelector(".select-popup");
-    const options = [...picker.querySelectorAll('[role="option"][data-value]')];
-    const defaultOption = options.find((option) => option.dataset.value === "");
-
-    input.value = "";
-    trigger.value = "";
-    display.textContent = defaultOption.querySelector(".option-label").textContent.trim();
-    options.forEach((option) => {
-      option.setAttribute("aria-selected", String(option === defaultOption));
-      option.classList.remove("is-active");
-    });
-    popup.hidden = true;
-    picker.classList.remove("is-open", "opens-up");
-    trigger.setAttribute("aria-expanded", "false");
-    trigger.removeAttribute("aria-activedescendant");
+    const control = window.IdenfluMono?.get(picker);
+    control?.setValue("", { emit: false });
+    control?.close();
   }
 
   form.addEventListener("submit", (event) => {

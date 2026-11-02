@@ -1,14 +1,6 @@
 (() => {
   "use strict";
 
-  document.querySelectorAll(".tooltip-wrap").forEach((wrap) => {
-    wrap.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") { wrap.classList.add("tooltip-dismissed"); event.stopPropagation(); }
-    });
-    wrap.addEventListener("mouseleave", () => wrap.classList.remove("tooltip-dismissed"));
-    wrap.addEventListener("focusout", () => wrap.classList.remove("tooltip-dismissed"));
-  });
-
   const menu = document.querySelector("#action-menu");
   const menuTrigger = document.querySelector("#action-trigger");
   const menuPanel = document.querySelector("#action-options");
@@ -85,12 +77,19 @@
   document.querySelector("#drawer-open").addEventListener("click", () => {
     drawerName.value = savedDrawer.name;
     drawerNote.value = savedDrawer.note;
+    drawerName.setCustomValidity("");
     drawer.showModal();
     drawerName.focus();
   });
   document.querySelector("#drawer-close").addEventListener("click", () => drawer.close());
   document.querySelector("#drawer-cancel").addEventListener("click", () => drawer.close());
-  drawer.addEventListener("click", (event) => { if (event.target === drawer) drawer.close(); });
+  drawer.addEventListener("click", (event) => {
+    if (event.target !== drawer) return;
+    const bounds = drawer.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) {
+      drawer.close();
+    }
+  });
   document.querySelector("#drawer-form").addEventListener("submit", (event) => {
     event.preventDefault();
     if (!drawerName.value.trim()) { drawerName.setCustomValidity("프로젝트 이름을 입력해주세요."); drawerName.reportValidity(); return; }

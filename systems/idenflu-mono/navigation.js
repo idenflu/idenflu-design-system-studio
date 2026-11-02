@@ -46,7 +46,7 @@
     surface.inert = true;
     backdrop.hidden = false;
     menuButton.setAttribute("aria-expanded", "true");
-    (sidebar.querySelector('[aria-current="page"]') || sidebar.querySelector("a")).focus();
+    (sidebar.querySelector('#docs-search') || sidebar.querySelector('[aria-current="page"]') || sidebar.querySelector("a")).focus();
   }
 
   menuButton.addEventListener("click", openMenu);
@@ -119,6 +119,7 @@
     title.textContent = name;
     document.querySelector("#doc-description").textContent = description;
     heading.hidden = route === "overview";
+    document.dispatchEvent(new CustomEvent('docsroutechange', { detail: { route } }));
     const index = views.indexOf(active);
     updatePageLink(document.querySelector("#previous-doc"), views[index - 1]);
     updatePageLink(document.querySelector("#next-doc"), views[index + 1]);

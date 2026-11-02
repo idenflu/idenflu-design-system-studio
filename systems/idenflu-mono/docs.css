@@ -1,7 +1,7 @@
 /* Documentation shell. Component colors, type and controls live in styles.css. */
 :root { --sidebar-width: 248px; }
 .docs-layout { min-height: 100vh; }
-.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 60; display: flex; flex-direction: column; width: var(--sidebar-width); height: 100dvh; border-right: 1px solid var(--border-subtle); background: #fff; }
+.sidebar { position: fixed; inset: 0 auto 0 0; z-index: var(--z-sidebar); display: flex; flex-direction: column; width: var(--sidebar-width); height: 100dvh; border-right: 1px solid var(--border-subtle); background: var(--canvas); }
 .sidebar-brand { position: relative; flex-shrink: 0; padding: 26px 24px 22px; border-bottom: 1px solid var(--divider); }
 .sidebar-brand .wordmark { font-size: 18px; line-height: 24px; letter-spacing: 1.4px; }
 .sidebar-brand p { margin-top: 6px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
@@ -11,10 +11,10 @@
 .nav-group h2 { margin: 0 12px 8px; color: var(--text-muted); font-size: 11px; line-height: 18px; font-weight: 500; letter-spacing: .7px; text-transform: uppercase; }
 .nav-group a { display: flex; align-items: center; min-height: 38px; padding: 8px 12px; border-left: 2px solid transparent; color: var(--text-secondary); font-size: 14px; line-height: 20px; }
 .nav-group a:hover { background: var(--surface); color: var(--text); }
-.nav-group a[aria-current="page"] { border-left-color: var(--primary); background: #edf0fb; color: var(--primary); font-weight: 500; }
+.nav-group a[aria-current="page"] { border-left-color: var(--primary); background: var(--info-surface); color: var(--primary); font-weight: 500; }
 .sidebar-footer { flex-shrink: 0; padding: 16px 24px; border-top: 1px solid var(--divider); color: var(--text-secondary); font-size: 11px; line-height: 18px; }
 .docs-main { display: flex; flex-direction: column; min-width: 0; min-height: 100vh; margin-left: var(--sidebar-width); }
-.docs-topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 64px; padding: 12px 56px; border-bottom: 1px solid var(--border-subtle); background: #fff; }
+.docs-topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 64px; padding: 12px 56px; border-bottom: 1px solid var(--border-subtle); background: var(--canvas); }
 .breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
 #breadcrumb-title { color: var(--text); }
 .topbar-caption { color: var(--text-muted); font-size: 12px; line-height: 18px; white-space: nowrap; }
@@ -87,7 +87,7 @@
 #previous-doc { grid-column: 1; }
 #next-doc { grid-column: 2; justify-self: end; text-align: right; }
 .docs-footer { display: flex; justify-content: space-between; gap: 24px; max-width: 1040px; margin-inline: 56px; padding-block: 20px 28px; border-top: 1px solid var(--divider); color: var(--text-secondary); font-size: 11px; line-height: 18px; }
-.sidebar-backdrop { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; border: 0; background: rgb(24 28 34 / 32%); }
+.sidebar-backdrop { position: fixed; inset: 0; z-index: var(--z-backdrop); width: 100%; height: 100%; border: 0; background: rgb(24 28 34 / 32%); }
 .sidebar-open { overflow: hidden; }
 
 @media (max-width: 1180px) {
@@ -142,3 +142,23 @@
 .nav-gallery { display:flex; align-items:center; justify-content:space-between; min-height:38px; margin:0 0 16px; padding:8px 12px; color:var(--text-secondary); font-size:12px; line-height:20px; }
 .nav-gallery:hover { background:var(--surface); color:var(--text); }
 .nav-gallery:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
+
+/* Search and application guides share the same public semantic tokens as components. */
+.docs-search { flex-shrink:0; padding:var(--space-4) var(--space-5) 0; }
+.docs-search input { width:100%; }
+.docs-search p { margin-top:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.docs-toc { display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-4); margin-bottom:var(--space-8); padding-block:var(--space-3); border-block:1px solid var(--divider); }
+.docs-toc a { color:var(--primary); font-size:var(--font-size-caption); text-decoration:underline; text-underline-offset:3px; }
+.component-guide { margin-top:var(--space-10); padding-top:var(--space-6); border-top:1px solid var(--divider); min-width:0; }
+.component-guide h2 { font-size:24px; line-height:32px; margin-bottom:var(--space-4); }
+.component-guide h3 { margin-block:var(--space-6) var(--space-3); font-size:18px; line-height:26px; }
+.component-guide p { margin-block:var(--space-3); color:var(--text-secondary); }
+.guide-facts > div { display:grid; grid-template-columns:112px minmax(0,1fr); gap:var(--space-4); padding-block:var(--space-3); border-bottom:1px solid var(--divider); }
+.guide-facts dt { font-weight:600; }
+.guide-facts dd { color:var(--text-secondary); overflow-wrap:anywhere; }
+.code-toolbar { display:flex; flex-wrap:wrap; gap:var(--space-3); align-items:center; margin-block:var(--space-4); }
+.code-toolbar [role=status] { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.code-example summary { padding:var(--space-3); background:var(--surface); cursor:pointer; }
+.component-guide pre { max-width:100%; overflow:auto; padding:var(--space-4); background:var(--surface); color:var(--text); font:13px/20px ui-monospace, SFMono-Regular, Consolas, monospace; tab-size:2; }
+.route-view h2 { scroll-margin-top:100px; }
+@media(max-width:600px) { .guide-facts > div { grid-template-columns:1fr; gap:var(--space-2); } }

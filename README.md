@@ -1,6 +1,8 @@
 # idenflu mono
 
-선택한 디자인 시안을 구현한 HTML·CSS·JavaScript 프로토타입입니다.
+HTML·CSS·JavaScript 디자인 시스템과 문서 스튜디오입니다. 문서 데모와 분리된 브라우저용 컴포넌트 런타임을 제공합니다.
+
+Node.js 20 이상에서 `npm ci`, `npm run dev`로 실행할 수 있습니다. 패키지를 설치하지 않고 미리보기만 확인하려면 아래 Python 서버도 사용할 수 있습니다.
 
 `index.html`을 브라우저로 열거나, 프로젝트 폴더에서 다음 명령으로 실행하세요.
 
@@ -11,6 +13,13 @@ python3 -m http.server 4173 --bind 127.0.0.1
 미리보기: http://127.0.0.1:4173
 
 기본 화면은 디자인 시스템 갤러리입니다. idenflu mono 문서는 `systems/idenflu-mono/index.html`에 있으며, 기존 루트 해시 주소도 해당 문서로 연결됩니다.
+
+- [프로젝트 적용과 API](docs/consumer-guide.md)
+- [변경·검증·릴리스 기준](CONTRIBUTING.md)
+- [변경 이력](CHANGELOG.md)
+- 문서 검색: 한글·영문 동의어, `/`로 검색 포커스, Escape 초기화, Enter 첫 결과 이동
+- 25개 컴포넌트의 사용 기준·구조·키보드·상태·API·HTML 복사 예제
+- `#/patterns/data-states`: 로딩·실패/재시도·빈 목록·검색 0건·정상 목록의 실제 전환
 
 - 본문 Pretendard 14px / 행간 22px
 - 기본 버튼·입력창·셀렉트 높이 38px
@@ -90,14 +99,55 @@ python3 -m http.server 4173 --bind 127.0.0.1
 외곽선은 1.5px / butt / miter로 맞췄으며, 실제 경로는 유지했습니다.
 출처와 라이선스: `systems/idenflu-mono/assets/icons/idenflu/SOURCE.md`, `LICENSE.txt`, `LICENSE-LUCIDE.txt`.
 
+## 검사와 회귀 테스트
+
+```sh
+npm run check
+npm test
+npm run build
+```
+
+`check`는 JS 구문, HTML ID·ARIA 참조·경로·로컬 에셋을 확인합니다. `test`는 배포물의 결정성과 런타임·문서 분리를 검사합니다.
+
+브라우저 자동 검증은 다음과 같습니다. GitHub Actions에서도 같은 명령을 실행합니다.
+
+```sh
+npx playwright install chromium
+npm run test:browser
+```
+
+밝은/어두운 데스크톱과 320px 모바일에서 회귀 시나리오, 전체 문서 경로, 단일 h1, 가로 넘침, 고대비·모션 설정을 확인합니다. 실패 trace와 화면은 `playwright-report/`, `test-results/`에 저장합니다.
+
+위의 로컬 서버를 실행한 뒤 `http://127.0.0.1:4173/tests/idenflu-mono-regression.html`을 여세요.
+별도 패키지 설치 없이 실제 문서를 iframe에 불러와 테스트하고, 결과를 화면에 표시합니다.
+`다시 실행` 버튼으로 반복 실행할 수 있습니다.
+
+- 드로어 오류 후 취소·닫기·재진입·저장, 내부 여백과 외부 배경 클릭
+- 예약 날짜 필수 오류 유지, 직접 입력·달력 선택·지우기·폼 초기화
+- 독립 날짜 선택기의 잘못된 날짜·윤년·역전 기간과 인스턴스 간 상태 분리
+
+자동 테스트의 클릭 좌표·취소 이벤트는 합성 이벤트입니다. 실제 Escape 키와 포인터 조작은 브라우저에서 별도로 확인합니다.
+
+## 배포물
+
+`npm run build`는 `dist/`에 정적 사이트와 컴포넌트 번들을 만듭니다. 해시는 내용에서 계산하므로 같은 소스는 같은 파일명을 생성합니다. 에셋·라이선스와 함께 폴더 전체를 복사하고, `systems/idenflu-mono/manifest.json`에서 버전·파일명을 확인하세요.
+
+컴포넌트 CSS·JS와 테마 스크립트는 각각 한 개 진입점입니다. 문서 사이트는 별도 번들로 데모 코드를 포함합니다. 빌드는 외부 서비스에 게시하지 않습니다.
+
 ## 파일 구성
 
 - `index.html`, `gallery.css`, `gallery-entry.js`: 디자인 시스템 갤러리와 기존 주소 연결
 - `gallery-assets/`: 갤러리에서 사용하는 글꼴
 - `systems/idenflu-mono/`: idenflu mono의 문서, 스타일, 스크립트와 에셋
+- `systems/idenflu-mono/runtime.js`: 컴포넌트 등록·초기화·해제와 공개 API
+- `systems/idenflu-mono/component-demos.js`: 문서 전용 데이터·입력·알림 예제
+- `systems/idenflu-mono/documentation.js`: 적용 가이드·코드 복사·문서 검색·목차
+- `systems/idenflu-mono/data-state.js`: 데이터 상태와 로컬 조회 예제
 - `systems/idenflu-mono/navigation.js`: 문서 페이지 전환과 모바일 메뉴 관리
-- `systems/idenflu-mono/tokens.css`: sm/md/lg 사이즈 토큰
-- `systems/idenflu-mono/theme.css`, `theme-components.css`, `theme.js`: 테마 색상과 모드 전환
+- `systems/idenflu-mono/tokens.css`: primitive→semantic→component 토큰과 밝은/어두운 테마 값
+- `systems/idenflu-mono/theme.css`, `theme-components.css`, `theme.js`: 테마 적용·고대비·모션 및 모드 전환
+- `tests/`: 브라우저 회귀 시나리오, 독립 소비 fixture, 배포 검증
+- `scripts/`: 로컬 서버, 정적 검사와 해시 기반 빌드
 
 새 문서는 `systems/idenflu-mono/index.html`의 `.route-view`에 `data-route`, `data-title`, `data-group`, `data-description`을 지정하고 사이드 메뉴에 링크를 추가합니다.
 페이지 제목·현재 위치·이전/다음 링크는 메타데이터와 페이지 순서에 따라 자동으로 갱신됩니다.

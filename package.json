@@ -1,0 +1,15 @@
+{
+  "name": "idenflu-design-system-studio",
+  "version": "0.2.0",
+  "private": true,
+  "description": "idenflu mono component runtime and documentation",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test tests/tooling.test.mjs",
+    "test:browser": "playwright test",
+    "build": "node scripts/build.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": { "@playwright/test": "1.64.1" }
+}
