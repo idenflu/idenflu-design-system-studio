@@ -1,0 +1,56 @@
+/* Date and time share one field, one selection panel and one confirmation. */
+.datetime-field .datetime-input { font-variant-numeric:tabular-nums; }
+.datetime-range-fields { grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr) calc(var(--control-height) - 2px); }
+.datetime-range-fields .datetime-range-input { min-width:0; height:100%; padding:0 var(--control-px); border:0; background:transparent; text-align:center; font-variant-numeric:tabular-nums; }
+.datetime-range-fields .datetime-range-input:focus { outline:none; box-shadow:none; }
+.datetime-field:has(input:disabled), .datetime-range-fields:has(input:disabled) { background:var(--disabled); }
+.datetime-field input:disabled, .datetime-range-fields input:disabled { color:var(--disabled-text); cursor:not-allowed; }
+.datetime-field:has(input[readonly]), .datetime-range-fields:has(input[readonly]) { background:var(--surface); }
+.datetime-picker .datetime-popup { width:min(560px, calc(100vw - 24px)); padding:0; }
+.datetime-panel { display:grid; grid-template-columns:minmax(0,318px) minmax(0,1fr); min-width:0; }
+.datetime-calendar { min-width:0; padding:var(--space-4); }
+.datetime-popup .calendar-day:disabled { background:var(--field-background); color:var(--disabled-text); cursor:not-allowed; }
+.datetime-time-panel { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-2); min-width:0; padding:var(--space-4) var(--space-2); border-left:1px solid var(--divider); }
+.datetime-time-column { min-width:0; }
+.datetime-time-label { display:grid; place-items:center; min-height:var(--control-height); background:var(--surface); color:var(--text-secondary); font-weight:var(--font-weight-medium); }
+.datetime-time-list { height:calc(var(--control-height) * 6); min-height:0; margin-top:var(--space-2); padding:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-gutter:stable; }
+.datetime-time-option { display:flex; align-items:center; justify-content:center; width:100%; min-height:var(--control-height); margin:0; padding:var(--space-2); border:0; background:var(--field-background); color:var(--text); font:inherit; font-variant-numeric:tabular-nums; line-height:var(--line-height-control); }
+.datetime-time-option:hover:not(:disabled) { background:var(--surface); }
+.datetime-time-option:is([aria-selected="true"],[aria-pressed="true"]) { background:var(--info-surface); color:var(--text); font-weight:var(--font-weight-medium); }
+.datetime-time-option:disabled { color:var(--disabled-text); cursor:not-allowed; }
+.datetime-time-option:focus-visible, .datetime-time-list:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
+.datetime-range-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); border-bottom:1px solid var(--divider); }
+.datetime-range-tab { display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-1); min-width:0; padding:var(--space-3) var(--space-4); border:0; border-bottom:2px solid transparent; background:var(--field-background); color:var(--text-secondary); font:inherit; text-align:left; }
+.datetime-range-tab + .datetime-range-tab { border-left:1px solid var(--divider); }
+.datetime-range-tab:hover { background:var(--surface); }
+.datetime-range-tab:is([aria-pressed="true"], [aria-current="step"]) { border-bottom-color:var(--primary); color:var(--primary); }
+.datetime-range-tab:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
+.datetime-range-tab > span { min-width:0; max-width:100%; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.datetime-range-tab > strong { max-width:100%; font-size:var(--font-size-body); font-weight:var(--font-weight-medium); overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.datetime-range-tab > small { font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.datetime-footer { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-3) var(--space-4); border-top:1px solid var(--divider); }
+.datetime-summary { min-width:0; color:var(--text); font-size:calc(var(--font-size-base) + 2px); line-height:calc(var(--line-height-body) + 2px); font-weight:var(--font-weight-semibold); font-variant-numeric:tabular-nums; white-space:pre-line; overflow-wrap:anywhere; }
+.datetime-summary > span { display:block; }
+.datetime-actions { display:flex; flex:0 0 auto; gap:var(--space-2); }
+.datetime-actions .button { flex:0 0 auto; white-space:nowrap; }
+.datetime-selection-error { padding:0 var(--space-4) var(--space-3); color:var(--danger-text); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+@media (max-width:600px) {
+  .datetime-range-fields { height:auto; grid-template-columns:minmax(0,1fr) calc(var(--control-height) - 2px); grid-template-rows:repeat(2,calc(var(--control-height) - 1px)); }
+  .datetime-range-fields .datetime-range-input { grid-column:1; height:100%; }
+  .datetime-range-fields .datetime-range-input:first-of-type { grid-row:1; }
+  .datetime-range-fields .datetime-range-input:nth-of-type(2) { grid-row:2; border-top:1px solid var(--divider); }
+  .datetime-range-fields .date-range-separator { display:none; }
+  .datetime-range-fields .date-trigger { grid-column:2; grid-row:1 / span 2; align-self:stretch; height:100%; border-left:1px solid var(--divider); }
+}
+@media (max-width:480px) {
+  .datetime-panel { grid-template-columns:minmax(0,1fr); }
+  .datetime-time-panel { padding:var(--space-3) var(--space-4); border-top:1px solid var(--divider); border-left:0; }
+  .datetime-time-list { height:calc(var(--control-height) * 3); }
+  .datetime-footer { flex-wrap:wrap; }
+  .datetime-summary { flex-basis:100%; }
+  .datetime-actions { margin-inline-start:auto; }
+}
+@media (forced-colors:active) {
+  .datetime-time-option:is([aria-selected="true"],[aria-pressed="true"]) { background:Highlight; color:HighlightText; outline:1px solid Highlight; outline-offset:-1px; }
+  .datetime-range-tab[aria-pressed="true"] { border-bottom-color:Highlight; }
+}

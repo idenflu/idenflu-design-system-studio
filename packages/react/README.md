@@ -48,7 +48,7 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 
 ## 컴포넌트
 
-- 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `Slider`, `FileUpload`
+- 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
 - 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
 - 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `NovaSpinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
@@ -59,6 +59,49 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 `NumberField`, `DatePicker`, `DateRangePicker`에서 `value`가 `undefined`일 때만 `defaultValue`를 사용합니다. Controlled `null`은 빈 값입니다. 숫자의 `grouping`·`decimals`를 변경하면 현재 입력을 새 형식으로 표시하며, 정밀도를 줄여도 임의로 반올림하지 않고 기존 값을 보존해 검증합니다.
 
 `NumberField`, `DatePicker`, `DateRangePicker`의 `error`로 부모 폼의 검증 메시지를 전달할 수 있습니다. 메시지는 입력의 오류 상태, 접근 가능한 설명과 네이티브 유효성 검사에 함께 반영됩니다.
+
+`DateTimePicker`와 `DateTimeRangePicker`는 하나의 패널에서 달력과 시·분을 선택합니다. 패널에서 고른 값은 `확인`을 눌렀을 때 반영되며 `취소`·Escape·바깥 클릭은 패널의 변경을 취소합니다. 직접 입력은 포커스를 옮기거나 Enter를 누르면 검증합니다. 단일·범위 입력 모두 `size="sm | md | lg"`, `required`, `readOnly`, `disabled`, `helperText`, `error`를 지원합니다.
+
+`DateTimeRangePicker`의 패널은 시작 날짜·시간 선택 → `다음` → 종료 날짜·시간 선택 → `확인` 순서로 진행합니다. `다음`은 시작 일시를 임시로 유지하고 종료 선택 단계로 이동하며, `확인`을 누르기 전까지 범위 값은 변경되지 않습니다. `defaultValue`를 생략하면 빈 기간에서 시작할 수 있습니다.
+
+`value`·`defaultValue`·`onValueChange`·`min`·`max`에는 시간대가 없는 로컬 일시 `YYYY-MM-DDTHH:mm`을 사용합니다. 화면에는 `YYYY-MM-DD HH:mm`으로 표시하며, 숫자 12자리 입력도 지원합니다. UTC 변환이나 시간대 변환은 수행하지 않으므로 서버에 절대 시각을 저장할 때 시간대 처리는 애플리케이션에서 결정합니다. 범위 값은 `[시작 일시, 종료 일시]`이며 빈 값은 `null`입니다. 종료 일시가 시작보다 빠른 값은 자동으로 순서를 바꾸지 않고 오류로 안내합니다.
+
+`minuteStep`의 기본값은 1입니다. 60을 나누어떨어지게 하는 1~60 사이의 정수를 지정하며, 목록과 직접 입력 모두 이 분 간격을 따릅니다. `min`·`max`는 같은 날짜 안의 시간까지 제한합니다. `name="booking"`인 범위 입력은 `booking-start`와 `booking-end` 이름으로 확정된 로컬 일시를 제출합니다.
+
+```tsx
+import { DateTimePicker, DateTimeRangePicker } from '@idenflu/mono-react';
+
+<DateTimePicker label="날짜 및 시간" name="eventAt"
+  defaultValue="2026-11-12T14:30" minuteStep={15} />
+<DateTimeRangePicker label="이용 기간" name="booking"
+  defaultValue={['2026-11-12T09:00', '2026-11-12T17:30']}
+  min="2026-11-12T09:00" max="2026-11-12T18:00" minuteStep={30} />
+```
+
+Datetime picker 문서의 **React 사용 예시**에는 실행 가능한 값 바인딩·값 변환·폼 제출과 복사 가능한 전체 코드가 있습니다. `value`/`onValueChange`로 부모 상태를 연결하고, 범위의 `[startsAt, endsAt]`을 애플리케이션의 객체 속성에 매핑합니다. 외부에서 `null` 또는 `[null, null]`을 넣으면 입력값도 비워집니다.
+
+UTC+09:00을 기준으로 동작하는 서비스의 변환 예시는 다음과 같습니다. 브라우저의 로컬 시간대와 관계없이 같은 결과를 사용하며, 빈 값은 `null`, 초·밀리초는 분 정밀도로 처리합니다.
+
+| 용도 | 예시 값 |
+| --- | --- |
+| 서버 UTC ISO | `2026-11-12T05:30:00.000Z` |
+| 컴포넌트 바인딩 | `2026-11-12T14:30` |
+| 화면 표시 | `2026-11-12 14:30` |
+| 숫자 문자열 | `202611121430` |
+
+```tsx
+// 형식이 검증된 UTC ISO와 컴포넌트 값을 변환합니다.
+function utcToPicker(iso: string | null): string | null {
+  if (!iso) return null;
+  return new Date(new Date(iso).getTime() + 9 * 60 * 60 * 1000)
+    .toISOString().slice(0, 16);
+}
+function pickerToUtc(value: string | null): string | null {
+  return value ? new Date(value + ':00+09:00').toISOString() : null;
+}
+```
+
+이 변환 함수는 고정 UTC+09:00 예시입니다. 다른 서비스 시간대에는 해당 시간대 규칙을 적용해야 합니다. 시간대가 없는 컴포넌트 값에 단순히 `Z`를 붙이면 UTC로 해석되므로 사용하지 않습니다. `FormData`에는 확정된 로컬 일시가 들어가며, 예시에서는 `booking-start`/`booking-end`를 읽어 API의 `startsAt`/`endsAt` UTC 값으로 변환합니다. `defaultValue`를 사용하는 폼은 reset 시 초기값으로 돌아가고, 제출 결과도 함께 지웁니다.
 
 중첩된 `Dialog`·`Drawer`·`Popover`·`DropdownMenu`·`Select`·날짜 팝업에서는 Escape가 가장 위의 팝업부터 한 단계씩 닫고 해당 트리거로 포커스를 돌려줍니다. 내부 입력이 Escape의 기본 동작을 취소하면 팝업은 유지됩니다.
 

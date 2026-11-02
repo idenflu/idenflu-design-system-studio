@@ -98,6 +98,13 @@
     "searchTerms": "날짜 달력 기간 예약 date calendar"
   },
   {
+    "route": "components/datetime-picker",
+    "title": "Datetime picker",
+    "group": "Components",
+    "description": "날짜와 시간을 함께 입력하거나 달력과 시·분 목록에서 선택합니다.",
+    "searchTerms": "날짜 시간 일시 기간 범위 예약 일정 시 분 datetime date time range picker"
+  },
+  {
     "route": "components/tree",
     "title": "Tree",
     "group": "Components",

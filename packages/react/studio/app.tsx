@@ -4,6 +4,8 @@ import { Button, TextField } from '../src';
 import { Section } from './demo-layout';
 import { ColorDemos } from './color-demos';
 import { TextFields, SelectDemos, NumberDemos, DateDemos } from './form-demos';
+import { DateTimeDemos } from './datetime-demos';
+import { DateTimeUsageExamples } from './datetime-usage-examples';
 import { IconDemos, TypographyDemos, SizeDemos, StateDemos } from './foundation-demos';
 import { TabsDemos, FeedbackDemos, AccordionDemos, OverlayDemos, TooltipDemos, CardDemos } from './content-demos';
 import { ButtonDemos, SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemos, StepperDemos, MenuDemos, PopoverDemos, DrawerDemos } from './structure-demos';
@@ -187,6 +189,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/select': return <SelectDemos />;
     case 'components/number-fields': return <NumberDemos />;
     case 'components/date-picker': return <DateDemos />;
+    case 'components/datetime-picker': return <DateTimeDemos />;
     case 'components/tree': return <TreeDemos />;
     case 'components/tabs': return <TabsDemos />;
     case 'components/progress': return <ProgressDemos />;
@@ -214,7 +217,9 @@ function App() {
   const current = useDocumentRoute();
   return <DocumentShell current={current}>
     <ComponentPage key={`page-${current.route}`} route={current.route} />
-    {snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} />}
+    {current.route === 'components/datetime-picker'
+      ? <DateTimeUsageExamples />
+      : snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} />}
   </DocumentShell>;
 }
 createRoot(document.getElementById('root')!).render(<App />);
