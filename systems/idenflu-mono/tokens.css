@@ -85,6 +85,7 @@
   --primary-control-hover: var(--color-blue-550);
   --primary-control-pressed: var(--color-blue-600);
   --text-on-primary: var(--color-white);
+  --text-on-danger: var(--color-white);
   --focus-on-primary: var(--color-blue-200);
   --focus-on-light: var(--color-blue-450);
   --focus-on-danger: var(--color-red-400);
@@ -116,7 +117,7 @@
   --selection-text: var(--color-ink);
   --switch-off: var(--color-switch-off-light);
   --switch-thumb-color: var(--color-white);
-  --error: var(--danger);
+  --error: var(--danger-text);
   --field-background: var(--surface-raised);
   --surface-subtle: var(--surface);
   --icon-on-primary-filter: brightness(0) invert(1);
@@ -168,7 +169,6 @@
   --motion-pulse: 1600ms;
 }
 :root[data-theme="dark"] {
-  color-scheme: dark;
   --canvas: var(--color-neutral-900);
   --surface-raised: var(--color-neutral-875);
   --surface: var(--color-neutral-850);

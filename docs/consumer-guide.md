@@ -5,7 +5,7 @@
 ```tsx
 import { useState } from 'react';
 import { Button, Select } from '@idenflu/mono-react';
-import '@idenflu/mono-react/styles.css';
+import '@idenflu/mono-react/styles.css'; // 기존 앱의 전역 스타일을 유지하는 컴포넌트 CSS
 
 export function Settings() {
   const [team, setTeam] = useState('design');
@@ -58,3 +58,11 @@ HTML 소비자용 `IdenfluMono` 런타임과 바닐라 어댑터는 제거했습
 ## 문서 배포
 
 `npm run build`는 `dist/`에 갤러리와 React 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포하고 `dist/systems/idenflu-mono/manifest.json`에서 문서·CSS·테마·설정 번들 파일명을 확인합니다. 이전 manifest의 `files.runtime`과 `files.styles`는 제거했으며, 문서용 스타일은 `files.docsComponents`와 `files.docsStyles`를 사용합니다. 앱에서 재사용할 때는 문서 번들 대신 React 패키지를 설치합니다.
+
+## 스타일 적용 범위
+
+- `styles.css`: 토큰·폰트·컴포넌트 스타일. 기존 본문·제목·링크·일반 입력의 스타일을 유지합니다.
+- `tokens.css`: CSS 변수만 사용하려는 경우.
+- `reset.css`: 앱 전체에 mono 기본 타이포그래피·배경·여백 초기화를 적용하는 선택 항목. 사용한다면 `styles.css`보다 먼저 가져옵니다.
+
+문서 스튜디오는 전역 초기화와 문서 전용 레이아웃을 별도로 합칩니다. 패키지 소비 앱에는 스튜디오 CSS를 가져오지 않습니다.

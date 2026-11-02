@@ -1,4 +1,4 @@
-/* Search within either multi-select presentation using the shared field tokens. */
+/* Shared React component rules from multi-select-search.css. */
 .custom-select[data-multiselect] .multi-search-field { border-radius:var(--radius-control); position:relative; display:flex; align-items:center; gap:var(--space-2); min-width:0; height:var(--control-height); margin:var(--space-1) var(--space-1) var(--space-2); padding-left:var(--control-px); border:1px solid var(--border); background:var(--field-background); transition:border-color var(--motion-fast) var(--motion-easing); }
 .custom-select[data-multiselect] .multi-search-field:hover:not(:focus-within):not(.is-invalid):not([aria-invalid="true"]):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])) { border-color:var(--border-hover); }
 .custom-select[data-multiselect] .multi-search-field:focus-within { border-color:transparent; }

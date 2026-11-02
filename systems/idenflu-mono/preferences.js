@@ -62,6 +62,29 @@
   function cssValues() {
     return keys.map((key) => [properties[key], `${key === "spacing" ? Number((4 * values.spacing / 100).toFixed(2)) : values[key]}px`]);
   }
+  const channels = (hex) => expandColor(hex).slice(1).match(/../g).map(value => parseInt(value, 16));
+  function contrastRatio(foreground, background) {
+    if (!color(foreground) || !color(background)) return null;
+    const luminance = (hex) => channels(hex).map(channel => {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    }).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+    const first = luminance(foreground), second = luminance(background);
+    return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+  }
+  function blendColor(from, to, amount) {
+    const target = channels(to);
+    return "#" + channels(from).map((channel, index) => Math.round(channel + (target[index] - channel) * amount).toString(16).padStart(2, "0")).join("");
+  }
+  function readableColor(preferred, backgrounds) {
+    if (backgrounds.every(background => contrastRatio(preferred, background) >= 4.5)) return preferred;
+    const target = ["#000000", "#ffffff"].sort((a, b) => Math.min(...backgrounds.map(background => contrastRatio(b, background))) - Math.min(...backgrounds.map(background => contrastRatio(a, background))))[0];
+    for (let step = 1; step <= 100; step++) {
+      const candidate = blendColor(preferred, target, step / 100);
+      if (backgrounds.every(background => contrastRatio(candidate, background) >= 4.5)) return candidate;
+    }
+    return target;
+  }
   function colorValues(theme) {
     const overrides = values.colors?.[theme] || {};
     const result = new Map(Object.entries(overrides));
@@ -73,9 +96,19 @@
       put("--focus-on-light", "var(--primary)");
       put("--selection-background", mix("--primary", 20, "var(--canvas)"));
     }
+    const buttonColors = (token, background, foregroundToken, focusToken) => {
+      const foreground = contrastRatio("#ffffff", background) >= contrastRatio("#000000", background) ? "#ffffff" : "#000000";
+      // Move interaction backgrounds away from their text color to retain contrast in every state.
+      const target = foreground === "#ffffff" ? "#000000" : "#ffffff";
+      put(`${token}-hover`, blendColor(background, target, 0.12));
+      put(`${token}-pressed`, blendColor(background, target, 0.24));
+      put(foregroundToken, foreground);
+      put(focusToken, foreground);
+      return foreground;
+    };
     if (overrides["--primary-control"]) {
-      put("--primary-control-hover", mix("--primary-control", 85, "var(--text)"));
-      put("--primary-control-pressed", mix("--primary-control", 70, "var(--text)"));
+      const foreground = buttonColors("--primary-control", overrides["--primary-control"], "--text-on-primary", "--focus-on-primary");
+      put("--icon-on-primary-filter", foreground === "#ffffff" ? "brightness(0) invert(1)" : "brightness(0)");
     }
     if (overrides["--text-secondary"]) put("--text-muted", "var(--text-secondary)");
     if (overrides["--canvas"]) put("--surface-raised", "var(--canvas)");
@@ -92,11 +125,14 @@
       if (!overrides[`--${role}`]) return;
       put(`--${role}-surface`, mix(`--${role}`, 12, "var(--canvas)"));
       if (role === "danger") {
-        put("--danger-text", "var(--danger)");
-        put("--danger-control", "var(--danger)");
-        put("--danger-control-hover", mix("--danger", 85, "var(--text)"));
-        put("--danger-control-pressed", mix("--danger", 70, "var(--text)"));
-        put("--focus-on-danger", "var(--danger)");
+        const canvas = overrides["--canvas"] || (theme === "dark" ? "#151719" : "#ffffff");
+        const surface = blendColor(canvas, overrides["--danger"], 0.12);
+        put("--danger-text", readableColor(overrides["--danger"], [canvas, surface]));
+        // A filled danger button has its own background and text contract, independent of status text.
+        const background = readableColor(overrides["--danger"], ["#ffffff"]);
+        put("--danger-control", background);
+        buttonColors("--danger-control", background, "--text-on-danger", "--focus-on-danger-control");
+        put("--focus-on-danger", "var(--danger-text)");
       }
     });
     return [...result];
@@ -159,7 +195,7 @@
     }).filter(Boolean)].join("\n\n");
   }
 
-  window.IdenfluPreferences = Object.freeze({ get, set, reset, cssText, defaults, ranges });
+  window.IdenfluPreferences = Object.freeze({ get, set, reset, cssText, defaults, ranges, contrastRatio });
   let stored = null;
   try { stored = parse(localStorage.getItem(storageKey)); } catch { /* Use defaults when reading storage is blocked. */ }
   if (stored) { values = stored; apply(); }

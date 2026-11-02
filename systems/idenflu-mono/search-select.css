@@ -1,4 +1,4 @@
-/* Searchable select shares the field and select size and interaction tokens. */
+/* Shared React component rules from search-select.css. */
 .search-select-control { border-radius:var(--radius-control); position:relative; display:flex; align-items:center; width:100%; height:var(--control-height); border:1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); transition:border-color var(--motion-fast) var(--motion-easing); }
 .search-select:not(.is-open):not(.is-invalid) > .search-select-control:hover:not(:focus-within):not([aria-invalid="true"]):not(:has(input:disabled,input[readonly],[aria-disabled="true"],[aria-invalid="true"])) { border-color:var(--border-hover); }
 .search-select-control:focus-within, .search-select.is-open > .search-select-control { border-color:transparent; }
@@ -11,4 +11,3 @@
 .search-select.opens-up > .select-popup { top:auto; bottom:calc(100% + 6px); }
 .search-select-empty { margin:0; padding:calc(var(--space-unit) * 2.5) var(--control-px); color:var(--text-secondary); font-size:var(--font-size-body); line-height:var(--line-height-control); }
 .search-select-help { margin-top:var(--space-2); }
-.search-select-example > .component-helper { margin-top:var(--space-2); }

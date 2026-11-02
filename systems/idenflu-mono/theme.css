@@ -1,26 +1,9 @@
-/* Theme values live in tokens.css; this file handles shell adapters and access preferences. */
-.sidebar, .docs-topbar { background:var(--canvas); }
-.sidebar-backdrop { background:var(--overlay-backdrop); }
-.skip-link { background:var(--inverse-canvas); color:var(--inverse-text); }
-img[src*="/icons/"] { filter:var(--icon-filter); }
+/* Shared component themes and access preferences. */
 .choice-mark img { filter:var(--icon-on-primary-filter); }
 .select-input { background-image:var(--select-arrow-image); }
-
-.docs-topbar-tools, .mobile-topbar-actions { display:flex; align-items:center; gap:var(--space-3); }
-.theme-toggle { flex:0 0 var(--control-height); color:var(--text-secondary); }
-.theme-toggle svg { display:block; width:18px; height:18px; }
-.theme-toggle .theme-icon-sun { display:none; }
-.theme-toggle .theme-icon-moon { display:block; }
-:root[data-theme="dark"] .theme-icon-sun { display:block; }
-:root[data-theme="dark"] .theme-icon-moon { display:none; }
-@media (max-width:900px) { .docs-topbar-tools { display:none; } }
-.theme-token-mode { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-.theme-palette-note { margin-bottom:var(--space-6); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-
-/* Windows high contrast must retain focus, selected values and native choice glyphs. */
 @media (forced-colors:active) {
-  :root, :root[data-theme="dark"] {
-    --canvas:Canvas;
+:root, :root[data-theme="dark"] {
+--canvas:Canvas;
     --surface-raised:Canvas;
     --surface:ButtonFace;
     --surface-hover:ButtonFace;
@@ -36,6 +19,7 @@ img[src*="/icons/"] { filter:var(--icon-filter); }
     --primary-control-hover:Highlight;
     --primary-control-pressed:Highlight;
     --text-on-primary:HighlightText;
+    --text-on-danger:HighlightText;
     --danger:CanvasText;
     --danger-text:CanvasText;
     --danger-control:Highlight;
@@ -62,40 +46,26 @@ img[src*="/icons/"] { filter:var(--icon-filter); }
     --inverse-text:Canvas;
     --shadow-popup:none;
     --shadow-dialog:none;
-  }
-  :focus-visible { outline:2px solid Highlight !important; outline-offset:-2px !important; }
-  :is(.input-group, .date-field, .date-range-fields, .number-field, .search-select-control, .multi-inline-control, .multi-search-field):focus-within {
-    outline:2px solid Highlight !important;
-    outline-offset:-2px !important;
-  }
-  .choice-input, .switch input { opacity:1 !important; appearance:auto !important; forced-color-adjust:auto; }
-  .choice-mark, .radio-mark, .switch-track { visibility:hidden; }
-  .ui-icon { forced-color-adjust:none; background-color:currentColor; }
-  .button { forced-color-adjust:none; outline:1px solid ButtonText; outline-offset:-1px; }
-  .button:disabled, button:disabled, [aria-disabled="true"] { color:GrayText; }
-  :is(.select-option, .calendar-day, .chip)[aria-selected="true"],
-  .select-option.is-active,
-  .calendar-day[aria-pressed="true"],
-  .chip[aria-pressed="true"],
-  .tree-item.is-selected,
-  .tab[aria-selected="true"] {
-    forced-color-adjust:none;
-    background:Highlight !important;
-    color:HighlightText !important;
-  }
-  .select-option[aria-disabled="true"] { background:Canvas !important; color:GrayText !important; }
-  .select-option[aria-selected="true"] .option-check,
-  .select-option:is([aria-selected="true"], .is-active) .option-description { color:HighlightText; }
-  .tooltip-content { forced-color-adjust:none; border:1px solid CanvasText; }
-  .skeleton { border:1px solid CanvasText; }
-  .spinner { border-color:GrayText; border-top-color:Highlight; }
-  .range-input { forced-color-adjust:auto; }
-  ::selection { background:Highlight; color:HighlightText; }
 }
-@media (prefers-reduced-motion:reduce) {
-  *, *::before, *::after {
-    animation:none !important;
-    transition:none !important;
-    scroll-behavior:auto !important;
-  }
+:is(.input-group, .date-field, .date-range-fields, .number-field, .search-select-control, .multi-inline-control, .multi-search-field):focus-within { outline:2px solid Highlight !important;
+    outline-offset:-2px !important; }
+.choice-input, .switch input { opacity:1 !important; appearance:auto !important; forced-color-adjust:auto; }
+.choice-mark, .radio-mark, .switch-track { visibility:hidden; }
+.ui-icon { forced-color-adjust:none; background-color:currentColor; }
+.button { forced-color-adjust:none; outline:1px solid ButtonText; outline-offset:-1px; }
+.button:disabled { color:GrayText; }
+:is(.select-option, .calendar-day, .chip)[aria-selected="true"], .select-option.is-active, .calendar-day[aria-pressed="true"], .chip[aria-pressed="true"], .tree-item.is-selected, .tab[aria-selected="true"] { forced-color-adjust:none;
+    background:Highlight !important;
+    color:HighlightText !important; }
+.select-option[aria-disabled="true"] { background:Canvas !important; color:GrayText !important; }
+.select-option[aria-selected="true"] .option-check, .select-option:is([aria-selected="true"], .is-active) .option-description { color:HighlightText; }
+.tooltip-content { forced-color-adjust:none; border:1px solid CanvasText; }
+.skeleton { border:1px solid CanvasText; }
+.spinner { border-color:GrayText; border-top-color:Highlight; }
+.range-input { forced-color-adjust:auto; }
+}
+
+@media (forced-colors:active) {
+  :where(.button, .text-input, .text-area, .select-input, .icon-button, .chip, .range-input, .tab, .page-button, .select-trigger, .date-picker, .number-field, .action-menu, .popover-wrap, .dialog):focus-visible,
+  :where(.custom-select, .date-picker, .number-field, .action-menu, .popover-wrap, .dialog) :focus-visible { outline:2px solid Highlight !important; outline-offset:-2px !important; }
 }

@@ -167,3 +167,7 @@
 @media (forced-colors: active) {
   :root #studio-settings-dialog, :root[data-theme="dark"] #studio-settings-dialog { --canvas: Canvas; --surface: Canvas; --field-background: Canvas; --text: CanvasText; --text-secondary: CanvasText; --border: CanvasText; --divider: CanvasText; --primary: LinkText; --primary-control: Highlight; --text-on-primary: HighlightText; --focus-on-light: Highlight; }
 }
+
+.studio-preferences-contrast:not(:empty) { margin-top: 12px; padding: 12px; border: 1px solid var(--border); color: var(--text); background: var(--surface); font-size: 12px; line-height: 18px; }
+.studio-preferences-contrast p { margin: 0; }
+.studio-preferences-contrast ul { margin: 8px 0; padding-left: 18px; }

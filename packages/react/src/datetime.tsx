@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEscapeLayer } from './escape-layer';
 
 type Size = 'sm' | 'md' | 'lg';
 type BaseField = { label: React.ReactNode; id?: string; name?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; size?: Size; helperText?: React.ReactNode; error?: string; className?: string };
@@ -58,18 +59,33 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
   const maxParsed = parseNumber(max ?? '', places, false);
   const stepParsed = parseNumber(step, places, false);
   if (minParsed.error || maxParsed.error || stepParsed.error || !stepParsed.value || stepParsed.value <= 0n || (minParsed.value != null && maxParsed.value != null && minParsed.value > maxParsed.value)) throw new RangeError('유효한 숫자 범위와 step을 지정해주세요.');
-  const initial = value ?? defaultValue ?? '';
+  const initial = (value === undefined ? defaultValue : value) ?? '';
   const [draft, setDraft] = React.useState(() => formatNumberDraft(initial, places, grouping));
   const [internalError, setError] = React.useState('');
   const error = externalError || internalError;
   const composing = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const focusPointer = React.useRef<{ x: number; y: number; dragged: boolean } | null>(null);
-  const previousValue = React.useRef(value);
+  const previousFormat = React.useRef({ value, places, grouping });
   React.useEffect(() => {
-    if (value !== undefined && value !== previousValue.current) { setDraft(formatNumberDraft(value ?? '', places, grouping)); setError(''); }
-    previousValue.current = value;
-  }, [value]);
+    const previous = previousFormat.current;
+    if (value !== undefined && value !== previous.value) {
+      setDraft(formatNumberDraft(value ?? '', places, grouping));
+      setError('');
+    } else if (places !== previous.places || grouping !== previous.grouping) {
+      // Preserve the current edit, including exact trailing decimals. A lower precision
+      // validates the existing value instead of silently rounding or discarding it.
+      setDraft(current => {
+        const precision = Math.max(previous.places, places);
+        const parsed = parseNumber(current, precision, previous.grouping);
+        if (parsed.error || parsed.value == null) return current;
+        const formatted = formatNumberDraft(formatNumber(parsed.value, precision, false, parsed.digits), places, grouping);
+        return current.trim().endsWith('.') && !formatted.endsWith('.') ? `${formatted}.` : formatted;
+      });
+      setError('');
+    }
+    previousFormat.current = { value, places, grouping };
+  }, [value, places, grouping]);
   React.useEffect(() => {
     const form = inputRef.current?.form;
     if (!form) return;
@@ -154,12 +170,13 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
     if (max && key > max) return parseDate(max) || date;
     return date;
   };
-  const [draft, setDraft] = React.useState<[string, string]>([values?.[0] ?? initial[0] ?? '', values?.[1] ?? initial[1] ?? '']);
+  const startingValues = values === undefined ? initial : values;
+  const [draft, setDraft] = React.useState<[string, string]>([startingValues[0] ?? '', startingValues[1] ?? '']);
   const [internalError, setError] = React.useState('');
   const error = externalError || internalError;
   const [open, setOpen] = React.useState(false);
   const [preview, setPreview] = React.useState<string | null>(null);
-  const [cursor, setCursor] = React.useState(() => clampCursor(parseDate(values?.[0] ?? initial[0] ?? '') || new Date()));
+  const [cursor, setCursor] = React.useState(() => clampCursor(parseDate(startingValues[0] ?? '') || new Date()));
   const [position, setPosition] = React.useState<{ top: string; bottom: string; left: number; maxHeight: number }>({ top: 'calc(100% + 6px)', bottom: 'auto', left: 0, maxHeight: 600 });
   const pickerRef = React.useRef<HTMLDivElement>(null), popupRef = React.useRef<HTMLDivElement>(null), triggerRef = React.useRef<HTMLButtonElement>(null);
   const startRef = React.useRef<HTMLInputElement>(null), endRef = React.useRef<HTMLInputElement>(null);
@@ -190,6 +207,7 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
     onValuesChange?.(next); return true;
   };
   const close = (restore = false) => { setOpen(false); setPreview(null); if (restore) triggerRef.current?.focus(); };
+  useEscapeLayer(open, pickerRef, () => close(true));
   React.useEffect(() => {
     if (!open) return;
     const update = () => {
@@ -202,9 +220,8 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
       setPosition({ top: up ? 'auto' : 'calc(100% + 6px)', bottom: up ? 'calc(100% + 6px)' : 'auto', left: Math.max(edge, Math.min(anchor.left, width - popup.offsetWidth - edge)) - anchor.left, maxHeight: up ? above : below });
     };
     const outside = (event: MouseEvent) => { if (!pickerRef.current?.contains(event.target as Node)) setOpen(false); };
-    const key = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(true); } };
-    update(); window.addEventListener('resize', update); window.addEventListener('scroll', update, true); document.addEventListener('mousedown', outside); document.addEventListener('keydown', key);
-    return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true); document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', key); };
+    update(); window.addEventListener('resize', update); window.addEventListener('scroll', update, true); document.addEventListener('mousedown', outside);
+    return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true); document.removeEventListener('mousedown', outside); };
   }, [open, cursor.getFullYear(), cursor.getMonth()]);
   React.useEffect(() => { if (open) popupRef.current?.querySelector<HTMLButtonElement>('.calendar-day[tabindex="0"]')?.focus(); }, [open, cursor]);
   const choose = (date: Date) => {

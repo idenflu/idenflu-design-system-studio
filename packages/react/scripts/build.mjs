@@ -2,7 +2,7 @@ import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'tsup';
-import { componentStyles } from '../../../scripts/build.mjs';
+import { componentStyles } from '../../../scripts/styles.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = resolve(root, '../../systems/idenflu-mono');
@@ -22,4 +22,6 @@ const styles = await Promise.all(componentStyles.map(async (name) =>
   `/* ${name} */\n${await readFile(resolve(source, name), 'utf8')}`));
 styles.push(`/* react.css */\n${await readFile(resolve(root, 'src/react.css'), 'utf8')}`);
 await writeFile(resolve(output, 'styles.css'), styles.join('\n'));
+await cp(resolve(source, 'tokens.css'), resolve(output, 'tokens.css'));
+await cp(resolve(source, 'reset.css'), resolve(output, 'reset.css'));
 await cp(resolve(source, 'assets'), resolve(output, 'assets'), { recursive: true });

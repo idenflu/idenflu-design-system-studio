@@ -183,3 +183,120 @@ test('exported colors apply to consumers without a theme attribute', async ({ pa
   expect(consumer.light).toEqual({ primary: '#7844aa', linkColor: rgb('#7844aa') });
   expect(consumer.dark).toEqual({ primary: '#ccabff', linkColor: rgb('#ccabff') });
 });
+
+const measuredRgbContrast = (first, second) => {
+  const luminance = color => {
+    const channels = color.match(/[\d.]+/g).slice(0, 3).map(Number);
+    const values = channels.map(channel => color.startsWith('color(srgb ') ? channel : channel / 255).map(value => value < 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4));
+    return values[0] * 0.2126 + values[1] * 0.7152 + values[2] * 0.0722;
+  };
+  const low = Math.min(luminance(first), luminance(second));
+  const high = Math.max(luminance(first), luminance(second));
+  return (high + 0.05) / (low + 0.05);
+};
+
+async function exportedButtonColors(page) {
+  return page.evaluate(async () => {
+    const frame = document.createElement('iframe');
+    const loaded = new Promise(resolve => frame.addEventListener('load', resolve, { once: true }));
+    const theme = document.documentElement.dataset.theme;
+    frame.srcdoc = `<html data-theme="${theme}"><head><link rel="stylesheet" href="/packages/react/dist/styles.css"><style>${window.IdenfluPreferences.cssText()} button { transition: none !important; }</style></head><body><button class="button" id="primary">확인</button><button class="button button--danger" id="danger">삭제</button></body></html>`;
+    document.body.append(frame);
+    await loaded;
+    const samples = [];
+    for (const name of ['primary', 'danger']) {
+      const button = frame.contentDocument.getElementById(name);
+      const original = button.className;
+      for (const state of ['', 'is-hovered', 'is-pressed']) {
+        button.className = `${original} ${state}`;
+        const styles = frame.contentWindow.getComputedStyle(button);
+        samples.push({ name, state: state || 'normal', text: styles.color, background: styles.backgroundColor });
+      }
+    }
+    frame.remove();
+    return samples;
+  });
+}
+
+test('edited primary and default dark Danger colors export readable real button styles in every state', async ({ page }) => {
+  await selectTheme(page, '다크');
+  // Saving the visible default danger swatch previously made danger buttons unreadable.
+  const defaultDanger = await tokenValue(page, '--danger');
+  expect(defaultDanger).toBe('#f2a3a7');
+  await changeHex(page, 'Danger', defaultDanger);
+  for (const primary of ['#ffeb3b', '#ffffff', '#000000', '#777777']) {
+    await changeHex(page, 'Control Primary', primary);
+    const samples = await exportedButtonColors(page);
+    for (const sample of samples) {
+      expect(measuredRgbContrast(sample.text, sample.background), `${primary} ${sample.name} ${sample.state}`).toBeGreaterThanOrEqual(4.5);
+    }
+  }
+  const dangerButton = await tokenValue(page, '--danger-control');
+  expect(dangerButton).not.toBe(defaultDanger);
+  expect(await tokenValue(page, '--danger')).toBe(defaultDanger);
+  await page.locator('#studio-preferences-close').click();
+  await page.reload();
+  await expect(page.locator('[data-route="foundations/colors"]')).toBeVisible();
+  for (const sample of await exportedButtonColors(page)) {
+    expect(measuredRgbContrast(sample.text, sample.background), `reload ${sample.name} ${sample.state}`).toBeGreaterThanOrEqual(4.5);
+  }
+});
+
+test('low text contrast is announced and clears when the edited foreground is reset', async ({ page }) => {
+  const status = page.locator('#studio-color-contrast');
+  await changeHex(page, 'Text Primary', '#ffffff');
+  await expect(status).toHaveAttribute('role', 'status');
+  await expect(status).toHaveAttribute('aria-live', 'polite');
+  await expect(status).toContainText('일부 글자색의 대비가 권장 기준 4.5:1보다 낮습니다.');
+  await expect(status).toContainText('본문 / 배경: 1.00:1');
+  await expect(hexField(page, 'Text Primary')).toHaveAttribute('aria-describedby', /studio-color-contrast/);
+  await page.getByRole('button', {name:'Text Primary 색상 초기화',exact:true}).click();
+  await expect(status).not.toContainText('본문 / 배경');
+  await expect(hexField(page, 'Text Primary')).not.toHaveValue('#ffffff');
+});
+
+
+test('danger text consumers and inverse spinners retain contrast after a bright primary edit', async ({ page }) => {
+  for (const theme of ['라이트', '다크']) {
+    await selectTheme(page, theme);
+    await changeHex(page, 'Control Primary', '#ffeb3b');
+    await changeHex(page, 'Danger', '#f2a3a7');
+    const samples = await page.evaluate(async () => {
+      const frame = document.createElement('iframe');
+      const loaded = new Promise(resolve => frame.addEventListener('load', resolve, {once:true}));
+      const theme = document.documentElement.dataset.theme;
+      const spinners = `
+        <span data-kind="ring" class="spinner spinner--inverse"></span>
+        <span data-kind="dots" class="spinner-dots spinner--inverse"><span></span><span></span><span></span></span>
+        <span data-kind="bars" class="spinner-bars spinner--inverse"><span></span><span></span><span></span></span>
+        <svg data-kind="nova" class="nova-spinner nova-spinner--inverse" viewBox="0 0 24 24"><path class="nova-spinner__facet" d="M2 2H22V22Z" /></svg>`;
+      frame.srcdoc = `<html data-theme="${theme}"><head><link rel="stylesheet" href="/packages/react/dist/styles.css"><style>${window.IdenfluPreferences.cssText()} * { animation:none !important; transition:none !important; }</style></head><body>
+        <div id="canvas" style="background:var(--canvas)"><span id="badge" class="badge badge--danger">오류</span><p id="helper" class="component-helper is-error">입력 오류</p><p id="field" class="field-error">필수 항목</p></div>
+        <div id="inverse" style="background:var(--inverse-canvas)">${spinners}</div>
+        <button id="button" class="button">처리 중 ${spinners}</button>
+      </body></html>`;
+      document.body.append(frame);
+      await loaded;
+      const doc = frame.contentDocument;
+      const style = element => frame.contentWindow.getComputedStyle(element);
+      const canvas = style(doc.getElementById('canvas')).backgroundColor;
+      const result = ['badge','helper','field'].map(name => {
+        const element = doc.getElementById(name), appearance = style(element);
+        return {name, kind:'text', foreground:appearance.color, background:name === 'badge' ? appearance.backgroundColor : canvas};
+      });
+      for (const container of ['inverse','button']) {
+        const stage = doc.getElementById(container), background = style(stage).backgroundColor;
+        for (const spinner of stage.querySelectorAll('[data-kind]')) {
+          const kind = spinner.dataset.kind;
+          const foreground = kind === 'ring' ? style(spinner).borderTopColor : kind === 'nova' ? style(spinner.querySelector('path')).fill : style(spinner.firstElementChild).backgroundColor;
+          result.push({name:`${container} ${kind}`,kind:'spinner',foreground,background});
+        }
+      }
+      frame.remove();
+      return result;
+    });
+    for (const sample of samples) {
+      expect(measuredRgbContrast(sample.foreground,sample.background), `${theme} ${sample.name}`).toBeGreaterThanOrEqual(sample.kind === 'text' ? 4.5 : 3);
+    }
+  }
+});

@@ -49,7 +49,7 @@
 .react-studio-nova-stage { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--space-6); min-height:240px; padding:var(--space-8); text-align:center; }
 .react-studio-nova-stage .react-studio-caption { margin-top:var(--space-1); }
 .react-studio-nova-surface { background:var(--surface); }
-.react-studio-nova-inverse { background:var(--primary-control); border-color:var(--primary-control); color:var(--text-on-primary); }
+.react-studio-nova-inverse { --spinner-inverse-color:var(--text-on-primary); background:var(--primary-control); border-color:var(--primary-control); color:var(--text-on-primary); }
 .react-studio-section .type-specimen { font-size:calc(var(--font-size-base) + 82px); line-height:1.15; letter-spacing:-4px; }
 .react-studio-type-example h4 { margin:0; font-size:var(--font-size-heading); line-height:var(--line-height-heading); font-weight:var(--font-weight-semibold); }
 .react-studio-type-example > p { margin-top:var(--space-2); font-size:var(--font-size-body); line-height:var(--line-height-body); }

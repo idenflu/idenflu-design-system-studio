@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEscapeLayer } from './escape-layer';
 
 /** Values must be unique and stable; option icons are decorative. */
 export interface SelectOption { value: string; label: string; disabled?: boolean; description?: string; icon?: React.ReactNode }
@@ -89,6 +90,7 @@ function SelectCore({options, label, name, disabled, placeholder = '선택하세
     setActive(enabled.find(option => selected.includes(option.value))?.value ?? enabled[0]?.value ?? null);
   };
   const closeMenu = (restoreFocus = false) => { setOpen(false); setQuery(''); if (restoreFocus) (searchable && !multiple ? search : trigger).current?.focus(); };
+  useEscapeLayer(open, root, () => closeMenu(true));
   const move = (delta: number) => {
     if (!enabled.length) { setActive(null); return; }
     const index = enabled.findIndex(option => option.value === active);
@@ -101,7 +103,6 @@ function SelectCore({options, label, name, disabled, placeholder = '선택하세
     if (!multiple) closeMenu(true);
   };
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Escape' && open) { event.preventDefault(); event.stopPropagation(); closeMenu(true); return; }
     if (event.key === 'Tab') { setOpen(false); setQuery(''); return; }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();

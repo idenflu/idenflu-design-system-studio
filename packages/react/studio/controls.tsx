@@ -16,7 +16,18 @@ function selectTheme(theme:Theme) {
 function usePalette() {
   const read = () => {
     const root = document.documentElement, styles = getComputedStyle(root);
-    return {forcedColors:window.matchMedia('(forced-colors: active)').matches, theme:root.dataset.theme === 'dark' ? 'dark' as const : 'light' as const, colors:Object.fromEntries([...baseColors,...semanticColors].map(([token]) => [token,styles.getPropertyValue(token).trim().toLowerCase()])) as Record<ColorToken,string>};
+    const theme = root.dataset.theme === 'dark' ? 'dark' as const : 'light' as const;
+    const checks = [
+      ['본문 / 배경','--text','--canvas'], ['본문 / 표면','--text','--surface'],
+      ['보조 글자 / 배경','--text-secondary','--canvas'], ['보조 글자 / 표면','--text-secondary','--surface'],
+      ['링크 / 배경','--primary','--canvas'], ['Danger / 배경','--danger-text','--canvas'],
+      ['Success / 배경','--success','--canvas'], ['Warning / 배경','--warning','--canvas'], ['Info / 배경','--info','--canvas'],
+    ];
+    const warnings = checks.flatMap(([label,foreground,background]) => {
+      const ratio = window.IdenfluPreferences.contrastRatio(styles.getPropertyValue(foreground).trim(),styles.getPropertyValue(background).trim());
+      return ratio !== null && ratio < 4.5 ? [{label,ratio}] : [];
+    });
+    return {warnings, forcedColors:window.matchMedia('(forced-colors: active)').matches, theme, colors:Object.fromEntries([...baseColors,...semanticColors].map(([token]) => [token,styles.getPropertyValue(token).trim().toLowerCase()])) as Record<ColorToken,string>};
   };
   const [palette,setPalette] = React.useState(read);
   React.useEffect(() => {
@@ -37,12 +48,12 @@ function ColorField({token,label,value,custom,onChange,onReset}:{token:ColorToke
     <label htmlFor={id}>{label}<small>{token}</small></label>
     <div className="studio-preferences-color-inputs">
       <input type="color" aria-label={`${label} 색상 선택`} value={value} onChange={event => onChange(event.target.value)} />
-      <input id={id} className="text-input" type="text" value={draft} maxLength={7} spellCheck={false} autoComplete="off" aria-label={`${label} HEX`} aria-invalid={!validColor(draft)} aria-describedby="studio-color-format" onChange={event => setDraft(event.target.value)} onBlur={() => { if (validColor(draft)) onChange(draft); else setDraft(value); }} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); if (validColor(draft)) onChange(draft); } else if (event.key === 'Escape' && draft !== value) { event.preventDefault(); event.stopPropagation(); setDraft(value); } }} />
+      <input id={id} className="text-input" type="text" value={draft} maxLength={7} spellCheck={false} autoComplete="off" aria-label={`${label} HEX`} aria-invalid={!validColor(draft)} aria-describedby="studio-color-format studio-color-contrast" onChange={event => setDraft(event.target.value)} onBlur={() => { if (validColor(draft)) onChange(draft); else setDraft(value); }} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); if (validColor(draft)) onChange(draft); } else if (event.key === 'Escape' && draft !== value) { event.preventDefault(); event.stopPropagation(); setDraft(value); } }} />
       <button type="button" className="icon-button" aria-label={`${label} 색상 초기화`} disabled={!custom} onClick={onReset}><span aria-hidden="true">↺</span></button>
     </div>
   </div>;
 }
-declare global { interface Window { IdenfluTheme: { get():Theme; set(theme:Theme):void }; IdenfluPreferences: { get():PreferenceValues; set(value:PreferenceUpdate):PreferenceValues; reset():PreferenceValues; cssText():string; ranges:Record<PreferenceKey, {min:number;max:number;step:number}> } } }
+declare global { interface Window { IdenfluTheme: { get():Theme; set(theme:Theme):void }; IdenfluPreferences: { get():PreferenceValues; set(value:PreferenceUpdate):PreferenceValues; reset():PreferenceValues; cssText():string; contrastRatio(foreground:string,background:string):number|null; ranges:Record<PreferenceKey, {min:number;max:number;step:number}> } } }
 export function usePreferences() {
   const [values, setValues] = React.useState(() => window.IdenfluPreferences.get());
   React.useEffect(() => {
@@ -95,6 +106,10 @@ export function StudioSettings() {
           <p className="studio-preferences-hint">선택한 테마에만 적용됩니다.</p>
           {palette.forcedColors ? <p className="studio-preferences-hint">고대비 모드에서는 시스템 색상을 사용합니다. 색상 조정은 고대비 모드를 해제한 뒤 사용할 수 있습니다.</p> : <>
           <p id="studio-color-format" className="studio-preferences-hint">색상 선택기를 열거나 HEX 코드(#RRGGBB)를 입력하세요.</p>
+          <p className="studio-preferences-hint">버튼 글자색과 상호작용 색상은 읽기 쉬운 대비로 자동 조정됩니다.</p>
+          <div id="studio-color-contrast" className="studio-preferences-contrast" role="status" aria-live="polite" aria-atomic="true">
+            {palette.warnings.length > 0 && <><p>일부 글자색의 대비가 권장 기준 4.5:1보다 낮습니다.</p><ul>{palette.warnings.map(({label,ratio}) => <li key={label}>{label}: {ratio.toFixed(2)}:1</li>)}</ul><p>글자색이나 배경색을 조정해주세요.</p></>}
+          </div>
           {[["기본 색상",baseColors],["의미 색상",semanticColors]].map(([title,items]) => <fieldset className="studio-preferences-color-group" key={title as string}><legend>{title as string}</legend>{(items as typeof baseColors).map(([token,label]) => <ColorField key={`${palette.theme}-${token}`} token={token} label={label} value={palette.colors[token]} custom={Boolean(values.colors?.[palette.theme]?.[token])} onChange={value => window.IdenfluPreferences.set({colors:{[palette.theme]:{[token]:value}}})} onReset={() => window.IdenfluPreferences.set({colors:{[palette.theme]:{[token]:null}}})} />)}</fieldset>)}
           </>}
         </section>

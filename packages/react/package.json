@@ -27,6 +27,8 @@
       }
     },
     "./styles.css": "./dist/styles.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./reset.css": "./dist/reset.css",
     "./assets/*": "./dist/assets/*",
     "./package.json": "./package.json"
   },

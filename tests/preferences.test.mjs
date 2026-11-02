@@ -225,7 +225,7 @@ test('color-only storage updates hydrate and synchronize without losing numeric 
   const app = engine({ stored: JSON.stringify(record) });
   assert.equal(app.events[0].detail.saved, true);
   app.theme('dark');
-  assert.equal(app.styles.get('--danger-text'), 'var(--danger)');
+  assert.equal(app.styles.get('--danger-text'), '#ff8888');
   app.api.set({fontSize:16});
   assert.equal(app.api.get().colors.dark['--danger'], '#ff8888');
   app.storageEvent({key:storageKey,newValue:JSON.stringify({colors:{dark:{'--info':'#aabbcc'}}})});
@@ -233,4 +233,103 @@ test('color-only storage updates hydrate and synchronize without losing numeric 
   assert.equal(app.styles.get('--info'), '#aabbcc');
   app.storageEvent({key:storageKey,newValue:null});
   assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+});
+
+
+// Measure the resulting colors independently of the preference API under test.
+const measuredContrast = (first, second) => {
+  const luminance = hex => {
+    const encoded = hex.replace('#', '');
+    const normalized = encoded.length === 3 ? [...encoded].map(char => char + char).join('') : encoded;
+    const linear = normalized.match(/../g).map(part => parseInt(part, 16) / 255).map(value => value < 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4));
+    return linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+  };
+  const values = [luminance(first), luminance(second)].sort((a, b) => a - b);
+  return (values[1] + 0.05) / (values[0] + 0.05);
+};
+const buttonProperties = ['--primary-control', '--primary-control-hover', '--primary-control-pressed'];
+const dangerProperties = ['--danger-control', '--danger-control-hover', '--danger-control-pressed'];
+function assertReadableButtons(styles, properties, foreground) {
+  for (const property of properties) {
+    const ratio = measuredContrast(styles.get(property), styles.get(foreground));
+    assert(ratio >= 4.5, `${property}: ${ratio.toFixed(4)}:1`);
+  }
+}
+
+test('contrast API recognizes shorthand colors and rejects non-HEX values', () => {
+  const { api } = engine();
+  assert.equal(api.contrastRatio('#000', '#fff'), 21);
+  assert.equal(api.contrastRatio('#aBc', '#aabbcc'), 1);
+  assert(Math.abs(api.contrastRatio('#ffeb3b', '#ffffff') - 1.221037733598236) < 0.000001);
+  for (const invalid of ['red', 'CanvasText', '#ffffff00', '#12345', null, 123]) {
+    assert.equal(api.contrastRatio(invalid, '#fff'), null);
+    assert.equal(api.contrastRatio('#fff', invalid), null);
+  }
+});
+
+test('primary controls retain readable text through every interaction state for bright and dark colors', () => {
+  const app = engine();
+  const colors = ['#ffeb3b', '#ffffff', '#000000', '#777777', '#747474', '#4263cc', '#f2a3a7'];
+  for (const theme of ['light', 'dark']) {
+    app.theme(theme);
+    for (const background of colors) {
+      app.api.set({colors:{[theme]:{'--primary-control':background}}});
+      assert.equal(app.styles.get('--primary-control'), background, 'the chosen background remains exact');
+      assertReadableButtons(app.styles, buttonProperties, '--text-on-primary');
+      const foreground = app.styles.get('--text-on-primary');
+      assert(['#000000', '#ffffff'].includes(foreground));
+      assert.equal(app.styles.get('--focus-on-primary'), foreground);
+    }
+  }
+});
+
+test('saving the default dark Danger color separates status text from accessible filled-button colors', () => {
+  const app = engine();
+  app.theme('dark');
+  app.api.set({colors:{dark:{'--danger':'#f2a3a7'}}});
+  assert.equal(app.styles.get('--danger'), '#f2a3a7', 'the selected status color remains exact');
+  assert.notEqual(app.styles.get('--danger-control'), '#f2a3a7');
+  assertReadableButtons(app.styles, dangerProperties, '--text-on-danger');
+  assert(measuredContrast(app.styles.get('--danger-text'), '#151719') >= 4.5);
+  assert(measuredContrast(app.styles.get('--danger-text'), '#30282a') >= 4.5);
+});
+
+test('danger foregrounds remain readable against custom light and dark canvas and status surfaces', () => {
+  const app = engine();
+  for (const [theme, canvas] of [['light', '#ffffff'], ['light', '#fffdf5'], ['dark', '#151719'], ['dark', '#101010']]) {
+    app.theme(theme);
+    for (const danger of ['#ffffff', '#000000', '#ffeb3b', '#777777', '#f2a3a7']) {
+      app.api.set({colors:{[theme]:{'--danger':danger,'--canvas':canvas}}});
+      const canvasChannels = canvas.slice(1).match(/../g).map(part => parseInt(part, 16));
+      const dangerChannels = danger.slice(1).match(/../g).map(part => parseInt(part, 16));
+      const surface = '#' + canvasChannels.map((channel, index) => Math.round(channel * 0.88 + dangerChannels[index] * 0.12).toString(16).padStart(2, '0')).join('');
+      assert(measuredContrast(app.styles.get('--danger-text'), canvas) >= 4.5, `${theme} status on canvas`);
+      assert(measuredContrast(app.styles.get('--danger-text'), surface) >= 4.5, `${theme} status on surface`);
+      assertReadableButtons(app.styles, dangerProperties, '--text-on-danger');
+    }
+  }
+});
+
+test('contrast-derived tokens hydrate, export by theme and clear with individual or full resets', () => {
+  const app = engine();
+  app.api.set({colors:{light:{'--primary-control':'#ffeb3b','--danger':'#eeeeee'},dark:{'--primary-control':'#000000','--danger':'#f2a3a7'}}});
+  const snapshot = [...app.styles].filter(([key]) => key.startsWith('--primary-control') || key.startsWith('--danger') || key.startsWith('--text-on-'));
+  const hydrated = engine({stored:app.storage.get(storageKey)});
+  for (const [key, value] of snapshot) assert.equal(hydrated.styles.get(key), value, key);
+  const exported = app.api.cssText();
+  assert.match(exported, /:root\[data-theme="light"\]/);
+  assert.match(exported, /:root\[data-theme="dark"\]/);
+  assert.match(exported, /--text-on-primary: #000000;/);
+  assert.match(exported, /--text-on-primary: #ffffff;/);
+  assert.match(exported, /--text-on-danger: #[0-9a-f]{6};/);
+  app.theme('dark');
+  assertReadableButtons(app.styles, buttonProperties, '--text-on-primary');
+  assertReadableButtons(app.styles, dangerProperties, '--text-on-danger');
+  app.api.set({colors:{dark:{'--primary-control':null,'--danger':null}}});
+  for (const property of [...buttonProperties,...dangerProperties,'--text-on-primary','--text-on-danger','--danger-text']) assert.equal(app.styles.has(property), false, property);
+  app.theme('light');
+  assertReadableButtons(app.styles, buttonProperties, '--text-on-primary');
+  app.api.reset();
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+  assert.doesNotMatch(app.api.cssText(), /--text-on-(?:primary|danger)/);
 });

@@ -1,3 +1,4 @@
+/* Shared React component rules from components.css. */
 .ui-icon { display: inline-block; flex: 0 0 var(--icon-size); width: var(--icon-size); height: var(--icon-size); background-color: currentColor; -webkit-mask: var(--icon) no-repeat center / contain; mask: var(--icon) no-repeat center / contain; vertical-align: middle; pointer-events: none; }
 .icon-plus { --icon: url("./assets/icons/idenflu/add.svg"); }
 .icon-arrow-right { --icon: url("./assets/icons/idenflu/arrow-right.svg"); }
@@ -19,11 +20,6 @@
 .icon-caret { --icon: url("./assets/icons/idenflu/keyboard-arrow-down.svg"); }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: var(--control-gap); }
 .button--icon { width: var(--control-height); min-width: var(--control-height); height: var(--control-height); padding: 0; }
-.example-heading { margin: 0; font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); letter-spacing: -.3px; }
-.example-description { margin-top: var(--space-2); color: var(--text-secondary); font-size:var(--font-size-body); line-height:var(--line-height-body); word-break: keep-all; }
-.example-row { margin-top: var(--space-5); }
-.group-examples { display: flex; flex-wrap: wrap; gap: var(--space-6) var(--space-10); }
-.group-examples .state-caption { margin-bottom: var(--space-2); }
 .segmented-control { --segmented-inset:min(calc(var(--space-unit) * .75), max(0px, calc((var(--control-height) - var(--line-height-control) - 2px) / 2))); display: inline-flex; gap: calc(var(--space-unit) * 0.5); height: var(--control-height); max-width: 100%; padding: var(--segmented-inset); background: var(--surface); }
 .segmented-control button { display: inline-flex; align-items: center; justify-content: center; gap: var(--control-gap); min-width: 0; height: calc(var(--control-height) - var(--segmented-inset) * 2 - 2px); padding: 0 var(--control-px); border: 0; background: transparent; color: var(--text-secondary); font-size:var(--font-size-body); line-height:var(--line-height-control); white-space: nowrap; }
 .segmented-control button + button { border-left: 0; }
@@ -34,8 +30,6 @@
 .button-group .button { width: auto; min-height: calc(var(--control-height) - 2px); height: calc(var(--control-height) - 2px); padding-block: 0; border-right: 1px solid var(--border); box-shadow: none; }
 .button-group .button:last-child { border-right: 0; }
 .button-group .button:focus-visible { box-shadow: inset 0 0 0 2px var(--focus-on-light); }
-
-/* Select-only combobox: native browser menus are not used. */
 .custom-select { position: relative; min-width: 0; }
 .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; height: var(--control-height); padding: 0 var(--control-px); border: 1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); font: inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); text-align: left; }
 .select-trigger > [data-select-label] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -59,8 +53,6 @@
 .select-option[aria-selected="true"] .option-check { visibility: visible; }
 .select-option[aria-disabled="true"], .select-option[aria-disabled="true"] .option-description { color: var(--disabled-text); cursor: not-allowed; }
 .select-option[aria-selected="true"].is-active { box-shadow: inset 0 0 0 1px var(--focus-on-light); }
-
-/* Multi-select shares the single-select surface and size tokens. */
 .select-options[aria-multiselectable="true"]:focus { outline: none; }
 .select-options[aria-multiselectable="true"] .select-option.is-active { box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .select-options[aria-multiselectable="true"] .select-option[aria-disabled="true"] { background: transparent; box-shadow: none; }
@@ -68,8 +60,6 @@
 .multi-selection-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-3); }
 .multi-selected { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .multi-clear { color: var(--text-secondary); }
-
-/* Selected tags live inside the field without nesting interactive controls. */
 .multi-inline-control { border-radius:var(--radius-control); position: relative; display: flex; align-items: center; min-height: var(--control-height); border: 1px solid var(--border); background:var(--field-background); }
 .custom-select:not(.is-open):not(.is-invalid) > .multi-inline-control:hover:not(:focus-within):not([aria-invalid="true"]):not(:has(:disabled, [aria-disabled="true"], [aria-invalid="true"])) { border-color: var(--border-hover); }
 .multi-inline-control:focus-within, .custom-select.is-open > .multi-inline-control { border-color: transparent; }
@@ -80,21 +70,13 @@
 .multi-inline-tags .multi-inline-chip:hover { background:var(--surface-hover); }
 .multi-inline-tags .multi-inline-chip img { width: 14px; height: 14px; flex: 0 0 14px; }
 .custom-select.is-open .multi-inline-trigger .icon-caret { transform: rotate(180deg); }
-
-/* Prefixes, suffixes and inline field actions share the control size. */
-.route-text-fields .field-examples-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-7) var(--space-8); max-width: 960px; }
-.route-text-fields .field-horizontal-examples { display:grid; gap:var(--space-5); margin-top:var(--space-6); }
-.route-text-fields .field-alignment-examples { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--space-6); margin-top:var(--space-6); }
-.field-example--wide { grid-column: 1 / -1; }
-/* Labels beside controls on wider screens, stacked when space is limited. */
 .field-horizontal { display:grid; grid-template-columns:minmax(0, var(--field-label-width, 120px)) minmax(0, 1fr); align-items:start; gap:var(--space-4); }
 .field-horizontal__label { margin:0; padding-top:max(0px, calc((var(--control-height) - var(--line-height-control)) / 2)); }
 .field-horizontal__body { min-width:0; }
 .field-horizontal__body > .component-helper { margin-top:calc(var(--space-unit) * 1.5); }
 @media (max-width:600px) {
-  .route-text-fields .field-alignment-examples { grid-template-columns:minmax(0, 1fr); }
-  .field-horizontal { grid-template-columns:minmax(0, 1fr); gap:var(--space-2); }
-  .field-horizontal__label { padding-top:0; }
+.field-horizontal { grid-template-columns:minmax(0, 1fr); gap:var(--space-2); }
+.field-horizontal__label { padding-top:0; }
 }
 .input-group { position: relative; display: flex; align-items: stretch; min-width: 0; height: var(--control-height); border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--field-background); transition: border-color var(--motion-fast) var(--motion-easing); }
 .input-group:hover:not(:focus-within):not(.is-invalid):not(:has(input:disabled, input[readonly], input[aria-invalid="true"])) { border-color: var(--border-hover); }
@@ -120,11 +102,9 @@
 .input-group:has(input:disabled) { background: var(--surface); }
 .input-group:has(input:disabled) :is(input, .input-prefix, .input-suffix, .input-status) { color: var(--disabled-text); }
 .input-group input:disabled { cursor: not-allowed; }
-.component-helper.is-error { color: var(--danger); }
-input[type="search"]::-webkit-search-cancel-button, input[type="number"]::-webkit-inner-spin-button { appearance: none; }
-input[type="number"] { appearance: textfield; }
-
-/* A size applies to a component or an enclosing data-size container. */
+.component-helper.is-error { color:var(--danger-text); }
+:is(.text-input, .search-select-input)[type="search"]::-webkit-search-cancel-button, :is(.text-input, .number-field-input)[type="number"]::-webkit-inner-spin-button { appearance: none; }
+:is(.text-input, .number-field-input)[type="number"] { appearance: textfield; }
 .choice { min-height: var(--control-height); }
 .choice-input { top: calc((var(--control-height) - var(--choice-size)) / 2); width: var(--choice-size); height: var(--choice-size); }
 .choice-mark, .radio-mark { flex-basis: var(--choice-size); width: var(--choice-size); height: var(--choice-size); }
@@ -139,65 +119,20 @@ input[type="number"] { appearance: textfield; }
 .icon-button img { width: var(--icon-size); height: var(--icon-size); }
 .page-button { padding-block: 0; padding-inline: var(--control-px); }
 .tab { min-height: var(--control-height); padding-block: 0; padding-inline: var(--control-px); }
-
-/* Reference pages for semantic colors, sizes and the imported icon family. */
-.swatch-text { background: var(--text); }
-.swatch-canvas { border-color: var(--border); background:var(--canvas); }
-.route-colors .palette-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-7) var(--space-6); max-width: 1040px; }
-.route-colors .color-swatch { height: 88px; }
-.route-colors .palette-list li > div { display: grid; gap: calc(var(--space-unit) * 0.75); }
-.semantic-palette { margin-top: var(--space-10); padding-top: var(--space-7); border-top: 1px solid var(--divider); }
-.semantic-palette h2 { margin: 0; font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); }
-.semantic-palette > p { margin-top: var(--space-2); color: var(--text-secondary); }
-.semantic-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-6); margin-top: var(--space-6); }
-.semantic-swatch { display: block; width: 100%; height: 72px; margin-bottom: var(--space-3); }
-.semantic-swatch--danger { background: var(--danger); }
-.semantic-swatch--success { background: var(--success); }
-.semantic-swatch--warning { background: var(--warning); }
-.semantic-swatch--info { background: var(--info); }
-.semantic-color > div { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-1) var(--space-3); }
-.semantic-color strong { font-weight:var(--font-weight-medium); }
-.semantic-color > div > span, .semantic-color > p { color: var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-.semantic-color > p { margin-top: calc(var(--space-unit) * 1.5); }
-.semantic-color > .badge { margin-top: var(--space-3); }
-.size-token-table { width: 100%; min-width: 420px; border-collapse: collapse; text-align: left; }
-.size-token-table th, .size-token-table td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--divider); font-size:var(--font-size-body); line-height:var(--line-height-body); }
-.size-token-table th { border-top: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); font-weight:var(--font-weight-medium); }
-.size-examples { margin-top: calc(var(--space-unit) * 9); }
-.size-preview { padding-block: var(--space-6); border-top: 1px solid var(--divider); }
-.size-preview-label { display: flex; gap: var(--space-3); align-items: baseline; margin-bottom: var(--space-4); }
-.size-preview-label strong { font-weight:var(--font-weight-medium); }
-.size-preview-label > span { color: var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-.size-preview-controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
-.size-preview-controls > .text-input, .size-preview-controls > .custom-select { width: 160px; max-width: 100%; }
-.size-note { margin-top: var(--space-6); color: var(--text-secondary); }
 .icon-reference-note { max-width: 760px; margin-bottom: var(--space-7); color: var(--text-secondary); }
 .icon-catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 0 var(--space-6); margin: 0; padding: 0; list-style: none; }
 .icon-catalog li { display: flex; align-items: center; gap: var(--space-3); min-width: 0; padding-block: var(--space-5); border-top: 1px solid var(--divider); }
 .icon-catalog .ui-icon { --icon-size: 24px; }
 .icon-catalog li > span:last-child { color: var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); overflow-wrap: anywhere; }
-@media (max-width: 700px) {
-  .route-text-fields .field-examples-grid { grid-template-columns: minmax(0, 1fr); }
-  .field-example--wide { grid-column: 1; }
-  .semantic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
 @media (max-width: 600px) {
-  .route-colors .palette-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-4); }
-  .group-examples { gap: var(--space-6); }
-  .segmented-control button { padding-inline: var(--space-2); gap: calc(var(--space-unit) * 1.5); }
-  .semantic-grid { gap: var(--space-6) var(--space-4); }
-  .semantic-color > div { display: grid; }
-  .icon-catalog { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 var(--space-4); }
-  .icon-catalog li { gap: var(--space-2); }
+.segmented-control button { padding-inline: var(--space-2); gap: calc(var(--space-unit) * 1.5); }
+.icon-catalog { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 var(--space-4); }
+.icon-catalog li { gap: var(--space-2); }
 }
-
-/* Round outer corners without clipping inset focus indicators or child popups. */
 .button-group .button { border-radius:0; }
 .button-group .button:first-child { border-start-start-radius:var(--radius-control); border-end-start-radius:var(--radius-control); }
 .button-group .button:last-child { border-start-end-radius:var(--radius-control); border-end-end-radius:var(--radius-control); }
 .segmented-control button { border-radius:max(0px, calc(var(--radius-control) - var(--segmented-inset))); }
-:is(.input-group, .multi-inline-control, .search-select-control, .multi-search-field, .date-field, .date-range-fields, .number-field):focus-within::after,
-.custom-select.is-open > .multi-inline-control::after,
-.search-select.is-open > .search-select-control::after { border-radius:inherit; }
+:is(.input-group, .multi-inline-control, .search-select-control, .multi-search-field, .date-field, .date-range-fields, .number-field):focus-within::after, .custom-select.is-open > .multi-inline-control::after, .search-select.is-open > .search-select-control::after { border-radius:inherit; }
 :is(.input-group, .search-select-control, .multi-inline-control) > :first-child { border-start-start-radius:inherit; border-end-start-radius:inherit; }
 :is(.input-group, .search-select-control, .multi-inline-control, .date-field, .date-range-fields) > :last-child { border-start-end-radius:inherit; border-end-end-radius:inherit; }

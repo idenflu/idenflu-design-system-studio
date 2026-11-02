@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEscapeLayer } from './escape-layer';
 const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
@@ -12,6 +13,7 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     if (open && !dialog.open) dialog.showModal();
     else if (!open && dialog.open) dialog.close();
   }, [open]);
+  const isTopLayer = useEscapeLayer(open, ref, () => onOpenChange(false));
   return <dialog {...props} ref={ref} className={`dialog ${className}`} onKeyDown={event => {
     onKeyDown?.(event);
     if (event.defaultPrevented || event.key !== 'Tab') return;
@@ -21,7 +23,7 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     if (!first) { event.preventDefault(); dialog.focus(); }
     else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
-  }} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
+  }} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); if (isTopLayer()) onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
 }
 
 export function Drawer({ className = '', closeOnBackdrop = true, ...props }: React.ComponentProps<typeof Dialog>) {
@@ -80,6 +82,7 @@ export function Popover({ trigger, children, label, open: controlledOpen, defaul
   const wrap = React.useRef<HTMLDivElement>(null);
   const button = React.useRef<HTMLButtonElement>(null);
   const id = React.useId();
+  useEscapeLayer(open, wrap, () => { setOpen(false); button.current?.focus(); });
   const previouslyOpen = React.useRef(open);
   useClientLayoutEffect(() => {
     if (previouslyOpen.current && !open && wrap.current?.contains(document.activeElement)) button.current?.focus();
@@ -88,9 +91,8 @@ export function Popover({ trigger, children, label, open: controlledOpen, defaul
   React.useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => { if (!wrap.current?.contains(event.target as Node)) setOpen(false); };
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); button.current?.focus(); } };
-    document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape);
-    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+    document.addEventListener('pointerdown', outside);
+    return () => { document.removeEventListener('pointerdown', outside); };
   }, [open, controlledOpen, onOpenChange]);
   return <div className="popover-wrap" ref={wrap}><button ref={button} type="button" className="button button--outline button-inline" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{trigger}</button><div id={id} className="popover-content" role="region" aria-label={label} hidden={!open}>{children}</div></div>;
 }
@@ -103,15 +105,15 @@ export function DropdownMenu({ trigger, items, onSelect, label }: { trigger: Rea
   const button = React.useRef<HTMLButtonElement>(null);
   const menu = React.useRef<HTMLDivElement>(null);
   const initialFocus = React.useRef<'first' | 'last'>('first');
+  useEscapeLayer(open, wrap, () => { setOpen(false); button.current?.focus(); });
   const id = React.useId();
   const focusItem = (index: number) => { const all = menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'); if (all?.length) all[(index + all.length) % all.length].focus(); };
   React.useEffect(() => {
     if (!open) return;
     focusItem(initialFocus.current === 'last' ? -1 : 0);
     const outside = (event: PointerEvent) => { if (!wrap.current?.contains(event.target as Node)) setOpen(false); };
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); button.current?.focus(); } };
-    document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape);
-    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+    document.addEventListener('pointerdown', outside);
+    return () => { document.removeEventListener('pointerdown', outside); };
   }, [open]);
   return <div className="action-menu" ref={wrap} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}><button ref={button} type="button" className="button button--outline button-inline" aria-haspopup="menu" aria-expanded={open} aria-controls={id}
     onClick={() => { initialFocus.current = 'first'; setOpen(!open); }} onKeyDown={(event) => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); initialFocus.current = event.key === 'ArrowDown' ? 'first' : 'last'; if (open) focusItem(initialFocus.current === 'first' ? 0 : -1); else setOpen(true); } }}>{trigger}</button>

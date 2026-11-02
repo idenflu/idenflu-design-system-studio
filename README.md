@@ -42,6 +42,8 @@ Overview, Foundations 5개, 컴포넌트 26개 분류, Form 8개와 데이터 �
 
 색상은 선택기 또는 HEX 코드(`#RRGGBB`, `#RGB`)로 조정합니다. 기본 색상은 Primary, Text Primary, Text Secondary, Surface, Border, Control Primary, Canvas이고 의미 색상은 Danger, Success, Warning, Info입니다. 라이트·다크 테마별로 별도 저장하며, 색상 옆 초기화는 해당 항목만 복원합니다. 전체 **초기화**는 두 테마의 색상과 크기 설정을 복원합니다. **CSS 복사**에는 테마별 색상과 연결된 hover·pressed·상태 배경도 포함합니다.
 
+버튼은 선택한 배경색에 맞춰 글자색과 hover·pressed 색상을 자동 보정합니다. 위험 상태의 텍스트와 버튼 색상은 별도로 파생하며, 본문·배경 등 직접 선택한 색상의 대비가 4.5:1보다 낮으면 화면 조정에서 안내합니다.
+
 큰 글자가 잘리지 않도록 최소 행간과 컨트롤 높이를 함께 보정합니다. 기본 Primary는 `#4263CC`이고 글꼴은 Pretendard입니다. 크기 토큰과 컴포넌트의 상태·키보드 예시는 문서에서 확인합니다.
 
 ## 검사와 빌드
@@ -70,7 +72,9 @@ npx playwright test --config packages/react/studio/playwright.config.cjs
 - `packages/react/studio/routes.json`: 문서 메타데이터와 메뉴 순서
 - `packages/react/scripts/build-studio.mjs`: 문서와 공유 스타일 번들
 - `systems/idenflu-mono/docs-dist/`: 생성되는 로컬 문서 번들, Git 제외
-- `systems/idenflu-mono/*.css`, `assets/`: 공유 토큰·스타일·폰트·아이콘
+- `systems/idenflu-mono/*.css`, `assets/`: 공유 토큰·컴포넌트 스타일·폰트·아이콘
+- `systems/idenflu-mono/reset.css`: 선택적 전역 초기화, `studio-layout.css`: 문서 전용 레이아웃
+- `scripts/styles.mjs`: 패키지·문서 스타일 입력 목록
 - `systems/idenflu-mono/theme.js`, `preferences.js`: 초기 테마·설정 적용
 - `scripts/`: 개발 서버·검사·배포 빌드
 

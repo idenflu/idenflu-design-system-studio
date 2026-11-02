@@ -9,7 +9,7 @@ import { buildStudio } from '../packages/react/scripts/build-studio.mjs';
 const execFileAsync = promisify(execFile);
 
 export const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export const componentStyles = ['styles.css', 'tokens.css', 'components.css', 'extras.css', 'additional.css', 'form-patterns.css', 'search-select.css', 'multi-select-search.css', 'theme.css', 'number-fields.css', 'data-state.css'];
+export { componentStyles } from './styles.mjs';
 const digest = (value) => createHash('sha256').update(value).digest('hex').slice(0, 12);
 
 export async function build(destination = resolve(project, 'dist')) {

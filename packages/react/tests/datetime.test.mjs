@@ -236,3 +236,97 @@ test('cancelled React form reset preserves date and number drafts and errors', a
     assert.match(f.container.textContent, /종료일은 시작일보다 빠를 수 없습니다/);
   } finally { await f.dispose(); }
 });
+
+
+test('controlled null values stay empty on mount and reset instead of using defaults', async () => {
+  const f = fixture();
+  const cases = [
+    [NumberField, {value:null, defaultValue:'42'}, ['']],
+    [DatePicker, {value:null, defaultValue:'2026-11-02'}, ['']],
+    [DateRangePicker, {value:[null,null], defaultValue:['2026-11-02','2026-11-03']}, ['','']],
+    [DateRangePicker, {value:[null,'2026-11-03'], defaultValue:['2026-11-02','2026-11-04']}, ['','2026-11-03']],
+  ];
+  try {
+    for (const [index, [Component, props, expected]] of cases.entries()) {
+      await f.render(h('form', {key:index}, h(Component, {label:'입력', name:'value', ...props})));
+      const form = f.container.querySelector('form');
+      const values = () => [...form.querySelectorAll('input')].map(input => input.value);
+      assert.deepEqual(values(), expected);
+      assert.deepEqual([...new dom.window.FormData(form).values()], expected);
+      await act(async () => form.reset());
+      assert.deepEqual(values(), expected);
+    }
+    await f.render(h(NumberField, {label:'기본값', defaultValue:'42'}));
+    assert.equal(f.container.querySelector('input').value,'42');
+    await f.render(h(DatePicker, {label:'기본값', defaultValue:'2026-11-02'}));
+    assert.equal(f.container.querySelector('input').value,'2026-11-02');
+  } finally { await f.dispose(); }
+});
+
+test('controlled NumberField reformats unchanged values when grouping changes', async () => {
+  const f = fixture(), changes = [];
+  const field = grouping => h(NumberField, {label:'금액', value:'1234.50', decimals:2, grouping, onValueChange:value => changes.push(value)});
+  try {
+    await f.render(field(true));
+    const input = f.container.querySelector('input');
+    assert.equal(input.value,'1,234.50');
+    await f.render(field(false));
+    assert.equal(input.value,'1234.50');
+    assert.equal(input.checkValidity(),true);
+    assert.equal(input.getAttribute('aria-valuenow'),'1234.5');
+    await f.render(field(true));
+    assert.equal(input.value,'1,234.50');
+    assert.equal(input.checkValidity(),true);
+    assert.deepEqual(changes,[]);
+  } finally { await f.dispose(); }
+});
+
+test('format changes preserve uncommitted numbers and validate precision without rounding', async () => {
+  const f = fixture(), changes = [];
+  const field = (grouping, decimals) => h(NumberField, {label:'금액', value:'1234.50', decimals, grouping, onValueChange:value => changes.push(value)});
+  try {
+    await f.render(field(true,2));
+    const input = f.container.querySelector('input');
+    input.focus();
+    await edit(input,'9876.25');
+    await f.render(field(false,2));
+    assert.equal(input.value,'9876.25');
+    assert.equal(input.checkValidity(),true);
+    await f.render(field(true,2));
+    assert.equal(input.value,'9,876.25');
+    await f.render(field(true,1));
+    assert.equal(input.value,'9876.25');
+    assert.equal(input.checkValidity(),false);
+    assert.match(input.validationMessage,/소수점은 최대 1자리/);
+    await f.render(field(true,3));
+    assert.equal(input.value,'9,876.25');
+    assert.equal(input.checkValidity(),true);
+    await edit(input,'1234.');
+    await f.render(field(false,3));
+    assert.equal(input.value,'1234.');
+    await f.render(field(true,3));
+    assert.equal(input.value,'1,234.');
+    await edit(input,'12,34');
+    await f.render(field(false,3));
+    assert.equal(input.value,'12,34');
+    assert.equal(input.checkValidity(),false);
+    assert.deepEqual(changes,[]);
+  } finally { await f.dispose(); }
+});
+
+test('uncontrolled NumberField keeps edited values across formatting changes and resets using the latest format', async () => {
+  const f = fixture();
+  const field = grouping => h('form', null, h(NumberField, {label:'금액', defaultValue:'1234.50', grouping, decimals:2}));
+  try {
+    await f.render(field(true));
+    const form = f.container.querySelector('form'), input = form.querySelector('input');
+    await edit(input,'9876.25');
+    await blur(input);
+    assert.equal(input.value,'9,876.25');
+    await f.render(field(false));
+    assert.equal(input.value,'9876.25');
+    assert.equal(input.checkValidity(),true);
+    await act(async () => form.reset());
+    assert.equal(input.value,'1234.50');
+  } finally { await f.dispose(); }
+});

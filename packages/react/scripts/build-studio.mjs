@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
+import { documentStyles } from '../../../scripts/styles.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const system = resolve(root, '../../systems/idenflu-mono');
@@ -17,8 +18,8 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
   const icons = (await readdir(resolve(system, 'assets/icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
   await writeFile(resolve(metadata, 'icons.json'), JSON.stringify(icons, null, 2));
   const result = await build({ entryPoints: [resolve(root, 'studio/app.tsx')], outfile: 'app.js', bundle: true, write: false, format: 'esm', target: 'es2020', minify: hashed });
-  const components = (await readFile(resolve(root, 'dist/styles.css'), 'utf8')).replaceAll('./assets/', '../assets/');
-  const docs = (await Promise.all(['docs.css', 'form-examples.css', 'preferences.css'].map(name => readFile(resolve(system, name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(root, 'studio/studio.css'), 'utf8');
+  const components = ((await readFile(resolve(system, 'reset.css'), 'utf8')) + '\n' + (await readFile(resolve(root, 'dist/styles.css'), 'utf8'))).replaceAll('./assets/', '../assets/');
+  const docs = (await Promise.all(documentStyles.map(name => readFile(resolve(system, name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(root, 'studio/studio.css'), 'utf8');
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
   const files = {};

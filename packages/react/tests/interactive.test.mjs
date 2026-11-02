@@ -4,11 +4,13 @@ import { JSDOM } from 'jsdom';
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost/', pretendToBeVisual: true });
 for (const name of ['window', 'document', 'navigator', 'HTMLElement', 'HTMLInputElement', 'Node', 'Event', 'MouseEvent', 'KeyboardEvent']) Object.defineProperty(globalThis, name, { configurable: true, value: dom.window[name] });
+Object.defineProperty(document.documentElement, 'clientWidth', { configurable:true, value:1024 });
+HTMLElement.prototype.getBoundingClientRect = () => ({ top:100, bottom:138, left:100, right:420, width:320, height:38, x:100, y:100, toJSON() {} });
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
-const { DropdownMenu, Popover, Slider, Slides, TextField, Toast, FileUpload, DataState } = await import('../dist/index.js');
+const { DropdownMenu, Popover, Slider, Slides, TextField, Toast, FileUpload, DataState, Select, DatePicker, Dialog } = await import('../dist/index.js');
 const { act, createElement: h } = React;
 const fixture = () => { const node = document.createElement('div'); document.body.append(node); const root = createRoot(node); return { node, render: async element => act(async () => root.render(element)), dispose: async () => { await act(async () => root.unmount()); node.remove(); } }; };
 const click = async element => { assert.ok(element); await act(async () => element.click()); };
@@ -120,4 +122,106 @@ test('slides navigate and toast close action is exposed', async () => {
     await click(f.node.querySelector('[aria-label="알림 닫기"]'));
     assert.equal(closed, 1);
   } finally { await f.dispose(); }
+});
+
+
+const escape = async element => act(async () => element.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true, cancelable:true })));
+
+test('nested initially open popovers dismiss one layer per Escape and restore the matching trigger', async () => {
+  const f = fixture();
+  try {
+    await f.render(h(Popover, {trigger:'외부', defaultOpen:true}, h(Popover, {trigger:'내부', defaultOpen:true}, h('button', null, '내부 동작'))));
+    const [outer, inner] = f.node.querySelectorAll('[aria-expanded]');
+    f.node.querySelector('.popover-content .popover-content button').focus();
+    await escape(document.activeElement);
+    assert.equal(inner.getAttribute('aria-expanded'), 'false');
+    assert.equal(outer.getAttribute('aria-expanded'), 'true');
+    assert.equal(document.activeElement, inner);
+    await escape(document.activeElement);
+    assert.equal(outer.getAttribute('aria-expanded'), 'false');
+    assert.equal(document.activeElement, outer);
+  } finally { await f.dispose(); }
+});
+
+test('Escape follows opening order across siblings and callback rerenders do not reorder layers', async () => {
+  const f = fixture();
+  try {
+    const view = revision => h('div', null,
+      h(Popover, {trigger:'첫 번째', onOpenChange:() => revision}, '첫 번째 내용'),
+      h(Popover, {trigger:'두 번째', onOpenChange:() => revision}, '두 번째 내용'));
+    await f.render(view(0));
+    const [first, second] = f.node.querySelectorAll('[aria-expanded]');
+    await click(second);
+    await click(first);
+    await f.render(view(1));
+    await escape(document);
+    assert.equal(first.getAttribute('aria-expanded'), 'false');
+    assert.equal(second.getAttribute('aria-expanded'), 'true');
+    await escape(document);
+    assert.equal(second.getAttribute('aria-expanded'), 'false');
+  } finally { await f.dispose(); }
+});
+
+test('inner keyboard handling can consume Escape without dismissing a popover', async () => {
+  const f = fixture();
+  try {
+    await f.render(h(Popover, {trigger:'외부', defaultOpen:true}, h('input', {'aria-label':'편집', onKeyDown:event => event.preventDefault()})));
+    await escape(f.node.querySelector('input'));
+    assert.equal(f.node.querySelector('[aria-expanded]').getAttribute('aria-expanded'), 'true');
+    await escape(document);
+    assert.equal(f.node.querySelector('[aria-expanded]').getAttribute('aria-expanded'), 'false');
+  } finally { await f.dispose(); }
+});
+
+test('menus, selects and calendars close before the containing popover', async () => {
+  const f = fixture();
+  try {
+    const children = [
+      h(DropdownMenu, {trigger:'메뉴', items:[{label:'편집',value:'edit'}], onSelect() {}}),
+      h(Select, {label:'팀', options:[{label:'디자인',value:'design'}]}),
+      h(DatePicker, {label:'날짜', defaultValue:'2026-11-02'}),
+    ];
+    for (let index = 0; index < children.length; index++) {
+      await f.render(h(Popover, {key:index, trigger:'외부', defaultOpen:true}, children[index]));
+      const [outer, inner] = f.node.querySelectorAll('[aria-expanded]');
+      await click(inner);
+      assert.equal(inner.getAttribute('aria-expanded'), 'true');
+      await escape(document.activeElement === document.body ? inner : document.activeElement);
+      assert.equal(inner.getAttribute('aria-expanded'), 'false');
+      assert.equal(outer.getAttribute('aria-expanded'), 'true');
+      assert.equal(document.activeElement, inner);
+      await escape(document.activeElement);
+      assert.equal(outer.getAttribute('aria-expanded'), 'false');
+    }
+  } finally { await f.dispose(); }
+});
+
+test('native modal cancellation leaves the dialog open while an inner layer is active', async () => {
+  const f = fixture();
+  const prototype = dom.window.HTMLDialogElement.prototype;
+  const showModal = prototype.showModal, close = prototype.close;
+  prototype.showModal = function () { this.setAttribute('open', ''); };
+  prototype.close = function () { this.removeAttribute('open'); };
+  let requests = 0;
+  try {
+    function Example() {
+      const [open,setOpen] = React.useState(true);
+      return h(Dialog, {open,onOpenChange:value => { requests++; setOpen(value); }}, h(Popover, {trigger:'내부',defaultOpen:true}, h('button',null,'동작')));
+    }
+    await f.render(h(Example));
+    const dialog = f.node.querySelector('dialog'), trigger = f.node.querySelector('[aria-expanded]');
+    await act(async () => dialog.dispatchEvent(new Event('cancel', {cancelable:true})));
+    assert.equal(requests,0);
+    assert.equal(dialog.open,true);
+    await escape(trigger);
+    assert.equal(trigger.getAttribute('aria-expanded'),'false');
+    assert.equal(dialog.open,true);
+    await escape(trigger);
+    assert.equal(dialog.open,false);
+    assert.equal(requests,1);
+  } finally {
+    await f.dispose();
+    if (showModal) prototype.showModal = showModal; else delete prototype.showModal;
+    if (close) prototype.close = close; else delete prototype.close;
+  }
 });
