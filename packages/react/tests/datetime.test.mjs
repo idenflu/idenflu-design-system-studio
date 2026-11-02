@@ -8,7 +8,7 @@ HTMLElement.prototype.getBoundingClientRect = () => ({ top: 100, bottom: 138, le
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
-const { NumberField, DatePicker, DateRangePicker } = await import('../dist/index.js');
+const { NumberField, DatePicker, DateRangePicker, Icon } = await import('../dist/index.js');
 const { act, createElement: h } = React;
 function fixture() { const container = document.createElement('div'); document.body.append(container); const root = createRoot(container); return { container, async render(el) { await act(async () => root.render(el)); }, async dispose() { await act(async () => root.unmount()); container.remove(); } }; }
 async function click(el) { assert.ok(el); await act(async () => el.click()); }
@@ -16,6 +16,47 @@ async function key(el, value) { await act(async () => el.dispatchEvent(new Keybo
 async function edit(input, value) { await act(async () => { Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, 'value').set.call(input, value); input.dispatchEvent(new Event('input', { bubbles: true })); }); }
 async function blur(input) { await act(async () => input.dispatchEvent(new dom.window.FocusEvent('focusout', { bubbles: true }))); }
 after(() => dom.window.close());
+
+test('date and number fields expose and clear parent form errors in validation and descriptions', async () => {
+  const f = fixture();
+  try {
+    for (const [Component, value] of [[NumberField,'8'],[DatePicker,'2026-11-02']]) {
+      await f.render(h(Component,{label:'입력',defaultValue:value,error:'입력값을 다시 확인해주세요.'}));
+      const input = f.container.querySelector('input');
+      assert.equal(input.validationMessage,'입력값을 다시 확인해주세요.');
+      assert.equal(input.getAttribute('aria-invalid'),'true');
+      assert.equal(document.getElementById(input.getAttribute('aria-describedby')).textContent,'입력값을 다시 확인해주세요.');
+      await f.render(h(Component,{label:'입력',defaultValue:value}));
+      assert.equal(input.validationMessage,'');
+      assert.equal(input.hasAttribute('aria-invalid'),false);
+    }
+  } finally { await f.dispose(); }
+});
+
+test('NumberField prefix icon focuses input without changing its submitted value or descriptions', async () => {
+  const f = fixture();
+  const render = disabled => h('form', null, h(NumberField, {label:'참여 인원', name:'people', defaultValue:'8', unit:'명', prefixIcon:h(Icon, {name:'person'}), disabled}));
+  try {
+    await f.render(render(false));
+    const input = f.container.querySelector('input');
+    const prefix = f.container.querySelector('.number-field-prefix');
+    assert.equal(prefix.getAttribute('aria-hidden'), 'true');
+    assert.equal(f.container.querySelector('label').control, input);
+    assert.equal(input.getAttribute('aria-describedby'), `${input.id}-unit`);
+    await click(prefix);
+    assert.equal(document.activeElement, input);
+    await key(input, 'ArrowUp');
+    assert.equal(input.value, '9');
+    assert.equal(new dom.window.FormData(f.container.querySelector('form')).get('people'), '9');
+    await act(async () => f.container.querySelector('form').reset());
+    assert.equal(input.value, '8');
+    await act(async () => input.blur());
+    await f.render(render(true));
+    await click(prefix);
+    assert.notEqual(document.activeElement, input);
+    assert.equal(new dom.window.FormData(f.container.querySelector('form')).has('people'), false);
+  } finally { await f.dispose(); }
+});
 
 test('NumberField increments exact decimal strings, clamps limits and resets', async () => {
   const f = fixture(), changes = [];

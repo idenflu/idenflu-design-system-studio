@@ -6,7 +6,7 @@ type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void }
 /** Native modal dialog; the browser manages focus trapping and restoration. */
 export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, onClick, ...props }: DismissibleProps & { closeOnBackdrop?: boolean } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>) {
   const ref = React.useRef<HTMLDialogElement>(null);
-  React.useEffect(() => {
+  useClientLayoutEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
@@ -27,6 +27,8 @@ export function Tooltip({ content, children }: { content: React.ReactNode; child
   React.useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || dismissed || !wrap.current || !(wrap.current.matches(':hover') || wrap.current.contains(document.activeElement))) return;
+      const dialog = wrap.current.ownerDocument.querySelector('dialog[open]');
+      if (dialog && !dialog.contains(wrap.current)) return;
       setDismissed(true); event.preventDefault(); event.stopPropagation();
     };
     document.addEventListener('keydown', escape, true);
@@ -34,8 +36,9 @@ export function Tooltip({ content, children }: { content: React.ReactNode; child
   }, [dismissed]);
   const existing = children.props['aria-describedby'];
   return <span ref={wrap} className={`tooltip-wrap${dismissed ? ' tooltip-dismissed' : ''}`}
-    onMouseEnter={() => setDismissed(false)} onMouseLeave={() => setDismissed(false)}
-    onFocus={() => setDismissed(false)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}>
+    onMouseEnter={() => setDismissed(false)}
+    onFocus={event => { if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}
+    onClickCapture={() => setDismissed(true)}>
     {React.cloneElement(children, { 'aria-describedby': [existing, id].filter(Boolean).join(' ') })}
     <span id={id} role="tooltip" className="tooltip-content">{content}</span>
   </span>;
@@ -145,8 +148,13 @@ export function FileUpload({ label = '파일 선택', onFilesChange, onInvalidFi
   </div>;
 }
 
-export function Toast({ children, onDismiss, ...props }: React.HTMLAttributes<HTMLDivElement> & { onDismiss?: () => void }) {
-  return <div {...props} role={props.role || 'status'} className={`toast ${props.className || ''}`}><p>{children}</p>{onDismiss && <button type="button" className="icon-button" aria-label="알림 닫기" onClick={onDismiss}><span className="ui-icon icon-close" aria-hidden="true" /></button>}</div>;
+export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'info' | 'success' | 'warning' | 'danger';
+  action?: React.ReactNode;
+  onDismiss?: () => void;
+}
+export function Toast({ children, variant = 'info', action, onDismiss, className = '', role, ...props }: ToastProps) {
+  return <div aria-atomic="true" {...props} role={role || (variant === 'danger' ? 'alert' : 'status')} className={`toast toast--${variant} ${className}`}><p>{children}</p>{action && <div className="toast-action">{action}</div>}{onDismiss && <button type="button" className="icon-button" aria-label="알림 닫기" onClick={onDismiss}><span className="ui-icon icon-close" aria-hidden="true" /></button>}</div>;
 }
 
 export function Slides({ slides, label = '슬라이드', initialIndex = 0 }: { slides: React.ReactNode[]; label?: string; initialIndex?: number }) {

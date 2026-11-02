@@ -1,5 +1,63 @@
 const { test, expect } = require('@playwright/test');
 
+test('text fields mark required and optional labels and validate only the required input', async ({ page }) => {
+  await page.goto('/packages/react/studio/index.html#/components/text-fields');
+  const form = page.locator('form').filter({has:page.getByRole('button', {name:'입력 확인', exact:true})});
+  const name = form.getByRole('textbox', {name:'이름 필수', exact:true});
+  const company = form.getByRole('textbox', {name:'회사명 선택', exact:true});
+  await expect(name).toHaveJSProperty('required', true);
+  await expect(company).toHaveJSProperty('required', false);
+  await name.fill('   ');
+  await form.getByRole('button', {name:'입력 확인', exact:true}).click();
+  await expect(name).toBeFocused();
+  await expect(name).toHaveAttribute('aria-invalid', 'true');
+  await expect(form.getByText('이름을 입력해주세요.', {exact:true})).toBeVisible();
+  await name.fill('김민수');
+  await form.getByRole('button', {name:'입력 확인', exact:true}).click();
+  await expect(form.getByRole('status')).toHaveText('김민수 · 회사명: 선택 안 함');
+  await expect(company).toHaveValue('');
+  await form.getByRole('button', {name:'입력 초기화', exact:true}).click();
+  await expect(name).toHaveValue('');
+  await expect(name).not.toHaveAttribute('aria-invalid', 'true');
+  await expect(form.getByRole('status')).toBeEmpty();
+});
+
+test('number prefix examples keep keyboard steps and units', async ({ page }) => {
+  await page.goto('/packages/react/studio/index.html#/components/number-fields');
+  const people = page.getByRole('spinbutton', {name:'참여 인원', exact:true});
+  const prefix = people.locator('..').locator('.number-field-prefix');
+  await expect(prefix).toHaveAttribute('aria-hidden', 'true');
+  await prefix.click();
+  await expect(people).toBeFocused();
+  await people.press('ArrowUp');
+  await expect(people).toHaveValue('9');
+  await expect(people).toHaveAttribute('aria-valuetext', '9 명');
+  const days = page.getByRole('spinbutton', {name:'작업 기간', exact:true});
+  await days.press('ArrowDown');
+  await expect(days).toHaveValue('2.5');
+  await expect(days).toHaveAttribute('aria-valuetext', '2.5 일');
+});
+
+test('Divider is discoverable in Korean and its examples fit the viewport', async ({ page }) => {
+  await page.goto('/packages/react/studio/index.html#/overview');
+  await page.keyboard.press('/');
+  const search = page.getByRole('searchbox', {name:'문서 검색'});
+  await search.fill('구분선');
+  await expect(page.locator('#docs-search-status')).toHaveText('1개 문서');
+  await search.press('Enter');
+  await expect(page).toHaveURL(/#\/components\/divider$/);
+  await expect(page.getByRole('heading', {level:1, name:'Divider', exact:true})).toBeVisible();
+  await expect(page.getByRole('separator', {name:'기본 정보', exact:true})).toHaveAttribute('aria-orientation', 'horizontal');
+  const vertical = page.getByRole('separator', {name:'담당 팀과 문서 수 구분', exact:true});
+  await expect(vertical).toHaveAttribute('aria-orientation', 'vertical');
+  const bounds = await vertical.boundingBox();
+  expect(bounds.height).toBeGreaterThan(10);
+  expect(bounds.width).toBeLessThan(3);
+  await expect(page.getByRole('link', {name:'기존 문서 보기', exact:true})).toHaveCount(0);
+  await expect(page.locator('.react-studio-code code')).toContainText("import { Divider } from '@idenflu/mono-react'");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+});
+
 test('save example prevents duplicate clicks and reports completion', async ({ page }) => {
   await page.goto('/packages/react/studio/index.html#/components/buttons');
   await page.getByRole('button', {name:'저장하기', exact:true}).click();
@@ -56,6 +114,7 @@ test('project dialog rejects whitespace and creates a named project with dismiss
   await page.getByRole('button', {name:'다이얼로그 열기', exact:true}).click();
   const dialog = page.getByRole('dialog', {name:'새 프로젝트', exact:true});
   const name = dialog.getByRole('textbox', {name:'프로젝트 이름', exact:true});
+  await expect(name).toBeFocused();
   await name.fill('   ');
   await dialog.getByRole('button', {name:'만들기', exact:true}).click();
   await expect(dialog.getByText('프로젝트 이름을 입력해주세요.', {exact:true})).toBeVisible();
@@ -68,6 +127,62 @@ test('project dialog rejects whitespace and creates a named project with dismiss
   await expect(toast).toContainText('계정 개선 프로젝트가 생성되었습니다.');
   await toast.getByRole('button', {name:'알림 닫기', exact:true}).click();
   await expect(toast).toHaveCount(0);
+});
+
+test('informational and destructive dialogs cancel safely and restore sample data', async ({ page }) => {
+  await page.goto('/packages/react/studio/index.html#/components/overlays');
+  const infoTrigger = page.getByRole('button', {name:'안내 열기', exact:true});
+  await infoTrigger.click();
+  const info = page.getByRole('dialog', {name:'공유 범위 안내', exact:true});
+  await expect(info.getByRole('button', {name:'확인', exact:true})).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(info).toBeHidden();
+  await expect(infoTrigger).toBeFocused();
+  const deleteTrigger = page.getByRole('button', {name:'삭제 확인', exact:true});
+  await deleteTrigger.click();
+  const confirm = page.getByRole('dialog', {name:'프로젝트를 삭제할까요?', exact:true});
+  await expect(confirm.getByRole('button', {name:'취소', exact:true})).toBeFocused();
+  await page.mouse.click(4, 4);
+  await expect(confirm).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(confirm).toBeHidden();
+  await expect(deleteTrigger).toBeFocused();
+  await deleteTrigger.click();
+  await confirm.getByRole('button', {name:'삭제', exact:true}).click();
+  await expect(confirm).toBeHidden();
+  await expect(deleteTrigger).toBeDisabled();
+  const restore = page.getByRole('button', {name:'다시 추가', exact:true});
+  await expect(restore).toBeFocused();
+  await restore.click();
+  await expect(deleteTrigger).toBeEnabled();
+  await expect(page.getByText('샘플 프로젝트 1개', {exact:true})).toBeVisible();
+});
+
+test('toast retry, replacement and undo actions update the examples', async ({ page }) => {
+  await page.goto('/packages/react/studio/index.html#/components/overlays');
+  const errorTrigger = page.getByRole('button', {name:'오류 알림 표시', exact:true});
+  await errorTrigger.click();
+  const toast = page.locator('.toast');
+  await expect(toast).toHaveAttribute('role', 'alert');
+  await expect(errorTrigger).toBeFocused();
+  await toast.getByRole('button', {name:'다시 시도', exact:true}).click();
+  await expect(toast).toHaveAttribute('role', 'status');
+  await expect(toast).toContainText('다시 시도해 변경사항을 저장했습니다.');
+  await expect(errorTrigger).toBeFocused();
+  const archive = page.getByRole('button', {name:'항목 보관', exact:true});
+  await archive.click();
+  await expect(toast).toHaveCount(1);
+  await expect(toast).toContainText('초안 문서를 보관했습니다.');
+  await expect(page.getByText('초안 문서 · 보관됨', {exact:true})).toBeVisible();
+  await toast.getByRole('button', {name:'실행 취소', exact:true}).click();
+  await expect(toast).toHaveCount(0);
+  await expect(page.getByText('초안 문서 · 목록에 표시 중', {exact:true})).toBeVisible();
+  await expect(archive).toBeFocused();
+  await archive.click();
+  await toast.getByRole('button', {name:'알림 닫기', exact:true}).click();
+  await expect(toast).toHaveCount(0);
+  await expect(page.getByText('초안 문서 · 보관됨', {exact:true})).toBeVisible();
+  await expect(archive).toBeFocused();
 });
 
 test('project tabs skip unavailable categories during keyboard navigation', async ({ page }) => {

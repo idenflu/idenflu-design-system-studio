@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { NovaSpinner } from './nova-spinner';
 
 const classes = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(' ');
 type Size = 'sm' | 'md' | 'lg';
@@ -112,8 +113,9 @@ export interface ChipProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 export const Chip = React.forwardRef<HTMLButtonElement, ChipProps>(function Chip({ size, className, type = 'button', ...props }, ref) { return <button {...props} ref={ref} type={type} data-size={size} className={classes('chip', className)} />; });
 export interface ProgressProps extends React.ProgressHTMLAttributes<HTMLProgressElement> { thickness?: 'thin' | 'normal' | 'thick'; variant?: 'primary' | 'success' | 'warning' | 'danger' }
 export const Progress = React.forwardRef<HTMLProgressElement, ProgressProps>(function Progress({ thickness = 'normal', variant = 'primary', className, ...props }, ref) { return <progress {...props} ref={ref} className={classes('progress-bar', thickness !== 'normal' && `progress-bar--${thickness}`, variant !== 'primary' && `progress-bar--${variant}`, className)} />; });
-export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> { size?: 'small' | 'medium' | 'large'; variant?: 'primary' | 'neutral' | 'inverse'; kind?: 'ring' | 'dual' | 'dots' | 'bars'; label?: string }
+export interface SpinnerProps extends React.HTMLAttributes<HTMLSpanElement> { size?: 'small' | 'medium' | 'large'; variant?: 'primary' | 'neutral' | 'inverse'; kind?: 'ring' | 'dual' | 'dots' | 'bars' | 'nova'; label?: string }
 export function Spinner({ size = 'medium', variant = 'primary', kind = 'ring', label = '로딩 중', className, ...props }: SpinnerProps) {
+  if (kind === 'nova') return <NovaSpinner {...props} size={{small:16,medium:24,large:32}[size]} variant={variant === 'primary' ? 'brand' : variant} label={label} className={className} />;
   const marks = kind === 'dots' || kind === 'bars';
   return <span {...props} role="status" aria-label={label} className={classes(marks ? `spinner-${kind}` : 'spinner', kind === 'dual' && 'spinner--dual', !marks && size !== 'medium' && `spinner--${size}`, variant !== 'primary' && `spinner--${variant}`, className)}>{marks && <><span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" /></>}</span>;
 }

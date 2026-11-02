@@ -5,8 +5,9 @@ import routes from './dist/routes.json';
 import navigation from './dist/navigation.json';
 
 export type DocumentRoute = typeof routes[number];
-const menuRoutes = navigation.map(path => routes.find(item => item.route === path)!).filter(item => item && !item.route.startsWith('patterns/'));
-const groups = [...new Set(menuRoutes.filter(item => item.route !== 'overview').map(item => item.group))];
+const menuRoutes = navigation.map(path => routes.find(item => item.route === path)!).filter(item => item && !/^patterns\/(layout|page)\//.test(item.route));
+const groups = [...new Set(menuRoutes.filter(item => item.route !== 'overview').map(item => item.group.split(' / ')[0]))];
+const currentGroups = (group:string) => ({[group.split(' / ')[0]]:true, [group]:true});
 const normalize = (text: string) => text.toLocaleLowerCase().replace(/[\s_-]+/g, '');
 const aliases: Record<string, string> = {foundations:'foundations/colors', states:'foundations/states', components:'components/buttons', 'components/empty-state':'patterns/empty-state', 'patterns/profile':'patterns/form/profile'};
 function resolveRoute() {
@@ -51,7 +52,7 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
   const mobile = useMobile();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
-  const [expanded, setExpanded] = React.useState<Record<string, boolean>>({[current.group]:true});
+  const [expanded, setExpanded] = React.useState<Record<string, boolean>>(currentGroups(current.group));
   const [toc, setToc] = React.useState<{id:string; title:string}[]>([]);
   const sidebar = React.useRef<HTMLElement>(null), surface = React.useRef<HTMLDivElement>(null), search = React.useRef<HTMLInputElement>(null), menuButton = React.useRef<HTMLButtonElement>(null), body = React.useRef<HTMLDivElement>(null), nav = React.useRef<HTMLElement>(null);
   const restoreFocus = React.useRef(true), wasOpen = React.useRef(false), initialRoute = React.useRef(true);
@@ -87,8 +88,11 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
       if (event.key === 'Escape') { event.preventDefault(); closeMenu(); }
       if (event.key === 'Tab') {
         const focusable = [...(sidebar.current?.querySelectorAll<HTMLElement>('a[href],button:not(:disabled),input:not(:disabled),summary') || [])].filter(element => {
-          const closed = element.closest('details:not([open])');
-          return element.getClientRects().length > 0 && (!closed || element === closed.querySelector('summary'));
+          if (!element.getClientRects().length) return false;
+          for (let ancestor = element.parentElement; ancestor; ancestor = ancestor.parentElement) {
+            if (ancestor instanceof HTMLDetailsElement && !ancestor.open && ancestor.querySelector(':scope > summary') !== element) return false;
+          }
+          return true;
         });
         const first = focusable[0], last = focusable[focusable.length - 1];
         if (event.shiftKey && (document.activeElement === first || !sidebar.current?.contains(document.activeElement))) { event.preventDefault(); last?.focus(); }
@@ -100,7 +104,7 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
   }, [mobile, menuOpen]);
 
   React.useLayoutEffect(() => {
-    setExpanded(previous => ({...previous, [current.group]:true}));
+    setExpanded(previous => ({...previous, ...currentGroups(current.group)}));
     restoreFocus.current = false;
     setMenuOpen(false);
     const headings = [...(body.current?.querySelectorAll('h2') || [])].filter(heading => !heading.closest('dialog'));
@@ -122,18 +126,24 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
   const index = menuRoutes.findIndex(item => item.route === current.route);
   const previous = index > 0 ? menuRoutes[index - 1] : null, next = index >= 0 ? menuRoutes[index + 1] : null;
   const docLink = (item:DocumentRoute, className?:string) => <a className={className} key={item.route} href={`#/${item.route}`} aria-current={item.route === current.route ? 'page' : undefined} hidden={!shown.includes(item)} onClick={() => navigate(item.route)}>{item.title}</a>;
+  const groupItems = (group:string) => menuRoutes.filter(item => item.group === group || item.group.startsWith(`${group} / `));
+  const groupOpen = (group:string) => needle ? shown.some(item => groupItems(group).includes(item)) : !!expanded[group];
+  const groupSummary = (group:string) => <summary onClick={event => { event.preventDefault(); if (!needle) setExpanded(previous => ({...previous, [group]:!previous[group]})); }}>{group.split(' / ').pop()}<Icon name="caret" /></summary>;
   return <div className="docs-layout react-studio">
     <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); surface.current?.querySelector<HTMLElement>('main')?.focus(); }}>본문 바로가기</a>
     <aside className="sidebar" id="sidebar" ref={sidebar} aria-label="문서 메뉴" role={mobile && menuOpen ? 'dialog' : undefined} aria-modal={mobile && menuOpen ? true : undefined} aria-hidden={mobile && !menuOpen ? true : undefined}>
       <div className="sidebar-brand"><a className="wordmark" href="#/overview" aria-label="idenflu mono 홈" onClick={() => navigate('overview')}>idenflu mono</a><button className="icon-button sidebar-close" type="button" aria-label="메뉴 닫기" onClick={() => closeMenu()}><Icon name="close" /></button><p>Design system</p></div>
-      <div className="docs-search"><label className="sr-only" htmlFor="docs-search">문서 검색</label><input ref={search} className="text-input" id="docs-search" type="search" placeholder="문서 검색 · /" autoComplete="off" aria-describedby="docs-search-status" value={query} onChange={event => { setQuery(event.target.value); if (!normalize(event.target.value)) setExpanded(previous => ({...previous, [current.group]:true})); }} onKeyDown={event => {
-        if (event.key === 'Escape' && query) { event.preventDefault(); event.stopPropagation(); setQuery(''); setExpanded(previous => ({...previous, [current.group]:true})); }
+      <div className="docs-search"><label className="sr-only" htmlFor="docs-search">문서 검색</label><input ref={search} className="text-input" id="docs-search" type="search" placeholder="문서 검색 · /" autoComplete="off" aria-describedby="docs-search-status" value={query} onChange={event => { setQuery(event.target.value); if (!normalize(event.target.value)) setExpanded(previous => ({...previous, ...currentGroups(current.group)})); }} onKeyDown={event => {
+        if (event.key === 'Escape' && query) { event.preventDefault(); event.stopPropagation(); setQuery(''); setExpanded(previous => ({...previous, ...currentGroups(current.group)})); }
         else if (event.key === 'Enter' && shown.length) { event.preventDefault(); location.hash = `#/${shown[0].route}`; navigate(shown[0].route); }
       }} /><p id="docs-search-status" role="status" aria-live="polite">{shown.length ? `${shown.length}개 문서` : '검색 결과가 없습니다.'}</p></div>
       <nav className="docs-navigation" id="react-studio-nav" ref={nav} aria-label="문서 탐색">
         {docLink(menuRoutes[0], 'nav-overview')}
-        {groups.map(group => <details className="nav-group" key={group} hidden={!!needle && !shown.some(item => item.group === group)} open={needle ? shown.some(item => item.group === group) : !!expanded[group]}>
-          <summary onClick={event => { event.preventDefault(); if (!needle) setExpanded(previous => ({...previous, [group]:!previous[group]})); }}>{group}<Icon name="caret" /></summary><div className="nav-children">{menuRoutes.filter(item => item.group === group).map(item => docLink(item))}</div>
+        {groups.map(group => <details className="nav-group" key={group} hidden={!!needle && !shown.some(item => groupItems(group).includes(item))} open={groupOpen(group)}>
+          {groupSummary(group)}<div className="nav-children">
+            {[...new Set(groupItems(group).filter(item => item.group !== group).map(item => item.group))].map(subgroup => <details className="nav-subgroup" key={subgroup} hidden={!!needle && !shown.some(item => item.group === subgroup)} open={groupOpen(subgroup)}>{groupSummary(subgroup)}<div className="nav-children">{menuRoutes.filter(item => item.group === subgroup).map(item => docLink(item))}</div></details>)}
+            {menuRoutes.filter(item => item.group === group).map(item => docLink(item))}
+          </div>
         </details>)}
       </nav>
       <div className="sidebar-footer"><p>{values.fontSize}px type · {values.controlHeight}px controls</p><p>{values.radius}px radius · {spacing}px spacing</p></div>

@@ -41,11 +41,25 @@ export function Example() {
 
 - 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
-- 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`
-- 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
+- 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
+- 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `NovaSpinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
 - 데이터 상태: `DataState`, `useDataState` (로딩·실패·빈 목록·검색 결과 없음·정상 목록)
 
 입력과 선택 컴포넌트는 React의 `value`/`onValueChange` 또는 `defaultValue`를 사용합니다. `TextField` 등 네이티브 입력 래퍼는 일반적인 `onChange`를 사용합니다. 날짜와 숫자의 `onValueChange`는 값을 확정하거나 증감할 때 호출하며 숫자는 정밀도를 유지하는 문자열을 전달합니다. `DateRangePicker`의 값은 `[시작일, 종료일]`이며 값은 `YYYY-MM-DD` 또는 `null`입니다.
+
+`NumberField`, `DatePicker`, `DateRangePicker`의 `error`로 부모 폼의 검증 메시지를 전달할 수 있습니다. 메시지는 입력의 오류 상태, 접근 가능한 설명과 네이티브 유효성 검사에 함께 반영됩니다.
+
+`NovaSpinner`는 NOVA Studio 로고를 사용한 로딩 표시입니다. `size`는 픽셀 단위이며 기본값은 48입니다. `appearance="orbit"`은 궤도 회전, `appearance="mark"`는 로고의 밝기 변화만 표시합니다. `variant`는 원본 색상의 `brand`와 `neutral`·`inverse`를 지원하며, 움직임 줄이기 설정에서는 애니메이션을 멈춥니다. `label`로 현재 작업을 설명하고, 버튼에 같은 설명이 있으면 `aria-hidden`으로 중복 안내를 피합니다.
+
+```tsx
+import { NovaSpinner, Spinner } from '@idenflu/mono-react';
+
+<NovaSpinner size={64} label="프로젝트를 준비하는 중" />
+<NovaSpinner size={24} appearance="mark" variant="neutral" />
+<Spinner kind="nova" size="small" />
+```
+
+기존 `Spinner`의 `kind="nova"`도 같은 컴포넌트를 사용하며 기존 크기 규칙인 16·24·32px을 따릅니다. `inverse`는 밝은 단색이므로 진한 배경에 사용합니다.
 
 ```tsx
 import { DatePicker, Select } from '@idenflu/mono-react';
@@ -62,6 +76,13 @@ function ProjectForm() {
 
 `Select`, `SearchSelect`, `MultiSelect`에 `prefixIcon`을 지정하면 선택값 앞에 고정 아이콘을 표시합니다. 옵션에는 `description`과 `icon`을 지정할 수 있고, `DropdownMenu` 항목에도 `icon`을 지정할 수 있습니다. 아이콘은 장식으로 처리하므로 의미는 `label`로 전달합니다.
 
+`NumberField`도 `prefixIcon`을 지원합니다. 아이콘은 입력값 앞에 표시되고, `unit`은 오른쪽에 표시됩니다. 아이콘을 눌러 입력에 포커스할 수 있으며 아이콘은 제출 값과 읽기 설명에서 제외됩니다.
+
+```tsx
+<NumberField label="참여 인원" prefixIcon={<Icon name="person" />}
+  defaultValue="8" min="0" unit="명" />
+```
+
 ```tsx
 import { Icon, Select } from '@idenflu/mono-react';
 
@@ -73,7 +94,28 @@ import { Icon, Select } from '@idenflu/mono-react';
 
 `Tree`는 사이드 메뉴와 같은 disclosure 목록으로, Tab과 Enter·Space를 사용합니다. 파일 탐색기 방식의 ARIA tree 키보드 모델은 제공하지 않습니다. `FileUpload`는 파일 선택과 드롭, 선택적 `accept`·`maxSizeBytes` 검증을 처리하며 실제 업로드는 애플리케이션에서 연결합니다. 제공된 CSS는 전역 기본 요소 스타일을 포함합니다.
 
+`Dialog`는 `open`과 `onOpenChange`로 제어하며, 제목과 설명을 `aria-labelledby`·`aria-describedby`로 연결합니다. `closeOnBackdrop`은 배경 클릭으로 닫을지 정하며 기본값은 `false`입니다. Escape는 취소로 처리합니다.
+
+`Toast`의 `variant`에는 `info`·`success`·`warning`·`danger`를 지정하고, `action`에 재시도·실행 취소 버튼을 넣을 수 있습니다. 기본 알림 역할은 `status`이며 `danger`는 `alert`입니다. 자동으로 닫히지 않으므로 표시 상태와 닫기 동작을 앱에서 연결합니다.
+
+```tsx
+<Toast variant="danger" onDismiss={dismissToast}
+  action={<Button variant="ghost" onClick={retrySave}>다시 시도</Button>}>
+  저장하지 못했습니다. 다시 시도해주세요.
+</Toast>
+```
+
 기존 바닐라 런타임과 React API는 별개입니다. 특히 내부 `datevalidation` DOM 이벤트는 React 컴포넌트에서 제공하지 않으므로 React 콜백과 폼 유효성 검사를 사용하세요.
+
+`Divider`는 기본 가로 구분선이며, `orientation="vertical"`로 세로 구분선을 표시합니다. 세로 구분선은 flex 부모에서 높이에 맞춰 늘어나므로 블록 안에서 사용할 때는 부모 높이나 `style`을 지정합니다. 자식 텍스트는 `align="start | center | end"`로 정렬하고, `variant="dashed"`는 점선을 표시합니다. 의미 있는 구분선은 `separator`로 제공하며 장식용은 `decorative`로 숨깁니다.
+
+```tsx
+import { Divider } from '@idenflu/mono-react';
+
+<Divider />
+<Divider align="start">추가 정보</Divider>
+<Divider variant="dashed" decorative />
+```
 
 ## 로컬 예제
 
@@ -85,7 +127,7 @@ npm ci
 npm run example:build
 ```
 
-문서 전환 작업 화면은 `npm run studio:build` 후 `/packages/react/studio/index.html`에서 확인할 수 있습니다. Overview, Foundations, 25개 컴포넌트 분류와 기본 정보 폼·데이터 상태의 기본 예시를 React로 표시합니다. 기존 문서의 모든 변형·폼 패턴과 동작을 이관한 완성본은 아니며, 기존 모노 문서가 계속 기준입니다.
+문서 전환 작업 화면은 `npm run studio:build` 후 `/packages/react/studio/index.html`에서 확인할 수 있습니다. Overview, Foundations, 26개 컴포넌트 분류와 Patterns의 Form 8개·데이터 상태·빈 상태를 React로 표시합니다. Patterns의 Layout과 Page는 메뉴·검색·이전 다음 문서에서 제외합니다. 폼의 검증·초기화·파일 선택과 데이터 상태 전환은 로컬 예시로 동작하며 실제 저장·전송·예약은 수행하지 않습니다. Divider는 React 문서에서 추가한 컴포넌트이며 `/components/divider`에서 예시를 확인할 수 있습니다.
 
 ## 개발과 배포
 

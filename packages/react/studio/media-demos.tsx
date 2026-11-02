@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Avatar, Button, CircleProgress, FileUpload, Progress, SegmentedProgress, Skeleton, Slider, Slides, Spinner } from '../src';
 import { Section } from './demo-layout';
+import { NovaSpinnerDemos } from './nova-spinner-demos';
 
 const sizes = ['sm', 'md', 'lg'] as const;
 
@@ -64,6 +65,7 @@ export function ProgressDemos() {
 
 export function LoadingDemos() {
   return <>
+    <NovaSpinnerDemos />
     <Section title="스켈레톤" description="콘텐츠가 표시될 영역의 구조를 먼저 보여줍니다.">
       <div className="skeleton-card" role="status" aria-label="콘텐츠를 불러오는 중"><Skeleton className="skeleton-avatar" /><div><Skeleton className="skeleton-title" /><Skeleton className="skeleton-line" /><Skeleton className="skeleton-line skeleton-line--short" /></div></div>
     </Section>

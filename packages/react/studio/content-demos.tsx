@@ -57,43 +57,82 @@ export function AccordionDemos() {
 }
 
 export function OverlayDemos() {
-  const [open, setOpen] = React.useState(false);
+  const [dialog, setDialog] = React.useState<'info' | 'delete' | 'form' | null>(null);
   const [name, setName] = React.useState('');
   const [error, setError] = React.useState('');
-  const [feedback, setFeedback] = React.useState('새 프로젝트의 이름을 입력해보세요.');
-  const [toast, setToast] = React.useState('');
+  const [feedback, setFeedback] = React.useState('');
+  const [deleted, setDeleted] = React.useState(false);
+  const [archived, setArchived] = React.useState(false);
+  const [toast, setToast] = React.useState<{message:string; variant:'info' | 'success' | 'danger'; action?:'retry' | 'undo'} | null>(null);
   const nameRef = React.useRef<HTMLInputElement>(null);
-  React.useEffect(() => { if (open) nameRef.current?.focus(); }, [open]);
+  const infoConfirm = React.useRef<HTMLButtonElement>(null);
+  const deleteCancel = React.useRef<HTMLButtonElement>(null);
+  const formTrigger = React.useRef<HTMLButtonElement>(null);
+  const deleteReset = React.useRef<HTMLButtonElement>(null);
+  const toastOrigin = React.useRef<HTMLButtonElement | null>(null);
+  const restoreToastFocus = React.useRef(false);
+  React.useEffect(() => {
+    if (dialog === 'info') infoConfirm.current?.focus();
+    else if (dialog === 'delete') deleteCancel.current?.focus();
+    else if (dialog === 'form') nameRef.current?.focus();
+  }, [dialog]);
+  React.useEffect(() => {
+    if (!toast && restoreToastFocus.current) { restoreToastFocus.current = false; toastOrigin.current?.focus(); }
+  }, [toast]);
+  React.useEffect(() => { if (deleted) deleteReset.current?.focus(); }, [deleted]);
+  const dismissToast = () => { restoreToastFocus.current = true; setToast(null); };
+  const closeDialog = (open:boolean) => { if (!open) setDialog(null); };
 
   return <>
-    <Section title="다이얼로그" description="이름 입력처럼 집중이 필요한 짧은 작업을 별도 창에서 진행합니다.">
-      <div className="react-studio-row"><Button variant="outline" onClick={() => { setName(''); setError(''); setOpen(true); }}>다이얼로그 열기</Button></div>
+    <Section title="다이얼로그" description="안내, 중요한 결정, 짧은 입력처럼 사용자의 집중이 필요한 상황을 비교합니다.">
+      <div className="react-studio-sample-grid">
+        <div className="react-studio-example"><h3 className="react-studio-example-title">안내</h3><p className="react-studio-caption">내용을 읽고 확인합니다. 배경을 누르거나 Escape로 닫을 수 있습니다.</p><div className="react-studio-row"><Button variant="outline" onClick={() => setDialog('info')}>안내 열기</Button></div></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">삭제 확인</h3><p className="react-studio-caption">삭제 대상을 확인하고 결정합니다. 처음에는 취소 버튼에 포커스합니다.</p><div className="react-studio-row"><Button variant="outline" disabled={deleted} onClick={() => setDialog('delete')}>삭제 확인</Button>{deleted && <Button ref={deleteReset} variant="ghost" onClick={() => { setDeleted(false); setFeedback('샘플 프로젝트를 다시 추가했습니다.'); }}>다시 추가</Button>}</div><p role="status" className="component-helper">{deleted ? '샘플 프로젝트 삭제됨' : '샘플 프로젝트 1개'}</p></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">입력과 검증</h3><p className="react-studio-caption">필수 값을 확인하고, 잘못 입력하면 오류 안내와 함께 입력란으로 이동합니다.</p><div className="react-studio-row"><Button ref={formTrigger} variant="outline" onClick={() => { setName(''); setError(''); setDialog('form'); }}>다이얼로그 열기</Button></div></div>
+      </div>
       <p role="status" className="component-helper">{feedback}</p>
-      <Dialog open={open} onOpenChange={setOpen} closeOnBackdrop aria-labelledby="studio-project-dialog-title" aria-describedby="studio-project-dialog-description">
-        <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setOpen(false)}><Icon name="close" /></button>
+      <Dialog open={dialog === 'info'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-info-dialog-title" aria-describedby="studio-info-dialog-description">
+        <button className="icon-button dialog-close" type="button" aria-label="안내 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
+        <h2 id="studio-info-dialog-title">공유 범위 안내</h2><p id="studio-info-dialog-description">초대한 팀원만 프로젝트를 볼 수 있습니다. 공유 범위는 프로젝트 설정에서 변경할 수 있습니다.</p>
+        <div className="dialog-actions"><Button ref={infoConfirm} onClick={() => setDialog(null)}>확인</Button></div>
+      </Dialog>
+      <Dialog open={dialog === 'delete'} onOpenChange={closeDialog} aria-labelledby="studio-delete-dialog-title" aria-describedby="studio-delete-dialog-description">
+        <h2 id="studio-delete-dialog-title">프로젝트를 삭제할까요?</h2><p id="studio-delete-dialog-description">샘플 프로젝트를 목록에서 삭제합니다. 이 예시에서는 삭제 후 다시 추가할 수 있습니다.</p>
+        <div className="react-studio-dialog-detail"><strong>샘플 프로젝트</strong><span className="react-studio-caption">디자인 팀 · 문서 3개</span></div>
+        <div className="dialog-actions"><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button variant="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></div>
+      </Dialog>
+      <Dialog open={dialog === 'form'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-project-dialog-title" aria-describedby="studio-project-dialog-description">
+        <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
         <h2 id="studio-project-dialog-title">새 프로젝트</h2><p id="studio-project-dialog-description">함께 시작할 프로젝트의 이름을 정해주세요.</p>
         <form noValidate onSubmit={event => {
           event.preventDefault();
           const value = name.trim();
           if (!value) { setError('프로젝트 이름을 입력해주세요.'); nameRef.current?.focus(); return; }
           setFeedback(`${value} 프로젝트를 만들었습니다.`);
-          setToast(`${value} 프로젝트가 생성되었습니다.`);
-          setOpen(false);
+          toastOrigin.current = formTrigger.current;
+          setToast({message:`${value} 프로젝트가 생성되었습니다.`, variant:'success'});
+          setDialog(null);
         }}>
           <TextField ref={nameRef} label="프로젝트 이름" name="project" value={name} onChange={event => { setName(event.target.value); setError(''); }} placeholder="예: 앱 리디자인" maxLength={40} required error={error || undefined} />
-          <div className="dialog-actions"><Button variant="outline" onClick={() => setOpen(false)}>취소</Button><Button type="submit">만들기</Button></div>
+          <div className="dialog-actions"><Button variant="outline" onClick={() => setDialog(null)}>취소</Button><Button type="submit">만들기</Button></div>
         </form>
       </Dialog>
+      <p className="react-studio-caption">다이얼로그 안에서는 Tab으로 이동하고 Escape로 취소할 수 있습니다. 취소하면 실행 버튼으로 돌아갑니다.</p>
     </Section>
-    <Section title="토스트" description="작업을 중단시키지 않고 짧은 완료 메시지를 표시합니다. 닫기 버튼으로 알림을 지울 수 있습니다.">
-      <div className="react-studio-row"><Button variant="secondary" onClick={() => setToast('변경사항이 저장되었습니다.')}>알림 표시</Button></div>
-      {toast && <Toast onDismiss={() => setToast('')}>{toast}</Toast>}
+    <Section title="토스트" description="작업 결과를 짧게 알립니다. 아래 예시는 화면 오른쪽 아래에 하나씩 표시되며, 직접 닫을 때까지 유지됩니다.">
+      <div className="react-studio-sample-grid">
+        <div className="react-studio-example"><h3 className="react-studio-example-title">완료 안내</h3><p className="react-studio-caption">작업을 방해하거나 포커스를 이동하지 않고 결과를 알립니다.</p><div className="react-studio-row"><Button variant="secondary" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'변경사항이 저장되었습니다.', variant:'success'}); }}>알림 표시</Button></div></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">오류와 재시도</h3><p className="react-studio-caption">저장 실패를 재현합니다. 다시 시도하면 완료 안내로 바뀝니다.</p><div className="react-studio-row"><Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'저장하지 못했습니다. 다시 시도해주세요.', variant:'danger', action:'retry'}); }}>오류 알림 표시</Button></div></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">실행 취소</h3><p className="react-studio-caption">초안 문서를 보관한 뒤 알림에서 실행 취소할 수 있습니다.</p><div className="react-studio-row"><Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setArchived(true); setToast({message:'초안 문서를 보관했습니다.', variant:'info', action:'undo'}); }}>항목 보관</Button></div><p role="status" className="component-helper">{archived ? '초안 문서 · 보관됨' : '초안 문서 · 목록에 표시 중'}</p></div>
+      </div>
+      <p className="react-studio-caption">새 알림은 이전 알림을 교체합니다. 필수 오류 안내는 해당 입력란에도 함께 표시합니다.</p>
+      {toast && <Toast variant={toast.variant} onDismiss={dismissToast} action={toast.action && <Button variant="ghost" onClick={() => { if (toast.action === 'undo') { setArchived(false); dismissToast(); } else { setToast({message:'다시 시도해 변경사항을 저장했습니다.', variant:'success'}); toastOrigin.current?.focus(); } }}>{toast.action === 'undo' ? '실행 취소' : '다시 시도'}</Button>}>{toast.message}</Toast>}
     </Section>
   </>;
 }
 
 export function TooltipDemos() {
-  return <Section title="기본 툴팁" description="버튼에 마우스를 올리거나 키보드로 포커스하면 보조 설명을 표시합니다. Escape 키로 닫을 수 있습니다.">
+  return <Section title="기본 툴팁" description="버튼에 마우스를 올리거나 키보드로 포커스하면 보조 설명을 표시합니다. 버튼을 실행하거나 Escape 키를 누르면 닫힙니다.">
     <div className="react-studio-field-grid">
       <div className="react-studio-example"><h3 className="react-studio-example-title">텍스트 버튼</h3><div className="react-studio-row"><Tooltip content="프로젝트를 구분할 수 있는 이름입니다."><Button variant="outline">프로젝트 이름</Button></Tooltip></div></div>
       <div className="react-studio-example"><h3 className="react-studio-example-title">아이콘 버튼</h3><div className="react-studio-row"><Tooltip content="화면에 표시할 항목을 설정합니다."><button type="button" className="icon-button" aria-label="표시 설정 도움말"><Icon name="settings" /></button></Tooltip></div></div>

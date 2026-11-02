@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 type Size = 'sm' | 'md' | 'lg';
-type BaseField = { label: React.ReactNode; id?: string; name?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; size?: Size; helperText?: React.ReactNode; className?: string };
+type BaseField = { label: React.ReactNode; id?: string; name?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; size?: Size; helperText?: React.ReactNode; error?: string; className?: string };
 
 type Parsed = { value?: bigint; error?: string; empty?: boolean; digits?: number };
 function parseNumber(text: string, decimals: number, grouping: boolean): Parsed {
@@ -46,10 +46,11 @@ export interface NumberFieldProps extends BaseField {
   decimals?: number;
   grouping?: boolean;
   unit?: string;
+  prefixIcon?: React.ReactNode;
   selectOnFocus?: boolean;
 }
 
-export function NumberField({ label, id, name, disabled, readOnly, required, size, helperText, className, value, defaultValue = null, onValueChange, min, max, step = '1', decimals = 0, grouping = false, unit, selectOnFocus = false }: NumberFieldProps) {
+export function NumberField({ label, id, name, disabled, readOnly, required, size, helperText, error: externalError, className, value, defaultValue = null, onValueChange, min, max, step = '1', decimals = 0, grouping = false, unit, prefixIcon, selectOnFocus = false }: NumberFieldProps) {
   const uid = React.useId();
   const inputId = id || `number-${uid}`;
   const places = Number.isInteger(decimals) ? Math.max(0, Math.min(6, decimals)) : 0;
@@ -59,7 +60,8 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
   if (minParsed.error || maxParsed.error || stepParsed.error || !stepParsed.value || stepParsed.value <= 0n || (minParsed.value != null && maxParsed.value != null && minParsed.value > maxParsed.value)) throw new RangeError('유효한 숫자 범위와 step을 지정해주세요.');
   const initial = value ?? defaultValue ?? '';
   const [draft, setDraft] = React.useState(() => formatNumberDraft(initial, places, grouping));
-  const [error, setError] = React.useState('');
+  const [internalError, setError] = React.useState('');
+  const error = externalError || internalError;
   const composing = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const focusPointer = React.useRef<{ x: number; y: number; dragged: boolean } | null>(null);
@@ -78,7 +80,7 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
   const parsed = parseNumber(draft, places, grouping);
   const boundsError = (number: Parsed) => number.value != null && minParsed.value != null && number.value < minParsed.value ? `${formatNumber(minParsed.value, places, grouping)} 이상 입력해주세요.` : number.value != null && maxParsed.value != null && number.value > maxParsed.value ? `${formatNumber(maxParsed.value, places, grouping)} 이하로 입력해주세요.` : '';
   const validate = (number: Parsed) => (required && number.empty ? '값을 입력해주세요.' : number.error || boundsError(number));
-  React.useEffect(() => { inputRef.current?.setCustomValidity(validate(parseNumber(draft, places, grouping)) || ''); }, [draft, places, grouping, min, max, required]);
+  React.useEffect(() => { inputRef.current?.setCustomValidity(externalError || validate(parseNumber(draft, places, grouping)) || ''); }, [draft, places, grouping, min, max, required, externalError]);
   const commit = () => {
     if (composing.current || disabled || readOnly) return;
     const result = parseNumber(draft, places, grouping);
@@ -102,6 +104,7 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
   return <div className={className}>
     <label htmlFor={inputId} className="field-label">{label}</label>
     <div className={`number-field${error ? ' is-invalid' : ''}`} data-size={size}>
+      {prefixIcon != null && <span className="number-field-prefix" aria-hidden="true" onClick={() => { if (!disabled) inputRef.current?.focus(); }}>{prefixIcon}</span>}
       <input ref={inputRef} id={inputId} name={name} type="text" role="spinbutton" inputMode={places ? 'decimal' : 'numeric'} className="number-field-input" value={draft} disabled={disabled} readOnly={readOnly} required={required}
         aria-invalid={error ? true : undefined} aria-describedby={described} aria-valuemin={minParsed.value == null ? undefined : ariaNumber(minParsed.value, places)} aria-valuemax={maxParsed.value == null ? undefined : ariaNumber(maxParsed.value, places)} aria-valuenow={parsed.value == null || parsed.error || boundsError(parsed) ? undefined : ariaNumber(parsed.value, places)} aria-valuetext={parsed.value == null || parsed.error || boundsError(parsed) ? undefined : `${formatNumber(parsed.value, places, grouping, parsed.digits)}${unit ? ` ${unit}` : ''}`}
         onChange={event => { setDraft(event.target.value); if (error) setError(''); }} onBlur={() => { focusPointer.current = null; commit(); }} onFocus={event => { if (selectOnFocus && !disabled) event.currentTarget.select(); }}
@@ -117,7 +120,7 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
       </div>
     </div>
     {helperText != null && <p className="number-field-meta" id={`${inputId}-help`}>{helperText}</p>}
-    {error && <p className="number-field-feedback is-error" id={`${inputId}-error`} role="status">{error}</p>}
+    <p className="number-field-feedback is-error" id={`${inputId}-error`} role="status" hidden={!error}>{error}</p>
   </div>;
 }
 
@@ -142,7 +145,7 @@ function moveMonth(date: Date, offset: number) {
   return makeDate(first.getFullYear(), first.getMonth(), Math.min(date.getDate(), makeDate(first.getFullYear(), first.getMonth() + 1, 0).getDate()));
 }
 type DateWidgetProps = BaseField & { range: boolean; values?: DateRangeValue; initial: DateRangeValue; onValuesChange?: (value: DateRangeValue) => void; min?: string; max?: string; startLabel?: string; endLabel?: string };
-function DateWidget({ label, id, name, disabled, readOnly, required, size, helperText, className, range, values, initial, onValuesChange, min, max, startLabel = '시작일', endLabel = '종료일' }: DateWidgetProps) {
+function DateWidget({ label, id, name, disabled, readOnly, required, size, helperText, error: externalError, className, range, values, initial, onValuesChange, min, max, startLabel = '시작일', endLabel = '종료일' }: DateWidgetProps) {
   const uid = React.useId(), base = id || `date-${uid}`;
   if ((min && (!parseDate(min) || dateKey(parseDate(min)!) !== min)) || (max && (!parseDate(max) || dateKey(parseDate(max)!) !== max)) || (min && max && min > max)) throw new RangeError('유효한 날짜 범위를 YYYY-MM-DD 형식으로 지정해주세요.');
   const clampCursor = (date: Date) => {
@@ -152,7 +155,8 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
     return date;
   };
   const [draft, setDraft] = React.useState<[string, string]>([values?.[0] ?? initial[0] ?? '', values?.[1] ?? initial[1] ?? '']);
-  const [error, setError] = React.useState('');
+  const [internalError, setError] = React.useState('');
+  const error = externalError || internalError;
   const [open, setOpen] = React.useState(false);
   const [preview, setPreview] = React.useState<string | null>(null);
   const [cursor, setCursor] = React.useState(() => clampCursor(parseDate(values?.[0] ?? initial[0] ?? '') || new Date()));
@@ -176,7 +180,7 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
     if ([a, b].some(d => d && ((min && dateKey(d) < min) || (max && dateKey(d) > max)))) return '허용된 날짜 범위를 확인해주세요.';
     return '';
   };
-  React.useEffect(() => { const message = validPair(draft); startRef.current?.setCustomValidity(message); if (range) endRef.current?.setCustomValidity(message); }, [draft[0], draft[1], range, required, min, max]);
+  React.useEffect(() => { const message = externalError || validPair(draft); startRef.current?.setCustomValidity(message); if (range) endRef.current?.setCustomValidity(message); }, [draft[0], draft[1], range, required, min, max, externalError]);
   const normalized = (pair: [string, string]): DateRangeValue => [parseDate(pair[0]) ? dateKey(parseDate(pair[0])!) : null, range && parseDate(pair[1]) ? dateKey(parseDate(pair[1])!) : null];
   const publish = (pair: [string, string], allowIncomplete = false) => {
     const problem = validPair(pair);
@@ -262,7 +266,7 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
       </div>}
     </div>
     {helperText != null && <p className="component-helper date-help" id={`${base}-help`}>{helperText}</p>}
-    {error && <p className="field-error" id={`${base}-error`} role="status">{error}</p>}
+    <p className="field-error date-field-error" id={`${base}-error`} role="status" hidden={!error}>{error}</p>
   </div>;
 }
 export function DatePicker({ value, defaultValue = null, onValueChange, ...props }: DatePickerProps) {

@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, CircleProgress, SegmentedProgress } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -26,6 +26,85 @@ function fixture() {
 async function click(element) { assert.ok(element, 'expected a clickable element'); await act(async () => element.click()); }
 async function key(element, value) { await act(async () => element.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }))); }
 after(() => dom.window.close());
+
+test('NovaSpinner provides a single accessible status and supports the existing Spinner API', async () => {
+  const f = fixture();
+  try {
+    await f.render(h(NovaSpinner,{size:64,label:'프로젝트를 준비하는 중','data-operation':'prepare'}));
+    const status = f.container.querySelector('[role="status"]');
+    assert.equal(f.container.querySelectorAll('[role="status"]').length,1);
+    assert.equal(status.getAttribute('aria-label'),'프로젝트를 준비하는 중');
+    assert.equal(status.getAttribute('data-operation'),'prepare');
+    assert.equal(status.querySelector('svg').getAttribute('aria-hidden'),'true');
+    assert.equal(status.querySelector('svg').getAttribute('focusable'),'false');
+    assert.equal(status.style.getPropertyValue('--nova-spinner-size'),'64px');
+    await f.render(h(Spinner,{kind:'nova',size:'small',variant:'inverse','aria-hidden':true}));
+    const compact = f.container.querySelector('.nova-spinner');
+    assert.equal(compact.style.getPropertyValue('--nova-spinner-size'),'16px');
+    assert.equal(compact.getAttribute('aria-hidden'),'true');
+  } finally { await f.dispose(); }
+});
+
+test('Tooltip activation dismisses without stealing focus or replacing the child click handler', async () => {
+  const f = fixture(); let activations = 0;
+  try {
+    await f.render(h(Tooltip, {content:'버튼 설명'}, h('button', {type:'button', onClick:event => { event.stopPropagation(); activations++; }}, '실행')));
+    const button = f.container.querySelector('button'), wrapper = f.container.querySelector('.tooltip-wrap');
+    await act(async () => button.focus());
+    await click(button);
+    assert.equal(activations,1);
+    assert.equal(document.activeElement,button);
+    assert.equal(wrapper.classList.contains('tooltip-dismissed'),true);
+    await act(async () => button.dispatchEvent(new MouseEvent('mouseout',{bubbles:true,relatedTarget:document.body})));
+    assert.equal(wrapper.classList.contains('tooltip-dismissed'),true);
+    await act(async () => button.blur());
+    await act(async () => button.focus());
+    assert.equal(wrapper.classList.contains('tooltip-dismissed'),false);
+    assert.equal(document.getElementById(button.getAttribute('aria-describedby')).textContent,'버튼 설명');
+  } finally { await f.dispose(); }
+});
+
+test('Divider exposes its orientation and label while decorative lines stay hidden', async () => {
+  const f = fixture(); const ref = React.createRef();
+  try {
+    await f.render(h(Divider, {ref, 'data-example':'divider'}, '추가 정보'));
+    const divider = f.container.querySelector('[role="separator"]');
+    assert.equal(ref.current, divider);
+    assert.equal(divider.getAttribute('data-example'), 'divider');
+    assert.equal(divider.getAttribute('aria-orientation'), 'horizontal');
+    assert.equal(document.getElementById(divider.getAttribute('aria-labelledby')).textContent, '추가 정보');
+    assert.equal(divider.tabIndex, -1);
+    await f.render(h(Divider, {orientation:'vertical', 'aria-label':'도구 그룹 구분'}));
+    assert.equal(divider.getAttribute('aria-orientation'), 'vertical');
+    assert.equal(divider.getAttribute('aria-label'), '도구 그룹 구분');
+    assert.equal(divider.hasAttribute('aria-labelledby'), false);
+    await f.render(h(Divider, {decorative:true}, '장식'));
+    assert.equal(divider.getAttribute('role'), 'presentation');
+    assert.equal(divider.getAttribute('aria-hidden'), 'true');
+    assert.equal(divider.hasAttribute('aria-orientation'), false);
+    assert.equal(divider.hasAttribute('aria-labelledby'), false);
+  } finally { await f.dispose(); }
+});
+
+test('Toast exposes urgency and keeps its action separate from dismissing the notice', async () => {
+  const f = fixture(); let retries = 0, dismissals = 0;
+  try {
+    await f.render(h(Toast, {variant:'danger', onDismiss:() => dismissals++, action:h('button', {type:'button', onClick:() => retries++}, '다시 시도')}, '저장 실패'));
+    const toast = f.container.querySelector('.toast');
+    assert.equal(toast.getAttribute('role'), 'alert');
+    assert.equal(toast.getAttribute('aria-atomic'), 'true');
+    assert.equal(toast.querySelector('p').textContent, '저장 실패');
+    await click(toast.querySelector('.toast-action button'));
+    assert.equal(retries, 1);
+    assert.equal(dismissals, 0);
+    await click(toast.querySelector('[aria-label="알림 닫기"]'));
+    assert.equal(dismissals, 1);
+    await f.render(h(Toast, {variant:'danger', role:'status'}, '우선순위 조정'));
+    assert.equal(f.container.querySelector('.toast').getAttribute('role'), 'status');
+    await f.render(h(Toast, {variant:'success'}, '저장 완료'));
+    assert.equal(f.container.querySelector('.toast').getAttribute('role'), 'status');
+  } finally { await f.dispose(); }
+});
 
 test('inline MultiSelect removes chips and clears the remaining values', async () => {
   const f = fixture();

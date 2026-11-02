@@ -13,11 +13,22 @@ const routes = [...html.matchAll(/<section\b[^>]*\bdata-route="([^"]+)"[^>]*>/g)
   const attr = name => decode(tag.match(new RegExp(`${name}="([^"]*)"`))?.[1] || '');
   return { route, title: attr('data-title'), group: attr('data-group'), description: attr('data-description'), searchTerms: searchTerms.get(route.replace('components/', '')) || '' };
 });
+const extraRoutes = JSON.parse(await readFile(resolve(root, 'studio/extra-routes.json'), 'utf8'));
+for (const {after, ...route} of extraRoutes) {
+  const index = routes.findIndex(item => item.route === after);
+  if (index < 0) throw new Error(`문서 위치를 확인해주세요: ${after}`);
+  routes.splice(index + 1, 0, route);
+}
 if (!routes.length || new Set(routes.map(route => route.route)).size !== routes.length) throw new Error('문서 경로 목록을 확인해주세요.');
 await mkdir(output, {recursive:true});
 await writeFile(resolve(output, 'routes.json'), JSON.stringify(routes, null, 2));
 const nav = html.match(/<nav class="docs-navigation"[^>]*>([\s\S]*?)<\/nav>/)?.[1] || '';
 const navigation = [...nav.matchAll(/href="#\/([^"]+)"/g)].map(([, route]) => route);
+for (const {after, route} of extraRoutes) {
+  const index = navigation.indexOf(after);
+  if (index < 0) throw new Error(`메뉴 위치를 확인해주세요: ${after}`);
+  navigation.splice(index + 1, 0, route);
+}
 await writeFile(resolve(output, 'navigation.json'), JSON.stringify(navigation, null, 2));
 const icons = (await readdir(resolve(root, '../../systems/idenflu-mono/assets/icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
 await writeFile(resolve(output, 'icons.json'), JSON.stringify(icons, null, 2));

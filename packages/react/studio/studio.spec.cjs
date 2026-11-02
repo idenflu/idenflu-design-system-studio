@@ -97,10 +97,45 @@ test('topbar tooltips support keyboard focus and stay within the viewport', asyn
   }
   await theme.focus();
   await theme.click();
-  await expect(theme.locator('..').getByRole('tooltip')).toHaveText(await theme.getAttribute('aria-label'));
+  const themeTooltip = theme.locator('..').getByRole('tooltip', {includeHidden:true});
+  await expect(themeTooltip).toHaveText(await theme.getAttribute('aria-label'));
+  await expect(themeTooltip).toBeHidden();
   await settings.click();
+  await expect(page.getByRole('dialog', { name: '화면 조정' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: '화면 조정' })).toBeHidden();
+});
+
+test('Tooltip closes after pointer and keyboard activation while the trigger keeps focus', async ({ page, isMobile }) => {
+  await page.goto('/packages/react/studio/index.html#/components/tooltip');
+  const button = page.getByRole('button',{name:'프로젝트 이름',exact:true});
+  const tooltip = button.locator('..').getByRole('tooltip',{includeHidden:true});
+  if (!isMobile) {
+    await button.hover();
+    await expect(tooltip).toBeVisible();
+  }
+  await button.click();
+  await expect(button).toBeFocused();
+  await expect(tooltip).toBeHidden();
+  if (!isMobile) {
+    await page.getByRole('heading',{level:1,name:'Tooltip',exact:true}).hover();
+    await expect(button).toBeFocused();
+    await expect(tooltip).toBeHidden();
+    await button.hover();
+    await expect(tooltip).toBeVisible();
+  }
+  await button.blur();
+  await button.focus();
+  await expect(tooltip).toBeVisible();
+  await button.press('Enter');
+  await expect(button).toBeFocused();
+  await expect(tooltip).toBeHidden();
+  await button.blur();
+  await button.focus();
+  await expect(tooltip).toBeVisible();
+  await button.press('Space');
+  await expect(button).toBeFocused();
+  await expect(tooltip).toBeHidden();
 });
 
 test('basic React form validates, accepts corrected data and resets', async ({ page }) => {
@@ -119,9 +154,12 @@ test('basic React form validates, accepts corrected data and resets', async ({ p
   await expect(email).toHaveValue('');
 });
 
-test('Patterns are excluded from the navigation', async ({ page }) => {
+test('Patterns includes forms and data examples while excluding Layout and Page', async ({ page }) => {
   await page.goto('/packages/react/studio/index.html#/components/buttons');
-  await expect(page.locator('#react-studio-nav').getByText('Patterns', { exact: false })).toHaveCount(0);
+  await expect(page.locator('#react-studio-nav').getByText('Patterns', { exact:true })).toHaveCount(1);
+  await expect(page.locator('#react-studio-nav a[href^="#/patterns/form/"]')).toHaveCount(8);
+  await expect(page.locator('#react-studio-nav a[href^="#/patterns/layout/"]')).toHaveCount(0);
+  await expect(page.locator('#react-studio-nav a[href^="#/patterns/page/"]')).toHaveCount(0);
 });
 
 test('chip selection and removal update the visible state', async ({ page }) => {

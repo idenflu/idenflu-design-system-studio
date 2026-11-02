@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const documentCount = require('./dist/navigation.json').filter(route => !/^patterns\/(layout|page)\//.test(route)).length;
 
 test('document chrome includes the original home, breadcrumb and footer', async ({ page, isMobile }) => {
   await page.goto('/packages/react/studio/index.html#/overview');
@@ -11,9 +12,11 @@ test('document chrome includes the original home, breadcrumb and footer', async 
   await expect(page.locator('.sidebar').getByRole('link', {name:'디자인 시스템 갤러리'})).toHaveCount(0);
   if (isMobile) await page.getByRole('button', {name:'메뉴', exact:true}).click();
   await expect(page.locator('.sidebar')).toHaveCSS('position', 'fixed');
-  await expect(page.locator('#docs-search-status')).toHaveText('31개 문서');
+  await expect(page.locator('#docs-search-status')).toHaveText(`${documentCount}개 문서`);
   await expect(page.locator('.topbar-gallery')).toHaveAttribute('href', '../../../index.html#/gallery');
-  await expect(page.locator('#react-studio-nav')).not.toContainText('Patterns');
+  await expect(page.locator('#react-studio-nav')).toContainText('Patterns');
+  await expect(page.locator('#react-studio-nav a[href*="patterns/layout/"]')).toHaveCount(0);
+  await expect(page.locator('#react-studio-nav a[href*="patterns/page/"]')).toHaveCount(0);
 });
 
 test('document search supports Korean aliases, Enter, Escape and the slash shortcut', async ({ page, isMobile }) => {
@@ -31,7 +34,7 @@ test('document search supports Korean aliases, Enter, Escape and the slash short
   await search.focus();
   await search.press('Escape');
   await expect(search).toHaveValue('');
-  await expect(page.locator('#docs-search-status')).toHaveText('31개 문서');
+  await expect(page.locator('#docs-search-status')).toHaveText(`${documentCount}개 문서`);
   await search.fill('없는문서xyz');
   await expect(page.locator('#docs-search-status')).toHaveText('검색 결과가 없습니다.');
   await search.press('Escape');
@@ -65,7 +68,7 @@ test('mobile menu traps focus, dismisses on Escape and restores focus', async ({
   await expect(page.locator('#docs-main')).toHaveJSProperty('inert', true);
   await sidebar.getByRole('link', {name:'idenflu mono 홈'}).focus();
   await page.keyboard.press('Shift+Tab');
-  await expect(sidebar.locator('summary').last()).toBeFocused();
+  await expect(sidebar.locator('.nav-group > summary').last()).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(sidebar.getByRole('link', {name:'idenflu mono 홈'})).toBeFocused();
   await page.keyboard.press('Escape');
@@ -89,6 +92,8 @@ test('TOC and document pagination move focus and use the visible menu order', as
   await expect(page.getByRole('heading', {level:1})).toBeFocused();
   await expect(page.getByRole('navigation', {name:'현재 위치'})).toContainText('Number fields');
   await page.goto('/packages/react/studio/index.html#/components/card');
+  await expect(page.locator('#next-doc')).toHaveAttribute('href','#/patterns/form/basic');
+  await page.goto('/packages/react/studio/index.html#/patterns/empty-state');
   await expect(page.locator('#next-doc')).toHaveCount(0);
 });
 

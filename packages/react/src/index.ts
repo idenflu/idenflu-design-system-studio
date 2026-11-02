@@ -5,3 +5,5 @@ export * from './interactive';
 export * from './navigation';
 export * from './datetime';
 export * from './data-state';
+export * from './divider';
+export * from './nova-spinner';
