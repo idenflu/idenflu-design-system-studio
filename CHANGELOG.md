@@ -2,6 +2,9 @@
 
 ## 미배포
 
+- MUI·Material Symbols·Ant Design·Heroicons·Lucide 공식 자료를 참고해 기존 톤의 Outline 32종과 Filled 20종 추가. 전체 SVG 99종을 React `IconName`·공통 CSS에서 지원하고 기존 별칭 유지
+- 파운데이션 아이콘에 Outline/Filled 필터와 북마크 상태 전환 예시 추가. 검색·필터·공개 마스크 경로의 개발본·배포본 회귀 검증 추가
+
 - 테이블 헤더의 회색 배경을 없애고 선 기반으로 정리. 헤더 위·아래와 마지막 행·합계 행은 진한 구분선, 행 사이는 연한 구분선 사용
 - `tbody`·`tfoot`의 `th`에도 헤더 스타일이 적용돼 합계 행 구분선이 끊겨 보이던 문제 수정
 - 테이블 셀 클래스 `table-numeric`·`table-date`·`table-primary`·`table-secondary`·`table-muted`를 공통 CSS로 제공하고 표 전체에 고정폭 숫자 적용

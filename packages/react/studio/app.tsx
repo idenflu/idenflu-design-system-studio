@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Button, TextField } from '../src';
+import { Button, Icon, Segmented, TextField, type IconName } from '../src';
 import { Section } from './demo-layout';
 import { ColorDemos } from './color-demos';
 import { TextFields, SelectDemos, NumberDemos, DateDemos } from './form-demos';
@@ -69,8 +69,9 @@ import '@idenflu/mono-react/styles.css';
 
 export function IconExample() {
   return <>
-    <Button><Icon name="plus" />새로 만들기</Button>
-    <Button iconOnly aria-label="설정"><Icon name="settings" /></Button>
+    <Button><Icon name="save" />저장</Button>
+    <Button iconOnly aria-label="알림"><Icon name="bell" /></Button>
+    <Button variant="outline" aria-pressed="true"><Icon name="bookmark-fill" />북마크됨</Button>
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
   </>;
 }`,
@@ -178,8 +179,9 @@ function CodeExample({ code }: { code:string }) {
 }
 function FoundationIcons() {
   const [query, setQuery] = React.useState('');
-  const visible = icons.filter(name => name.includes(query.trim().toLowerCase()));
-  return <><div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: search, calendar, close" /></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 다른 이름으로 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><span className="ui-icon" aria-hidden="true" style={{'--icon':`url('${new URL(`./assets/icons/idenflu/${name}.svg`, document.baseURI).href}')`} as React.CSSProperties} /><span>{name}</span></li>)}</ul></>;
+  const [variant, setVariant] = React.useState('all');
+  const visible = icons.filter(name => name.includes(query.trim().toLowerCase()) && (variant === 'all' || name.endsWith('-fill') === (variant === 'filled')));
+  return <><div className="react-studio-stack"><Segmented label="아이콘 유형" value={variant} onValueChange={setVariant} options={[{value:'all', label:'전체'}, {value:'outline', label:'Outline'}, {value:'filled', label:'Filled'}]} /><div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: bookmark, cart, chart" /></div></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 이름이나 유형을 바꿔 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><Icon name={name as IconName} /><span>{name}</span></li>)}</ul></>;
 }
 function ComponentPage({ route }: { route:string }) {
   const Pattern = patternPages[route as keyof typeof patternPages];
@@ -189,7 +191,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'foundations/colors': return <ColorDemos />;
     case 'foundations/typography': return <TypographyDemos />;
     case 'foundations/sizes': return <SizeDemos />;
-    case 'foundations/icons': return <><IconDemos /><Section title="아이콘 목록" description="목록은 SVG 파일명 기준입니다. React Icon에서 지원하는 이름은 컴포넌트 타입을 확인해주세요."><FoundationIcons /></Section></>;
+    case 'foundations/icons': return <><IconDemos /><Section title="아이콘 목록" description="유형별로 살펴보거나 이름으로 검색하세요. 표시된 이름을 React Icon의 name에 그대로 사용합니다. Filled 이름에는 -fill이 붙습니다."><FoundationIcons /></Section></>;
     case 'foundations/states': return <StateDemos />;
     case 'components/buttons': return <ButtonDemos />;
     case 'components/text-fields': return <TextFields />;

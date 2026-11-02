@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <mask id="nova-icon-chat-fill-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+    <path d="M3 3h18v14H9l-6 4z" fill="white" />
+    <path d="M7 8h10M7 12h7" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="butt" />
+  </mask>
+  <rect width="24" height="24" mask="url(#nova-icon-chat-fill-mask)" />
+</svg>

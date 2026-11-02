@@ -46,6 +46,26 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 
 스타일의 색상·크기는 `--font-size-base`, `--line-height-base`, `--space-unit`, `--control-base-height`, `--radius-control` CSS 변수로 조정할 수 있습니다. 다크 테마는 문서 루트에 `data-theme="dark"`를 설정합니다.
 
+## 아이콘
+
+`Icon`은 현재 글자색을 따르는 SVG 마스크를 사용하며 전체 99종을 SVG 파일명 그대로 지원합니다. `name`의 타입은 `IconName`으로 내보냅니다. 기존 `plus`, `trash`, `list`, `email`, `eye`, `eye-slash`, `caret` 별칭도 유지합니다. 크기는 `--icon-size`로 조정합니다.
+
+이번 추가는 탐색·편집·협업·차트·커머스에 쓰는 Outline 32종과 Filled 20종입니다. Outline은 기존의 24×24 기준, 1.5px 선과 각진 선 끝을 유지합니다. Filled는 `-fill` 접미사로 선택하며 모든 아이콘에 Filled가 있는 것은 아닙니다.
+
+```tsx
+import { Button, Icon } from '@idenflu/mono-react';
+
+<Button><Icon name="save" />저장</Button>
+<Button iconOnly variant="outline" aria-label="북마크" aria-pressed={bookmarked}
+  onClick={() => setBookmarked(value => !value)}>
+  <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
+</Button>
+```
+
+일반 동작은 Outline, 선택·저장 상태나 강한 시각적 강조는 Filled를 우선 고려합니다. 상태를 전환할 때는 형태와 함께 `aria-pressed`나 텍스트도 갱신합니다. `Icon`은 장식으로 처리되므로 의미는 함께 표시하는 텍스트로 전달하고, 아이콘만 있는 버튼에는 `aria-label`을 지정합니다.
+
+문서의 파운데이션 → Icons에서 전체 목록을 이름으로 검색하고 Outline/Filled로 필터링할 수 있습니다. 선정 근거와 공식 자료는 [아이콘 리서치](../../docs/icon-research.md)에 정리했습니다.
+
 ## 컴포넌트
 
 - 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`

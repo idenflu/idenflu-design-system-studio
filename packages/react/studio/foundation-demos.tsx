@@ -10,15 +10,20 @@ const sizes = [
 
 export function IconDemos() {
   const [message, setMessage] = React.useState('');
-  return <Section title="아이콘 사용 예시" description="아이콘은 텍스트의 의미를 보조하고, 아이콘만 있는 버튼에는 접근 가능한 이름을 제공합니다.">
+  const [bookmarked, setBookmarked] = React.useState(false);
+  const pairs = ['home', 'folder', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'users', 'shield-check', 'dashboard', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle'] as const;
+  return <><Section title="아이콘 사용 예시" description="아이콘은 텍스트의 의미를 보조하고, 아이콘만 있는 버튼에는 접근 가능한 이름을 제공합니다.">
     <div className="react-studio-field-grid">
-      <div className="react-studio-example"><h3 className="react-studio-example-title">텍스트와 함께</h3><div className="react-studio-row"><Button onClick={() => setMessage('새로 만들기를 선택했습니다.')}><Icon name="plus" />새로 만들기</Button><Button variant="outline" onClick={() => setMessage('다운로드를 선택했습니다.')}><Icon name="download" />다운로드</Button></div></div>
-      <div className="react-studio-example"><h3 className="react-studio-example-title">아이콘 버튼</h3><div className="react-studio-row"><Button iconOnly variant="outline" aria-label="복사" onClick={() => setMessage('복사를 선택했습니다.')}><Icon name="copy" /></Button><Button iconOnly variant="outline" aria-label="설정" onClick={() => setMessage('설정을 선택했습니다.')}><Icon name="settings" /></Button></div></div>
+      <div className="react-studio-example"><h3 className="react-studio-example-title">텍스트와 함께</h3><div className="react-studio-row"><Button onClick={() => setMessage('저장을 선택했습니다.')}><Icon name="save" />저장</Button><Button variant="outline" onClick={() => setMessage('다운로드를 선택했습니다.')}><Icon name="download" />다운로드</Button></div></div>
+      <div className="react-studio-example"><h3 className="react-studio-example-title">아이콘 버튼</h3><div className="react-studio-row"><Button iconOnly variant="outline" aria-label="알림" onClick={() => setMessage('알림을 선택했습니다.')}><Icon name="bell" /></Button><Button iconOnly variant="outline" aria-label="설정" onClick={() => setMessage('설정을 선택했습니다.')}><Icon name="settings" /></Button></div></div>
       <div className="react-studio-example"><h3 className="react-studio-example-title">입력 필드</h3><TextField label="프로젝트 검색" type="search" placeholder="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative /></div>
-      <div className="react-studio-example"><h3 className="react-studio-example-title">상태 안내</h3><p className="react-studio-icon-label"><Icon name="check" />변경사항을 저장했습니다.</p></div>
+      <div className="react-studio-example"><h3 className="react-studio-example-title">선택 상태</h3><Button variant="outline" aria-label="북마크" aria-pressed={bookmarked} onClick={() => setBookmarked(value => !value)}><Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />{bookmarked ? '북마크됨' : '북마크 추가'}</Button></div>
     </div>
     <p role="status" className="component-helper">{message}</p>
-  </Section>;
+  </Section>
+  <Section title="Outline / Filled" description="기본 탐색·동작에는 Outline을, 선택·활성 강조에는 Filled를 사용할 수 있습니다. 상태는 색이나 모양만으로 전달하지 않고 텍스트와 함께 표시합니다. 두 유형 모두 24 × 24 그리드를 사용합니다.">
+    <ul className="react-studio-icon-pairs">{pairs.map(name => <li key={name}><span className="react-studio-caption">{name}</span><div className="react-studio-icon-pair"><span><Icon name={name} /><small>Outline</small></span><span><Icon name={`${name}-fill`} /><small>Filled</small></span></div></li>)}</ul>
+  </Section></>;
 }
 
 export function TypographyDemos() {

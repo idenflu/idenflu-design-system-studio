@@ -180,5 +180,25 @@ export function Stepper({ steps, currentStep, className, ...props }: StepperProp
 }
 export interface TableContainerProps extends React.HTMLAttributes<HTMLDivElement> { label: string }
 export function TableContainer({ label, className, tabIndex = 0, ...props }: TableContainerProps) { return <div {...props} role="region" aria-label={label} tabIndex={tabIndex} className={classes('table-scroll', className)} />; }
-export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> { name: 'plus' | 'arrow-right' | 'download' | 'copy' | 'settings' | 'trash' | 'list' | 'grid' | 'calendar' | 'search' | 'email' | 'person' | 'lock' | 'eye' | 'eye-slash' | 'link' | 'check' | 'close' | 'caret' }
+/** Canonical SVG filenames and the original public aliases. Filled variants use the -fill suffix. */
+export type IconName =
+  | 'add' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up' | 'attachment'
+  | 'bell' | 'bell-fill' | 'bookmark' | 'bookmark-fill' | 'briefcase' | 'briefcase-fill'
+  | 'calendar' | 'calendar-fill' | 'camera' | 'camera-fill' | 'caret' | 'cart'
+  | 'cart-fill' | 'chart-bar' | 'chart-line' | 'chat' | 'chat-fill' | 'check'
+  | 'check-circle' | 'check-circle-fill' | 'clock' | 'clock-fill' | 'close' | 'copy'
+  | 'credit-card' | 'credit-card-fill' | 'dashboard' | 'dashboard-fill' | 'download' | 'edit'
+  | 'email' | 'external-link' | 'eye' | 'eye-off' | 'eye-slash' | 'file'
+  | 'file-fill' | 'filter' | 'folder' | 'folder-fill' | 'globe' | 'grid'
+  | 'grid-fill' | 'heart' | 'heart-fill' | 'help-circle' | 'help-circle-fill' | 'home'
+  | 'home-fill' | 'image' | 'image-fill' | 'info' | 'info-fill' | 'keyboard-arrow-down'
+  | 'keyboard-arrow-left' | 'keyboard-arrow-right' | 'keyboard-arrow-up' | 'link' | 'list' | 'location'
+  | 'location-fill' | 'lock' | 'lock-fill' | 'logout' | 'mail' | 'mail-fill'
+  | 'menu' | 'more-horizontal' | 'person' | 'person-fill' | 'play' | 'play-fill'
+  | 'plus' | 'receipt' | 'receipt-fill' | 'redo' | 'refresh' | 'remove'
+  | 'save' | 'search' | 'send' | 'send-fill' | 'settings' | 'shield-check'
+  | 'shield-check-fill' | 'sort' | 'star' | 'star-fill' | 'tag' | 'tag-fill'
+  | 'trash' | 'trash-2' | 'undo' | 'upload' | 'users' | 'users-fill'
+  | 'visibility' | 'visibility-fill' | 'warning' | 'warning-fill';
+export interface IconProps extends React.HTMLAttributes<HTMLSpanElement> { name: IconName }
 export function Icon({ name, className, ...props }: IconProps) { return <span {...props} aria-hidden="true" className={classes('ui-icon', `icon-${name}`, className)} />; }

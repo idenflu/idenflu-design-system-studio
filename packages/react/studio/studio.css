@@ -113,6 +113,13 @@
 .react-studio-icons { list-style:none; padding:0; }
 .react-studio-icons > li { display:flex; align-items:center; padding:var(--space-2); border-bottom:1px solid var(--divider); overflow-wrap:anywhere; }
 .react-studio-icons .ui-icon { flex:none; }
+.react-studio-icon-pairs { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:var(--space-4); margin:0; padding:0; list-style:none; }
+.react-studio-icon-pairs > li { display:grid; gap:var(--space-4); min-width:0; padding-block:var(--space-4); border-top:1px solid var(--divider); }
+.react-studio-icon-pair { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); }
+.react-studio-icon-pair > span { display:grid; justify-items:start; gap:var(--space-2); }
+.react-studio-icon-pair .ui-icon { --icon-size:24px; }
+.react-studio-icon-pair small { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+@media (max-width:600px) { .react-studio-icon-pairs { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
 .react-studio-size { display:flex; align-items:center; gap:var(--space-4); flex-wrap:wrap; }
 .react-studio-note { margin-top:var(--space-6); color:var(--text-secondary); }
 .react-pattern-form { display:grid; gap:var(--space-5); max-width:720px; min-width:0; }

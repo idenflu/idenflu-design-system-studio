@@ -1,5 +1,12 @@
 const { test, expect } = require('@playwright/test');
+const { readdirSync } = require('node:fs');
+const { resolve } = require('node:path');
 const documents = require('../packages/react/studio/routes.json');
+const iconNames = readdirSync(resolve(__dirname, '../systems/idenflu-mono/assets/icons/idenflu'))
+  .filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
+const newOutlineNames = ['home', 'folder', 'edit', 'save', 'external-link', 'refresh', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'attachment', 'globe', 'users', 'shield-check', 'dashboard', 'chart-bar', 'chart-line', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle', 'logout', 'undo', 'redo', 'sort'];
+const newFilledNames = ['home', 'folder', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'users', 'shield-check', 'dashboard', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle'].map(name => `${name}-fill`);
+const newIconNames = [...newOutlineNames, ...newFilledNames];
 
 test('every route has one heading and no page overflow', async ({ page }, testInfo) => {
   const errors = [];
@@ -88,12 +95,41 @@ for (const prefix of ['', '/dist']) {
     page.on('response', response => { if (response.status() >= 400 && /\.(svg|woff2)(?:$|\?)/.test(response.url())) failures.push(response.url()); });
     await page.goto(`${prefix}/systems/idenflu-mono/index.html#/foundations/icons`);
     const icons = page.locator('.react-studio-icons .ui-icon');
-    await expect(icons).toHaveCount(47);
-    const urls = await icons.evaluateAll(nodes => nodes.map(node => getComputedStyle(node).maskImage.match(/url\(["']?(.*?)["']?\)/)?.[1]));
-    for (const url of urls) {
-      expect(url).toContain(`${prefix}/systems/idenflu-mono/assets/icons/idenflu/`);
-      expect((await page.request.get(url)).ok(), url).toBe(true);
+    await expect(icons).toHaveCount(iconNames.length);
+    await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(iconNames);
+    expect(iconNames).toEqual(expect.arrayContaining(newIconNames));
+    for (const name of iconNames) {
+      const icon = page.locator(`.react-studio-icons .icon-${name}`);
+      await expect(icon).toHaveAttribute('aria-hidden', 'true');
+      const url = await icon.evaluate(node => getComputedStyle(node).maskImage.match(/url\(["']?(.*?)["']?\)/)?.[1]);
+      expect(url, name).toBeTruthy();
+      expect(new URL(url).pathname, name).toBe(`${prefix}/systems/idenflu-mono/assets/icons/idenflu/${name}.svg`);
+      expect((await page.request.get(url)).ok(), name).toBe(true);
     }
+    const types = page.getByRole('group', {name: '아이콘 유형'});
+    await types.getByRole('button', {name: 'Filled', exact: true}).click();
+    await expect(icons).toHaveCount(iconNames.filter(name => name.endsWith('-fill')).length);
+    const search = page.getByRole('searchbox', {name: '아이콘 검색'});
+    await search.fill('bookmark');
+    await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(['bookmark-fill']);
+    await types.getByRole('button', {name: 'Outline', exact: true}).click();
+    await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(['bookmark']);
+    await search.fill('');
+    await expect(icons).toHaveCount(iconNames.filter(name => !name.endsWith('-fill')).length);
+    await types.getByRole('button', {name: '전체', exact: true}).click();
+    await expect(icons).toHaveCount(iconNames.length);
+    await search.fill('no-such-icon');
+    await expect(icons).toHaveCount(0);
+    await expect(page.getByRole('status').filter({hasText: '검색 결과가 없습니다.'})).toBeVisible();
+    const bookmark = page.getByRole('button', {name: '북마크', exact: true});
+    await expect(bookmark).toHaveAttribute('aria-pressed', 'false');
+    await expect(bookmark.locator('.icon-bookmark')).toHaveCount(1);
+    await bookmark.click();
+    await expect(bookmark).toHaveAttribute('aria-pressed', 'true');
+    await expect(bookmark.locator('.icon-bookmark-fill')).toHaveCount(1);
+    await bookmark.click();
+    await expect(bookmark).toHaveAttribute('aria-pressed', 'false');
+    await expect(bookmark.locator('.icon-bookmark')).toHaveCount(1);
     expect(failures).toEqual([]);
   });
 }
