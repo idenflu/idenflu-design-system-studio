@@ -1,0 +1,178 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
+
+const source = await readFile(new URL('../systems/idenflu-mono/preferences.js', import.meta.url), 'utf8');
+const storageKey = 'idenflu-mono-preferences-v1';
+const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 38, radius: 0 };
+const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6 };
+const plain = (value) => JSON.parse(JSON.stringify(value));
+
+function engine({ stored, values = new Map(), blocked = {} } = {}) {
+  const storage = new Map(values);
+  if (stored !== undefined) storage.set(storageKey, stored);
+  const styles = new Map([['--unrelated-property', 'keep']]);
+  const events = [];
+  const listeners = new Map();
+  const calls = [];
+  const localStorage = {
+    getItem(key) {
+      calls.push(['getItem', key]);
+      if (blocked.getItem) throw new Error('Storage read blocked');
+      return storage.get(key) ?? null;
+    },
+    setItem(key, value) {
+      calls.push(['setItem', key]);
+      if (blocked.setItem) throw new Error('Storage write blocked');
+      storage.set(key, String(value));
+    },
+    removeItem(key) {
+      calls.push(['removeItem', key]);
+      if (blocked.removeItem) throw new Error('Storage removal blocked');
+      storage.delete(key);
+    },
+  };
+  const document = {
+    documentElement: { style: {
+      setProperty(name, value) { styles.set(name, value); },
+      removeProperty(name) { styles.delete(name); },
+    } },
+    dispatchEvent(event) { events.push({ type: event.type, detail: plain(event.detail) }); return true; },
+  };
+  const window = {
+    addEventListener(type, listener) {
+      if (!listeners.has(type)) listeners.set(type, []);
+      listeners.get(type).push(listener);
+    },
+  };
+  class CustomEvent {
+    constructor(type, options) { this.type = type; this.detail = options.detail; }
+  }
+  const context = vm.createContext({ window, document, localStorage, CustomEvent });
+  const run = () => vm.runInContext(source, context, { filename: 'preferences.js' });
+  run();
+  return {
+    get api() { return window.IdenfluPreferences; },
+    styles, storage, events, calls, run,
+    storageEvent(event) { (listeners.get('storage') || []).forEach((listener) => listener(event)); },
+  };
+}
+
+test('preference engine starts with defaults, returns copies and initializes once', () => {
+  const app = engine();
+  assert.deepEqual(plain(app.api.get()), defaults);
+  const copy = app.api.get();
+  copy.fontSize = -100;
+  assert.deepEqual(plain(app.api.get()), defaults);
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+  assert.deepEqual(app.events, [{ type: 'preferenceschange', detail: { values: defaults, saved: false, reason: 'load' } }]);
+  const original = app.api;
+  app.run();
+  assert.equal(app.api, original);
+  assert.equal(app.events.length, 1);
+  assert.equal(app.storage.has(storageKey), false);
+});
+
+test('strict partial updates ignore invalid types, unknown keys and inherited values', () => {
+  const app = engine();
+  for (const value of [null, [], '18', 18, { fontSize: '18', lineHeight: null, spacing: Infinity, controlHeight: NaN, radius: {} }, { unknown: 18 }]) {
+    assert.deepEqual(plain(app.api.set(value)), defaults);
+  }
+  assert.equal(app.events.length, 1, 'ignored updates must not announce a successful change');
+  assert.equal(app.storage.has(storageKey), false, 'ignored updates must not create a preference record');
+  const inherited = Object.assign(Object.create({ fontSize: 18 }), { radius: 4 });
+  assert.deepEqual(plain(app.api.set(inherited)), { ...defaults, radius: 4 });
+  assert.deepEqual(Object.keys(JSON.parse(app.storage.get(storageKey))), Object.keys(defaults));
+});
+
+test('ranges snap to permitted steps and enforce font-linked line and control minimums', () => {
+  const app = engine();
+  assert.deepEqual(plain(app.api.set({ fontSize: 99, lineHeight: 1, spacing: 149, controlHeight: 31, radius: 99 })), {
+    fontSize: 18, lineHeight: 22, spacing: 150, controlHeight: 36, radius: 12,
+  });
+  assert.deepEqual(plain(app.api.set({ fontSize: -1, lineHeight: 100, spacing: -10, controlHeight: 99, radius: -9 })), {
+    fontSize: 12, lineHeight: 32, spacing: 75, controlHeight: 48, radius: 0,
+  });
+  assert.deepEqual(plain(app.api.set({ fontSize: 15.4, lineHeight: 18.2, spacing: 111, controlHeight: 33, radius: 2.6 })), {
+    fontSize: 15, lineHeight: 19, spacing: 110, controlHeight: 34, radius: 3,
+  });
+});
+
+test('successful updates apply CSS, persist exact state and return exportable current CSS', () => {
+  const app = engine();
+  assert.deepEqual(plain(app.api.set(custom)), custom);
+  const expectedProperties = {
+    '--font-size-base': '16px',
+    '--line-height-base': '26px',
+    '--space-unit': '5px',
+    '--control-base-height': '44px',
+    '--radius-control': '6px',
+  };
+  for (const [property, value] of Object.entries(expectedProperties)) {
+    assert.equal(app.styles.get(property), value);
+    assert(app.api.cssText().includes(`${property}: ${value};`));
+  }
+  assert.deepEqual(JSON.parse(app.storage.get(storageKey)), custom);
+  assert.deepEqual(app.events.at(-1), { type: 'preferenceschange', detail: { values: custom, saved: true, reason: 'set' } });
+  assert.equal(app.styles.get('--unrelated-property'), 'keep');
+});
+
+test('stored records hydrate before UI and corrupt or incorrectly typed records fall back', () => {
+  const stored = engine({ stored: JSON.stringify({ fontSize: 18, lineHeight: 18, spacing: 101, controlHeight: 32, radius: 2, unknown: 99 }) });
+  assert.deepEqual(plain(stored.api.get()), { fontSize: 18, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 2 });
+  assert.equal(stored.styles.get('--font-size-base'), '18px');
+  assert.equal(stored.events[0].detail.reason, 'load');
+  assert.equal(stored.events[0].detail.saved, true);
+  assert.equal(stored.calls.filter(([method]) => method === 'setItem').length, 0, 'reading a record must not rewrite storage');
+  for (const raw of ['{broken', 'null', '[]', '42', '"18"', '{"unknown":20}', '{"fontSize":"18","spacing":null}']) {
+    const app = engine({ stored: raw });
+    assert.deepEqual(plain(app.api.get()), defaults, raw);
+    assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']], raw);
+    assert.equal(app.events[0].detail.saved, false, raw);
+  }
+});
+
+test('storage exceptions preserve in-memory controls and accurately report unsaved changes', () => {
+  const app = engine({ blocked: { getItem: true, setItem: true, removeItem: true } });
+  assert.deepEqual(plain(app.api.get()), defaults);
+  assert.deepEqual(plain(app.api.set(custom)), custom);
+  assert.equal(app.styles.get('--font-size-base'), '16px');
+  assert.deepEqual(app.events.at(-1).detail, { values: custom, saved: false, reason: 'set' });
+  assert.deepEqual(plain(app.api.reset()), defaults);
+  assert.deepEqual(app.events.at(-1).detail, { values: defaults, saved: false, reason: 'reset' });
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+});
+
+test('reset removes only preference storage and owned CSS overrides', () => {
+  const otherValues = new Map([['idenflu-mono-theme', 'dark'], ['consumer-draft', 'unsaved text']]);
+  const app = engine({ values: otherValues });
+  app.api.set(custom);
+  assert.deepEqual(plain(app.api.reset()), defaults);
+  assert.equal(app.storage.has(storageKey), false);
+  assert.deepEqual(app.storage, otherValues);
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+  assert.deepEqual(app.events.at(-1).detail, { values: defaults, saved: true, reason: 'reset' });
+  assert(app.calls.every(([, key]) => key === storageKey), 'engine accessed an unrelated storage key');
+  assert.deepEqual(plain(engine({ values: app.storage }).api.get()), defaults);
+});
+
+test('storage synchronization reacts only to its key and clears invalid remote preferences', () => {
+  const app = engine();
+  app.storageEvent({ key: storageKey, newValue: JSON.stringify(custom) });
+  assert.deepEqual(plain(app.api.get()), custom);
+  assert.equal(app.styles.get('--space-unit'), '5px');
+  assert.deepEqual(app.events.at(-1).detail, { values: custom, saved: true, reason: 'storage' });
+  const eventCount = app.events.length;
+  app.storageEvent({ key: 'idenflu-mono-theme', newValue: 'dark' });
+  assert.equal(app.events.length, eventCount);
+  assert.deepEqual(plain(app.api.get()), custom);
+  app.storageEvent({ key: storageKey, newValue: '{broken' });
+  assert.deepEqual(plain(app.api.get()), defaults);
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+  app.storageEvent({ key: storageKey, newValue: JSON.stringify(custom) });
+  app.storageEvent({ key: null, newValue: null });
+  assert.deepEqual(plain(app.api.get()), defaults);
+  assert.deepEqual(app.events.at(-1).detail, { values: defaults, saved: false, reason: 'storage' });
+  assert.equal(app.calls.filter(([method]) => method !== 'getItem').length, 0, 'remote updates must not write back to storage');
+});

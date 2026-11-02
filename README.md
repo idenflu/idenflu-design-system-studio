@@ -21,6 +21,20 @@ python3 -m http.server 4173 --bind 127.0.0.1
 - 25개 컴포넌트의 사용 기준·구조·키보드·상태·API·HTML 복사 예제
 - `#/patterns/data-states`: 로딩·실패/재시도·빈 목록·검색 0건·정상 목록의 실제 전환
 
+## 화면 조정
+
+상단 **화면 조정**에서 본문 글자 크기·행간·여백 배율·기본 컨트롤 높이·모서리를 실시간으로 바꿀 수 있습니다. 패널의 미리보기와 문서 전체에 반영하고 이 브라우저에 저장합니다.
+
+| 항목 | 기본값 | 조정 범위 |
+| --- | --- | --- |
+| 본문 크기 | 14px | 12–18px |
+| 본문 행간 | 22px | 18–32px |
+| 여백 배율 | 100% | 75–150% |
+| 기본 컨트롤 높이 | 38px | 32–48px |
+| 모서리 | 0px | 0–12px |
+
+큰 글자가 잘리지 않도록 최소 행간과 높이를 자동 보정합니다. **기본값으로 초기화**는 화면 조정만 복원하며 테마와 작성 중인 폼은 유지합니다. **CSS 복사**로 현재 설정을 프로젝트에 적용할 수 있습니다. 저장소를 사용할 수 없으면 현재 화면에 적용하고 안내합니다.
+
 - 본문 Pretendard 14px / 행간 22px
 - 기본 버튼·입력창·셀렉트 높이 38px
 - Primary `#4263CC`, 기본 보더는 중성 회색 `#C6C6CC`
@@ -146,6 +160,7 @@ npm run test:browser
 - `systems/idenflu-mono/navigation.js`: 문서 페이지 전환과 모바일 메뉴 관리
 - `systems/idenflu-mono/tokens.css`: primitive→semantic→component 토큰과 밝은/어두운 테마 값
 - `systems/idenflu-mono/theme.css`, `theme-components.css`, `theme.js`: 테마 적용·고대비·모션 및 모드 전환
+- `systems/idenflu-mono/preferences.js`, `preferences-ui.js`, `preferences.css`: 화면 조정 저장·복원과 패널
 - `tests/`: 브라우저 회귀 시나리오, 독립 소비 fixture, 배포 검증
 - `scripts/`: 로컬 서버, 정적 검사와 해시 기반 빌드
 

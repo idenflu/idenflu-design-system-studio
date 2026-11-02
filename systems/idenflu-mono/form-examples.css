@@ -1,16 +1,15 @@
 /* Form examples compose existing controls without changing their shared states. */
 .form-example-group { min-width:0; margin:0; padding:0; border:0; }
 .form-example-group + .form-example-group { margin-top:var(--space-8); padding-top:var(--space-6); border-top:1px solid var(--divider); }
-.form-example-group > legend { margin:0 0 var(--space-4); padding:0; font-size:16px; font-weight:var(--font-weight-semibold); line-height:24px; }
-.form-example-group > h3 { margin:0 0 var(--space-4); font-size:16px; font-weight:var(--font-weight-semibold); line-height:24px; }
-.form-example-group > .component-helper { margin:-8px 0 var(--space-4); }
+.form-example-group > legend { margin:0 0 var(--space-4); padding:0; font-size:calc(var(--font-size-base) + 2px); font-weight:var(--font-weight-semibold); line-height:calc(var(--line-height-base) + 2px); }
+.form-example-group > h3 { margin:0 0 var(--space-4); font-size:calc(var(--font-size-base) + 2px); font-weight:var(--font-weight-semibold); line-height:calc(var(--line-height-base) + 2px); }
+.form-example-group > .component-helper { margin:calc(var(--space-unit) * -2) 0 var(--space-4); }
 .form-example-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-5) var(--space-6); }
 .form-example-grid > * { min-width:0; }
-.form-example-grid > div > .component-helper { margin-top:6px; }
+.form-example-grid > div > .component-helper { margin-top:calc(var(--space-unit) * 1.5); }
 .form-example-wide { grid-column:1 / -1; }
 .form-example-unit, .form-example-password { min-width:0; width:100%; }
 .form-example-unit input, .form-example-password input { flex:1 1 auto; min-width:0; }
-.form-example-unit .input-suffix { flex:0 0 auto; white-space:nowrap; }
 .form-example-password .input-action { flex-shrink:0; }
 .form-example-slider { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:var(--space-1) var(--space-4); min-width:0; }
 .form-example-slider .field-label { margin-bottom:0; }
@@ -36,7 +35,7 @@
 .form-example-choice-cards small { display:block; margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); word-break:keep-all; }
 .form-example-upload { min-width:0; }
 .form-example-upload .form-pattern-upload { width:100%; }
-.form-example-upload > .component-helper { margin-top:6px; overflow-wrap:anywhere; }
+.form-example-upload > .component-helper { margin-top:calc(var(--space-unit) * 1.5); overflow-wrap:anywhere; }
 .form-example-note { margin-top:var(--space-3); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); word-break:keep-all; }
 .form-example-actions { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-6); }
 .form-example-actions .button { width:auto; }

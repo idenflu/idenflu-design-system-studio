@@ -1,0 +1,116 @@
+/* Keep the settings controls steady while the surrounding design changes. */
+#studio-settings-dialog {
+  --font-size-base: 14px;
+  --font-size-body: 14px;
+  --font-size-caption: 12px;
+  --font-size-title: 18px;
+  --font-size-heading: 24px;
+  --line-height-base: 22px;
+  --line-height-body: 22px;
+  --line-height-control: 20px;
+  --line-height-caption: 18px;
+  --line-height-title: 26px;
+  --line-height-heading: 32px;
+  --space-unit: 4px;
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --control-base-height: 38px;
+  --size-sm-height: 32px;
+  --size-md-height: 38px;
+  --size-lg-height: 44px;
+  --control-height: 38px;
+  --control-px: 12px;
+  --control-gap: 8px;
+  --icon-size: 16px;
+  --range-thumb-width: 12px;
+  --range-thumb-height: 20px;
+  --radius-control: 0px;
+  position: fixed;
+  inset: 12px 12px 12px auto;
+  width: min(440px, calc(100vw - 24px));
+  max-width: none;
+  height: calc(100dvh - 24px);
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-family-body);
+  font-size: 14px;
+  line-height: 22px;
+  box-shadow: var(--shadow-dialog);
+}
+#studio-settings-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+#studio-settings-dialog::backdrop { background: var(--overlay-backdrop); }
+.studio-preferences-header { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding: 24px; border-bottom: 1px solid var(--divider); }
+.studio-preferences-header h2 { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -.3px; }
+.studio-preferences-header p { margin-top: 6px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
+.studio-preferences-header .studio-preferences-hint { margin: 0 0 4px; }
+#studio-preferences-close { flex: 0 0 32px; width: 32px; height: 32px; padding: 8px; }
+.studio-preferences-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-gutter: stable; }
+.studio-preferences-body > section { margin-top: 24px; }
+.studio-preferences-field + .studio-preferences-field { margin-top: 20px; }
+.studio-preferences-label { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.studio-preferences-label label { color: var(--text); font-size: 14px; line-height: 22px; font-weight: 500; }
+.studio-preferences-label output { color: var(--text-secondary); font-size: 14px; line-height: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.studio-preferences-hint { margin-top: 2px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
+#studio-settings-dialog .studio-preferences-field .range-input { height: 32px; }
+.studio-preferences-preview-heading { margin-top: 28px; margin-bottom: 12px; font-size: 14px; line-height: 22px; font-weight: 600; }
+#studio-preferences-preview { display: grid; min-width: 0; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--border); background: var(--surface); font-size: var(--font-size-body); line-height: var(--line-height-body); overflow-wrap: anywhere; }
+#studio-preferences-preview h3 { margin: 0; font-size: var(--font-size-title); line-height: var(--line-height-title); font-weight: 600; }
+#studio-preferences-preview p { margin: 0; font-size: inherit; line-height: inherit; }
+#studio-preferences-preview .field-label { margin: 0; font-size: inherit; line-height: inherit; }
+#studio-preferences-preview .text-input, #studio-preferences-preview .button { min-width: 0; max-width: 100%; border-radius: var(--radius-control); font-size: var(--font-size-body); line-height: var(--line-height-control); }
+#studio-preferences-preview .button { justify-self: start; width: auto; }
+#studio-preview-feedback:empty { display: none; }
+#studio-preview-feedback { color: var(--text-secondary); }
+.studio-preferences-footer { padding: 16px 24px 20px; border-top: 1px solid var(--divider); }
+.studio-preferences-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.studio-preferences-actions .button { flex: 1 1 auto; width: auto; font-size: 14px; line-height: 20px; }
+#studio-preferences-status { min-height: 18px; margin-top: 12px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
+#studio-preferences-storage-note { margin-top: 4px; color: var(--text-secondary); font-size: 12px; line-height: 18px; }
+
+/* Documentation chrome remains usable at the largest body settings. */
+.docs-topbar {
+  --control-height: 32px;
+  --control-px: 8px;
+  --control-gap: 6px;
+  --font-size-body: 14px;
+  --line-height-control: 20px;
+  --radius-control: 0px;
+}
+.docs-topbar .icon-button { flex: 0 0 32px; width: 32px; height: 32px; padding: 7px; }
+.docs-topbar-tools { gap: 12px; }
+.mobile-topbar-actions { flex: 0 0 auto; gap: 6px; }
+.mobile-topbar-actions #open-menu { min-height: 32px; padding: 6px 8px; font-size: 14px; line-height: 20px; white-space: nowrap; }
+@media (max-width: 900px) {
+  .docs-topbar { padding: 16px 24px 12px; }
+  .mobile-brand { gap: 8px; margin-bottom: 12px; }
+  .mobile-brand > a { min-width: 0; flex: 0 1 auto; font-size: 16px; line-height: 24px; letter-spacing: .3px; white-space: nowrap; }
+}
+@media (max-width: 380px) {
+  .docs-topbar { padding-inline: 16px; }
+  .studio-preferences-header { padding: 20px; }
+  .studio-preferences-body { padding: 20px; }
+  .studio-preferences-footer { padding-inline: 20px; }
+}
+@media (max-height: 520px) {
+  .studio-preferences-header { padding-block: 12px; }
+  .studio-preferences-footer { padding-block: 10px; }
+  .studio-preferences-header p { display: none; }
+}
+@media (forced-colors: active) {
+  #studio-settings-dialog { border-color: CanvasText; }
+  #studio-settings-dialog::backdrop { background: Canvas; opacity: .6; }
+}

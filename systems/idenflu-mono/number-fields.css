@@ -14,7 +14,7 @@
 .number-field-input::placeholder { color:var(--text-muted); opacity:1; }
 .number-field-unit { display:flex; flex:0 0 auto; align-items:center; padding-right:var(--control-px); color:var(--text-secondary); font-size:var(--font-size-body); line-height:var(--line-height-control); white-space:nowrap; }
 .number-field-stepper { display:grid; flex:0 0 calc(var(--control-height) - 8px); grid-template-rows:repeat(2,minmax(0,1fr)); min-width:0; width:calc(var(--control-height) - 8px); border-left:1px solid var(--border); }
-.number-field-step { display:flex; align-items:center; justify-content:center; min-width:0; min-height:0; margin:0; padding:0; border:0; border-radius:var(--radius-control); background:transparent; color:var(--text-secondary); font:inherit; font-size:var(--font-size-body); line-height:1; cursor:pointer; }
+.number-field-step { display:flex; align-items:center; justify-content:center; min-width:0; min-height:0; margin:0; padding:0; border:0; border-radius:0; background:transparent; color:var(--text-secondary); font:inherit; font-size:var(--font-size-body); line-height:1; cursor:pointer; }
 .number-field-step + .number-field-step { border-top:1px solid var(--divider); }
 .number-field-step:hover:not(:disabled) { background:var(--surface-hover); color:var(--text); }
 .number-field-step:active:not(:disabled) { background:var(--surface-pressed); }
@@ -28,8 +28,8 @@
 .number-field:has(.number-field-input[aria-invalid="true"]), .number-field.is-invalid { border-color:var(--danger); }
 .number-field:has(.number-field-input[aria-invalid="true"]):focus-within, .number-field.is-invalid:focus-within { border-color:transparent; }
 .number-field:has(.number-field-input[aria-invalid="true"]):focus-within::after, .number-field.is-invalid:focus-within::after { box-shadow:inset 0 0 0 2px var(--focus-on-danger); }
-.number-field-meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--space-1) var(--space-3); margin-top:6px; color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-.number-field-feedback { margin-top:6px; color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.number-field-meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--space-1) var(--space-3); margin-top:calc(var(--space-unit) * 1.5); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.number-field-feedback { margin-top:calc(var(--space-unit) * 1.5); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .number-field-feedback.is-error, .number-field-feedback[data-state="error"] { color:var(--danger); }
 .number-field-feedback:empty { display:none; }
 .number-field-presets { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-2); margin-top:var(--space-3); }
@@ -51,3 +51,9 @@
 .number-focus-option { display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); max-width:368px; margin-top:var(--space-5); }
 .number-focus-option > label:first-child { font-size:var(--font-size-body); line-height:var(--line-height-control); }
 .number-focus-option .switch { flex-shrink:0; }
+
+.number-field-stepper { border-start-end-radius:inherit; border-end-end-radius:inherit; }
+.number-field-step:first-child { border-start-end-radius:var(--radius-control); }
+.number-field-step:last-child { border-end-end-radius:var(--radius-control); }
+.number-field--horizontal .number-field-step:first-child { border-start-end-radius:0; }
+.number-field--horizontal .number-field-step:last-child { border-start-end-radius:var(--radius-control); }

@@ -6,7 +6,7 @@
     buttons: ['버튼 저장 취소 액션 button', '한 번의 행동을 실행할 때 사용합니다.', '화면 이동은 링크를 사용하고, 한 영역의 주요 행동은 하나로 제한합니다.', '라벨 · 선택적 아이콘 · 로딩 표시', 'Tab 이동, Enter·Space 실행', '.button', null, 'disabled는 실제 속성으로, loading은 disabled와 aria-busy를 함께 제공합니다.'],
     select: ['선택 셀렉트 검색 복수 멀티 태그 combobox', '정해진 옵션 중 하나 또는 여러 항목을 선택할 때 사용합니다.', '자유 입력은 Text fields, 소수의 즉시 선택은 라디오를 사용합니다.', '라벨 · 트리거/검색창 · 옵션 목록 · 선택값', '기본형: 방향키·Home·End 탐색. 검색형: 방향키 탐색. Enter 선택, Escape 닫기, Tab 이동', '[data-select]', 'select / search-select / multiselect', 'disabled 옵션은 탐색에서 제외합니다. 빈 검색 결과와 aria-invalid 오류를 구분합니다.'],
     selection: ['체크박스 라디오 토글 스위치 checkbox radio switch', '복수 선택은 체크박스, 한 개 선택은 라디오, 즉시 반영 설정은 토글을 사용합니다.', '토글에 저장 버튼이 필요하면 반영 시점을 문구로 명확히 안내합니다.', '네이티브 input · 장식 요소 · 연결된 라벨', 'Space 선택, 라디오 방향키 이동', '.choice', null, 'disabled·checked는 input 속성입니다. 부분 선택은 input.indeterminate로 설정합니다.'],
-    'text-fields': ['입력 필드 검색 비밀번호 이메일 textarea', '자유 텍스트와 여러 줄 내용을 입력받습니다.', 'placeholder를 라벨 대신 사용하지 않습니다. 오류는 색상과 문구를 함께 제공합니다.', 'label · input/textarea · 선택적 prefix/suffix · 도움말/오류', 'Tab 이동, 네이티브 텍스트 편집 키', '.input-group', null, 'readonly는 읽고 복사할 수 있으며 disabled는 제출 대상에서 제외됩니다. aria-invalid와 오류 참조를 함께 갱신합니다.'],
+    'text-fields': ['입력 필드 검색 비밀번호 이메일 textarea prefix suffix 프리픽스 서픽스 접두사 접미사 좌측 라벨 가로 텍스트 정렬 가운데 오른쪽', '자유 텍스트와 여러 줄 내용을 입력받습니다. 여러 항목의 라벨은 입력 왼쪽에 배치할 수도 있습니다.', 'placeholder를 라벨 대신 사용하지 않습니다. 일반 텍스트는 시작 정렬을 기본으로 사용합니다. 고정된 주소·단위는 입력값에 포함되지 않으므로 제출할 때 필요한 형식으로 조합합니다.', 'label · input/textarea · 선택적 prefix/suffix · 도움말/오류', 'Tab 이동, 네이티브 텍스트 편집 키. 보조 버튼은 Enter·Space 실행', '.input-group', null, '의미 있는 고정 텍스트는 aria-describedby로 연결하고 장식 아이콘은 숨깁니다. 오류는 색상과 문구로 표시하고 aria-invalid와 오류 참조를 함께 갱신합니다. readonly는 읽고 복사할 수 있으며 disabled는 제출 대상에서 제외됩니다.'],
     'number-fields': ['숫자 정수 소수 금액 수량 number', '범위·소수 자릿수·정확한 증감이 필요한 숫자를 입력받습니다.', '금액을 부동소수점 Number로 변환하지 않습니다. API에는 정확한 10진 문자열을 전달합니다.', '라벨 · spinbutton · 단위 · 증감 버튼 · 오류', '↑·↓ 단위 증감, PageUp·PageDown 10배 증감, Enter 값 확인, 직접 입력', '[data-number-field]', 'number-field', '최소·최대·자릿수 오류를 표시합니다. 빈 값은 null, 정상 값은 정확한 10진 문자열입니다.'],
     chips: ['칩 태그 필터 chip tag', '짧은 선택값·필터·분류를 표시합니다.', '한 개 칩에 선택과 삭제를 중첩 버튼으로 넣지 않습니다.', '라벨 · 선택적 삭제 버튼', 'Tab 이동, Enter·Space 실행', '.chip', null, '선택 상태는 aria-pressed, 삭제 버튼에는 제거할 대상 이름을 제공합니다.'],
     slider: ['슬라이더 범위 슬라이드 range', '연속 값이나 일정 간격의 범위를 빠르게 조절합니다.', '정확한 값 입력이 중요하면 숫자 입력을 함께 제공합니다.', 'label · 네이티브 range · 출력값', '방향키 조절, Home·End 경계', '.slider-field', null, 'min·max·step·disabled를 지정하고 단위가 있으면 aria-valuetext를 갱신합니다.'],
@@ -44,6 +44,13 @@
       for (const query of ['[data-date-picker="single"]', '[data-date-picker="range"]']) {
         const target = local(query); if (target) targets.push(target);
       }
+    } else if (key === 'text-fields') {
+      const horizontal = local('.field-horizontal');
+      const vertical = local('#project-slug')?.closest('.input-group');
+      const alignment = local('.field-alignment-examples');
+      if (horizontal) targets.push(horizontal);
+      if (vertical) targets.push(vertical);
+      if (alignment) targets.push(alignment);
     } else {
       const target = key === 'tabs' ? local('.tabs') || local(selector) : local(selector) || (key === 'overlays' ? document.querySelector(selector) : null);
       if (target) targets.push(target);

@@ -17,8 +17,11 @@ test('distribution is deterministic and contains portable runtime, documentation
     const runtime = await readFile(resolve(target, first.files.runtime), 'utf8');
     assert(!runtime.includes('#profile-form'), 'portable runtime must not require demo DOM');
     assert(!runtime.includes('#component-search'), 'portable runtime must not require demo fields');
+    assert(!runtime.includes('IdenfluPreferences'), 'portable runtime must not depend on studio preferences');
     const html = await readFile(resolve(target, 'index.html'), 'utf8');
     assert(html.includes(first.files.docs));
+    assert(html.includes(first.files.preferences));
+    assert(html.indexOf(first.files.preferences) < html.indexOf(first.files.docsStyles), 'preferences apply before styles');
     assert(!html.includes('?v='));
     assert((await readFile(resolve(target, 'assets/fonts/LICENSE.txt'), 'utf8')).length > 0);
     assert((await readFile(resolve(target, 'assets/icons/idenflu/SOURCE.md'), 'utf8')).length > 0);

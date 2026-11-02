@@ -55,6 +55,40 @@
     let dates = inputs.map(() => null);
     let dateErrors = inputs.map(() => false);
     const formErrors = inputs.map(() => null);
+    let positionFrame = 0;
+
+    function positionPopup() {
+      if (popup.hidden) return;
+      const anchor = picker.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = window.innerHeight;
+      const gap = 6;
+      const edge = 12;
+      if (anchor.bottom <= edge || anchor.top >= viewportHeight - edge || anchor.right <= edge || anchor.left >= viewportWidth - edge) {
+        close();
+        return;
+      }
+      const below = Math.max(0, viewportHeight - anchor.bottom - gap - edge);
+      const above = Math.max(0, anchor.top - gap - edge);
+      const styles = getComputedStyle(popup);
+      const naturalHeight = popup.scrollHeight + parseFloat(styles.borderTopWidth || 0) + parseFloat(styles.borderBottomWidth || 0);
+      const up = below < naturalHeight && above > below;
+      picker.classList.toggle('opens-up', up);
+      picker.classList.remove('align-right');
+      popup.style.setProperty('--date-popup-available-height', `${up ? above : below}px`);
+      const width = popup.getBoundingClientRect().width;
+      const left = Math.max(edge, Math.min(anchor.left, viewportWidth - width - edge));
+      popup.style.left = `${left - anchor.left}px`;
+      popup.style.right = 'auto';
+    }
+
+    function schedulePosition() {
+      if (popup.hidden || positionFrame) return;
+      positionFrame = requestAnimationFrame(() => {
+        positionFrame = 0;
+        if (scope.active) positionPopup();
+      });
+    }
 
     function renderValidation() {
       const invalid = inputs.map((input, i) => dateErrors[i] || Boolean(formErrors[i]?.message));
@@ -184,6 +218,7 @@
         }
         grid.append(row);
       }
+      positionPopup();
       if (focus) grid.querySelector('[tabindex="0"]').focus();
     }
     function close(restoreFocus = false) {
@@ -191,6 +226,11 @@
       popup.hidden = true;
       trigger.setAttribute('aria-expanded', 'false');
       picker.classList.remove('opens-up', 'align-right');
+      if (positionFrame) cancelAnimationFrame(positionFrame);
+      positionFrame = 0;
+      popup.style.removeProperty('--date-popup-available-height');
+      popup.style.removeProperty('left');
+      popup.style.removeProperty('right');
       if (restoreFocus) trigger.focus();
     }
     function open() {
@@ -200,9 +240,6 @@
       popup.hidden = false;
       trigger.setAttribute('aria-expanded', 'true');
       renderCalendar();
-      const rect = popup.getBoundingClientRect();
-      if (rect.bottom > window.innerHeight && picker.getBoundingClientRect().top > rect.height) picker.classList.add('opens-up');
-      if (rect.right > window.innerWidth - 12) picker.classList.add('align-right');
       grid.querySelector('[tabindex="0"]').focus();
     }
     function choose(date) {
@@ -280,6 +317,9 @@
     listen(document, 'click', (event) => { if (!event.composedPath().includes(picker)) close(); });
     listen(document, 'select-open', (event) => { if (event.detail !== picker) close(); });
     listen(window, 'hashchange', () => close());
+    listen(window, 'resize', schedulePosition);
+    listen(window, 'scroll', schedulePosition, { capture: true, passive: true });
+    listen(document, 'preferenceschange', schedulePosition);
     listen(picker.closest('form'), 'reset', () => setTimeout(() => {
       if (!scope.active) return;
       close();

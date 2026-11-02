@@ -1,6 +1,5 @@
 /* Theme values live in tokens.css; this file handles shell adapters and access preferences. */
 .sidebar, .docs-topbar { background:var(--canvas); }
-.nav-group a[aria-current="page"] { background:var(--info-surface); }
 .sidebar-backdrop { background:var(--overlay-backdrop); }
 .skip-link { background:var(--inverse-canvas); color:var(--inverse-text); }
 img[src*="/icons/"] { filter:var(--icon-filter); }

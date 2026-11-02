@@ -28,12 +28,13 @@ export async function build(destination = resolve(project, 'dist')) {
     styles: await bundle(componentStyles, 'css', 'idenflu-mono'),
     runtime: await bundle(componentScripts, 'js', 'idenflu-mono'),
     theme: await bundle(['theme.js'], 'js', 'theme'),
+    preferences: await bundle(['preferences.js'], 'js', 'preferences'),
     docsStyles: await bundle(styles, 'css', 'docs'),
     docs: await bundle(scripts.filter((match) => match[2].includes('defer')).map((match) => match[1]), 'js', 'docs'),
   };
   let document = html.replace(/\s*<link\b[^>]*rel="stylesheet"[^>]*>/g, '')
     .replace(/\s*<script src="\.\/[^\"]+"[^>]*><\/script>/g, '');
-  document = document.replace('</head>', `  <script src="./${files.theme}"></script>\n    <link rel="stylesheet" href="./${files.docsStyles}" />\n    <script src="./${files.docs}" defer></script>\n  </head>`);
+  document = document.replace('</head>', `  <script src="./${files.theme}"></script>\n    <script src="./${files.preferences}"></script>\n    <link rel="stylesheet" href="./${files.docsStyles}" />\n    <script src="./${files.docs}" defer></script>\n  </head>`);
   await writeFile(resolve(output, 'index.html'), document);
   await cp(resolve(source, 'assets'), resolve(output, 'assets'), { recursive: true });
   for (const file of ['index.html', 'gallery.css', 'gallery-entry.js', 'gallery-assets']) await cp(resolve(project, file), resolve(destination, file), { recursive: true });
