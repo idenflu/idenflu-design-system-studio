@@ -1,9 +1,13 @@
 name: Design system quality
-on: [push, pull_request]
+on:
+  push:
+    branches: [deploy]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   react-package:
+    if: github.ref == 'refs/heads/deploy'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -24,6 +28,7 @@ jobs:
       - run: npm run studio:check
         working-directory: packages/react
   verify:
+    if: github.ref == 'refs/heads/deploy'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

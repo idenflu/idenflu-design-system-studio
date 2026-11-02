@@ -68,13 +68,31 @@ npx playwright test --config packages/react/studio/playwright.config.cjs
 
 저장소의 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 설정합니다. `Deploy from a branch` 방식은 빌드되지 않은 소스만 올리므로 Git에서 제외한 `docs-dist` 파일이 없어 모노 문서가 표시되지 않습니다.
 
-[Pages 워크플로](.github/workflows/pages.yml)는 `main`에 푸시하거나 **Actions → Deploy GitHub Pages → Run workflow**에서 `main`을 선택하면 실행됩니다. 루트와 React 의존성을 설치하고, 검사·`npm run build`·타입 검사를 통과한 `dist/` 전체를 배포합니다. 생성된 JS·CSS를 직접 커밋할 필요는 없습니다.
+[Pages 워크플로](.github/workflows/pages.yml)는 `deploy`에 푸시하거나 **Actions → Deploy GitHub Pages → Run workflow**에서 `deploy`를 선택하면 실행됩니다. 루트와 React 의존성을 설치하고, 검사·`npm run build`·타입 검사를 통과한 `dist/` 전체를 배포합니다. 생성된 JS·CSS를 직접 커밋할 필요는 없습니다.
+
+`main`과 `dev`의 푸시·PR에는 자동 Actions를 실행하지 않습니다. 품질 검사와 Pages 배포는 `deploy`에 푸시할 때 실행합니다. 수동 품질 검사·Pages 배포·React 패키지 게시도 `deploy`에서만 작업을 실행합니다.
+
+**Settings → Environments → github-pages → Deployment branches and tags**에서도 `deploy`만 허용합니다. Pages의 Source는 계속 **GitHub Actions**를 사용합니다.
+
+배포할 변경을 개발 브랜치 `dev`에 커밋·푸시한 뒤 다음과 같이 반영합니다.
+
+```sh
+git fetch origin
+git switch dev
+git pull --ff-only
+git switch deploy
+git merge --ff-only dev
+git push origin deploy
+git switch dev
+```
+
+`deploy`는 배포할 개발 커밋을 반영하는 용도로 사용합니다. 코드는 개발 브랜치에서 수정합니다.
 
 - [디자인 시스템 갤러리](https://idenflu.github.io/idenflu-design-system-studio/)
 - [idenflu mono 문서](https://idenflu.github.io/idenflu-design-system-studio/systems/idenflu-mono/index.html#/overview)
 - [Datetime picker](https://idenflu.github.io/idenflu-design-system-studio/systems/idenflu-mono/index.html#/components/datetime-picker)
 
-설정을 바꾸고 워크플로 파일을 푸시한 뒤, Actions에서 build와 deploy가 모두 성공했는지 확인합니다. 문서는 저장소 하위 경로에서도 동작하도록 상대 경로와 해시 라우팅을 사용합니다.
+설정을 바꾸고 `deploy`를 푸시한 뒤, Actions에서 build와 deploy가 모두 성공했는지 확인합니다. 문서는 저장소 하위 경로에서도 동작하도록 상대 경로와 해시 라우팅을 사용합니다.
 
 ## 파일 구성
 
