@@ -75,7 +75,16 @@ export function IconExample() {
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
   </>;
 }`,
-  'components/buttons':'<Button variant="outline">저장</Button>',
+  'components/buttons':`import { Button, Icon, Segmented } from '@idenflu/mono-react';
+
+<Button variant="outline">저장</Button>
+<Segmented label="보기 방식" size="md" defaultValue="list"
+  options={[
+    { value: 'list', label: <><Icon name="list" />목록</> },
+    { value: 'grid', label: <><Icon name="grid" />격자</> },
+    { value: 'calendar', label: <><Icon name="calendar" />캘린더</> },
+  ]}
+/>`,
   'components/text-fields':`import { Icon, TextField } from '@idenflu/mono-react';
 
 <TextField

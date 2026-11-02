@@ -54,7 +54,7 @@
 .ui-icon { forced-color-adjust:none; background-color:currentColor; }
 .button { forced-color-adjust:none; outline:1px solid ButtonText; outline-offset:-1px; }
 .button:disabled { color:GrayText; }
-:is(.select-option, .calendar-day, .chip)[aria-selected="true"], .select-option.is-active, .calendar-day[aria-pressed="true"], .chip[aria-pressed="true"], .tree-item.is-selected, .tab[aria-selected="true"] { forced-color-adjust:none;
+:is(.select-option, .calendar-day, .chip)[aria-selected="true"], .select-option.is-active, .calendar-day[aria-pressed="true"], .chip[aria-pressed="true"], .tree-item.is-selected, .tab[aria-selected="true"], .segmented-control > button[aria-pressed="true"] { forced-color-adjust:none;
     background:Highlight !important;
     color:HighlightText !important; }
 .select-option[aria-disabled="true"] { background:Canvas !important; color:GrayText !important; }
