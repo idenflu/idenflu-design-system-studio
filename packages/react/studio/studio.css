@@ -13,7 +13,13 @@
 .react-studio .nav-subgroup > summary .ui-icon { flex:none; width:16px; height:16px; transition:transform var(--motion-fast) var(--motion-easing); }
 .react-studio .nav-subgroup[open] > summary .ui-icon { transform:rotate(180deg); }
 .react-studio .sidebar .nav-children a[aria-current="page"], .react-studio .nav-overview[aria-current="page"] { background:transparent; }
-.react-studio .overview-links { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+.react-studio .overview-links { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+.docs-search-control { position:relative; }
+.react-studio .docs-search-control .text-input { padding-inline-end:38px; }
+.docs-search-control input::-webkit-search-cancel-button { display:none; }
+.react-studio .docs-search-clear { position:absolute; inset-block:3px; inset-inline-end:3px; width:calc(var(--control-height) - 6px); height:auto; min-height:0; padding:0; display:grid; place-items:center; }
+.docs-search-clear .ui-icon { width:16px; height:16px; }
+.docs-search-empty { display:grid; justify-items:start; gap:var(--space-4); padding:var(--space-4); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .react-studio .react-studio-section:first-child { margin-top:0; padding-top:0; border-top:0; }
 .react-studio-section { margin-top:var(--space-10); padding-top:var(--space-7); border-top:1px solid var(--divider); }
 .react-studio-section h2 { font-size:var(--font-size-title); font-weight:var(--font-weight-semibold); }
@@ -91,7 +97,9 @@
 .react-studio-caption { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .react-studio-field-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--space-2); }
 .react-studio-horizontal-fields { max-width:760px; }
-.react-studio-tree-sample { max-width:320px; }
+.react-studio-tree-sample { max-width:360px; padding:var(--space-3); border:1px solid var(--divider); }
+.react-studio .react-studio-tree-sample .demo-tree { max-width:none; }
+.react-studio-card-sample { max-width:440px; }
 .react-studio-divider-inline { display:flex; align-items:center; gap:var(--space-4); min-height:var(--control-height); }
 .react-studio-search-field { max-width:440px; }
 .react-studio-inverse { padding:var(--space-5); background:var(--inverse-canvas); color:var(--inverse-text); }
@@ -119,7 +127,8 @@
 .react-studio-section .simple-list, .react-studio-section .selectable-list, .react-studio-section .step-panel { margin-top:0; }
 .react-studio .docs-toc { max-width:1040px; }
 .react-studio-field-wide { grid-column:1 / -1; }
-.react-studio-code { overflow:auto; padding:var(--space-4); background:var(--surface); }
+.react-studio-code { max-height:480px; overflow:auto; overscroll-behavior:contain; padding:var(--space-4); background:var(--surface); }
+.react-studio-code:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .react-studio-code pre { font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; }
 .react-datetime-usage .tab-list { overflow-x:auto; }
 .react-datetime-value pre { white-space:pre-wrap; overflow-wrap:anywhere; }
@@ -148,6 +157,7 @@
 .react-studio-size { display:flex; align-items:center; gap:var(--space-4); flex-wrap:wrap; }
 .react-studio-note { margin-top:var(--space-6); color:var(--text-secondary); }
 .react-pattern-form { display:grid; gap:var(--space-5); max-width:720px; min-width:0; }
+.react-pattern-form-states { max-width:720px; align-items:start; }
 .react-pattern-form .form-pattern-actions { margin-top:0; }
 .react-pattern-form .form-pattern-result:not(:empty) { margin-top:0; }
 .react-pattern-form .form-example-group { margin:0; }
@@ -182,6 +192,8 @@
 }
 @media (max-width:600px) {
   .react-studio-field-grid, .react-studio-size-grid, .react-studio .overview-links { grid-template-columns:minmax(0, 1fr); }
+  .react-pattern-form :is(.number-field-feedback,.date-field-error) { min-height:0; }
+  .react-pattern-form :is(.number-field-feedback,.date-field-error)[hidden] { display:none !important; }
   .react-studio-table-toolbar, .react-studio-table-footer { align-items:flex-start; }
   .react-studio-table-toolbar > p, .react-studio-table-footer > p { flex-basis:100%; }
   .react-studio-table-footer .pagination { max-width:100%; flex-wrap:wrap; }

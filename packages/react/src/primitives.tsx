@@ -107,8 +107,8 @@ export const Switch = React.forwardRef<HTMLInputElement, ChoiceProps>(function S
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> { variant?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger' }
 export function Badge({ variant = 'neutral', className, ...props }: BadgeProps) { return <span {...props} className={classes('badge', variant !== 'neutral' && `badge--${variant}`, className)} />; }
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> { variant?: 'info' | 'success' }
-export function Alert({ variant = 'info', className, ...props }: AlertProps) { return <div {...props} className={classes('inline-alert', variant === 'success' && 'inline-alert--success', className)} />; }
+export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> { variant?: 'info' | 'success' | 'warning' | 'danger' }
+export function Alert({ variant = 'info', className, ...props }: AlertProps) { return <div {...props} className={classes('inline-alert', variant !== 'info' && `inline-alert--${variant}`, className)} />; }
 export { Chip } from './chip';
 export type { ChipProps, InteractiveChipProps, StaticChipProps } from './chip';
 export interface ProgressProps extends React.ProgressHTMLAttributes<HTMLProgressElement> { thickness?: 'thin' | 'normal' | 'thick'; variant?: 'primary' | 'success' | 'warning' | 'danger' }

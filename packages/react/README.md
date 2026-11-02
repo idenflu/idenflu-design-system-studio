@@ -188,6 +188,8 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu
 </Dialog>
 ```
 
+`Alert`는 관련 입력이나 작업 영역에 표시하는 인라인 안내입니다. `variant="info | success | warning | danger"`로 의미에 맞는 색상을 사용합니다. 정적인 안내에는 알림 역할을 생략하고, 작업 후 나타나는 완료 안내에는 `role="status"`, 즉시 알려야 하는 오류에는 `role="alert"`를 지정합니다.
+
 `Toast`의 `variant`에는 `info`·`success`·`warning`·`danger`를 지정하고, `action`에 재시도·실행 취소 버튼을 넣을 수 있습니다. 기본 알림 역할은 `status`이며 `danger`는 `alert`입니다. 자동으로 닫히지 않으므로 표시 상태와 닫기 동작을 앱에서 연결합니다.
 
 ```tsx

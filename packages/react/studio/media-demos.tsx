@@ -17,7 +17,7 @@ function SliderExample({id, label, initialValue = 50, step = 1, disabled = false
 export function SliderDemos() {
   return <>
     <Section title="슬라이더" description="값과 범위를 함께 표시합니다. 방향키로도 값을 조절할 수 있습니다.">
-      <div className="react-studio-field-grid">
+      <div className="react-studio-size-grid">
         <div className="react-studio-example"><SliderExample id="studio-slider" label="진행률" /></div>
         <div className="react-studio-example"><SliderExample id="studio-slider-step" label="단계별 조절" initialValue={60} step={10} /><p className="react-studio-caption">10 단위로 조절합니다.</p></div>
         <div className="react-studio-example"><SliderExample id="studio-slider-disabled" label="비활성" initialValue={35} disabled /></div>

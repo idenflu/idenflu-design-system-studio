@@ -13,6 +13,7 @@ import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from
 import { DocumentShell, Overview, useDocumentRoute } from './shell';
 import { DividerDemos } from './divider-demos';
 import { patternPages, patternSnippets } from './patterns';
+import { componentUsage } from './component-usage';
 import icons from './dist/icons.json';
 
 const snippets: Record<string, string> = {
@@ -105,7 +106,6 @@ export function IconExample() {
 <Switch size="md" label="자동 저장" />
 <Switch size="lg" label="활동 알림" defaultChecked />
 <Switch label="비활성 설정" disabled />`,
-  'components/select':'<Select label="담당 팀" options={[{ value: "design", label: "디자인", description: "제품 경험을 설계합니다.", icon: <Icon name="grid" /> }]} />',
   'components/number-fields':`import { Icon, NumberField } from '@idenflu/mono-react';
 
 <NumberField label="참여 인원" prefixIcon={<Icon name="person" />}
@@ -113,8 +113,6 @@ export function IconExample() {
 <NumberField label="작업 기간" prefixIcon={<Icon name="calendar" />}
              defaultValue="3" min="0" decimals={1} step="0.5" unit="일" />`,
   'components/date-picker':'<DatePicker label="시작일" />\n<DateRangePicker label="기간" />',
-  'components/tree':'<Tree label="메뉴" items={items} />',
-  'components/tabs':'<Tabs label="설정" items={items} />',
   'components/progress':`import { Progress, SegmentedProgress, CircleProgress } from '@idenflu/mono-react';
 
 <Progress value={60} max={100} aria-label="파일 업로드" />
@@ -132,8 +130,6 @@ export function LoadingExample() {
     <Spinner kind="nova" size="small" />
   </div>;
 }`,
-  'components/file-upload':'<FileUpload accept="image/png,image/jpeg,application/pdf" maxSizeBytes={5 * 1024 * 1024} onFilesChange={setFiles} />',
-  'components/feedback':'<Badge variant="success">완료</Badge>\n<Alert><strong>안내</strong><p>내용을 확인하세요.</p></Alert>',
   'components/accordion':'<Accordion><AccordionItem title="제목">내용</AccordionItem></Accordion>',
   'components/overlays':`import { useState } from 'react';
 import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Toast } from '@idenflu/mono-react';
@@ -187,18 +183,16 @@ export function OverlayExample() {
   'components/list':'<List><ListItem>디자인 시스템</ListItem></List>',
   'components/slider':'<Slider aria-label="진행률" defaultValue={50} />',
   'components/tooltip':'<Tooltip content="도움말"><Button>정보</Button></Tooltip>',
-  'components/dropdown-menu':'<DropdownMenu trigger="더보기" items={items} onSelect={handleSelect} />',
   'components/popover':'<Popover trigger="표시 설정" label="표시 설정">내용</Popover>',
-  'components/drawer':'<Drawer open={open} onOpenChange={setOpen} aria-label="상세 정보">내용</Drawer>',
-  'components/avatar':'<Avatar size="md" shape="circle" aria-label="김민수">김</Avatar>',
   'components/stepper':'<Stepper aria-label="프로젝트 생성" steps={["기본 정보", "확인"]} currentStep={0} />',
   'components/card':'<Card><h3>프로젝트</h3><p>상세 내용</p></Card>',
   'patterns/form/basic':'<TextField label="이름" name="name" required error={errors.name} />\n<TextField label="이메일" name="email" type="email" required error={errors.email} />',
   ...patternSnippets,
+  ...componentUsage,
 };
 function CodeExample({ code }: { code:string }) {
   const [message, setMessage] = React.useState('');
-  return <Section title="React 사용 예시" description="패키지에서 컴포넌트를 가져와 사용합니다."><div className="react-studio-code"><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
+  return <Section title="React 사용 예시" description="패키지에서 컴포넌트를 가져와 사용합니다."><div className="react-studio-code" role="region" aria-label="React 사용 예시 코드" tabIndex={0}><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
 }
 function FoundationIcons() {
   const [query, setQuery] = React.useState('');

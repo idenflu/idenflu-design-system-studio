@@ -58,6 +58,11 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
   const restoreFocus = React.useRef(true), wasOpen = React.useRef(false), initialRoute = React.useRef(true);
   const needle = normalize(query.trim());
   const shown = menuRoutes.filter(item => normalize(`${item.title} ${item.description} ${item.searchTerms} ${item.route}`).includes(needle));
+  const clearSearch = () => {
+    setQuery('');
+    setExpanded(previous => ({...previous, ...currentGroups(current.group)}));
+    search.current?.focus();
+  };
   const closeMenu = (restore = true) => { restoreFocus.current = restore; setMenuOpen(false); };
   const focusHeading = () => { const heading = surface.current?.querySelector<HTMLElement>('h1'); heading?.focus({preventScroll:true}); window.scrollTo(0, 0); };
   const navigate = (path:string) => {
@@ -133,11 +138,12 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
     <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); surface.current?.querySelector<HTMLElement>('main')?.focus(); }}>본문 바로가기</a>
     <aside className="sidebar" id="sidebar" ref={sidebar} aria-label="문서 메뉴" role={mobile && menuOpen ? 'dialog' : undefined} aria-modal={mobile && menuOpen ? true : undefined} aria-hidden={mobile && !menuOpen ? true : undefined}>
       <div className="sidebar-brand"><a className="wordmark" href="#/overview" aria-label="idenflu mono 홈" onClick={() => navigate('overview')}>idenflu mono</a><button className="icon-button sidebar-close" type="button" aria-label="메뉴 닫기" onClick={() => closeMenu()}><Icon name="close" /></button><p>Design system</p></div>
-      <div className="docs-search"><label className="sr-only" htmlFor="docs-search">문서 검색</label><input ref={search} className="text-input" id="docs-search" type="search" placeholder="문서 검색 · /" autoComplete="off" aria-describedby="docs-search-status" value={query} onChange={event => { setQuery(event.target.value); if (!normalize(event.target.value)) setExpanded(previous => ({...previous, ...currentGroups(current.group)})); }} onKeyDown={event => {
-        if (event.key === 'Escape' && query) { event.preventDefault(); event.stopPropagation(); setQuery(''); setExpanded(previous => ({...previous, ...currentGroups(current.group)})); }
+      <div className="docs-search"><label className="sr-only" htmlFor="docs-search">문서 검색</label><div className="docs-search-control"><input ref={search} className="text-input" id="docs-search" type="search" placeholder="문서 검색 · /" autoComplete="off" aria-describedby="docs-search-status" value={query} onChange={event => { setQuery(event.target.value); if (!normalize(event.target.value)) setExpanded(previous => ({...previous, ...currentGroups(current.group)})); }} onKeyDown={event => {
+        if (event.key === 'Escape' && query) { event.preventDefault(); event.stopPropagation(); clearSearch(); }
         else if (event.key === 'Enter' && shown.length) { event.preventDefault(); location.hash = `#/${shown[0].route}`; navigate(shown[0].route); }
-      }} /><p id="docs-search-status" role="status" aria-live="polite">{shown.length ? `${shown.length}개 문서` : '검색 결과가 없습니다.'}</p></div>
+      }} />{query && <button className="icon-button docs-search-clear" type="button" aria-label="검색어 지우기" onClick={clearSearch}><Icon name="close" /></button>}</div><p id="docs-search-status" role="status" aria-live="polite">{shown.length ? `${shown.length}개 문서` : '검색 결과가 없습니다.'}</p></div>
       <nav className="docs-navigation" id="react-studio-nav" ref={nav} aria-label="문서 탐색">
+        {!shown.length && <div className="docs-search-empty"><p>문서 이름이나 다른 키워드로 검색해보세요.</p><button className="button button--outline button-inline" type="button" onClick={clearSearch}>전체 문서 보기</button></div>}
         {docLink(menuRoutes[0], 'nav-overview')}
         {groups.map(group => <details className="nav-group" key={group} hidden={!!needle && !shown.some(item => groupItems(group).includes(item))} open={groupOpen(group)}>
           {groupSummary(group)}<div className="nav-children">
@@ -174,5 +180,5 @@ export function Overview() {
   }, []);
   return <><section className="hero" aria-labelledby="page-title"><p className="eyebrow">DESIGN SYSTEM</p><h1 id="page-title" tabIndex={-1}>Form follows<br />function.</h1><p className="hero-description">A precise foundation for everyday interfaces.</p></section>
     <dl className="overview-facts"><div><dt>Primary</dt><dd><span className="inline-color" aria-hidden="true" />{primary}</dd></div><div><dt>Typography</dt><dd>{values.fontSize}px / {values.lineHeight}px</dd></div><div><dt>Control height</dt><dd>{values.controlHeight}px</dd></div><div><dt>Corner radius</dt><dd>{values.radius}px</dd></div></dl>
-    <section className="overview-start"><h2>하나의 기준으로, 일관되게.</h2><p>기초 스타일에서 필요한 컴포넌트까지 찾아보세요.</p><div className="overview-links"><a href="#/foundations/colors"><span>01 / Foundations</span><h3>기초 스타일</h3><p>색상, 타이포그래피와 인터랙션의 기본 규칙.</p></a><a href="#/components/buttons"><span>02 / Components</span><h3>컴포넌트</h3><p>버튼부터 테이블까지, 직접 사용해보는 기본 요소.</p></a></div></section></>;
+    <section className="overview-start"><h2>하나의 기준으로, 일관되게.</h2><p>기초 스타일부터 컴포넌트와 폼 패턴까지 찾아보세요.</p><div className="overview-links"><a href="#/foundations/colors"><span>01 / Foundations</span><h3>기초 스타일</h3><p>색상, 타이포그래피와 인터랙션의 기본 규칙.</p></a><a href="#/components/buttons"><span>02 / Components</span><h3>컴포넌트</h3><p>버튼부터 테이블까지, 직접 사용해보는 기본 요소.</p></a><a href="#/patterns/form/basic"><span>03 / Patterns</span><h3>패턴</h3><p>입력 폼과 데이터 상태를 조합한 화면 예시.</p></a></div></section></>;
 }

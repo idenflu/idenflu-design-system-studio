@@ -39,7 +39,8 @@ export function FeedbackDemos() {
       <p className="react-studio-caption">배지는 상태를 안내하는 표시입니다. 선택하거나 필터링할 때는 칩을 사용합니다.</p>
     </Section>
     <Section title="인라인 알림" description="관련된 입력이나 작업 영역 가까이에 안내와 결과를 표시합니다.">
-      <div className="react-studio-field-grid"><Alert><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert><Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert></div>
+      <div className="react-studio-field-grid"><Alert><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert><Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert><Alert variant="warning"><strong>주의</strong><p>저장 공간이 부족합니다. 불필요한 파일을 정리해주세요.</p></Alert><Alert variant="danger"><strong>오류</strong><p>변경사항을 저장하지 못했습니다. 연결을 확인하고 다시 시도해주세요.</p></Alert></div>
+      <p className="react-studio-caption">작업 후 새로 나타나는 완료 안내에는 role="status", 즉시 알려야 하는 오류에는 role="alert"를 지정합니다.</p>
     </Section>
     <Section title="아이콘이 있는 배지와 알림" description="상태를 아이콘과 문구로 함께 전달합니다."><div className="react-studio-row"><Badge variant="success"><Icon name="check" /> 완료</Badge><Badge variant="primary"><Icon name="calendar" /> 예약됨</Badge></div><Alert variant="success"><div className="react-studio-icon-alert"><Icon name="check" /><div><strong>저장 완료</strong><p>변경한 내용이 저장되었습니다.</p></div></div></Alert></Section>
   </>;
@@ -176,7 +177,7 @@ export function CardDemos() {
       <div className="react-studio-field-grid"><Card><span className="card-label">PROJECT</span><h3>디자인 시스템</h3><p>일관된 제품 경험을 위한 공통 기준을 만듭니다.</p><div className="card-footer"><Badge variant="primary">진행 중</Badge><span>최근 수정 · 오늘</span></div></Card><Card><span className="card-label">GUIDE</span><h3>브랜드 가이드</h3><p>브랜드의 시각 언어와 사용 원칙을 정리합니다.</p><div className="card-footer"><Badge>검토 중</Badge><span>최근 수정 · 어제</span></div></Card></div>
     </Section>
     <Section title="동작이 있는 카드" description="카드 전체를 누르게 만들기보다 이동할 곳을 설명하는 링크를 제공합니다.">
-      <Card><span className="card-label">RESOURCE</span><h3>컴포넌트 살펴보기</h3><p>자주 쓰는 UI 요소와 사용 예시를 확인합니다.</p><div className="card-footer"><a className="button button--outline button-inline" href="#/components/buttons">컴포넌트 보기 <Icon name="arrow-right" /></a></div></Card>
+      <Card className="react-studio-card-sample"><span className="card-label">RESOURCE</span><h3>컴포넌트 살펴보기</h3><p>자주 쓰는 UI 요소와 사용 예시를 확인합니다.</p><div className="card-footer"><a className="button button--outline button-inline" href="#/components/buttons">컴포넌트 보기 <Icon name="arrow-right" /></a></div></Card>
     </Section>
     <Section title="아이콘이 있는 카드" description="아이콘으로 콘텐츠 종류를 보조하고 제목과 설명을 함께 표시합니다."><div className="react-studio-field-grid"><Card><h3 className="react-studio-icon-label"><Icon name="grid" />컴포넌트</h3><p>공통 요소와 사용 예시를 확인합니다.</p></Card><Card><h3 className="react-studio-icon-label"><Icon name="calendar" />일정</h3><p>프로젝트 일정을 확인합니다.</p></Card></div></Section>
   </>;

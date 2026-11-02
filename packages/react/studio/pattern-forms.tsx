@@ -102,7 +102,7 @@ export function BookingPattern() {
 }
 
 export function FormStatesPattern() {
-  return <Section title="입력 상태" description="읽기 전용 정보는 선택하거나 복사할 수 있고, 비활성 항목은 입력과 제출에서 제외됩니다."><div className="form-pattern-grid">
+  return <Section title="입력 상태" description="읽기 전용 정보는 선택하거나 복사할 수 있고, 비활성 항목은 입력과 제출에서 제외됩니다."><div className="form-pattern-grid react-pattern-form-states">
     <TextField label="계정 ID · 읽기 전용" readOnly defaultValue="idenflu-user" helperText="계정 ID는 변경할 수 없습니다." />
     <TextField label="팀 · 비활성" disabled defaultValue="지정되지 않음" helperText="팀에 가입하면 변경할 수 있습니다." />
     <Select label="프로젝트 · 비활성" disabled options={[]} placeholder="선택할 수 없습니다" /><Switch label="알림 · 비활성" disabled defaultChecked />
