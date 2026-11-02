@@ -71,10 +71,10 @@
 .data-grid-heading strong { font-weight:var(--font-weight-semibold); overflow-wrap:anywhere; }
 .data-grid-heading > span { color:var(--text-secondary); font-size:var(--font-size-caption); white-space:nowrap; }
 .data-grid-tools { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-2); max-width:100%; }
+.data-grid-export-error { flex-basis:100%; margin:0; }
 .data-grid-search { width:240px; max-width:100%; min-width:0; }
 .data-grid-search > .field-label { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .data-grid-search input::-webkit-search-cancel-button { display:none; }
-.data-grid-search .icon-button { align-self:center; flex:0 0 30px; width:30px; height:30px; min-height:0; margin-inline-end:3px; padding:7px; }
 .data-grid-tools .popover-wrap > .button { gap:var(--space-2); }
 .data-grid-tools .popover-content { right:0; left:auto; width:240px; max-width:calc(100vw - 48px); }
 .data-grid-column-options { display:grid; gap:var(--space-2); }
@@ -156,6 +156,8 @@
 .data-grid-page-size .select-trigger { width:96px; }
 .data-grid-page-size .select-popup { top:auto; bottom:calc(100% + var(--space-1)); }
 .data-grid .data-grid-table[data-interactive] tbody tr { cursor:default; }
+.data-grid .data-grid-table .data-grid-virtual-spacer > td { padding:0; border:0; font-size:0; line-height:0; background:transparent !important; }
+.data-grid-virtual-spacer { pointer-events:none; }
 @media (max-width:600px) {
   .data-grid-toolbar { align-items:flex-start; }
   .data-grid-tools { width:100%; }

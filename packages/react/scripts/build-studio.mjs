@@ -1,4 +1,4 @@
-import { readFile, readdir, mkdir, writeFile, rm } from 'node:fs/promises';
+import { readFile, readdir, mkdir, writeFile, rm, copyFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +22,7 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
   const docs = (await Promise.all(documentStyles.map(name => readFile(resolve(system, name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(root, 'studio/studio.css'), 'utf8');
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
+  await copyFile(resolve(root, 'dist/THIRD_PARTY_NOTICES.txt'), resolve(destination, 'THIRD_PARTY_NOTICES.txt'));
   const files = {};
   for (const [name, extension, content] of [['app', 'js', result.outputFiles[0].text], ['components', 'css', components], ['docs', 'css', docs]]) {
     const hash = hashed ? '.' + createHash('sha256').update(content).digest('hex').slice(0, 12) : '';

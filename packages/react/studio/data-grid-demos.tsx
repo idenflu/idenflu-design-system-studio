@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Badge, DataGrid, Progress, Segmented, type DataGridCellEdit, type DataGridColumn } from '../src';
+import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, type DataGridColumn } from '../src';
 import { Section } from './demo-layout';
 
 type Project = {
@@ -36,6 +36,18 @@ const projectColumns:DataGridColumn<Project>[] = [
   {id:'due',header:'마감일',accessor:row=>row.due,width:150,filter:'text'},
 ];
 
+const virtualProjects:Project[] = Array.from({length:10000},(_,index)=>({
+  ...projects[index % projects.length],
+  id:`ROW-${String(index + 1).padStart(5,'0')}`,
+  name:`가상 프로젝트 ${String(index + 1).padStart(5,'0')}`,
+  progress:index % 101,
+  budget:(index + 1) * 25000,
+}));
+const virtualColumns:DataGridColumn<Project>[] = [
+  {id:'name',header:'프로젝트',accessor:row=>row.name,width:260,minWidth:160,pinned:'start',filter:'text',editable:true,validate:value=>value.trim().length >= 2 ? undefined : '프로젝트 이름은 2자 이상 입력해주세요.',cell:row=><div className="studio-grid-project"><strong>{row.name}</strong><small>{row.id}</small>{Number(row.id.slice(4)) % 37 === 0 && <small>여러 줄의 설명도 행 높이에 반영합니다. 열 너비를 조절해 줄바꿈을 확인하세요.</small>}</div>},
+  ...projectColumns.slice(1),
+];
+
 type Task = {id:string; name:string; owner:string; hours:number; locked:boolean};
 const initialTasks:Task[] = [
   {id:'TASK-01',name:'토큰 사용 기준 정리',owner:'김민수',hours:12,locked:false},
@@ -56,6 +68,12 @@ export function DataGridDemos() {
   const [tasks,setTasks] = React.useState(initialTasks);
   const [notice,setNotice] = React.useState('셀의 편집 버튼으로 값을 수정할 수 있습니다.');
   const [state,setState] = React.useState('loading');
+  const [virtualRows,setVirtualRows] = React.useState(virtualProjects);
+  const [virtualCount,setVirtualCount] = React.useState(10000);
+  const [virtualDensity,setVirtualDensity] = React.useState<'default'|'compact'>('default');
+  const [virtualSelected,setVirtualSelected] = React.useState<string[]>([]);
+  const [virtualNotice,setVirtualNotice] = React.useState('프로젝트 이름을 편집하고 멀리 스크롤해도 입력 중인 값을 유지합니다.');
+  const largeRows = React.useMemo(()=>virtualRows.slice(0,virtualCount),[virtualRows,virtualCount]);
   const editTask = ({rowId,columnId,value}:DataGridCellEdit<Task>) => {
     setTasks(current=>current.map(row=>row.id === rowId ? {...row,[columnId]:columnId === 'hours' ? Number(value) : value.trim()} : row));
     setNotice(`${rowId}의 ${taskColumns.find(column=>column.id === columnId)?.header} 값을 변경했습니다.`);
@@ -79,6 +97,20 @@ export function DataGridDemos() {
       <p role="status" className="component-helper">{notice}</p>
       <p className="react-studio-caption">Enter 또는 저장 버튼으로 확정하고 Escape 또는 취소 버튼으로 되돌립니다. 검증 오류는 셀 안에 표시합니다. 마지막 행은 읽기 전용입니다.</p>
     </Section>
+    <Section title="가상 스크롤" description="10,000행 중 화면 근처의 행만 렌더링합니다. 데이터 수와 밀도를 바꾸고, 스크롤·검색·열 조절·선택·편집을 함께 확인하세요.">
+      <div className="studio-grid-virtual-toolbar"><Select label="가상 스크롤 데이터 수" value={String(virtualCount)} onValueChange={value=>setVirtualCount(Number(value))} options={[{value:'100',label:'100개'},{value:'1000',label:'1,000개'},{value:'10000',label:'10,000개'}]} /><Segmented label="가상 스크롤 밀도" size="sm" value={virtualDensity} onValueChange={value=>setVirtualDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
+      <DataGrid label="대용량 데이터그리드" rows={largeRows} columns={virtualColumns}
+        getRowId={row=>row.id} getRowLabel={row=>row.name}
+        virtualized={{estimateRowHeight:68,overscan:6}} maxHeight={420} density={virtualDensity}
+        selectable selectedRowIds={virtualSelected} onSelectedRowIdsChange={setVirtualSelected}
+        searchLabel="대용량 데이터 검색" exportable exportFileName="idenflu-virtual-projects.csv"
+        onCellEdit={({rowId,value})=>{
+          setVirtualRows(current=>current.map(row=>row.id === rowId ? {...row,name:value.trim()} : row));
+          setVirtualNotice(`${rowId}의 프로젝트 이름을 변경했습니다.`);
+        }} />
+      <p role="status" className="component-helper">{virtualNotice}</p>
+      <p className="react-studio-caption">가상 스크롤의 전체 선택은 검색 결과 전체에 적용합니다. CSV도 화면 밖의 결과를 포함합니다. 행의 높이는 실제 콘텐츠에 맞춰 측정하며 검색·정렬은 전달한 데이터 전체를 브라우저에서 처리합니다.</p>
+    </Section>
     <Section title="로딩·빈 데이터·오류" description="조회 상태에 맞는 안내를 그리드 안에 표시합니다. 오류에서 다시 시도하면 샘플 데이터를 표시합니다.">
       <div className="react-studio-row"><Segmented label="데이터그리드 조회 상태" value={state} onValueChange={setState} options={[{value:'loading',label:'로딩'},{value:'empty',label:'빈 데이터'},{value:'error',label:'오류'},{value:'success',label:'조회 완료'}]} /></div>
       <DataGrid label="조회 상태 데이터그리드" rows={state === 'empty' ? [] : projects.slice(0,3)}
@@ -93,7 +125,8 @@ export function DataGridDemos() {
         <div><dt>필터와 정렬</dt><dd>검색과 열별 필터는 AND로 적용합니다. 정렬은 오름차순 → 내림차순 → 해제 순서이며 빈 값은 마지막에 표시합니다.</dd></div>
         <div><dt>키보드</dt><dd>Tab으로 컨트롤을 탐색합니다. 열 경계에서 ←·→는 10px, Shift와 함께 누르면 1px씩 조절하며 Home·End는 최소·최대 너비로 이동합니다.</dd></div>
         <div><dt>데이터 연결</dt><dd>행은 고유하고 안정적인 ID가 필요합니다. 편집 결과는 onCellEdit에서 rows 상태를 갱신하세요. 서버 저장은 이 콜백에서 별도로 연결합니다.</dd></div>
-        <div><dt>처리 범위</dt><dd>검색·정렬·페이지 이동은 전달한 rows 전체를 브라우저에서 처리합니다. 가상 스크롤·서버 페이지 이동·행 그룹화·다중 열 정렬은 포함하지 않습니다.</dd></div>
+        <div><dt>가상 스크롤</dt><dd>virtualized를 켜면 화면 근처 행과 입력·포커스 유지에 필요한 행을 렌더링합니다. 기본은 페이지 이동 없이 전체 검색 결과를 스크롤하며, pagination을 지정하면 페이지 이동과 함께 사용할 수 있습니다.</dd></div>
+        <div><dt>처리 범위</dt><dd>가상화는 세로 방향의 행 렌더링을 줄입니다. 전체 rows의 검색·정렬 계산과 데이터 메모리는 유지합니다. 서버 페이지 이동·열 가상화·행 그룹화·다중 열 정렬은 포함하지 않습니다.</dd></div>
       </dl>
     </Section>
   </>;
@@ -129,4 +162,14 @@ export function ProjectGrid() {
         ? { ...row, [columnId]: columnId === 'hours' ? Number(value) : value.trim() }
         : row));
     }} />;
-}`;
+}
+
+// 페이지 이동 없이 전체 결과를 가상 스크롤합니다.
+export function VirtualProjectGrid({ rows }: { rows: Project[] }) {
+  return <DataGrid label="프로젝트 전체 목록" rows={rows} columns={columns}
+    getRowId={row => row.id} maxHeight={420}
+    virtualized={{ estimateRowHeight: 56, overscan: 6 }} />;
+}
+// pagination을 명시하면 현재 페이지 안에서만 가상화합니다.
+// <DataGrid ... virtualized pagination defaultPageSize={100} />
+`;

@@ -114,6 +114,7 @@ test('cell editing validates, binds saved values and cancels pending changes', a
 
 test('CSV uses visible columns and filtered rows across all pages', async ({page}) => {
   await page.goto(route);
+  await page.evaluate(() => { window.showSaveFilePicker=undefined; });
   const grid = projectGrid(page);
   await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('디자인');
   const count = await grid.locator('tbody tr').count();
@@ -122,6 +123,7 @@ test('CSV uses visible columns and filtered rows across all pages', async ({page
   await page.getByRole('checkbox',{name:'마감일',exact:true}).uncheck();
   await page.keyboard.press('Escape');
   const downloaded = page.waitForEvent('download');
+  page.once('dialog',dialog => dialog.accept());
   await grid.getByRole('button',{name:'CSV 내보내기',exact:true}).click();
   const file = await downloaded;
   expect(file.suggestedFilename()).toBe('idenflu-projects.csv');
@@ -134,10 +136,12 @@ test('CSV uses visible columns and filtered rows across all pages', async ({page
 
 test('selected CSV includes selected rows outside current filters and sticky headers remain visible', async ({page}) => {
   await page.goto(route);
+  await page.evaluate(() => { window.showSaveFilePicker=undefined; });
   const grid=projectGrid(page);
   await grid.getByRole('checkbox',{name:'현재 페이지 전체 선택',exact:true}).check();
   await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('없는프로젝트XYZ');
   const downloaded=page.waitForEvent('download');
+  page.once('dialog',dialog => dialog.accept());
   await grid.getByRole('button',{name:'선택한 행 내보내기',exact:true}).click();
   const file=await downloaded;
   expect(file.suggestedFilename()).toBe('idenflu-projects-selected.csv');

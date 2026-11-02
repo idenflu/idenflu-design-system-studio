@@ -22,6 +22,12 @@ const styles = await Promise.all(componentStyles.map(async (name) =>
   `/* ${name} */\n${await readFile(resolve(source, name), 'utf8')}`));
 styles.push(`/* react.css */\n${await readFile(resolve(root, 'src/react.css'), 'utf8')}`);
 await writeFile(resolve(output, 'styles.css'), styles.join('\n'));
+const runtimeNotices = await Promise.all(['@tanstack/react-virtual', '@tanstack/virtual-core'].map(async name => {
+  const folder = resolve(root, 'node_modules', name);
+  const pkg = JSON.parse(await readFile(resolve(folder, 'package.json'), 'utf8'));
+  return `${name} ${pkg.version}\n\n${await readFile(resolve(folder, 'LICENSE'), 'utf8')}`;
+}));
+await writeFile(resolve(output, 'THIRD_PARTY_NOTICES.txt'), runtimeNotices.join('\n\n-----\n\n'));
 await cp(resolve(source, 'tokens.css'), resolve(output, 'tokens.css'));
 await cp(resolve(source, 'reset.css'), resolve(output, 'reset.css'));
 await cp(resolve(source, 'assets'), resolve(output, 'assets'), { recursive: true });

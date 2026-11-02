@@ -30,17 +30,59 @@ export interface DownloadDataGridCsvOptions<T> extends DataGridCsvOptions<T> {
   fileName?: string;
 }
 
-/** Downloads locally in a browser; importing this module is safe on the server. */
-export function downloadDataGridCsv<T>({ fileName = 'data-grid.csv', ...options }: DownloadDataGridCsvOptions<T>) {
-  if (typeof document === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
+type CsvSaveWindow = Window & {
+  showSaveFilePicker?: (options: {
+    id: string;
+    suggestedName: string;
+    types: {description: string; accept: Record<string, string[]>}[];
+  }) => Promise<FileSystemFileHandle>;
+};
+
+function csvFileName(fileName: string) {
+  const cleanName = fileName.trim().replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_') || 'data-grid.csv';
+  return /\.csv$/i.test(cleanName) ? cleanName : `${cleanName}.csv`;
+}
+
+/** Prompts for a local save destination, falling back to a named browser download. */
+export async function downloadDataGridCsv<T>({ fileName = 'data-grid.csv', ...options }: DownloadDataGridCsvOptions<T>) {
+  if (typeof document === 'undefined' || typeof Blob === 'undefined') {
     throw new Error('CSV 파일 다운로드는 브라우저에서만 사용할 수 있습니다. 서버에서는 createDataGridCsv를 사용해주세요.');
   }
-  const cleanName = fileName.trim().replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_') || 'data-grid.csv';
+  const suggestedName = csvFileName(fileName);
+  const view = document.defaultView as CsvSaveWindow | null;
+  if (typeof view?.showSaveFilePicker === 'function') {
+    let handle: FileSystemFileHandle;
+    try {
+      // Open before generating the CSV so the click's user activation stays valid.
+      handle = await view.showSaveFilePicker({
+        id: 'idenflu-data-grid-csv', suggestedName,
+        types: [{description: 'CSV 파일', accept: {'text/csv': ['.csv']}}],
+      });
+    } catch (error) {
+      if (error && typeof error === 'object' && 'name' in error && error.name === 'AbortError') return;
+      throw error;
+    }
+    const blob = new Blob([createDataGridCsv(options)], {type: 'text/csv;charset=utf-8'});
+    const writable = await handle.createWritable();
+    try {
+      await writable.write(blob);
+      await writable.close();
+    } catch (error) {
+      await writable.abort().catch(() => {});
+      throw error;
+    }
+    return;
+  }
+  const name = view?.prompt('CSV 파일명을 입력해주세요.\n저장 위치는 브라우저의 다운로드 설정을 따릅니다.', suggestedName);
+  if (name == null) return;
+  if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
+    throw new Error('이 브라우저에서는 CSV 파일을 다운로드할 수 없습니다.');
+  }
   const blob = new Blob([createDataGridCsv(options)], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = /\.csv$/i.test(cleanName) ? cleanName : `${cleanName}.csv`;
+  anchor.download = csvFileName(name.trim() || suggestedName);
   anchor.hidden = true;
   try {
     (document.body || document.documentElement).appendChild(anchor);

@@ -117,6 +117,43 @@ test('DataGrid searches underlying values, resets pagination and recovers from n
   } finally { await f.dispose(); }
 });
 
+test('DataGrid saves filtered rows across pages and selected rows with their suggested names', async () => {
+  const f=fixture(), originalPicker=window.showSaveFilePicker, saved=[];
+  try {
+    window.showSaveFilePicker=async options => {
+      const file={name:options.suggestedName}; saved.push(file);
+      return {createWritable:async () => ({write:async blob => {file.csv=await blob.text();},close:async () => {}})};
+    };
+    await f.render(h(DataGrid,{...props,exportable:true,exportFileName:'projects.csv',selectable:true,defaultSelectedRowIds:['b'],defaultQuery:'디자인',defaultPageSize:1,defaultHiddenColumnIds:['team']}));
+    await click(button(f.node,'CSV 내보내기'));
+    assert.deepEqual(saved[0],{name:'projects.csv',csv:'이름,금액\r\nAlpha,10\r\nGamma,\r\n'});
+    await click(button(f.node,'선택한 행 내보내기'));
+    assert.deepEqual(saved[1],{name:'projects-selected.csv',csv:'이름,금액\r\nBeta,2\r\n'});
+  } finally { window.showSaveFilePicker=originalPicker; await f.dispose(); }
+});
+
+test('DataGrid disables duplicate exports, treats cancellation quietly, and recovers from save errors', async () => {
+  const f=fixture(), originalPicker=window.showSaveFilePicker;
+  let cancel;
+  try {
+    window.showSaveFilePicker=() => new Promise((resolve,reject) => {cancel=reject;});
+    await f.render(h(DataGrid,{...props,exportable:true,selectable:true,defaultSelectedRowIds:['a']}));
+    await click(button(f.node,'CSV 내보내기'));
+    assert.equal(button(f.node,'CSV 내보내기').disabled,true);
+    assert.equal(button(f.node,'선택한 행 내보내기').disabled,true);
+    await act(async () => cancel(new dom.window.DOMException('Cancelled','AbortError')));
+    assert.equal(f.node.querySelector('[role="alert"]'),null);
+    assert.equal(button(f.node,'CSV 내보내기').disabled,false);
+    window.showSaveFilePicker=async () => {throw new Error('Save failed');};
+    await click(button(f.node,'CSV 내보내기'));
+    assert.match(f.node.querySelector('[role="alert"]').textContent,/CSV 파일을 저장하지 못했습니다/);
+    assert.equal(button(f.node,'CSV 내보내기').disabled,false);
+    window.showSaveFilePicker=async () => ({createWritable:async () => ({write:async () => {},close:async () => {}})});
+    await click(button(f.node,'CSV 내보내기'));
+    assert.equal(f.node.querySelector('[role="alert"]'),null);
+  } finally { window.showSaveFilePicker=originalPicker; await f.dispose(); }
+});
+
 test('DataGrid clamps its page when rows shrink and resets on sort and page size changes', async () => {
   const f = fixture();
   try {

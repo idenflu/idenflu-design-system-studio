@@ -133,14 +133,33 @@ export function ProjectGrid() {
 | 확정·취소 | 셀의 편집 버튼으로 진입하고 Enter/저장으로 확정, Escape/취소로 원본을 유지합니다. 오류는 셀 안에 표시하며 종료 후 편집 버튼으로 포커스를 복원합니다. blur로 저장하지 않습니다. |
 | 상태 | `loading`·`error`·`onRetry`·`emptyMessage`를 지정합니다. 로딩·오류에서는 이전 행을 정상 데이터처럼 노출하지 않습니다. 데이터 없음과 검색 결과 없음을 구분합니다. |
 | 내보내기 | `exportable`·`exportFileName`으로 CSV 다운로드를 켭니다. 표시 중인 열만 출력합니다. 전체 다운로드는 검색·필터·정렬된 **모든 페이지**, 선택 다운로드는 원본 rows 중 **선택한 행**이 대상입니다. |
-| CSV 형식 | 한글 BOM, 쉼표·따옴표·개행 이스케이프와 문자열 수식 보호를 적용합니다. `createDataGridCsv`·`downloadDataGridCsv`로 동일한 규칙을 직접 사용할 수 있습니다. |
+| 저장 위치 | 내보내기를 누르면 지원 브라우저에서 파일명과 저장 위치를 지정하는 시스템 저장 창을 엽니다. 취소하면 저장하지 않습니다. 미지원 브라우저에서는 파일명을 확인한 뒤 브라우저 다운로드 설정에 따라 저장합니다. |
+| CSV 형식 | 한글 BOM, 쉼표·따옴표·개행 이스케이프와 문자열 수식 보호를 적용합니다. `createDataGridCsv`·`downloadDataGridCsv`로 동일한 규칙을 직접 사용할 수 있습니다. `downloadDataGridCsv`는 사용자 클릭에서 호출하고 반환하는 Promise의 저장 오류를 처리하세요. |
 | 밀도 | `density="default | compact"`로 기존 테이블과 동일한 행 간격을 사용합니다. |
+| 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. `overscan`은 화면 앞뒤에 추가할 행 수입니다. |
+| 페이지와 가상화 | `pagination` 기본값은 일반 모드에서 `true`, 가상 모드에서 `false`입니다. `virtualized pagination defaultPageSize={100}`은 현재 페이지 내부를 가상화합니다. `pagination={false}`에서는 검색 결과 전체가 선택·스크롤 대상입니다. |
 
 제어형 속성은 부모 상태가 기준입니다. 콜백을 받은 뒤 해당 상태를 갱신하세요. 서버 저장이 필요하면 `onCellEdit`에서 저장 처리와 오류 안내를 연결하고, 성공한 값으로 `rows`를 갱신합니다. 내장 서버 저장·비동기 트랜잭션·재시도 큐는 제공하지 않습니다.
 
 열의 선택형 필터는 `Select`의 `popupStrategy="fixed"`를 사용해 짧은 목록이나 스크롤 영역에서 옵션이 잘리지 않도록 합니다. 일반 `Select`의 기본값은 `absolute`이며 필요한 화면에서 이 옵션을 지정할 수 있습니다.
 
-이 버전은 **전달한 rows 전체를 브라우저에서 처리하는 데이터그리드**입니다. 서버 페이지 이동, 가상 스크롤, 다중 열 정렬, 행 그룹화·피벗, 스프레드시트식 셀 범위 선택은 포함하지 않습니다. 해당 기능이나 큰 데이터의 성능이 필요하면 별도 데이터 어댑터·가상화 구조가 필요합니다.
+이 버전은 **전달한 rows 전체를 브라우저에서 처리하는 데이터그리드**입니다. 가상 스크롤은 세로 방향의 DOM 렌더링을 줄이며, 전체 rows의 메모리와 검색·정렬 계산을 줄이는 서버 처리 기능은 아닙니다. 서버 페이지 이동, 열 가상화, 다중 열 정렬, 행 그룹화·피벗, 스프레드시트식 셀 범위 선택은 포함하지 않습니다.
+
+```tsx
+// rows는 부모가 로드한 전체 데이터입니다.
+<DataGrid label="프로젝트 전체 목록" rows={rows} columns={columns}
+  getRowId={row => row.id}
+  virtualized={{ estimateRowHeight: 68, overscan: 6 }}
+  maxHeight={420} selectable exportable />
+```
+
+가상 모드에서 `maxHeight`를 생략하면 480px로 제한합니다. `none` 같은 무제한 높이 키워드나 0 이하의 숫자는 기본값으로 되돌립니다. CSS 문자열을 지정할 때도 실제로 높이를 제한하는 유효한 값을 사용해야 가상화가 적용됩니다. 기본 가상 모드는 전체 검색 결과를 스크롤하며 페이지 크기 선택 UI를 표시하지 않습니다. 전체 선택은 현재 검색 결과 전체에 적용하고 CSV는 기존처럼 필터·정렬 결과 또는 선택한 행 전체를 내보냅니다. 일반 모드의 기본 페이지 이동 동작은 유지됩니다.
+
+줄바꿈·열 너비·밀도·편집 오류로 달라지는 실제 행 높이를 측정하고 반영합니다. 데이터 조건이나 페이지를 바꾸면 세로 위치를 복구하며 가로 스크롤 위치는 유지합니다. 편집 중이거나 포커스를 가진 행은 화면 밖에서도 유지합니다. 이를 위해 떨어진 행 사이에 별도의 빈 공간을 두므로 중간의 모든 행을 렌더링하지 않습니다.
+
+가상화는 [TanStack Virtual](https://tanstack.com/virtual/latest/docs/framework/react/react-virtual) 런타임 의존성을 사용합니다. 실제 데이터 행의 순서와 전체 행 수는 `aria-rowindex`·`aria-rowcount`에 헤더를 포함해 전달하고, 빈 공간용 행은 접근성 트리에서 제외합니다. 부분 렌더링된 표의 보조기기 동작은 사용 환경에서도 확인하세요. 관련 기준은 [WAI 행 수·행 인덱스](https://www.w3.org/WAI/ARIA/apg/practices/grid-and-table-properties/)를 참고했습니다.
+
+보조기기로 모든 행을 차례대로 탐색하는 것이 우선이면 `virtualized={false}`와 페이지 이동 방식을 사용하세요. 가상 모드의 행 수 정보가 DOM 밖의 모든 행을 즉시 탐색할 수 있다는 뜻은 아닙니다. [AG Grid 접근성 지침](https://www.ag-grid.com/react-data-grid/accessibility/)도 이 차이를 설명합니다.
 
 구조는 native `table`이며 정렬 버튼·필터·체크박스·편집 컨트롤을 Tab으로 탐색합니다. 단일 진입점과 방향키 셀 이동을 전제하는 `role="grid"`를 불완전하게 붙이지 않습니다. 정렬 상태는 `aria-sort`, 부분 선택은 네이티브 `indeterminate`, 조회 상태는 상태 메시지로 전달합니다.
 

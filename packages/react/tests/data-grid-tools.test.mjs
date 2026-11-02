@@ -47,15 +47,21 @@ test('CSV neutralizes formula-like text including whitespace prefixes without ch
 test('CSV download uses an encoded local Blob, the requested file name, and releases its temporary URL', async () => {
   const originalCreate = URL.createObjectURL, originalRevoke = URL.revokeObjectURL;
   const originalClick = dom.window.HTMLAnchorElement.prototype.click, originalTimer = globalThis.setTimeout;
+  const originalPrompt = window.prompt;
   let blob, download, href, attached, revoked;
   const timers = [];
   try {
+    window.prompt = (message, suggestedName) => {
+      assert.match(message, /저장 위치.*브라우저/);
+      assert.equal(suggestedName, '프로젝트 목록.csv');
+      return '확정한/프로젝트 목록';
+    };
     URL.createObjectURL = value => { blob = value; return 'blob:local-csv'; };
     URL.revokeObjectURL = value => { revoked = value; };
     globalThis.setTimeout = callback => { timers.push(callback); return 1; };
     dom.window.HTMLAnchorElement.prototype.click = function () { download=this.download; href=this.getAttribute('href'); attached=document.body.contains(this); };
-    downloadDataGridCsv({rows:['한글'],columns:[column],fileName:'프로젝트 목록'});
-    assert.equal(download,'프로젝트 목록.csv');
+    await downloadDataGridCsv({rows:['한글'],columns:[column],fileName:'프로젝트 목록'});
+    assert.equal(download,'확정한_프로젝트 목록.csv');
     assert.equal(href,'blob:local-csv');
     assert.equal(attached,true);
     assert.equal(blob.type,'text/csv;charset=utf-8');
@@ -66,17 +72,86 @@ test('CSV download uses an encoded local Blob, the requested file name, and rele
     assert.equal(revoked,'blob:local-csv');
   } finally {
     URL.createObjectURL=originalCreate; URL.revokeObjectURL=originalRevoke;
+    window.prompt=originalPrompt;
     dom.window.HTMLAnchorElement.prototype.click=originalClick; globalThis.setTimeout=originalTimer;
   }
 });
 
-test('CSV creation and editor rendering are server safe while download gives a useful server error', () => {
+test('CSV save picker receives a normalized name before serialization and writes BOM CSV to the selected file', async () => {
+  const originalPicker = window.showSaveFilePicker, originalCreate = URL.createObjectURL;
+  const calls = [];
+  let blob;
+  try {
+    URL.createObjectURL = undefined;
+    window.showSaveFilePicker = async options => {
+      calls.push('picker');
+      assert.equal(options.suggestedName, '프로젝트_목록.csv');
+      assert.equal(options.id, 'idenflu-data-grid-csv');
+      assert.deepEqual(options.types, [{description:'CSV 파일',accept:{'text/csv':['.csv']}}]);
+      return {createWritable:async () => ({
+        write:async value => { calls.push('write'); blob=value; },
+        close:async () => { calls.push('close'); },
+      })};
+    };
+    await downloadDataGridCsv({rows:['한글'],columns:[{header:'값',accessor:row => { calls.push('serialize'); return row; }}],fileName:' 프로젝트/목록 '});
+    assert.deepEqual(calls, ['picker','serialize','write','close']);
+    assert.equal(blob.type, 'text/csv;charset=utf-8');
+    assert.deepEqual([...new Uint8Array(await blob.arrayBuffer()).slice(0,3)], [0xEF,0xBB,0xBF]);
+    assert.equal(await blob.text(), '값\r\n한글\r\n');
+    assert.equal(document.querySelector('a[download]'), null);
+  } finally {
+    window.showSaveFilePicker=originalPicker; URL.createObjectURL=originalCreate;
+  }
+});
+
+test('CSV save cancellation does not serialize data or fall back to a download', async () => {
+  const originalPicker=window.showSaveFilePicker, originalPrompt=window.prompt, originalCreate=URL.createObjectURL;
+  const unwanted = () => assert.fail('cancelled exports must not serialize or download');
+  try {
+    window.prompt=unwanted; URL.createObjectURL=unwanted;
+    window.showSaveFilePicker=async () => { throw new dom.window.DOMException('Cancelled','AbortError'); };
+    await downloadDataGridCsv({rows:['한글'],columns:[{header:'값',accessor:unwanted}]});
+  } finally {
+    window.showSaveFilePicker=originalPicker; window.prompt=originalPrompt; URL.createObjectURL=originalCreate;
+  }
+});
+
+test('CSV save permission and write failures propagate, abort incomplete writes, and do not download elsewhere', async () => {
+  const originalPicker=window.showSaveFilePicker, originalPrompt=window.prompt, originalCreate=URL.createObjectURL;
+  const denied=new dom.window.DOMException('Denied','NotAllowedError'), failed=new Error('Disk full');
+  let aborted=false;
+  try {
+    window.prompt=URL.createObjectURL=() => assert.fail('failed exports must not download elsewhere');
+    window.showSaveFilePicker=async () => { throw denied; };
+    await assert.rejects(downloadDataGridCsv({rows:['한글'],columns:[column]}), error => error === denied);
+    window.showSaveFilePicker=async () => ({createWritable:async () => ({
+      write:async () => { throw failed; },
+      close:async () => assert.fail('failed writes must not close successfully'),
+      abort:async () => { aborted=true; },
+    })});
+    await assert.rejects(downloadDataGridCsv({rows:['한글'],columns:[column]}), error => error === failed);
+    assert.equal(aborted,true);
+  } finally {
+    window.showSaveFilePicker=originalPicker; window.prompt=originalPrompt; URL.createObjectURL=originalCreate;
+  }
+});
+
+test('CSV fallback filename cancellation does not serialize or download', async () => {
+  const originalPrompt=window.prompt, originalCreate=URL.createObjectURL;
+  const unwanted=() => assert.fail('cancelled exports must not serialize or download');
+  try {
+    window.prompt=() => null; URL.createObjectURL=unwanted;
+    await downloadDataGridCsv({rows:['한글'],columns:[{header:'값',accessor:unwanted}]});
+  } finally { window.prompt=originalPrompt; URL.createObjectURL=originalCreate; }
+});
+
+test('CSV creation and editor rendering are server safe while download gives a useful server error', async () => {
   const original = globalThis.document;
   try {
     delete globalThis.document;
     assert.match(createDataGridCsv({rows:['서버'],columns:[column]}),/서버/);
     assert.match(renderToString(h(DataGridCellEditor,{value:'mono',label:'프로젝트',onCommit(){},onCancel(){}})),/mono/);
-    assert.throws(() => downloadDataGridCsv({rows:[],columns:[column]}),/브라우저.*createDataGridCsv/);
+    await assert.rejects(downloadDataGridCsv({rows:[],columns:[column]}),/브라우저.*createDataGridCsv/);
   } finally { Object.defineProperty(globalThis,'document',{configurable:true,value:original}); }
 });
 
