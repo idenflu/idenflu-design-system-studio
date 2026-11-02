@@ -259,7 +259,7 @@ test('largest preferences remain usable across every route and settings controls
   await expect(page.locator('#studio-settings-dialog')).toBeHidden();
 });
 
-test('built documentation loads preferences early and portable consumers retain their own defaults', async ({ page }) => {
+test('built React documentation loads preferences early and consumer styles retain their own defaults', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await openApp(page, 'components/text-fields', '/dist');
@@ -281,7 +281,7 @@ test('built documentation loads preferences early and portable consumers retain 
   const consumer = await page.evaluate(async (files) => {
     const frame = document.createElement('iframe');
     const loaded = new Promise((resolve) => frame.addEventListener('load', resolve, { once: true }));
-    frame.srcdoc = `<link rel="stylesheet" href="/dist/systems/idenflu-mono/${files.styles}"><button id="consumer-button" class="button" type="button">저장</button><script src="/dist/systems/idenflu-mono/${files.runtime}"><\/script>`;
+    frame.srcdoc = `<link rel="stylesheet" href="/dist/systems/idenflu-mono/${files.docsComponents}"><button id="consumer-button" class="button" type="button">저장</button>`;
     document.body.append(frame);
     await loaded;
     const button = frame.contentDocument.querySelector('#consumer-button');
@@ -290,6 +290,6 @@ test('built documentation loads preferences early and portable consumers retain 
     frame.remove();
     return value;
   }, files);
-  expect(consumer).toEqual({ font: 14, height: 38, runtime: true, dialog: false });
+  expect(consumer).toEqual({ font: 14, height: 38, runtime: false, dialog: false });
   expect(errors).toEqual([]);
 });

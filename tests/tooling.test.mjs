@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm, access } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, access } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { build } from '../scripts/build.mjs';
 
-test('distribution is deterministic and contains portable runtime, documentation and licenses', async () => {
+test('distribution is deterministic and contains React documentation and licenses', async () => {
   const folder = await mkdtemp(resolve(tmpdir(), 'idenflu-build-'));
   try {
     const first = await build(resolve(folder, 'first'));
@@ -13,10 +13,9 @@ test('distribution is deterministic and contains portable runtime, documentation
     assert.deepEqual(first, second);
     const target = resolve(folder, 'first/systems/idenflu-mono');
     for (const file of Object.values(first.files)) await access(resolve(target, file));
-    const runtime = await readFile(resolve(target, first.files.runtime), 'utf8');
-    assert(!runtime.includes('#profile-form'), 'portable runtime must not require demo DOM');
-    assert(!runtime.includes('#component-search'), 'portable runtime must not require demo fields');
-    assert(!runtime.includes('IdenfluPreferences'), 'portable runtime must not depend on studio preferences');
+    assert(!('runtime' in first.files), 'legacy runtime must not be distributed');
+    assert(!('styles' in first.files), 'legacy standalone stylesheet must not be distributed');
+    assert(!(await readdir(target)).some(file => /^idenflu-mono\./.test(file)), 'legacy bundles must not be distributed');
     const html = await readFile(resolve(target, 'index.html'), 'utf8');
     assert(html.includes(first.files.docs));
     assert(html.includes(first.files.preferences));

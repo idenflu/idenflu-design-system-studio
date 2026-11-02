@@ -2,7 +2,7 @@
   "name": "idenflu-design-system-studio",
   "version": "0.3.0",
   "private": true,
-  "description": "idenflu mono component runtime and documentation",
+  "description": "idenflu mono React components and documentation",
   "scripts": {
     "dev": "npm --prefix packages/react run studio:build && node scripts/serve.mjs",
     "check": "node scripts/check.mjs",

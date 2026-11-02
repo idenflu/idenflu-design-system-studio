@@ -34,7 +34,7 @@ function engine({ stored, values = new Map(), blocked = {} } = {}) {
     },
   };
   const document = {
-    documentElement: { style: {
+    documentElement: { dataset: {theme:"light"}, style: {
       setProperty(name, value) { styles.set(name, value); },
       removeProperty(name) { styles.delete(name); },
     } },
@@ -49,12 +49,18 @@ function engine({ stored, values = new Map(), blocked = {} } = {}) {
   class CustomEvent {
     constructor(type, options) { this.type = type; this.detail = options.detail; }
   }
-  const context = vm.createContext({ window, document, localStorage, CustomEvent });
+  let themeObserver;
+  class MutationObserver {
+    constructor(callback) { themeObserver = callback; }
+    observe() {}
+  }
+  const context = vm.createContext({ window, document, localStorage, CustomEvent, MutationObserver });
   const run = () => vm.runInContext(source, context, { filename: 'preferences.js' });
   run();
   return {
     get api() { return window.IdenfluPreferences; },
     styles, storage, events, calls, run,
+    theme(theme) { document.documentElement.dataset.theme = theme; themeObserver(); },
     storageEvent(event) { (listeners.get('storage') || []).forEach((listener) => listener(event)); },
   };
 }
@@ -175,4 +181,56 @@ test('storage synchronization reacts only to its key and clears invalid remote p
   assert.deepEqual(plain(app.api.get()), defaults);
   assert.deepEqual(app.events.at(-1).detail, { values: defaults, saved: false, reason: 'storage' });
   assert.equal(app.calls.filter(([method]) => method !== 'getItem').length, 0, 'remote updates must not write back to storage');
+});
+
+
+test('color preferences validate tokens, keep theme overrides separate and export derived states', () => {
+  const app = engine();
+  const invalid = { colors: { light: { '--primary': 'red', '--text': 'url(evil)', '--unknown': '#123456', '--canvas': 123 } } };
+  assert.deepEqual(plain(app.api.set(invalid)), defaults);
+  assert.equal(app.events.length, 1);
+  app.api.set({ colors: { light: { '--primary': '#AbC', '--success': '#287544' }, dark: { '--primary': '#aabbff', '--canvas': '#101010' } } });
+  assert.equal(app.styles.get('--primary'), '#aabbcc');
+  assert.equal(app.styles.get('--success'), '#287544');
+  assert.match(app.styles.get('--primary-hover'), /var\(--primary\)/);
+  assert.match(app.styles.get('--success-surface'), /var\(--success\)/);
+  assert.match(app.api.cssText(), /:root\[data-theme="light"\]/);
+  assert.match(app.api.cssText(), /:root\[data-theme="dark"\]/);
+  assert.match(app.api.cssText(), /--primary: #aabbff;/);
+  const copy = app.api.get();
+  copy.colors.light['--primary'] = '#000000';
+  assert.equal(app.api.get().colors.light['--primary'], '#aabbcc');
+  app.theme('dark');
+  assert.equal(app.styles.get('--primary'), '#aabbff');
+  assert.equal(app.styles.get('--canvas'), '#101010');
+  assert.equal(app.styles.has('--success'), false);
+  assert.equal(app.styles.has('--success-surface'), false);
+  app.api.set({ colors: { dark: { '--primary': null } } });
+  assert.equal(app.styles.has('--primary'), false);
+  assert.equal(app.styles.has('--primary-hover'), false);
+  assert.equal(app.styles.get('--canvas'), '#101010');
+  app.theme('light');
+  assert.equal(app.styles.get('--primary'), '#aabbcc');
+  const restored = engine({ stored: app.storage.get(storageKey) });
+  assert.deepEqual(plain(restored.api.get()), plain(app.api.get()));
+  assert.equal(restored.styles.get('--primary'), '#aabbcc');
+  app.api.reset();
+  assert.deepEqual(plain(app.api.get()), defaults);
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
+  assert.doesNotMatch(app.api.cssText(), /--primary/);
+});
+
+test('color-only storage updates hydrate and synchronize without losing numeric preferences', () => {
+  const record = { colors: { dark: { '--danger': '#ff8888' } } };
+  const app = engine({ stored: JSON.stringify(record) });
+  assert.equal(app.events[0].detail.saved, true);
+  app.theme('dark');
+  assert.equal(app.styles.get('--danger-text'), 'var(--danger)');
+  app.api.set({fontSize:16});
+  assert.equal(app.api.get().colors.dark['--danger'], '#ff8888');
+  app.storageEvent({key:storageKey,newValue:JSON.stringify({colors:{dark:{'--info':'#aabbcc'}}})});
+  assert.equal(app.styles.has('--danger'), false);
+  assert.equal(app.styles.get('--info'), '#aabbcc');
+  app.storageEvent({key:storageKey,newValue:null});
+  assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
 });

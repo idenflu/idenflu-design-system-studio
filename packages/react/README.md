@@ -117,7 +117,7 @@ import { Chip } from '@idenflu/mono-react';
   onClick={() => setSelected(!selected)}>프로젝트 필터</Chip>
 ```
 
-기존 바닐라 런타임과 React API는 별개입니다. 특히 내부 `datevalidation` DOM 이벤트는 React 컴포넌트에서 제공하지 않으므로 React 콜백과 폼 유효성 검사를 사용하세요.
+컴포넌트의 값 변경은 React 콜백으로 받고 폼 유효성 검사는 앱에서 관리합니다. 이전 HTML 런타임과 DOM 이벤트 API는 제거했으며, 전환 방법은 [프로젝트 적용 가이드](../../docs/consumer-guide.md)를 참고하세요.
 
 `Divider`는 기본 가로 구분선이며, `orientation="vertical"`로 세로 구분선을 표시합니다. 세로 구분선은 flex 부모에서 높이에 맞춰 늘어나므로 블록 안에서 사용할 때는 부모 높이나 `style`을 지정합니다. 자식 텍스트는 `align="start | center | end"`로 정렬하고, `variant="dashed"`는 점선을 표시합니다. 의미 있는 구분선은 `separator`로 제공하며 장식용은 `decorative`로 숨깁니다.
 

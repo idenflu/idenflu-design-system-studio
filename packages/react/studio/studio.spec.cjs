@@ -53,7 +53,7 @@ test('screen settings change and reset the document tokens', async ({ page }) =>
   await page.reload();
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--font-size-base').trim())).toBe('18px');
   await page.getByRole('button', { name: '화면 조정' }).click();
-  await dialog.getByRole('button', { name: '초기화' }).click();
+  await dialog.getByRole('button', { name: '초기화', exact: true }).click();
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--font-size-base').trim())).toBe('14px');
   await dialog.getByRole('button', { name: '화면 조정 닫기' }).click();
   await expect(dialog).not.toBeVisible();

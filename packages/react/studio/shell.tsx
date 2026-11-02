@@ -169,7 +169,7 @@ export function Overview() {
     const root = document.documentElement;
     const update = () => setPrimary(getComputedStyle(root).getPropertyValue('--primary').trim().toUpperCase());
     const observer = new MutationObserver(update);
-    observer.observe(root, {attributes:true, attributeFilter:['data-theme']}); update();
+    observer.observe(root, {attributes:true, attributeFilter:['data-theme','style']}); update();
     return () => observer.disconnect();
   }, []);
   return <><section className="hero" aria-labelledby="page-title"><p className="eyebrow">DESIGN SYSTEM</p><h1 id="page-title" tabIndex={-1}>Form follows<br />function.</h1><p className="hero-description">A precise foundation for everyday interfaces.</p></section>

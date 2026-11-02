@@ -1,16 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const documents = require('../packages/react/studio/routes.json');
 
-test('component behavior and consumer lifecycle regression suite', async ({ page }) => {
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/tests/idenflu-mono-regression.html');
-  await page.waitForFunction(() => ['passed', 'failed'].includes(document.documentElement.dataset.testState));
-  const failures = await page.evaluate(() => window.regressionResults.filter((result) => !result.passed));
-  expect(failures).toEqual([]);
-  expect(errors).toEqual([]);
-});
-
 test('every route has one heading and no page overflow', async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -59,7 +49,7 @@ test('hover tooltip accepts pointer movement and Escape without trigger focus', 
   await expect(content).toBeHidden();
 });
 
-test('built documentation and portable bundle work without demo dependencies', async ({ page }) => {
+test('built React documentation works without the legacy HTML runtime', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/dist/systems/idenflu-mono/index.html#/components/select');
@@ -68,18 +58,14 @@ test('built documentation and portable bundle work without demo dependencies', a
   await expect(page.locator('script[type="module"]')).toHaveCount(1);
   const response = await page.request.get('/dist/systems/idenflu-mono/manifest.json');
   const manifest = await response.json();
-  const outcome = await page.evaluate(async (files) => {
-    const frame = document.createElement('iframe');
-    const loaded = new Promise((resolve) => frame.addEventListener('load', resolve, { once: true }));
-    frame.srcdoc = `<form><div data-select id="consumer"><input type="hidden" value="a"><button type="button" class="select-trigger" role="combobox" aria-label="팀" aria-expanded="false"><span data-select-label>A</span></button><div class="select-popup" hidden><ul role="listbox"><li role="option" data-value="a" aria-selected="true">A</li><li role="option" data-value="b" aria-selected="false">B</li></ul></div></div></form><script src="/dist/systems/idenflu-mono/${files.runtime}"><\/script>`;
-    document.body.append(frame);
-    await loaded;
-    const runtime = frame.contentWindow.IdenfluMono;
-    const widget = runtime.get(frame.contentDocument.querySelector('#consumer'));
-    widget.setValue('b'); const value = widget.getValue(); runtime.destroy(frame.contentDocument); frame.remove();
-    return value;
-  }, manifest.files);
-  expect(outcome).toBe('b');
+  expect(manifest.files.runtime).toBeUndefined();
+  expect(manifest.files.styles).toBeUndefined();
+  await page.getByRole('combobox', {name:'담당 팀: 디자인', exact:true}).click();
+  await page.getByRole('option', {name:'개발', exact:true}).click();
+  await expect(page.getByRole('combobox', {name:'담당 팀: 개발', exact:true})).toBeVisible();
+  for (const file of ['runtime.js', 'components.js', 'script.js']) {
+    expect((await page.request.get(`/systems/idenflu-mono/${file}`)).status()).toBe(404);
+  }
   expect(errors).toEqual([]);
 });
 

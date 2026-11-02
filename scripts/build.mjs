@@ -9,8 +9,7 @@ import { buildStudio } from '../packages/react/scripts/build-studio.mjs';
 const execFileAsync = promisify(execFile);
 
 export const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export const componentScripts = ['runtime.js', 'components.js', 'script.js', 'search-select.js', 'multi-select.js', 'extras.js', 'datepicker.js', 'number-fields.js', 'data-state.js'];
-export const componentStyles = ['styles.css', 'tokens.css', 'components.css', 'extras.css', 'additional.css', 'form-patterns.css', 'search-select.css', 'multi-select-search.css', 'theme.css', 'theme-components.css', 'number-fields.css', 'data-state.css'];
+export const componentStyles = ['styles.css', 'tokens.css', 'components.css', 'extras.css', 'additional.css', 'form-patterns.css', 'search-select.css', 'multi-select-search.css', 'theme.css', 'number-fields.css', 'data-state.css'];
 const digest = (value) => createHash('sha256').update(value).digest('hex').slice(0, 12);
 
 export async function build(destination = resolve(project, 'dist')) {
@@ -30,8 +29,6 @@ export async function build(destination = resolve(project, 'dist')) {
     return file;
   }
   const files = {
-    styles: await bundle(componentStyles, 'css', 'idenflu-mono'),
-    runtime: await bundle(componentScripts, 'js', 'idenflu-mono'),
     theme: await bundle(['theme.js'], 'js', 'theme'),
     preferences: await bundle(['preferences.js'], 'js', 'preferences'),
   };
