@@ -133,7 +133,17 @@ export function OverlayExample() {
     </Toast>}
   </>;
 }`,
-  'components/table':'<Table><thead><tr><th>이름</th></tr></thead><tbody><tr><td>프로젝트</td></tr></tbody></Table>',
+  'components/table':`import { Table, TableContainer } from '@idenflu/mono-react';
+
+<TableContainer label="프로젝트 목록">
+  <Table density="compact">
+    <colgroup><col style={{ width: '44%' }} /><col /><col /><col /></colgroup>
+    <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col">상태</th></tr></thead>
+    <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td><td>김민수</td><td>진행 중</td></tr></tbody>
+  </Table>
+</TableContainer>
+
+// density="default"는 기본 간격, "compact"는 조밀한 간격입니다.`,
   'components/chips':`import { Chip } from '@idenflu/mono-react';
 
 <Chip interactive={false}>디자인</Chip>

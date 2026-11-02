@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Badge, Button, Checkbox, Chip, Drawer, DropdownMenu, Icon, Pagination, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, Table, TableContainer, TextArea, TextField, Tree } from '../src';
+import { Badge, Button, Checkbox, Chip, Drawer, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
 import { Section } from './demo-layout';
+export { TableDemos } from './table-demos';
 
 const sizes = ['sm', 'md', 'lg'] as const;
 
@@ -98,16 +99,6 @@ export function ChipDemos() {
     <Section title="삭제 가능한 칩" description="선택된 값을 제거하고, 초기화로 다시 표시할 수 있습니다."><div className="react-studio-row">{removable.map(name => <Chip key={name} rounded aria-label={`${name} 제거`} onClick={() => setRemovable(current => current.filter(item => item !== name))}>{name}<Icon name="close" /></Chip>)}{!removable.length && <p className="react-studio-caption" role="status">모든 칩을 제거했습니다.</p>}</div><div className="react-studio-row"><Button variant="outline" onClick={() => setRemovable(['프로젝트','브랜드','문서'])}>초기화</Button></div></Section>
     <Section title="아이콘이 있는 칩" description="아이콘은 분류의 의미를 보조하며 칩은 선택 상태를 유지합니다."><div className="react-studio-row"><Chip aria-pressed={iconSelected} onClick={() => setIconSelected(!iconSelected)}><Icon name="calendar" />일정 필터</Chip><Chip aria-pressed={componentSelected} onClick={() => setComponentSelected(!componentSelected)}><Icon name="grid" />컴포넌트</Chip></div></Section>
   </>;
-}
-
-const projects = Array.from({length:12}, (_, index) => ({name:['디자인 시스템','브랜드 가이드','웹사이트 개선','모바일 앱'][index % 4] + (index >= 4 ? ` ${Math.floor(index / 4) + 1}` : ''), team:index % 2 ? '개발' : '디자인', owner:['김민수','이서연','박지훈','정수빈'][index % 4], status:index % 3 ? '검토 중' : '진행 중'}));
-export function TableDemos() {
-  const [page, setPage] = React.useState(1); const pageSize = 4;
-  const visible = projects.slice((page - 1) * pageSize, page * pageSize);
-  return <Section title="테이블과 페이지" description="페이지를 바꾸면 실제 목록이 갱신됩니다. 좁은 화면에서는 표 영역을 가로로 스크롤할 수 있습니다.">
-    <TableContainer label="프로젝트 목록"><Table><caption className="sr-only">프로젝트별 담당 팀·담당자와 진행 상태</caption><thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col">상태</th></tr></thead><tbody>{visible.map(row => <tr key={row.name}><td>{row.name}</td><td>{row.team}</td><td>{row.owner}</td><td><Badge variant={row.status === '진행 중' ? 'primary' : 'warning'}>{row.status}</Badge></td></tr>)}</tbody></Table></TableContainer>
-    <div className="react-studio-row"><p role="status" className="component-helper">{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, projects.length)} / {projects.length}개 프로젝트</p><Pagination page={page} pageCount={Math.ceil(projects.length / pageSize)} onPageChange={setPage} /></div>
-  </Section>;
 }
 
 export function ListDemos() {

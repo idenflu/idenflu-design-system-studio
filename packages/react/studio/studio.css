@@ -22,6 +22,30 @@
 .react-studio-demo > :is(.button,.icon-button,.segmented-control,.button-group,.popover-wrap,.action-menu,.tooltip-wrap) { justify-self:start; }
 .react-studio-demo > p:empty { display:none; }
 .react-studio-row { display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+.react-studio-table-toolbar, .react-studio-table-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3) var(--space-4); min-width:0; }
+.react-studio-table-toolbar .segmented-control, .react-studio-table-footer .pagination { flex:0 0 auto; margin-inline-start:auto; }
+.react-studio-table-footer .component-helper { margin:0; }
+.react-studio .react-studio-table { table-layout:fixed; }
+.react-studio .react-studio-table--projects { min-width:640px; }
+.react-studio .react-studio-table--members { min-width:720px; }
+.react-studio .react-studio-table--billing { min-width:800px; }
+.react-studio-table :is(th,td) { vertical-align:middle; overflow-wrap:anywhere; }
+.react-studio-table--projects .table-col-project { width:44%; }
+.react-studio-table--projects .table-col-team { width:20%; }
+.react-studio-table--projects :is(.table-col-owner,.table-col-status) { width:18%; }
+.react-studio-table--members .table-col-member { width:40%; }
+.react-studio-table--members :is(.table-col-team,.table-col-date,.table-col-status) { width:20%; }
+.react-studio-table--billing .table-col-invoice { width:36%; }
+.react-studio-table--billing .table-col-date { width:18%; }
+.react-studio-table--billing .table-col-quantity { width:10%; }
+.react-studio-table--billing .table-col-amount { width:20%; }
+.react-studio-table--billing .table-col-status { width:16%; }
+.react-studio-table .table-primary { display:block; font-weight:var(--font-weight-medium); }
+.react-studio-table .table-secondary { display:block; margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.react-studio-table .table-muted { color:var(--text-secondary); }
+.react-studio-table .table-numeric { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.react-studio-table .table-date { white-space:nowrap; font-variant-numeric:tabular-nums; }
+.react-studio-table tfoot :is(th,td) { border-top:1px solid var(--border); background:var(--surface); font-weight:var(--font-weight-semibold); }
 .react-studio-icon-label { display:inline-flex; align-items:center; gap:var(--space-2); }
 .react-studio-icon-label > .ui-icon, .react-studio-icon-alert > .ui-icon { flex:0 0 16px; width:16px; height:16px; color:var(--text-secondary); }
 .react-studio-icon-alert { display:flex; align-items:flex-start; gap:var(--space-3); }
@@ -120,6 +144,9 @@
 }
 @media (max-width:600px) {
   .react-studio-field-grid, .react-studio-size-grid, .react-studio .overview-links { grid-template-columns:minmax(0, 1fr); }
+  .react-studio-table-toolbar, .react-studio-table-footer { align-items:flex-start; }
+  .react-studio-table-toolbar > p, .react-studio-table-footer > p { flex-basis:100%; }
+  .react-studio-table-footer .pagination { max-width:100%; flex-wrap:wrap; }
 }
 
 .react-studio-chip-palette .react-studio-example-title { display:grid; gap:var(--space-1); }

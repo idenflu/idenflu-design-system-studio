@@ -173,12 +173,24 @@ test('chip selection and removal update the visible state', async ({ page }) => 
   await expect(page.getByRole('button', { name: '프로젝트 제거' })).toBeVisible();
 });
 
-test('pagination changes the displayed rows and stepper moves between steps', async ({ page }) => {
+test('table density preserves data while pagination changes rows and stepper moves between steps', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/table');
-  await expect(page.locator('tbody tr').first()).toContainText('디자인 시스템');
-  await page.getByRole('button', { name: '2페이지' }).click();
-  await expect(page.locator('tbody tr').first()).toContainText('디자인 시스템 2');
-  await expect(page.locator('.react-studio-demo').getByRole('status')).toContainText('5–8 / 12');
+  const projects = page.getByRole('region', { name: '프로젝트 목록', exact: true });
+  const projectSection = page.locator('.react-studio-section').filter({ has: projects });
+  const firstRow = projects.locator('tbody tr').first();
+  await expect(firstRow).toContainText('디자인 시스템');
+  const defaultHeight = (await firstRow.boundingBox()).height;
+  await projectSection.getByRole('button', { name: 'Compact', exact: true }).click();
+  await expect(firstRow).toContainText('디자인 시스템');
+  expect((await firstRow.boundingBox()).height).toBeLessThan(defaultHeight);
+  await projectSection.getByRole('button', { name: '2페이지' }).click();
+  await expect(firstRow).toContainText('고객 지원 워크스페이스');
+  await expect(projectSection.getByRole('status')).toContainText('5–8 / 16');
+  await projectSection.getByRole('button', { name: '4페이지' }).click();
+  await expect(projectSection.getByRole('status')).toContainText('13–16 / 16');
+  await expect(projectSection.getByRole('button', { name: '다음', exact: true })).toBeDisabled();
+  await projectSection.getByRole('button', { name: 'Default', exact: true }).click();
+  await expect(projectSection.getByRole('status')).toContainText('13–16 / 16');
   await page.goto('/systems/idenflu-mono/index.html#/components/stepper');
   await page.getByRole('button', { name: '다음', exact: true }).click();
   await expect(page.getByRole('list', { name: '프로젝트 생성 단계' }).locator('[aria-current="step"]')).toContainText('팀원 초대');

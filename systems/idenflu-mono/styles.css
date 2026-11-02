@@ -96,11 +96,11 @@
 .accordion details > p { padding: 0 var(--space-6) var(--space-4) 0; color: var(--text-secondary); word-break: keep-all; }
 .table-scroll { max-width: 100%; overflow-x: auto; }
 .table-scroll:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
-.data-table { width: 100%; min-width: 420px; border-collapse: collapse; text-align: left; font-size:var(--font-size-body); line-height:var(--line-height-body); }
-.data-table th { padding: calc(var(--space-unit) * 2.5) var(--space-4); border-block: 1px solid var(--border); background:var(--surface); color: var(--text-secondary); font-weight:var(--font-weight-medium); }
-.data-table td { padding: calc(var(--space-unit) * 3.5) var(--space-4); border-bottom: 1px solid var(--divider); }
-.data-table th:first-child, .data-table td:first-child { padding-left: 0; width: 55%; }
-.data-table th:last-child, .data-table td:last-child { padding-right: 0; }
+.data-table { --table-cell-padding-inline:var(--space-4); --table-cell-padding-block:calc(var(--space-unit) * 3.5); --table-header-padding-block:calc(var(--space-unit) * 2.5); width: 100%; min-width: 420px; border-collapse: collapse; text-align: left; font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.data-table[data-density="compact"] { --table-cell-padding-block:var(--space-2); --table-header-padding-block:var(--space-2); }
+.data-table th, .data-table td { vertical-align:middle; overflow-wrap:anywhere; }
+.data-table th { padding: var(--table-header-padding-block) var(--table-cell-padding-inline); border-block: 1px solid var(--border); background:var(--surface); color: var(--text-secondary); font-weight:var(--font-weight-medium); }
+.data-table td { padding: var(--table-cell-padding-block) var(--table-cell-padding-inline); border-bottom: 1px solid var(--divider); }
 .data-table tbody tr:hover { background:var(--surface); }
 .pagination { display: flex; gap: var(--space-1); }
 .page-button { border-radius:var(--radius-control); display: inline-flex; align-items: center; justify-content: center; min-width: var(--control-height); height: var(--control-height); padding: var(--space-2) var(--space-3); border: 1px solid transparent; background:var(--field-background); color: var(--text-secondary); }

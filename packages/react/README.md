@@ -143,6 +143,21 @@ import { Divider } from '@idenflu/mono-react';
 <Divider variant="dashed" decorative />
 ```
 
+`Table`은 기본 밀도인 `density="default"`와 행 간격을 줄인 `density="compact"`를 지원합니다. 글자 크기는 두 밀도 모두 본문 기준을 유지하며 첫·마지막 셀까지 같은 좌우 패딩을 적용합니다. 열 너비는 데이터에 맞게 `colgroup`으로 정의하고 숫자 열은 오른쪽 정렬을 권장합니다. `TableContainer`는 좁은 화면에서 표 영역만 가로로 스크롤하도록 감쌉니다.
+
+```tsx
+import { Table, TableContainer } from '@idenflu/mono-react';
+
+<TableContainer label="프로젝트 목록">
+  <Table density="compact">
+    <caption className="sr-only">프로젝트와 담당 팀</caption>
+    <colgroup><col style={{ width: '60%' }} /><col style={{ width: '40%' }} /></colgroup>
+    <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th></tr></thead>
+    <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td></tr></tbody>
+  </Table>
+</TableContainer>
+```
+
 ## 로컬 예제
 
 저장소 루트와 이 디렉터리에서 `npm ci`를 실행하고 루트의 `npm run dev`로 서버를 시작합니다. 별도 패키지 예제는 아래 명령으로 빌드한 뒤 `/packages/react/examples/index.html`에서 엽니다.
