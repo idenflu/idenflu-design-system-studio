@@ -10,6 +10,7 @@ export interface InteractiveChipProps extends ChipAppearance, Omit<React.ButtonH
 }
 export interface StaticChipProps extends ChipAppearance, Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick' | 'onClickCapture' | 'tabIndex' | 'aria-pressed'> {
   interactive: false;
+  density?: 'comfortable' | 'compact';
   onClick?: never;
   onClickCapture?: never;
   tabIndex?: never;
@@ -24,9 +25,9 @@ interface ChipComponent {
 
 export const Chip = React.forwardRef<HTMLButtonElement | HTMLSpanElement, ChipProps>(function Chip(props, ref) {
   const { variant = 'neutral', rounded = false, className } = props;
-  const classes = ['chip', variant !== 'neutral' && `chip--colored chip--${variant}`, rounded && 'chip--rounded', props.interactive === false && 'chip--static', className].filter(Boolean).join(' ');
+  const classes = ['chip', variant !== 'neutral' && `chip--colored chip--${variant}`, rounded && 'chip--rounded', props.interactive === false && 'chip--static', props.interactive === false && props.density === 'compact' && 'chip--compact', className].filter(Boolean).join(' ');
   if (props.interactive === false) {
-    const { interactive, size, variant, rounded, className, onClick, onClickCapture, tabIndex, 'aria-pressed': pressed, ...attributes } = props;
+    const { interactive, density, size, variant, rounded, className, onClick, onClickCapture, tabIndex, 'aria-pressed': pressed, ...attributes } = props;
     return <span {...attributes} ref={ref as React.ForwardedRef<HTMLSpanElement>} data-size={size} className={classes} />;
   } else {
     const { interactive, size, variant, rounded, className, type = 'button', ...attributes } = props;

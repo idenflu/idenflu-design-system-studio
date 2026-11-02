@@ -135,6 +135,22 @@
         put("--focus-on-danger", "var(--danger-text)");
       }
     });
+    if (Object.keys(overrides).length) {
+      const palette = theme === "dark"
+        ? { primary: "#9aafff", success: "#9acba6", warning: "#e2c27f", danger: "#f2a3a7", text: "#eceef2", canvas: "#151719", infoSurface: "#28314b", secondarySurface: "#343941" }
+        : { primary: "#4263cc", success: "#38754d", warning: "#8c641b", danger: "#ad3131", text: "#181c22", canvas: "#ffffff", infoSurface: "#edf0fb", secondarySurface: "#e1e4e9" };
+      const canvas = overrides["--canvas"] || palette.canvas;
+      const text = overrides["--text"] || palette.text;
+      // Selected chips use status/link accents, independently of filled button colors.
+      ["primary", "success", "warning", "danger"].forEach(role => {
+        const background = role === "danger" ? result.get("--danger-text") || palette.danger : overrides[`--${role}`] || palette[role];
+        put(`--chip-${role}-selected-text`, readableColor(canvas, [background]));
+      });
+      const infoSurface = overrides["--info"] ? blendColor(canvas, overrides["--info"], 0.12) : palette.infoSurface;
+      put("--chip-neutral-selected-text", readableColor(overrides["--primary"] || palette.primary, [infoSurface]));
+      const secondarySurface = overrides["--surface"] ? blendColor(overrides["--surface"], text, 0.16) : palette.secondarySurface;
+      put("--chip-secondary-selected-text", readableColor(text, [secondarySurface]));
+    }
     return [...result];
   }
   function applyColors() {

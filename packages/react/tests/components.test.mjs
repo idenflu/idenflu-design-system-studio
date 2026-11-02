@@ -46,6 +46,34 @@ test('display Chip uses a span, forwards its ref and ignores activation props', 
   } finally { await f.dispose(); }
 });
 
+test('compact Chip keeps display semantics and forwards size and refs without leaking density to the DOM', async () => {
+  const f = fixture(), ref = React.createRef();
+  try {
+    for (const size of ['sm', 'md', 'lg']) {
+      await f.render(h(Chip,{interactive:false,density:'compact',size,ref,rounded:true,'data-density-example':size},'문서'));
+      const chip = f.container.querySelector('.chip');
+      assert.equal(chip.tagName,'SPAN');
+      assert.equal(ref.current,chip);
+      assert.equal(chip.getAttribute('data-size'),size);
+      assert.equal(chip.getAttribute('data-density-example'),size);
+      assert.equal(chip.classList.contains('chip--static'),true);
+      assert.equal(chip.classList.contains('chip--compact'),true);
+      assert.equal(chip.classList.contains('chip--rounded'),true);
+      assert.equal(chip.hasAttribute('density'),false);
+      assert.equal(chip.tabIndex,-1);
+      assert.equal(chip.hasAttribute('aria-pressed'),false);
+    }
+    await f.render(h(Chip,{interactive:false,density:'comfortable',ref},'기본 표시'));
+    assert.equal(ref.current.classList.contains('chip--compact'),false);
+    await f.render(h(Chip,{interactive:false,ref},'기본 표시'));
+    assert.equal(ref.current.classList.contains('chip--compact'),false);
+    await f.render(h(Chip,{ref,'aria-pressed':true},'필터'));
+    assert.equal(ref.current.tagName,'BUTTON');
+    assert.equal(ref.current.classList.contains('chip--compact'),false);
+    assert.equal(ref.current.getAttribute('aria-pressed'),'true');
+  } finally { await f.dispose(); }
+});
+
 test('interactive Chip keeps button refs, pressed state and disabled behavior', async () => {
   const f = fixture(), ref = React.createRef(); let clicks = 0;
   try {

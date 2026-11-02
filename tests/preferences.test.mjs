@@ -333,3 +333,59 @@ test('contrast-derived tokens hydrate, export by theme and clear with individual
   assert.deepEqual([...app.styles], [['--unrelated-property', 'keep']]);
   assert.doesNotMatch(app.api.cssText(), /--text-on-(?:primary|danger)/);
 });
+
+
+const chipRoles = ['primary','success','warning','danger','neutral','secondary'];
+const chipProperty = role => `--chip-${role}-selected-text`;
+const chipThemeDefaults = {
+  light: {primary:'#4263cc',success:'#38754d',warning:'#8c641b',danger:'#ad3131',neutral:'#edf0fb',secondary:'#e1e4e9'},
+  dark: {primary:'#9aafff',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#28314b',secondary:'#343941'},
+};
+function assertReadableChips(app, theme, customAccent) {
+  for (const role of chipRoles) {
+    const background = role === 'danger' ? app.styles.get('--danger-text') || chipThemeDefaults[theme].danger : ['primary','success','warning'].includes(role) ? customAccent || chipThemeDefaults[theme][role] : chipThemeDefaults[theme][role];
+    const foreground = app.styles.get(chipProperty(role));
+    assert.match(foreground, /^#[0-9a-f]{6}$/i, `${theme} ${role} has a concrete exportable foreground`);
+    const ratio = measuredContrast(foreground,background);
+    assert(ratio >= 4.5, `${theme} ${role}: ${foreground} on ${background} = ${ratio.toFixed(4)}:1`);
+  }
+}
+
+test('selected chip foregrounds stay readable for bright, dark and midtone accents in both themes', () => {
+  const app = engine();
+  for (const theme of ['light','dark']) {
+    app.theme(theme);
+    for (const accent of ['#ffeb3b','#ffffff','#000000','#777777']) {
+      app.api.set({colors:{[theme]:{'--primary':accent,'--success':accent,'--warning':accent,'--danger':accent}}});
+      assertReadableChips(app,theme,accent);
+    }
+  }
+});
+
+test('changing only canvas still derives safe selected chip foregrounds', () => {
+  for (const theme of ['light','dark']) {
+    const app = engine();
+    app.theme(theme);
+    app.api.set({colors:{[theme]:{'--canvas':theme === 'light' ? '#000000' : '#ffffff'}}});
+    assertReadableChips(app,theme);
+  }
+});
+
+test('selected chip contrast tokens hydrate, export, synchronize and reset with their palettes', () => {
+  const app = engine();
+  app.api.set({colors:{light:{'--primary':'#ffeb3b','--success':'#ffffff','--warning':'#777777'},dark:{'--primary':'#000000','--danger':'#f2a3a7'}}});
+  const record = app.storage.get(storageKey);
+  const hydrated = engine({stored:record});
+  for (const role of chipRoles) assert.equal(hydrated.styles.get(chipProperty(role)),app.styles.get(chipProperty(role)));
+  const exported = app.api.cssText();
+  for (const role of chipRoles) assert.match(exported,new RegExp(`${chipProperty(role)}: #[0-9a-f]{6};`));
+  app.theme('dark');
+  for (const role of chipRoles) assert(app.styles.has(chipProperty(role)));
+  app.api.set({colors:{dark:{'--primary':null,'--danger':null}}});
+  for (const role of chipRoles) assert.equal(app.styles.has(chipProperty(role)),false,`removed dark override: ${role}`);
+  app.storageEvent({key:storageKey,newValue:record});
+  for (const role of chipRoles) assert(app.styles.has(chipProperty(role)));
+  app.api.reset();
+  for (const role of chipRoles) assert.equal(app.styles.has(chipProperty(role)),false);
+  assert.doesNotMatch(app.api.cssText(),/--chip-.*-selected-text/);
+});
