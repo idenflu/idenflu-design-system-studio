@@ -277,3 +277,92 @@ test('loading, empty, error and retry keep stale rows out of the state grid', as
   await retry.click();
   await expect(grid.locator('tbody')).toContainText('디자인 시스템 v2');
 });
+
+async function expectStateFillsViewport(grid) {
+  await expect.poll(()=>grid.locator('.data-grid-state').evaluate(state=>{
+    const scroller=state.closest('.data-grid-scroll');
+    const head=scroller.querySelector('thead').getBoundingClientRect();
+    const viewport=scroller.getBoundingClientRect();
+    const bounds=state.getBoundingClientRect();
+    const bottom=viewport.top+scroller.clientTop+scroller.clientHeight;
+    return {
+      startsBelowHeader:Math.abs(bounds.top-head.bottom)<3,
+      reachesBottom:Math.abs(bounds.bottom-bottom)<3,
+      verticallyCentered:Math.abs((bounds.top+bounds.bottom)/2-(head.bottom+bottom)/2)<3,
+    };
+  })).toEqual({startsBelowHeader:true,reachesBottom:true,verticallyCentered:true});
+}
+
+async function expandGrid(grid) {
+  await grid.evaluate(element=>{
+    Object.assign(element.style,{height:'800px',width:'min(100%, 360px)',display:'flex',flexDirection:'column',minHeight:'0'});
+    Object.assign(element.querySelector('.data-grid-viewport').style,{flex:'1 1 0%',minHeight:'0'});
+  });
+}
+
+test('expanded loading, empty and error states fill the area below the headers without stretching data rows',async({page})=>{
+  await page.goto(route);
+  const grid=page.getByRole('group',{name:'조회 상태 데이터그리드',exact:true});
+  const controls=page.getByRole('group',{name:'데이터그리드 조회 상태',exact:true});
+  await grid.evaluate(element=>{element.style.width='min(100%, 360px)';});
+  await expect(grid.locator('.data-grid-state')).toContainText('데이터를 불러오는 중입니다.');
+  const naturalStateHeight=await grid.locator('.data-grid-state').evaluate(element=>element.getBoundingClientRect().height);
+  expect(naturalStateHeight).toBeGreaterThanOrEqual(220);
+  expect(naturalStateHeight).toBeLessThan(400);
+  await controls.getByRole('button',{name:'조회 완료',exact:true}).click();
+  const row=grid.locator('tbody tr[data-grid-row-id]').first();
+  await expect(row).toBeVisible();
+  const naturalRowHeight=await row.evaluate(element=>element.getBoundingClientRect().height);
+  await expandGrid(grid);
+  for(const [name,message] of [['로딩','데이터를 불러오는 중입니다.'],['빈 데이터','아직 등록한 프로젝트가 없습니다.'],['오류','프로젝트를 불러오지 못했습니다.']]){
+    await controls.getByRole('button',{name,exact:true}).click();
+    await expect(grid.locator('.data-grid-state')).toContainText(message);
+    await expectStateFillsViewport(grid);
+  }
+  await grid.getByRole('button',{name:'다시 시도',exact:true}).click();
+  await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(3);
+  expect(await row.evaluate(element=>element.getBoundingClientRect().height)).toBeCloseTo(naturalRowHeight,0);
+  await controls.getByRole('button',{name:'로딩',exact:true}).click();
+  await grid.evaluate(element=>{
+    element.style.removeProperty('height');element.style.removeProperty('display');element.style.removeProperty('flex-direction');element.style.removeProperty('min-height');
+    const viewport=element.querySelector('.data-grid-viewport');viewport.style.removeProperty('flex');viewport.style.removeProperty('min-height');
+  });
+  expect(await grid.locator('.data-grid-state').evaluate(element=>element.getBoundingClientRect().height)).toBeCloseTo(naturalStateHeight,0);
+});
+
+test('expanded search-empty state remains centered across horizontal scrolling and resets normally',async({page})=>{
+  await page.goto(route);
+  const grid=projectGrid(page);
+  await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('일치하지 않는 프로젝트 xyz');
+  await expect(grid.locator('.data-grid-state')).toContainText('검색 결과가 없습니다.');
+  // maxHeight limits content; it must not force a naturally sized empty grid to 480px.
+  expect(await grid.locator('.data-grid-viewport').evaluate(element=>element.getBoundingClientRect().height)).toBeLessThan(480);
+  await expandGrid(grid);
+  await expectStateFillsViewport(grid);
+  const scroller=grid.locator('.data-grid-scroll');
+  await expect.poll(()=>scroller.evaluate(element=>element.scrollWidth-element.clientWidth)).toBeGreaterThan(100);
+  await scroller.evaluate(element=>{element.scrollLeft=200;});
+  await expect.poll(()=>scroller.evaluate(element=>element.scrollLeft)).toBeGreaterThan(0);
+  const centers=await scroller.evaluate(element=>{
+    const state=element.querySelector('.data-grid-state').getBoundingClientRect();
+    const bounds=element.getBoundingClientRect();
+    return {state:state.left+state.width/2,viewport:bounds.left+element.clientLeft+element.clientWidth/2};
+  });
+  expect(Math.abs(centers.state-centers.viewport)).toBeLessThan(3);
+  await grid.getByRole('button',{name:'조건 초기화',exact:true}).click();
+  await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(5);
+});
+
+
+test('virtualized search-empty state fills an expanded viewport and restores virtual rows',async({page})=>{
+  await page.goto(route);
+  const grid=page.getByRole('group',{name:'대용량 데이터그리드',exact:true});
+  await expandGrid(grid);
+  const search=grid.getByRole('searchbox',{name:'대용량 데이터 검색',exact:true});
+  await search.fill('일치하지 않는 가상 프로젝트 xyz');
+  await expect(grid.locator('.data-grid-state')).toContainText('검색 결과가 없습니다.');
+  await expectStateFillsViewport(grid);
+  await grid.getByRole('button',{name:'조건 초기화',exact:true}).click();
+  await expect(grid.locator('tbody tr[data-grid-row-id]').first()).toBeVisible();
+  await expect(grid.locator('.data-grid-state')).toHaveCount(0);
+});

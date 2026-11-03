@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DropdownMenu, Icon, Popover, Tabs, TextField, Tree, type TreeNode } from '../src';
 import { StudioSettings, ThemeControl } from './controls';
+import { initialWorkspaceRoles } from './layout-role-data';
+import { RoleManagementPage } from './layout-role-management';
 import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceTab } from './layout-workspace-data';
 import { HomePage, InviteMemberForm, MasterDetailPage, MembersPage, NotificationSettingsPage, ProfileForm, ProjectDetailContent, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage, VerticalSettingsPage } from './layout-workspace-pages';
 
@@ -48,20 +50,25 @@ function WorkspaceTabsToolbar({workspaceRef,items,onSelect}: {workspaceRef:React
 
 export function SidebarLayoutSample() {
   const [projects,setProjects]=React.useState(initialProjects),[members,setMembers]=React.useState(initialMembers),[settings,setSettings]=React.useState(initialSettings);
+  const [workspaceRoles,setWorkspaceRoles]=React.useState(initialWorkspaceRoles);
   const [tabs,setTabs]=React.useState<WorkspaceTab[]>([{key:'home',page:'home'},{key:'projects',page:'projects'}]);
   const [active,setActive]=React.useState('projects'),[expanded,setExpanded]=React.useState(defaultExpanded),[searchExpanded,setSearchExpanded]=React.useState(defaultExpanded),[menuQuery,setMenuQuery]=React.useState('');
   const [mobileOpen,setMobileOpen]=React.useState(false),[searchOpen,setSearchOpen]=React.useState(false),[search,setSearch]=React.useState('');
   const [createOpen,setCreateOpen]=React.useState(false),[inviteOpen,setInviteOpen]=React.useState(false),[accountOpen,setAccountOpen]=React.useState(false);
   const [detailProjectId,setDetailProjectId]=React.useState<string|null>(null);
+  const [deleteProjectIds,setDeleteProjectIds]=React.useState<string[]|null>(null);
   const [notificationOpen,setNotificationOpen]=React.useState(false),[unread,setUnread]=React.useState(['reviews','project:PRJ-001']),[notice,setNotice]=React.useState('변경 사항은 현재 샘플에서만 유지됩니다.');
   const [notificationTimes]=React.useState(()=>{const now=Date.now();return {reviews:now-5*60_000,project:now-60*60_000};});
   const [notificationNow,setNotificationNow]=React.useState(Date.now);
   const createFormId=React.useId(),inviteFormId=React.useId(),profileFormId=React.useId();
   const searchInput=React.useRef<HTMLInputElement>(null);
+  const deleteCancel=React.useRef<HTMLButtonElement>(null);
+  const deleteConfirmed=React.useRef(false);
   const workspaceRef=React.useRef<HTMLElement>(null);
   const activeTab=tabs.find(tab=>tab.key===active)??tabs[0];
   const currentMember=members.find(member=>member.id==='member-1')??initialMembers[0];
   const detailProject=projects.find(project=>project.id===detailProjectId);
+  const deleteProjects=projects.filter(project=>deleteProjectIds?.includes(project.id));
   const selected=activeTab.page==='project-detail'?'projects':activeTab.page;
   const tabTitle=(tab:WorkspaceTab)=>tab.page==='project-detail'?projects.find(project=>project.id===tab.projectId)?.name??'프로젝트 상세':pageInfo[tab.page].title;
   const activate=(key:string)=>{setActive(key);const tab=tabs.find(item=>item.key===key);const page=tab?.page==='project-detail'?'projects':tab?.page;if(page)setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));};
@@ -70,12 +77,25 @@ export function SidebarLayoutSample() {
   const openProject=(id:string)=>openTab({key:`project:${id}`,page:'project-detail',projectId:id});
   const closeTab=(key:string)=>setTabs(values=>values.filter(tab=>tab.key!==key||tab.page==='home'));
   const updateProject=(id:string,patch:Partial<Project>)=>{setProjects(values=>values.map(project=>project.id===id?{...project,...patch}:project));setNotice('프로젝트 변경사항을 적용했습니다.');};
+  const confirmDelete=()=>{
+    const ids=new Set(deleteProjects.map(project=>project.id));
+    if(!ids.size){setDeleteProjectIds(null);return;}
+    const remainingTabs=tabs.filter(tab=>tab.page!=='project-detail'||!ids.has(tab.projectId??''));
+    setProjects(values=>values.filter(project=>!ids.has(project.id)));
+    setTabs(remainingTabs);
+    if(!remainingTabs.some(tab=>tab.key===active))setActive(remainingTabs[remainingTabs.length-1]?.key??'home');
+    if(detailProjectId&&ids.has(detailProjectId))setDetailProjectId(null);
+    deleteConfirmed.current=true;
+    setDeleteProjectIds(null);
+    setNotice(`${ids.size}개 프로젝트를 삭제했습니다.`);
+  };
   React.useEffect(()=>{document.title=`${tabTitle(activeTab)} · ${settings.name} | NOVA Workspace`;},[activeTab,projects,settings.name]);
   React.useEffect(()=>{const shortcut=(event:KeyboardEvent)=>{if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'&&!document.querySelector('dialog[open]')){event.preventDefault();setSearch('');setSearchOpen(true);}};document.addEventListener('keydown',shortcut);return()=>document.removeEventListener('keydown',shortcut);},[]);
   React.useEffect(()=>{if(searchOpen)searchInput.current?.focus();},[searchOpen]);
+  React.useEffect(()=>{if(deleteProjectIds)deleteCancel.current?.focus();else if(deleteConfirmed.current){deleteConfirmed.current=false;workspaceRef.current?.querySelector<HTMLElement>('.tab-panel:not([hidden]) .data-grid-scroll')?.focus();}},[deleteProjectIds]);
   React.useEffect(()=>{if(!notificationOpen)return;setNotificationNow(Date.now());const timer=window.setInterval(()=>setNotificationNow(Date.now()),60_000);return()=>window.clearInterval(timer);},[notificationOpen]);
   React.useEffect(()=>{const media=window.matchMedia('(min-width: 901px)');const change=()=>{if(media.matches)setMobileOpen(false);};media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
-  const createProject=(draft:ProjectDraft)=>{const id=`PRJ-${String(Math.max(...projects.map(project=>Number(project.id.split('-')[1])))+1).padStart(3,'0')}`;setProjects(values=>[{...draft,id,owner:currentMember.name,status:'준비 중',progress:0},...values]);setCreateOpen(false);openProject(id);setNotice(`“${draft.name}” 프로젝트를 만들었습니다.`);};
+  const createProject=(draft:ProjectDraft)=>{const id=`PRJ-${String(Math.max(0,...projects.map(project=>Number(project.id.split('-')[1])))+1).padStart(3,'0')}`;setProjects(values=>[{...draft,id,owner:currentMember.name,status:'준비 중',progress:0},...values]);setCreateOpen(false);openProject(id);setNotice(`“${draft.name}” 프로젝트를 만들었습니다.`);};
   const saveProfile=(profile:Pick<Member,'name'|'email'>)=>{setMembers(values=>values.map(member=>member.id===currentMember.id?{...member,...profile}:member));if(profile.name!==currentMember.name)setProjects(values=>values.map(project=>project.owner===currentMember.name?{...project,owner:profile.name}:project));setAccountOpen(false);setNotice('프로필을 저장했습니다.');};
   const inviteMember=(member:Omit<Member,'id'>)=>{if(members.some(item=>item.email.toLowerCase()===member.email.toLowerCase())){setNotice('이미 등록된 이메일입니다.');return;}setMembers(values=>[...values,{...member,id:`member-${Date.now()}`}]);setInviteOpen(false);setNotice(`${member.name}님을 샘플 멤버 목록에 추가했습니다.`);};
   const renderPage=(tab:WorkspaceTab)=>{
@@ -83,10 +103,11 @@ export function SidebarLayoutSample() {
     if(tab.page==='home')return <HomePage projects={projects} members={members} onOpen={openProject} onPage={openPage}/>;
     if(tab.page==='master-detail')return <MasterDetailPage projects={projects} members={members} onUpdate={updateProject} onOpen={openProject}/>;
     if(tab.page==='members')return <MembersPage members={members} onInvite={()=>setInviteOpen(true)} onRole={(id,roles)=>{setMembers(values=>values.map(member=>member.id===id?{...member,roles}:member));setNotice('멤버 역할을 변경했습니다.');}}/>;
+    if(tab.page==='role-management')return <RoleManagementPage roles={workspaceRoles} members={members} onSave={(id,connections)=>{setWorkspaceRoles(values=>values.map(role=>role.id===id?{...role,...connections}:role));setNotice('역할의 권한과 알림 설정을 저장했습니다.');}}/>;
     if(tab.page==='settings')return <SettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}}/>;
     if(tab.page==='notifications')return <NotificationSettingsPage settings={settings} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
     if(tab.page==='vertical-settings')return <VerticalSettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
-    return <ProjectsPage page={tab.page} projects={projects} onOpen={setDetailProjectId} onCreate={()=>setCreateOpen(true)} onComplete={ids=>{setProjects(values=>values.map(project=>ids.includes(project.id)?{...project,status:'완료',progress:100}:project));setNotice(`${ids.length}개 프로젝트를 완료했습니다.`);}}/>;
+    return <ProjectsPage page={tab.page} projects={projects} onOpen={setDetailProjectId} onCreate={()=>setCreateOpen(true)} onDelete={setDeleteProjectIds} onComplete={ids=>{setProjects(values=>values.map(project=>ids.includes(project.id)?{...project,status:'완료',progress:100}:project));setNotice(`${ids.length}개 프로젝트를 완료했습니다.`);}}/>;
   };
   const tree=filterWorkspaceTree(workspaceTree(),menuQuery);
   const sidebarProps={items:tree,query:menuQuery,onQuery:(value:string)=>{setMenuQuery(value);setSearchExpanded(defaultExpanded);},selected,expanded:menuQuery?searchExpanded:expanded,onExpanded:menuQuery?setSearchExpanded:setExpanded,onPage:openPage};
@@ -110,7 +131,8 @@ export function SidebarLayoutSample() {
     </main>
     <div className="layout-floating-settings"><StudioSettings/></div>
     <Drawer open={mobileOpen} onOpenChange={setMobileOpen} className="layout-mobile-sidebar" aria-label="워크스페이스 메뉴"><SidebarNavigation {...sidebarProps} mobile onClose={()=>setMobileOpen(false)}/></Drawer>
-    <Dialog open={searchOpen} onOpenChange={setSearchOpen} variant="divided" className="layout-command-dialog" aria-labelledby="workspace-search-title" closeOnBackdrop><DialogHeader><h2 id="workspace-search-title">빠른 검색</h2><Button size="sm" variant="ghost" aria-label="검색 닫기" onClick={()=>setSearchOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody><TextField ref={searchInput} label="메뉴 및 프로젝트 검색" type="search" value={search} onChange={event=>setSearch(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="어떤 화면을 찾으세요?"/><div className="layout-command-results">{menuResults.length>0&&<section><h3>메뉴</h3>{menuResults.map(page=><button type="button" key={page} onClick={()=>openPage(page)}><Icon name={pageInfo[page].icon}/><span>{pageInfo[page].title}<small>{pageInfo[page].group}</small></span><Icon name="arrow-right"/></button>)}</section>}{projectResults.length>0&&<section><h3>프로젝트</h3>{projectResults.map(project=><button type="button" key={project.id} onClick={()=>openProject(project.id)}><Icon name="folder"/><span>{project.name}<small>{project.id}</small></span><Icon name="arrow-right"/></button>)}</section>}{!menuResults.length&&!projectResults.length&&<p className="layout-empty" role="status">검색 결과가 없습니다.</p>}</div></DialogBody></Dialog>
+    <Dialog open={deleteProjectIds!==null} onOpenChange={open=>{if(!open)setDeleteProjectIds(null);}} variant="divided" aria-labelledby="workspace-delete-title" aria-describedby="workspace-delete-description"><DialogHeader><h2 id="workspace-delete-title">프로젝트 삭제</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setDeleteProjectIds(null)}><Icon name="close"/></Button></DialogHeader><DialogBody><p id="workspace-delete-description">선택한 {deleteProjects.length}개 프로젝트를 삭제할까요?</p><ul className="layout-delete-project-list">{deleteProjects.slice(0,3).map(project=><li key={project.id}><strong>{project.name}</strong><span>{project.id}</span></li>)}{deleteProjects.length>3&&<li className="layout-delete-project-summary">외 {deleteProjects.length-3}개 프로젝트</li>}</ul><p className="component-helper">열려 있는 해당 프로젝트의 상세 탭도 함께 닫힙니다.</p></DialogBody><DialogFooter><Button ref={deleteCancel} variant="outline" onClick={()=>setDeleteProjectIds(null)}>취소</Button><Button variant="danger" disabled={!deleteProjects.length} onClick={confirmDelete}><Icon name="trash"/>삭제</Button></DialogFooter></Dialog>
+    <Dialog open={searchOpen} onOpenChange={setSearchOpen} variant="divided" className="layout-command-dialog" aria-labelledby="workspace-search-title" aria-describedby="workspace-search-description" closeOnBackdrop><DialogHeader><div><h2 id="workspace-search-title">빠른 검색</h2><p id="workspace-search-description">메뉴나 프로젝트를 검색해 빠르게 이동하세요.</p></div><Button size="sm" variant="ghost" aria-label="검색 닫기" onClick={()=>setSearchOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody><TextField ref={searchInput} label="메뉴 및 프로젝트 검색" type="search" value={search} onChange={event=>setSearch(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="어떤 화면을 찾으세요?"/><div className="layout-command-results">{menuResults.length>0&&<section><h3>메뉴</h3>{menuResults.map(page=><button type="button" key={page} onClick={()=>openPage(page)}><Icon name={pageInfo[page].icon}/><span>{pageInfo[page].title}<small>{pageInfo[page].group}</small></span><Icon name="arrow-right"/></button>)}</section>}{projectResults.length>0&&<section><h3>프로젝트</h3>{projectResults.map(project=><button type="button" key={project.id} onClick={()=>openProject(project.id)}><Icon name="folder"/><span>{project.name}<small>{project.id}</small></span><Icon name="arrow-right"/></button>)}</section>}{!menuResults.length&&!projectResults.length&&<p className="layout-empty" role="status">검색 결과가 없습니다.</p>}</div></DialogBody></Dialog>
     <Dialog open={!!detailProject} onOpenChange={open=>{if(!open)setDetailProjectId(null);}} variant="divided" className="layout-project-detail-dialog" aria-labelledby="workspace-project-detail-title" closeOnBackdrop><DialogHeader><div><h2 id="workspace-project-detail-title">프로젝트 상세</h2>{detailProject&&<p>{detailProject.name} · {detailProject.id}</p>}</div><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setDetailProjectId(null)}><Icon name="close"/></Button></DialogHeader><DialogBody>{detailProject&&<ProjectDetailContent project={detailProject} members={members} onUpdate={updateProject}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setDetailProjectId(null)}>닫기</Button><Button onClick={()=>{if(detailProject){setDetailProjectId(null);openProject(detailProject.id);}}}>새 탭으로 열기<Icon name="arrow-right"/></Button></DialogFooter></Dialog>
     <Dialog open={createOpen} onOpenChange={setCreateOpen} variant="divided" className="layout-project-create-dialog" aria-labelledby="workspace-create-title" closeOnBackdrop><DialogHeader><h2 id="workspace-create-title">새 프로젝트</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setCreateOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{createOpen&&<ProjectForm id={createFormId} onCreate={createProject}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setCreateOpen(false)}>취소</Button><Button type="submit" form={createFormId}>프로젝트 만들기</Button></DialogFooter></Dialog>
     <Dialog open={inviteOpen} onOpenChange={setInviteOpen} variant="divided" aria-labelledby="workspace-invite-title" closeOnBackdrop><DialogHeader><h2 id="workspace-invite-title">멤버 초대</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setInviteOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{inviteOpen&&<InviteMemberForm id={inviteFormId} onInvite={inviteMember} existingEmails={members.map(member=>member.email)}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setInviteOpen(false)}>취소</Button><Button type="submit" form={inviteFormId}>멤버 추가</Button></DialogFooter></Dialog>

@@ -155,6 +155,8 @@
 .data-grid-select-cell .choice { gap:0; width:18px; min-height:18px; }
 .data-grid .data-grid-state-cell { padding:0; text-align:center; }
 .data-grid-state { position:sticky; inset-inline-start:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--space-3); min-height:220px; max-width:100%; padding:var(--space-8); color:var(--text-secondary); }
+.data-grid .data-grid-table:has(.data-grid-state-cell) { height:100%; }
+.data-grid .data-grid-state-cell, .data-grid-state { height:100%; }
 .data-grid-state > .ui-icon { width:24px; height:24px; }
 .data-grid-state strong { color:var(--text); font-weight:var(--font-weight-medium); }
 .data-grid-state p { margin:0; }

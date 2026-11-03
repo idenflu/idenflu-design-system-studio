@@ -48,11 +48,12 @@ export function ProfileForm({id,member,members,onSave}: {id:string;member:Member
   </form>;
 }
 
-export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'projects'|'active-projects'|'reviews'|'completed';projects:Project[];onOpen:(id:string)=>void;onCreate:()=>void;onComplete:(ids:string[])=>void}){
+export function ProjectsPage({page,projects,onOpen,onCreate,onComplete,onDelete}: {page:'projects'|'active-projects'|'reviews'|'completed';projects:Project[];onOpen:(id:string)=>void;onCreate:()=>void;onComplete:(ids:string[])=>void;onDelete:(ids:string[])=>void}){
   const [team,setTeam]=React.useState('all'),[status,setStatus]=React.useState('all'),[query,setQuery]=React.useState('');
+  const [filters,setFilters]=React.useState({team:'all',status:'all'});
   const [selected,setSelected]=React.useState<string[]>([]);
   const filterStatus=page==='active-projects'?'진행 중':page==='reviews'?'검토 중':page==='completed'?'완료':null;
-  const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(team==='all'||project.team===team)&&(status==='all'||project.status===status)),[projects,filterStatus,team,status]);
+  const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(filters.team==='all'||project.team===filters.team)&&(filters.status==='all'||project.status===filters.status)),[projects,filterStatus,filters]);
   const availableIds=React.useMemo(()=>new Set(rows.map(row=>row.id)),[rows]);
   const visibleSelected=selected.filter(id=>availableIds.has(id));
   React.useEffect(()=>{setSelected(current=>{const next=current.filter(id=>availableIds.has(id));return next.length===current.length?current:next;});},[availableIds]);
@@ -65,8 +66,8 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
     {id:'due',header:'마감일',accessor:row=>row.due,width:135},
   ];
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
-    <div className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`}><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]} popupStrategy="fixed"/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setQuery('');}}>필터 초기화</Button></div>
-    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={10} pageSizeOptions={[10,20,50]} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button>} exportable exportFileName="workspace-projects.csv"/>
+    <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();setFilters({team,status});}}><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]} popupStrategy="fixed"/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setFilters({team:'all',status:'all'});setQuery('');}}><Icon name="refresh"/>필터 초기화</Button><Button type="submit"><Icon name="search"/>검색</Button></form>
+    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} pagination={false} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<><Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button><Button variant="danger" size="sm" onClick={()=>onDelete(visibleSelected)}><Icon name="trash"/>삭제</Button></>} exportable exportFileName="workspace-projects.csv"/>
     <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 정보를 확인할 수 있습니다.</p>
   </>;
 }

@@ -259,9 +259,9 @@ test('project grids fill the content height and keep scrolling inside the rows',
   await assertGridFit();
   await navigate(page,'전체 프로젝트',isMobile);
   const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
-  await grid.getByRole('combobox',{name:'페이지당 행 수: 10개',exact:true}).click();
-  await page.getByRole('option',{name:'50개',exact:true}).click();
-  await expect(grid.locator('tbody tr')).toHaveCount(50);
+  await expect(grid.locator('tbody tr')).toHaveCount(120);
+  await expect(grid.getByRole('combobox',{name:/^페이지당 행 수:/})).toHaveCount(0);
+  await expect(grid.locator('[aria-label="전체 프로젝트 목록 페이지 탐색"]')).toHaveCount(0);
   await assertGridFit();
   const scrollbar=grid.getByRole('scrollbar',{name:'전체 프로젝트 목록 세로 스크롤',exact:true});
   await scrollbar.focus();
@@ -279,7 +279,7 @@ test('project grids fill the content height and keep scrolling inside the rows',
   await assertGridFit();
 });
 
-test('project filters and page size popups escape clipping and stay within the viewport',async({page})=>{
+test('project filter popups escape clipping and stay within the viewport',async({page})=>{
   await page.goto(sample);
   const assertFixedPopup=async trigger=>{
     await trigger.click();
@@ -303,9 +303,144 @@ test('project filters and page size popups escape clipping and stay within the v
     await trigger.press('Escape');
     await expect(trigger).toBeFocused();
   }
-  const pageSize=panel(page).getByRole('combobox',{name:'페이지당 행 수: 10개',exact:true});
-  const popup=await assertFixedPopup(pageSize);
-  await popup.getByRole('option',{name:'50개',exact:true}).click();
-  await expect(panel(page).getByRole('combobox',{name:'페이지당 행 수: 50개',exact:true})).toBeFocused();
   await expect(panel(page).locator('.select-popup:visible')).toHaveCount(0);
+});
+
+test('project management lists apply draft filters on search and reset immediately',async({page,isMobile})=>{
+  await page.goto(sample);
+  for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
+    if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
+    const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
+    const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
+    await expect(grid.locator('.data-grid-page-tools')).toHaveCount(0);
+    const firstRow=grid.locator('tbody tr').first();
+    const originalId=await firstRow.getAttribute('data-grid-row-id');
+    await expect(search.getByRole('button',{name:'검색',exact:true})).toBeVisible();
+    await search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true}).click();
+    await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
+    await expect(firstRow).toHaveAttribute('data-grid-row-id',originalId);
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await expect.poll(()=>grid.locator('tbody tr').evaluateAll(rows=>rows.length>0&&rows.every(row=>row.children[3]?.textContent==='플랫폼 개발'))).toBe(true);
+    if(title==='전체 프로젝트'){
+      const appliedId=await firstRow.getAttribute('data-grid-row-id');
+      await search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true}).click();
+      await search.getByRole('option',{name:'완료',exact:true}).click();
+      await expect(firstRow).toHaveAttribute('data-grid-row-id',appliedId);
+      await search.getByRole('button',{name:'검색',exact:true}).press('Enter');
+      await expect.poll(()=>grid.locator('tbody tr').evaluateAll(rows=>rows.length>0&&rows.every(row=>row.children[2]?.textContent==='완료'&&row.children[3]?.textContent==='플랫폼 개발'))).toBe(true);
+    }
+    await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('일치하지않는프로젝트xyz');
+    await expect(grid.getByText('검색 결과가 없습니다.',{exact:true})).toBeVisible();
+    await search.getByRole('button',{name:'필터 초기화',exact:true}).click();
+    await expect(search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true})).toBeVisible();
+    await expect(search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true})).toBeVisible();
+    await expect(grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true})).toHaveValue('');
+    await expect(firstRow).toHaveAttribute('data-grid-row-id',originalId);
+  }
+});
+
+test('master detail filters immediately without a search button',async({page,isMobile})=>{
+  await page.goto(sample);
+  await navigate(page,'마스터-디테일',isMobile);
+  const input=panel(page).getByRole('searchbox',{name:'프로젝트 검색',exact:true});
+  const list=panel(page).locator('.layout-master-list');
+  const originalCount=await list.getByRole('button').count();
+  expect(originalCount).toBeGreaterThan(1);
+  await expect(panel(page).getByRole('button',{name:'검색',exact:true})).toHaveCount(0);
+  await input.fill('PRJ-003');
+  await expect(list.getByRole('button')).toHaveCount(1);
+  await expect(list.getByRole('button',{name:'파트너 포털 PRJ-003',exact:true})).toBeVisible();
+  await input.fill('PRJ-001');
+  await expect(list.getByRole('button',{name:'디자인 시스템 v2 PRJ-001',exact:true})).toBeVisible();
+  await expect(list.getByRole('button')).toHaveCount(1);
+  await input.fill('일치하지않는프로젝트xyz');
+  await expect(list.getByRole('status')).toHaveText('검색 결과가 없습니다.');
+  await input.fill('');
+  await expect(list.getByRole('button')).toHaveCount(originalCount);
+});
+
+test('project deletion confirms selected rows, preserves cancellation, and updates open screens',async({page,isMobile})=>{
+  await page.goto(sample);
+  await panel(page).getByRole('button',{name:'디자인 시스템 v2 PRJ-001',exact:true}).click();
+  const detail=page.getByRole('dialog',{name:'프로젝트 상세',exact:true});
+  await detail.getByRole('button',{name:'새 탭으로 열기',exact:true}).click();
+  await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveAttribute('aria-selected','true');
+  await navigate(page,'검토 요청',isMobile);
+  await navigate(page,'전체 프로젝트',isMobile);
+  const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
+  const first=grid.locator('tr[data-grid-row-id="PRJ-001"]');
+  const second=grid.locator('tr[data-grid-row-id="PRJ-002"]');
+  await first.getByRole('checkbox').check();
+  await second.getByRole('checkbox').check();
+  const selection=grid.locator('.data-grid-selection');
+  const remove=selection.getByRole('button',{name:'삭제',exact:true});
+  await expect(remove).toHaveClass(/button--danger/);
+  await expect(remove.locator('.icon-trash')).toHaveCount(1);
+  await remove.click();
+  const dialog=page.getByRole('dialog',{name:'프로젝트 삭제',exact:true});
+  await expect(dialog.getByRole('button',{name:'취소',exact:true})).toBeFocused();
+  await expect(dialog).toContainText('디자인 시스템 v2');
+  await expect(dialog).toContainText('PRJ-001');
+  await expect(dialog).toContainText('모바일 앱 온보딩');
+  await expect(dialog).toContainText('PRJ-002');
+  await dialog.getByRole('button',{name:'취소',exact:true}).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(first).toBeVisible();
+  await expect(second).toBeVisible();
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('2개 선택됨');
+  await remove.click();
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(first).toBeVisible();
+  await remove.click();
+  await dialog.getByRole('button',{name:'삭제',exact:true}).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(first).toHaveCount(0);
+  await expect(second).toHaveCount(0);
+  await expect(selection).toHaveCount(0);
+  await expect(page.locator('.layout-workspace-tabs > .tab-list [role="tab"]').filter({hasText:'디자인 시스템 v2'})).toHaveCount(0);
+  await navigate(page,'검토 요청',isMobile);
+  await expect(panel(page).locator('tr[data-grid-row-id="PRJ-002"]')).toHaveCount(0);
+  await navigate(page,'팀 홈',isMobile);
+  await expect(panel(page).locator('.layout-home-metrics .layout-metric').first()).toContainText('118');
+});
+
+test('project filter actions place the reset icon before search and keep reset behaviour',async({page,isMobile})=>{
+  await page.goto(sample);
+  for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
+    if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
+    const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
+    const reset=search.getByRole('button',{name:'필터 초기화',exact:true});
+    await expect(search.locator(':scope > button')).toHaveText(['필터 초기화','검색']);
+    await expect(reset.locator('.icon-refresh')).toHaveAttribute('aria-hidden','true');
+    const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
+    await search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true}).click();
+    await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('일치하지않는프로젝트xyz');
+    await expect(grid.getByText('검색 결과가 없습니다.',{exact:true})).toBeVisible();
+    await reset.click();
+    await expect(search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true})).toBeVisible();
+    await expect(search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true})).toBeVisible();
+    await expect(grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true})).toHaveValue('');
+    await expect.poll(()=>grid.locator('tr[data-grid-row-id]').count()).toBeGreaterThan(0);
+  }
+});
+
+test('bulk deletion previews three projects while deleting the complete selection',async({page})=>{
+  await page.goto(sample);
+  const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
+  const selectedIds=await grid.locator('tr[data-grid-row-id]').evaluateAll(rows=>rows.map(row=>row.getAttribute('data-grid-row-id')));
+  expect(selectedIds).toHaveLength(120);
+  await grid.getByRole('checkbox',{name:'검색 결과 전체 선택',exact:true}).check();
+  await grid.locator('.data-grid-selection').getByRole('button',{name:'삭제',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'프로젝트 삭제',exact:true});
+  await expect(dialog.locator('#workspace-delete-description')).toContainText('선택한 120개 프로젝트');
+  await expect(dialog.locator('.layout-delete-project-list li:not(.layout-delete-project-summary)')).toHaveCount(3);
+  await expect(dialog.locator('.layout-delete-project-summary')).toHaveText('외 117개 프로젝트');
+  await dialog.getByRole('button',{name:'삭제',exact:true}).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(grid.locator('.data-grid-heading')).toContainText('0개 항목');
+  await expect(grid.locator('.data-grid-selection')).toHaveCount(0);
+  await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
 });

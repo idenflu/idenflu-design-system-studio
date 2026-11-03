@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { Icon, type IconName, type TreeNode } from '../src';
+import { initialWorkspaceRoles } from './layout-role-data';
 
 export type Project = {id:string; name:string; team:string; owner:string; status:string; progress:number; due:string; description:string};
 export type ProjectDraft = Pick<Project,'name'|'team'|'description'|'due'>;
 export type Member = {id:string; name:string; email:string; team:string; roles:string[]};
 export type WorkspaceSettings = {name:string; description:string; timezone:string; projectNotifications:boolean; weeklySummary:boolean; mentionNotifications:boolean};
-export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'master-detail'|'members'|'settings'|'notifications'|'vertical-settings';
+export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'master-detail'|'members'|'role-management'|'settings'|'notifications'|'vertical-settings';
 export type WorkspaceTab = {key:string; page:WorkspacePage|'project-detail'; projectId?:string};
 export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:string; icon:IconName; description:string}> = {
   home:{title:'팀 홈',group:'업무 공간',parent:'work',icon:'home',description:'팀의 주요 업무와 최근 활동을 한눈에 확인하세요.'},
@@ -15,6 +16,7 @@ export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:s
   completed:{title:'완료된 프로젝트',group:'프로젝트 관리',parent:'project-menu',icon:'folder',description:'작업을 마친 프로젝트와 결과를 확인하세요.'},
   'master-detail':{title:'마스터-디테일',group:'프로젝트 관리',parent:'project-menu',icon:'grid',description:'프로젝트 목록과 선택한 항목의 상세 정보를 함께 확인하세요.'},
   members:{title:'멤버 관리',group:'조직 관리',parent:'team-menu',icon:'person',description:'함께 일하는 팀원을 찾고 역할을 관리하세요.'},
+  'role-management':{title:'역할 관리',group:'조직 관리',parent:'team-menu',icon:'shield-check',description:'역할별 사용 권한과 수신할 알림을 설정하세요.'},
   settings:{title:'워크스페이스 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'워크스페이스의 기본 정보와 표시 기준을 설정하세요.'},
   notifications:{title:'알림 설정',group:'환경 설정',parent:'settings-menu',icon:'bell',description:'필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다.'},
   'vertical-settings':{title:'버티컬 탭 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'설정 항목을 세로 탭으로 나누어 관리하세요.'},
@@ -22,7 +24,7 @@ export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:s
 export const defaultExpanded=['work','project-menu','team-menu','settings-menu'];
 export const statuses=['준비 중','진행 중','검토 중','완료'].map(value=>({value,label:value}));
 export const teams=['프로덕트 디자인','플랫폼 개발','브랜드 디자인'].map(value=>({value,label:value}));
-export const roles=['관리자','편집자','뷰어'].map(value=>({value,label:value}));
+export const roles=initialWorkspaceRoles.map(role=>({value:role.name,label:role.name}));
 const extraProjectAreas=[
   '계정 관리','결제 흐름','상품 탐색','주문 내역','고객 상담','알림 센터','문서 공유',
   '검색 경험','운영 대시보드','사용자 권한','파트너 정산','콘텐츠 관리','모바일 내비게이션','예약 관리',
@@ -63,7 +65,7 @@ export const badgeVariant=(status:string)=>status==='완료'?'success' as const:
 export function workspaceTree():TreeNode[]{
   const leaf=(value:WorkspacePage):TreeNode=>({value,label:<span className="layout-tree-label"><span>{pageInfo[value].title}</span></span>});
   const group=(value:string,title:string,children:TreeNode[],root=false):TreeNode=>({value,label:<span className="layout-tree-label">{root&&<Icon name="folder"/>}<span>{title}</span></span>,children});
-  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed'),leaf('master-detail')])],true),group('team-menu','조직 관리',[leaf('members')],true),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications'),leaf('vertical-settings')],true)];
+  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed'),leaf('master-detail')])],true),group('team-menu','조직 관리',[leaf('members'),leaf('role-management')],true),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications'),leaf('vertical-settings')],true)];
 }
 
 export function filterWorkspaceTree(items:readonly TreeNode[],query:string):TreeNode[]{
