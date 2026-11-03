@@ -25,6 +25,7 @@ function fixture() {
   };
 }
 const click = async element => { assert.ok(element, 'expected a clickable control'); await act(async () => element.click()); };
+const shiftClick = async element => { assert.ok(element, 'expected a sortable header'); await act(async () => element.dispatchEvent(new MouseEvent('click',{bubbles:true,shiftKey:true}))); };
 function button(node, name) {
   return [...node.querySelectorAll('button')].find(element => {
     if (element.hasAttribute('aria-label')) return element.getAttribute('aria-label') === name;
@@ -94,6 +95,86 @@ test('DataGrid sorts numbers stably, keeps missing values last and restores sour
     assert.equal(header.getAttribute('aria-sort'),'none');
     assert.deepEqual(names(f.node),rows.map(row => row.name));
   } finally { await f.dispose(); }
+});
+
+test('Shift-click sorts tied values by ordered conditions and renumbers priorities when one is removed', async () => {
+  const f=fixture(),models=[];
+  try {
+    await f.render(h(DataGrid,{...props,pagination:false,onSortModelChange:model=>models.push(model)}));
+    await click(button(f.node,'금액'));
+    await shiftClick(button(f.node,'이름'));
+    assert.deepEqual(names(f.node),['Beta','Delta','Alpha','Gamma']);
+    assert.deepEqual(models.at(-1),[{columnId:'amount',direction:'asc'},{columnId:'name',direction:'asc'}]);
+    assert.deepEqual([...f.node.querySelectorAll('.data-grid-sort-priority')].map(item=>item.textContent),['2','1']);
+    assert.equal(f.node.querySelectorAll('th[aria-sort="ascending"]').length,1);
+    await shiftClick(button(f.node,'이름'));
+    assert.deepEqual(names(f.node),['Delta','Beta','Alpha','Gamma']);
+    await shiftClick(button(f.node,'팀'));
+    await shiftClick(button(f.node,'금액'));
+    assert.deepEqual(names(f.node),['Alpha','Delta','Beta','Gamma']);
+    await shiftClick(button(f.node,'금액'));
+    assert.deepEqual(models.at(-1),[{columnId:'name',direction:'desc'},{columnId:'team',direction:'asc'}]);
+    assert.match(f.node.textContent,/1순위 내림차순/);
+    assert.match(f.node.textContent,/2순위 오름차순/);
+    await click(button(f.node,'팀'));
+    assert.deepEqual(models.at(-1),[{columnId:'team',direction:'desc'}]);
+    assert.equal(f.node.querySelectorAll('.data-grid-sort-priority').length,0);
+  } finally {await f.dispose();}
+});
+
+test('multi-sort keeps missing values last at every level and exports the complete sorted result', async () => {
+  const f=fixture(),originalPicker=window.showSaveFilePicker;
+  const data=[
+    {id:'1',name:'One',amount:null,team:'A'},
+    {id:'2',name:'Two',amount:2,team:'A'},
+    {id:'3',name:'Three',amount:2,team:'A'},
+    {id:'4',name:'Four',amount:10,team:'A'},
+    {id:'5',name:'Five',amount:1,team:null},
+    {id:'6',name:'Six',amount:null,team:null},
+  ];
+  let csv;
+  try {
+    window.showSaveFilePicker=async()=>({createWritable:async()=>({write:async blob=>{csv=await blob.text();},close:async()=>{}})});
+    await f.render(h(DataGrid,{...props,rows:data,exportable:true,defaultPageSize:2,defaultSortModel:[{columnId:'team',direction:'desc'},{columnId:'amount',direction:'desc'}]}));
+    assert.deepEqual(names(f.node),['Four','Two']);
+    await click(button(f.node,'CSV 내보내기'));
+    assert.deepEqual(csv.trimEnd().split('\r\n').slice(1).map(line=>line.split(',')[0]),['Four','Two','Three','One','Five','Six']);
+  } finally {window.showSaveFilePicker=originalPicker;await f.dispose();}
+});
+
+test('controlled sortModel resets pages and preserves legacy primary-sort callbacks', async () => {
+  const f=fixture(),models=[],primary=[],pages=[];
+  function Harness() {
+    const [sortModel,setSortModel]=React.useState([{columnId:'amount',direction:'asc'}]);
+    return h(DataGrid,{...props,sortModel,sort:{columnId:'name',direction:'desc'},defaultPageSize:2,
+      onSortModelChange:model=>{models.push(model);setSortModel(model);},
+      onSortChange:value=>primary.push(value),onPageChange:value=>pages.push(value)});
+  }
+  try {
+    await f.render(h(Harness));
+    assert.deepEqual(names(f.node),['Beta','Delta']);
+    await click(button(f.node,'다음'));
+    await shiftClick(button(f.node,'이름'));
+    assert.equal(pages.at(-1),1);
+    assert.equal(models.at(-1).length,2);
+    assert.equal(primary.length,0,'secondary sorts do not alter the legacy primary sort');
+    await shiftClick(button(f.node,'이름'));
+    assert.deepEqual(names(f.node),['Delta','Beta']);
+    await click(button(f.node,'이름'));
+    assert.deepEqual(primary.at(-1),null);
+    assert.deepEqual(names(f.node),['Alpha','Beta']);
+  } finally {await f.dispose();}
+});
+
+test('sort models ignore unavailable, duplicate and non-sortable columns', async () => {
+  const f=fixture();
+  try {
+    await f.render(h(DataGrid,{...props,pagination:false,columns:columns.map(column=>column.id==='team'?{...column,sortable:false}:column),
+      defaultSortModel:[{columnId:'missing',direction:'asc'},{columnId:'team',direction:'asc'},{columnId:'amount',direction:'asc'},{columnId:'amount',direction:'desc'},{columnId:'name',direction:'desc'}]}));
+    assert.deepEqual(names(f.node),['Delta','Beta','Alpha','Gamma']);
+    assert.equal(button(f.node,'팀'),undefined);
+    assert.equal(f.node.querySelectorAll('.data-grid-sort-priority').length,2);
+  } finally {await f.dispose();}
 });
 
 test('DataGrid searches underlying values, resets pagination and recovers from no results', async () => {
@@ -197,6 +278,72 @@ test('DataGrid selects only selectable rows on the current page and keeps select
     assert.deepEqual(changes.at(-1),[]);
     assert.equal(control(f.node,'Delta 선택').checked,false);
   } finally { await f.dispose(); }
+});
+
+test('row clicks toggle selectable records once and move keyboard focus to their checkbox', async () => {
+  const f=fixture(),changes=[];
+  try {
+    await f.render(h(DataGrid,{...props,selectable:true,isRowSelectable:row=>row.id!=='b',onSelectedRowIdsChange:ids=>changes.push(ids)}));
+    const row=id=>f.node.querySelector(`tr[data-grid-row-id="${id}"]`);
+    await click(row('a').querySelectorAll('td')[1]);
+    assert.deepEqual(changes,[['a']]);
+    assert.equal(control(f.node,'Alpha 선택').checked,true);
+    assert.equal(document.activeElement,control(f.node,'Alpha 선택'));
+    await click(row('a').querySelectorAll('td')[2]);
+    assert.deepEqual(changes.at(-1),[]);
+    await click(control(f.node,'Alpha 선택'));
+    assert.equal(changes.length,3,'checkbox activation must not also toggle its row');
+    assert.deepEqual(changes.at(-1),['a']);
+    await click(row('b').querySelectorAll('td')[1]);
+    assert.equal(changes.length,3,'disabled records cannot be selected by a row click');
+    await f.render(h(DataGrid,{...props,selectable:true,selectOnRowClick:false,onSelectedRowIdsChange:ids=>changes.push(ids)}));
+    await click(row('c').querySelectorAll('td')[1]);
+    assert.equal(changes.length,3,'row click selection can be disabled');
+    await click(control(f.node,'Gamma 선택'));
+    assert.deepEqual(changes.at(-1),['a','c']);
+  } finally {await f.dispose();}
+});
+
+test('row selection ignores interactive descendants, editing and text selection', async () => {
+  const f=fixture(),changes=[];
+  const richColumns=[
+    {...columns[0],editable:true},
+    {...columns[1],cell:()=>h('div',null,
+      h('button',null,h('span',null,'작업')),
+      h('a',{href:'#details',onClick:event=>event.preventDefault()},'상세'),
+      h('span',{'data-grid-ignore-row-click':true},'제외 영역'),
+      h('span',{role:'button',tabIndex:0},'사용자 컨트롤'))},
+  ];
+  try {
+    await f.render(h(DataGrid,{...props,columns:richColumns,selectable:true,onCellEdit:()=>{},onSelectedRowIdsChange:ids=>changes.push(ids)}));
+    const row=f.node.querySelector('tr[data-grid-row-id="a"]');
+    for(const selector of ['td:nth-child(3) button span','a','[data-grid-ignore-row-click]','[role="button"]']) await click(row.querySelector(selector));
+    await click(button(f.node,'Alpha 이름 편집'));
+    await click(control(f.node,'이름'));
+    await key(control(f.node,'이름'),'Escape');
+    assert.equal(changes.length,0,'cell controls and editor actions must leave selection alone');
+    const text=row.querySelector('.data-grid-cell-content > span').firstChild;
+    const selection=window.getSelection(),range=document.createRange();
+    range.selectNodeContents(text);selection.removeAllRanges();selection.addRange(range);
+    await click(row.querySelectorAll('td')[1]);
+    assert.equal(changes.length,0,'copying text must not select the row');
+    selection.removeAllRanges();
+    await click(row.querySelectorAll('td')[1]);
+    assert.deepEqual(changes.at(-1),['a']);
+  } finally {window.getSelection().removeAllRanges();await f.dispose();}
+});
+
+test('row click selection honors controlled values until the parent updates them', async () => {
+  const f=fixture(),changes=[];
+  try {
+    const base={...props,selectable:true,onSelectedRowIdsChange:ids=>changes.push(ids)};
+    await f.render(h(DataGrid,{...base,selectedRowIds:[]}));
+    await click(f.node.querySelector('tr[data-grid-row-id="a"] td:nth-child(2)'));
+    assert.deepEqual(changes.at(-1),['a']);
+    assert.equal(control(f.node,'Alpha 선택').checked,false);
+    await f.render(h(DataGrid,{...base,selectedRowIds:['a']}));
+    assert.equal(control(f.node,'Alpha 선택').checked,true);
+  } finally {await f.dispose();}
 });
 
 test('DataGrid controlled state follows parent updates for search, sorting, pagination and selection', async () => {

@@ -24,6 +24,45 @@ test('data grid supports search, current-page selection and page size without do
   expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 
+test('Shift-click adds, cycles and removes sort priorities while ordinary click returns to single sorting', async ({page}) => {
+  await page.goto(route);
+  const grid=projectGrid(page),team=grid.getByRole('button',{name:'담당 팀',exact:true}),owner=grid.getByRole('button',{name:'담당자',exact:true});
+  await team.click();
+  await grid.getByRole('button',{name:'2페이지',exact:true}).click();
+  await owner.click({modifiers:['Shift']});
+  await expect(grid.getByRole('button',{name:'1페이지',exact:true})).toHaveAttribute('aria-current','page');
+  await expect(team.locator('.data-grid-sort-priority')).toHaveText('1');
+  await expect(owner.locator('.data-grid-sort-priority')).toHaveText('2');
+  await expect(grid.locator('th[aria-sort="ascending"]')).toHaveCount(1);
+  await expect(owner).toHaveAccessibleDescription(/2순위 오름차순/);
+  await owner.click({modifiers:['Shift']});
+  await expect(owner).toHaveAccessibleDescription(/2순위 내림차순/);
+  await owner.click({modifiers:['Shift']});
+  await expect(grid.locator('.data-grid-sort-priority')).toHaveCount(0);
+  await expect(owner).toHaveAccessibleDescription(/정렬 안 함/);
+  await owner.click({modifiers:['Shift']});
+  await owner.click();
+  await expect(grid.locator('.data-grid-sort-priority')).toHaveCount(0);
+  await expect(owner.locator('..')).toHaveAttribute('aria-sort','descending');
+  await expect(team.locator('..')).toHaveAttribute('aria-sort','none');
+});
+
+test('clicking row content selects once and the focused checkbox retains native keyboard behavior', async ({page}) => {
+  await page.goto(route);
+  const grid=projectGrid(page),row=grid.locator('tbody tr[data-grid-row-id]').first();
+  const content=row.locator('td').nth(1).locator('strong'),checkbox=row.getByRole('checkbox');
+  await content.click();
+  await expect(checkbox).toBeChecked();
+  await expect(checkbox).toBeFocused();
+  await expect(grid.locator('.data-grid-selection')).toContainText('1개 선택됨');
+  await checkbox.press('Space');
+  await expect(checkbox).not.toBeChecked();
+  await checkbox.check();
+  await expect(checkbox).toBeChecked();
+  await content.click();
+  await expect(checkbox).not.toBeChecked();
+});
+
 test('column filters combine, keep numeric zero, and reset empty results', async ({page}) => {
   await page.goto(route);
   const grid = projectGrid(page);

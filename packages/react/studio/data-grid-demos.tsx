@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, type DataGridColumn } from '../src';
+import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, type DataGridColumn, type DataGridSort } from '../src';
 import { Section } from './demo-layout';
 
 type Project = {
@@ -36,13 +36,14 @@ const projectColumns:DataGridColumn<Project>[] = [
   {id:'due',header:'마감일',accessor:row=>row.due,width:150,filter:'text'},
 ];
 
-const virtualProjects:Project[] = Array.from({length:10000},(_,index)=>({
+const virtualProject = (index:number):Project => ({
   ...projects[index % projects.length],
   id:`ROW-${String(index + 1).padStart(5,'0')}`,
   name:`가상 프로젝트 ${String(index + 1).padStart(5,'0')}`,
   progress:index % 101,
   budget:(index + 1) * 25000,
-}));
+});
+const virtualProjects:Project[] = Array.from({length:10000},(_,index)=>virtualProject(index));
 const virtualColumns:DataGridColumn<Project>[] = [
   {id:'name',header:'프로젝트',accessor:row=>row.name,width:260,minWidth:160,pinned:'start',filter:'text',editable:true,validate:value=>value.trim().length >= 2 ? undefined : '프로젝트 이름은 2자 이상 입력해주세요.',cell:row=><div className="studio-grid-project"><strong>{row.name}</strong><small>{row.id}</small>{Number(row.id.slice(4)) % 37 === 0 && <small>여러 줄의 설명도 행 높이에 반영합니다. 열 너비를 조절해 줄바꿈을 확인하세요.</small>}</div>},
   ...projectColumns.slice(1),
@@ -65,6 +66,7 @@ const taskColumns:DataGridColumn<Task>[] = [
 export function DataGridDemos() {
   const [density,setDensity] = React.useState<'default'|'compact'>('default');
   const [selected,setSelected] = React.useState<string[]>([]);
+  const [sortModel,setSortModel] = React.useState<DataGridSort[]>([{columnId:'name',direction:'asc'}]);
   const [tasks,setTasks] = React.useState(initialTasks);
   const [notice,setNotice] = React.useState('셀의 편집 버튼으로 값을 수정할 수 있습니다.');
   const [state,setState] = React.useState('loading');
@@ -80,14 +82,15 @@ export function DataGridDemos() {
   };
   return <>
     <Section title="프로젝트 데이터그리드" description="24개 프로젝트에서 검색·열별 필터·정렬·선택·페이지 이동을 함께 사용합니다. 프로젝트 이름은 가로 스크롤 중에도 고정됩니다.">
-      <div className="studio-grid-demo-toolbar"><p className="react-studio-caption">열 경계는 드래그하거나 포커스 후 방향키로 조절하세요.</p><Segmented label="데이터그리드 밀도" size="sm" value={density} onValueChange={value=>setDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
+      <div className="studio-grid-demo-toolbar"><p className="react-studio-caption">Shift+클릭으로 정렬 조건을 추가하세요. 열 경계는 드래그하거나 방향키로 조절합니다.</p><Segmented label="데이터그리드 밀도" size="sm" value={density} onValueChange={value=>setDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
       <DataGrid label="프로젝트 데이터그리드" rows={projects} columns={projectColumns}
         getRowId={row=>row.id} getRowLabel={row=>row.name} selectable
         selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
         searchLabel="프로젝트 검색" defaultPageSize={5} pageSizeOptions={[5,10,20]}
-        defaultSort={{columnId:'name',direction:'asc'}} density={density}
+        sortModel={sortModel} onSortModelChange={setSortModel} density={density}
         exportable exportFileName="idenflu-projects.csv" maxHeight={480} />
-      <p className="react-studio-caption">전체 선택은 현재 페이지에 적용합니다. 다른 페이지와 검색 결과로 이동해도 선택한 행은 유지합니다. CSV는 표시 중인 열을 사용하며, 검색 결과 전체와 선택한 행을 구분해 내려받습니다.</p>
+      <p role="status" className="component-helper">정렬: {sortModel.length ? sortModel.map((sort,index)=>`${index+1}. ${projectColumns.find(column=>column.id===sort.columnId)?.header} ${sort.direction === 'asc' ? '오름차순' : '내림차순'}`).join(' · ') : '원래 순서'}</p>
+      <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV는 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다.</p>
     </Section>
     <Section title="셀 편집과 값 바인딩" description="텍스트·숫자 편집, 입력 검증과 읽기 전용 행을 비교합니다. 저장한 값은 React 상태에 반영되어 다시 검색·정렬할 수 있습니다.">
       <DataGrid label="작업 편집 데이터그리드" rows={tasks} columns={taskColumns}
@@ -97,11 +100,14 @@ export function DataGridDemos() {
       <p role="status" className="component-helper">{notice}</p>
       <p className="react-studio-caption">Enter 또는 저장 버튼으로 확정하고 Escape 또는 취소 버튼으로 되돌립니다. 검증 오류는 셀 안에 표시합니다. 마지막 행은 읽기 전용입니다.</p>
     </Section>
-    <Section title="가상 스크롤" description="10,000행 중 화면 근처의 행만 렌더링합니다. 데이터 수와 밀도를 바꾸고, 스크롤·검색·열 조절·선택·편집을 함께 확인하세요.">
-      <div className="studio-grid-virtual-toolbar"><Select label="가상 스크롤 데이터 수" value={String(virtualCount)} onValueChange={value=>setVirtualCount(Number(value))} options={[{value:'100',label:'100개'},{value:'1000',label:'1,000개'},{value:'10000',label:'10,000개'}]} /><Segmented label="가상 스크롤 밀도" size="sm" value={virtualDensity} onValueChange={value=>setVirtualDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
+    <Section title="가상 스크롤" description="최대 50,000행 중 화면 근처의 행만 렌더링합니다. 데이터 수와 밀도를 바꾸고, 세로 스크롤바 드래그·검색·열 조절·선택·편집을 함께 확인하세요.">
+      <div className="studio-grid-virtual-toolbar"><Select label="가상 스크롤 데이터 수" value={String(virtualCount)} onValueChange={value=>{
+        const count=Number(value);setVirtualCount(count);
+        setVirtualRows(current=>current.length >= count ? current : [...current,...Array.from({length:count-current.length},(_,index)=>virtualProject(current.length+index))]);
+      }} options={[{value:'100',label:'100개'},{value:'1000',label:'1,000개'},{value:'10000',label:'10,000개'},{value:'50000',label:'50,000개'}]} /><Segmented label="가상 스크롤 밀도" size="sm" value={virtualDensity} onValueChange={value=>setVirtualDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
       <DataGrid label="대용량 데이터그리드" rows={largeRows} columns={virtualColumns}
         getRowId={row=>row.id} getRowLabel={row=>row.name}
-        virtualized={{estimateRowHeight:68,overscan:6}} maxHeight={420} density={virtualDensity}
+        virtualized={{estimateRowHeight:virtualDensity === 'compact' ? 61 : 73,overscan:8}} maxHeight={420} density={virtualDensity}
         selectable selectedRowIds={virtualSelected} onSelectedRowIdsChange={setVirtualSelected}
         searchLabel="대용량 데이터 검색" exportable exportFileName="idenflu-virtual-projects.csv"
         onCellEdit={({rowId,value})=>{
@@ -122,18 +128,19 @@ export function DataGridDemos() {
     </Section>
     <Section title="사용 기준" description="일반 테이블은 읽기 중심의 표에, 데이터그리드는 검색·열 조작·선택·편집이 결합된 목록에 사용합니다.">
       <dl className="detail-list studio-grid-guidelines">
-        <div><dt>필터와 정렬</dt><dd>검색과 열별 필터는 AND로 적용합니다. 정렬은 오름차순 → 내림차순 → 해제 순서이며 빈 값은 마지막에 표시합니다.</dd></div>
+        <div><dt>필터와 정렬</dt><dd>검색과 열별 필터는 AND로 적용합니다. 클릭은 단일 정렬, Shift+클릭은 다중 정렬입니다. 오름차순 → 내림차순 → 해제 순서이며 숫자는 정렬 우선순위입니다. 빈 값은 각 조건에서 마지막에 표시합니다.</dd></div>
+        <div><dt>행 선택</dt><dd>행의 일반 영역 또는 체크박스로 선택합니다. 편집 버튼·링크·입력 컨트롤과 텍스트 드래그는 선택을 변경하지 않습니다. selectOnRowClick을 false로 설정하면 체크박스로만 선택합니다.</dd></div>
         <div><dt>키보드</dt><dd>Tab으로 컨트롤을 탐색합니다. 열 경계에서 ←·→는 10px, Shift와 함께 누르면 1px씩 조절하며 Home·End는 최소·최대 너비로 이동합니다.</dd></div>
         <div><dt>데이터 연결</dt><dd>행은 고유하고 안정적인 ID가 필요합니다. 편집 결과는 onCellEdit에서 rows 상태를 갱신하세요. 서버 저장은 이 콜백에서 별도로 연결합니다.</dd></div>
         <div><dt>가상 스크롤</dt><dd>virtualized를 켜면 화면 근처 행과 입력·포커스 유지에 필요한 행을 렌더링합니다. 기본은 페이지 이동 없이 전체 검색 결과를 스크롤하며, pagination을 지정하면 페이지 이동과 함께 사용할 수 있습니다.</dd></div>
-        <div><dt>처리 범위</dt><dd>가상화는 세로 방향의 행 렌더링을 줄입니다. 전체 rows의 검색·정렬 계산과 데이터 메모리는 유지합니다. 서버 페이지 이동·열 가상화·행 그룹화·다중 열 정렬은 포함하지 않습니다.</dd></div>
+        <div><dt>처리 범위</dt><dd>가상화는 세로 방향의 행 렌더링을 줄입니다. 전체 rows의 검색·정렬 계산과 데이터 메모리는 유지합니다. 서버 페이지 이동·열 가상화·행 그룹화는 포함하지 않습니다.</dd></div>
       </dl>
     </Section>
   </>;
 }
 
 export const dataGridUsage = `import { useState } from 'react';
-import { DataGrid, type DataGridColumn } from '@idenflu/mono-react';
+import { DataGrid, type DataGridColumn, type DataGridSort } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 type Project = { id: string; name: string; hours: number };
@@ -152,9 +159,11 @@ export function ProjectGrid() {
     { id: 'p2', name: '브랜드 가이드', hours: 16 },
   ]);
   const [selected, setSelected] = useState<string[]>([]);
+  const [sortModel, setSortModel] = useState<DataGridSort[]>([]);
   return <DataGrid label="프로젝트 목록" rows={rows} columns={columns}
     getRowId={row => row.id} getRowLabel={row => row.name}
     selectable selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
+    sortModel={sortModel} onSortModelChange={setSortModel}
     defaultPageSize={5} pageSizeOptions={[5, 10, 20]} maxHeight={400}
     exportable exportFileName="projects.csv"
     onCellEdit={({ rowId, columnId, value }) => {

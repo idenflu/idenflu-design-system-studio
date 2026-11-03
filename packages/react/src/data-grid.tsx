@@ -3,7 +3,8 @@ import { Button, Checkbox, Icon, Pagination, Spinner, Table, TextField } from '.
 import { Popover } from './interactive';
 import { Select } from './navigation';
 import { DataGridCellEditor, downloadDataGridCsv } from './data-grid-tools';
-import { useDataGridVirtualization, type DataGridVirtualizationOptions } from './data-grid-virtual';
+import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
+import { DataGridScrollbar } from './data-grid-scrollbar';
 export type { DataGridVirtualizationOptions } from './data-grid-virtual';
 
 export interface DataGridColumn<T> {
@@ -25,6 +26,7 @@ export interface DataGridColumn<T> {
   validate?: (value: string, row: T) => string | undefined;
 }
 export interface DataGridSort { columnId: string; direction: 'asc' | 'desc' }
+export type DataGridSortModel = readonly DataGridSort[];
 export type DataGridFilters = Record<string, string | {min?: string; max?: string}>;
 export interface DataGridCellEdit<T> { row: T; rowId: string; columnId: string; value: string }
 export interface DataGridProps<T> {
@@ -34,6 +36,8 @@ export interface DataGridProps<T> {
   getRowId: (row: T) => string;
   getRowLabel?: (row: T) => string;
   selectable?: boolean;
+  /** Clicking non-interactive row content toggles selection. Defaults to true. */
+  selectOnRowClick?: boolean;
   isRowSelectable?: (row: T) => boolean;
   selectedRowIds?: readonly string[];
   defaultSelectedRowIds?: readonly string[];
@@ -49,6 +53,10 @@ export interface DataGridProps<T> {
   sort?: DataGridSort | null;
   defaultSort?: DataGridSort | null;
   onSortChange?: (sort: DataGridSort | null) => void;
+  /** Ordered multi-column sorting. Takes precedence over the legacy sort prop. */
+  sortModel?: DataGridSortModel;
+  defaultSortModel?: DataGridSortModel;
+  onSortModelChange?: (sortModel: DataGridSort[]) => void;
   page?: number;
   defaultPage?: number;
   onPageChange?: (page: number) => void;
@@ -96,10 +104,11 @@ const hasFilter = (value: DataGridFilters[string]) => typeof value === 'string' 
 /** A client-side data table. Selection is keyed by stable row IDs across pages. */
 export function DataGrid<T>({
   label, rows, columns, getRowId, getRowLabel,
-  selectable = false, isRowSelectable, selectedRowIds, defaultSelectedRowIds = [], onSelectedRowIdsChange,
+  selectable = false, selectOnRowClick = true, isRowSelectable, selectedRowIds, defaultSelectedRowIds = [], onSelectedRowIdsChange,
   searchable = true, searchLabel = '검색', query: controlledQuery, defaultQuery = '', onQueryChange,
   filters: controlledFilters, defaultFilters = {}, onFiltersChange,
   sort: controlledSort, defaultSort = null, onSortChange,
+  sortModel: controlledSortModel, defaultSortModel, onSortModelChange,
   page: controlledPage, defaultPage = 1, onPageChange,
   pageSize: controlledPageSize, defaultPageSize = 10, onPageSizeChange, pageSizeOptions = [5, 10, 20, 50],
   density = 'default', showColumnVisibility = true, defaultHiddenColumnIds = [],
@@ -109,7 +118,17 @@ export function DataGrid<T>({
 }: DataGridProps<T>) {
   const id = React.useId();
   const [query, setQuery] = useGridValue(controlledQuery, defaultQuery, onQueryChange);
-  const [sort, setSort] = useGridValue<DataGridSort | null>(controlledSort, defaultSort, onSortChange);
+  const [internalSortModel, setInternalSortModel] = React.useState<DataGridSortModel>(() => defaultSortModel ?? (defaultSort ? [defaultSort] : []));
+  const requestedSortModel = React.useMemo(() => controlledSortModel ?? (controlledSort !== undefined ? controlledSort ? [controlledSort] : [] : internalSortModel), [controlledSortModel, controlledSort, internalSortModel]);
+  const sorting = React.useMemo(() => {
+    const seen = new Set<string>();
+    return requestedSortModel.filter(item => {
+      if (seen.has(item.columnId) || !['asc','desc'].includes(item.direction) || !columns.some(column => column.id === item.columnId && column.sortable !== false)) return false;
+      seen.add(item.columnId);
+      return true;
+    });
+  }, [requestedSortModel, columns]);
+  const sort = sorting[0] ?? null;
   const [filters, setFilters] = useGridValue<DataGridFilters>(controlledFilters, defaultFilters, onFiltersChange);
   const [requestedPage, setPage] = useGridValue(controlledPage, defaultPage, onPageChange);
   const [requestedPageSize, setPageSize] = useGridValue(controlledPageSize, defaultPageSize, onPageSizeChange);
@@ -122,6 +141,7 @@ export function DataGrid<T>({
   const [focusedRowId, setFocusedRowId] = React.useState<string | null>(null);
   const root = React.useRef<HTMLDivElement>(null), scroll = React.useRef<HTMLDivElement>(null);
   const header = React.useRef<HTMLTableSectionElement>(null);
+  const prepareScroll = React.useRef<((offset:number) => void) | null>(null);
   const [viewportWidth, setViewportWidth] = React.useState<number>();
   const restoreEditor = React.useRef<string | null>(null);
   const drag = React.useRef<{id:string; startX:number; startWidth:number; direction:number} | null>(null);
@@ -132,7 +152,7 @@ export function DataGrid<T>({
   const paginated = pagination ?? !virtualEnabled;
   const size = positiveInteger(requestedPageSize, 10);
   const needle = searchable ? searchableText(query) : '';
-  const criteria = JSON.stringify([needle, sort, filters, size]);
+  const criteria = JSON.stringify([needle, sorting, filters, size]);
   const previousCriteria = React.useRef(criteria);
   const eventResetCriteria = React.useRef<string | null>(null);
   const criteriaChanged = previousCriteria.current !== criteria;
@@ -152,17 +172,20 @@ export function DataGrid<T>({
         return column.filter === 'select' ? String(value ?? '') === filter : searchableText(String(value ?? '')).includes(searchableText(filter));
       });
     });
-    const column = sort && columns.find(item => item.id === sort.columnId && item.sortable !== false);
-    if (!column || !sort) return matching;
+    const sortColumns = sorting.map(item => ({...item, column:columns.find(column => column.id === item.columnId)!}));
+    if (!sortColumns.length) return matching;
     return matching.map((row, index) => ({row, index})).sort((a, b) => {
-      const left = column.accessor(a.row), right = column.accessor(b.row);
-      if (left == null && right == null) return a.index - b.index;
-      if (left == null) return 1;
-      if (right == null) return -1;
-      const comparison = typeof left === 'number' && typeof right === 'number' ? left - right : collator.compare(String(left), String(right));
-      return (sort.direction === 'asc' ? comparison : -comparison) || a.index - b.index;
+      for (const {column, direction} of sortColumns) {
+        const left = column.accessor(a.row), right = column.accessor(b.row);
+        if (left == null && right == null) continue;
+        if (left == null) return 1;
+        if (right == null) return -1;
+        const comparison = typeof left === 'number' && typeof right === 'number' ? left - right : collator.compare(String(left), String(right));
+        if (comparison) return direction === 'asc' ? comparison : -comparison;
+      }
+      return a.index - b.index;
     }).map(item => item.row);
-  }, [rows, columns, needle, filters, sort]);
+  }, [rows, columns, needle, filters, sorting]);
   const pageCount = paginated ? Math.max(1, Math.ceil(filtered.length / size)) : 1;
   const page = !paginated || (criteriaChanged && controlledPage === undefined) ? 1 : Math.min(pageCount, positiveInteger(requestedPage, 1));
   const shownRows = React.useMemo(() => paginated ? filtered.slice((page - 1) * size, page * size) : filtered, [paginated, filtered, page, size]);
@@ -186,20 +209,6 @@ export function DataGrid<T>({
   const headerRows = anyFilters ? 2 : 1;
   const keepRowIds = React.useMemo(() => [...new Set([editing?.rowId, focusedRowId].filter((value): value is string => value != null))], [editing?.rowId, focusedRowId]);
   const shownIds = React.useMemo(() => new Set(shownRows.map(getRowId)), [shownRows, getRowId]);
-  const virtual = useDataGridVirtualization({
-    enabled:virtualEnabled && !blocked && count > 0,
-    rows:shownRows,
-    getRowId,
-    scrollRef:scroll,
-    headerRef:header,
-    keepRowIds,
-    options:typeof virtualized === 'object' ? virtualized : undefined,
-    density,
-    headerRows,
-    maxHeight:virtualMaxHeight,
-    resetKey:JSON.stringify([criteria, paginated ? page : 'all', blocked]),
-    measureKey:JSON.stringify([density, widths, visibleColumns.map(column => column.id)]),
-  });
   const columnWidth = (column: DataGridColumn<T>) => {
     const bounds = widthBounds(column);
     const initial = typeof column.width === 'number' ? column.width : typeof column.width === 'string' && /^\d+(\.\d+)?(px)?$/.test(column.width) ? Number.parseFloat(column.width) : 160;
@@ -262,7 +271,7 @@ export function DataGrid<T>({
     setFocusedRowId(null);
   }, [focusedRowId, shownIds, blocked]);
 
-  const resetPageFor = (nextQuery = query, nextSort = sort, nextFilters = filters, nextSize = size) => {
+  const resetPageFor = (nextQuery = query, nextSort = sorting, nextFilters = filters, nextSize = size) => {
     if (!paginated) return;
     eventResetCriteria.current = JSON.stringify([searchable ? searchableText(nextQuery) : '', nextSort, nextFilters, nextSize]);
     setPage(1);
@@ -279,15 +288,23 @@ export function DataGrid<T>({
       setExporting(false);
     }
   };
-  const changeFilter = (columnId: string, next: DataGridFilters[string]) => { const nextFilters = {...filters, [columnId]:next}; setFilters(nextFilters); resetPageFor(query, sort, nextFilters); };
+  const changeFilter = (columnId: string, next: DataGridFilters[string]) => { const nextFilters = {...filters, [columnId]:next}; setFilters(nextFilters); resetPageFor(query, sorting, nextFilters); };
   const finishEditing = (row: T, column: DataGridColumn<T>, value?: string) => {
     if (value !== undefined) onCellEdit?.({row, rowId:getRowId(row), columnId:column.id, value});
     restoreEditor.current = JSON.stringify([getRowId(row), column.id]);
     setEditing(null);
   };
-  const changeSort = (columnId: string) => {
-    const next: DataGridSort | null = !sort || sort.columnId !== columnId ? {columnId, direction:'asc'} : sort.direction === 'asc' ? {columnId, direction:'desc'} : null;
-    setSort(next); resetPageFor(query, next);
+  const changeSort = (columnId: string, multiple: boolean) => {
+    const current = sorting.find(item => item.columnId === columnId);
+    const nextDirection = !current ? 'asc' : current.direction === 'asc' ? 'desc' : null;
+    const next:DataGridSort[] = multiple
+      ? current ? sorting.flatMap(item => item.columnId !== columnId ? [item] : nextDirection ? [{columnId, direction:nextDirection}] : []) : [...sorting, {columnId, direction:'asc'}]
+      : nextDirection ? [{columnId, direction:nextDirection}] : [];
+    if (controlledSortModel === undefined && controlledSort === undefined) setInternalSortModel(next);
+    onSortModelChange?.(next);
+    const primary = next[0] ?? null;
+    if (primary?.columnId !== sort?.columnId || primary?.direction !== sort?.direction) onSortChange?.(primary);
+    resetPageFor(query, next);
   };
   const toggleRow = (rowId: string) => {
     const next = new Set(selectedSet);
@@ -299,9 +316,18 @@ export function DataGrid<T>({
     for (const rowId of selectableIds) { if (allOnPage) next.delete(rowId); else next.add(rowId); }
     setSelected([...next]);
   };
-  const renderRow = (row:T, rowIndex:number) => {
+  const renderRow = (row:T, rowIndex:number, measure?: (element:HTMLTableRowElement | null) => void) => {
           const rowId = getRowId(row);
-          return <tr key={rowId} ref={virtualEnabled ? virtual.measureElement : undefined} data-index={virtualEnabled ? rowIndex : undefined} data-grid-row-id={rowId} aria-rowindex={virtualEnabled ? (paginated ? (page - 1) * size : 0) + rowIndex + headerRows + 1 : undefined} data-selected={selectable && selectedSet.has(rowId) || undefined}>
+          const rowClickable = selectable && selectOnRowClick && (!isRowSelectable || isRowSelectable(row));
+          return <tr key={rowId} ref={measure} data-index={virtualEnabled ? rowIndex : undefined} data-grid-row-id={rowId} aria-rowindex={virtualEnabled ? (paginated ? (page - 1) * size : 0) + rowIndex + headerRows + 1 : undefined} data-selected={selectable && selectedSet.has(rowId) || undefined} data-row-selectable={rowClickable || undefined} onClick={rowClickable ? event => {
+            if (event.defaultPrevented || event.button !== 0) return;
+            const target = event.target as Element;
+            if (target.closest('button,a[href],input,select,textarea,label,summary,[role="button"],[role="link"],[role="checkbox"],[role="combobox"],[role="switch"],[role="slider"],[role="spinbutton"],[contenteditable]:not([contenteditable="false"]),[data-grid-ignore-row-click]')) return;
+            const selection = event.currentTarget.ownerDocument.defaultView?.getSelection();
+            if (selection && !selection.isCollapsed && (event.currentTarget.contains(selection.anchorNode) || event.currentTarget.contains(selection.focusNode))) return;
+            toggleRow(rowId);
+            event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]')?.focus({preventScroll:true});
+          } : undefined}>
             {selectable && <td className="data-grid-select-cell"><Checkbox label={<span className="sr-only">{getRowLabel ? getRowLabel(row) : rowId} 선택</span>} checked={selectedSet.has(rowId)} disabled={!!isRowSelectable && !isRowSelectable(row)} onChange={() => toggleRow(rowId)} /></td>}
             {visibleColumns.map(column => {
               const editValue = editing?.rowId === rowId && editing.columnId === column.id;
@@ -311,24 +337,11 @@ export function DataGrid<T>({
           </tr>;
 
   };
-  const renderedRows:React.ReactNode[] = [];
   const columnCount = Math.max(1, visibleColumns.length + (selectable ? 1 : 0));
-  const spacer = (height:number, key:string) => <tr key={key} className="data-grid-virtual-spacer" aria-hidden="true" role="presentation"><td colSpan={columnCount} style={{height}} /></tr>;
-  if (virtualEnabled && !blocked && count) {
-    let offset = 0;
-    for (const item of virtual.items) {
-      const start = Math.max(0, item.start - virtual.headerHeight);
-      if (start > offset) renderedRows.push(spacer(start - offset, `spacer-${item.index}`));
-      renderedRows.push(renderRow(shownRows[item.index], item.index));
-      offset = Math.max(offset, item.end - virtual.headerHeight);
-    }
-    if (virtual.totalSize > offset) renderedRows.push(spacer(virtual.totalSize - offset, 'spacer-end'));
-  } else if (!virtualEnabled && !blocked && count) {
-    shownRows.forEach((row, index) => renderedRows.push(renderRow(row, index)));
-  }
   const status = loading ? '데이터를 불러오는 중입니다.' : hasError ? '데이터를 불러오지 못했습니다.' : !rows.length ? '등록된 데이터가 없습니다.' : !count ? '검색 결과가 없습니다.' : paginated ? `${(page - 1) * size + 1}–${Math.min(page * size, count)} / ${count}개 항목` : `${count}개 항목`;
 
   return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined}>
+    <p className="sr-only" id={`${id}-sort-help`}>클릭하면 단일 정렬을 변경합니다. Shift 키를 누르고 클릭하면 정렬 조건을 추가하거나 변경합니다.</p>
     <div className="data-grid-toolbar">
       <div className="data-grid-heading"><strong>{label}</strong><span>{rows.length}개 항목</span></div>
       <div className="data-grid-tools">
@@ -340,19 +353,23 @@ export function DataGrid<T>({
           })}</div>
         </Popover>}
         {exportable && <Button variant="outline" title="현재 검색·필터·정렬 결과의 모든 페이지와 표시 중인 열을 내보냅니다." disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" />CSV 내보내기</Button>}
-        {activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sort, {}); }}>필터 초기화</Button>}
+        {activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>}
       </div>
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>
     {selectable && selectedSet.size > 0 && <div className="data-grid-selection"><span>{selectedSet.size}개 선택됨</span><div className="data-grid-selection-actions">{exportable && <Button variant="ghost" size="sm" title="검색·필터와 관계없이 전체 데이터에서 선택한 행과 표시 중인 열을 내보냅니다." disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}>선택한 행 내보내기</Button>}<Button variant="ghost" size="sm" onClick={() => setSelected([])}>선택 해제</Button></div></div>}
-    <div ref={scroll} className="data-grid-scroll" role="region" aria-label={`${label} 표`} aria-busy={loading} tabIndex={0} style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight, overflowAnchor:virtualEnabled ? 'none' : undefined} : undefined}>
+    <div className="data-grid-viewport">
+    <div id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" role="region" aria-label={`${label} 표`} aria-busy={loading} tabIndex={0} style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight, overflowAnchor:virtualEnabled ? 'none' : undefined} : undefined}>
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>
         <caption className="sr-only">{label}</caption>
         <colgroup>{selectable && <col className="data-grid-select-column" />}{visibleColumns.map(column => <col key={column.id} style={{width:columnWidth(column)}} />)}</colgroup>
         <thead ref={header}><tr aria-rowindex={virtualEnabled ? 1 : undefined}>
           {selectable && <th scope="col" className="data-grid-select-cell"><Checkbox label={<span className="sr-only">{paginated ? '현재 페이지 전체 선택' : '검색 결과 전체 선택'}</span>} checked={allOnPage} indeterminate={selectedOnPage > 0 && !allOnPage} disabled={blocked || !selectableIds.length} onChange={togglePage} /></th>}
-          {visibleColumns.map(column => <th key={column.id} scope="col" className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)} aria-sort={column.sortable === false ? undefined : sort?.columnId === column.id ? sort.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
-            {column.sortable === false ? column.header : <button className="data-grid-sort" type="button" disabled={blocked} onClick={() => changeSort(column.id)}><span>{column.header}</span><span className={`data-grid-sort-icon${sort?.columnId === column.id ? ' is-active' : ''}`} aria-hidden="true">{sort?.columnId === column.id ? <Icon name={sort.direction === 'asc' ? 'arrow-up' : 'arrow-down'} /> : <span>↕</span>}</span></button>}
+          {visibleColumns.map((column, columnIndex) => {
+            const sortIndex = sorting.findIndex(item => item.columnId === column.id);
+            const currentSort = sorting[sortIndex];
+            return <th key={column.id} scope="col" className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)} aria-sort={column.sortable === false || sortIndex > 0 ? undefined : currentSort ? currentSort.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
+            {column.sortable === false ? column.header : <><button className="data-grid-sort" type="button" disabled={blocked} aria-describedby={`${id}-sort-help ${id}-sort-${columnIndex}`} onClick={event => changeSort(column.id, event.shiftKey)}><span>{column.header}</span><span className={`data-grid-sort-icon${currentSort ? ' is-active' : ''}`} aria-hidden="true">{currentSort ? <Icon name={currentSort.direction === 'asc' ? 'arrow-up' : 'arrow-down'} /> : <span>↕</span>}{currentSort && sorting.length > 1 && <span className="data-grid-sort-priority">{sortIndex + 1}</span>}</span></button><span className="sr-only" id={`${id}-sort-${columnIndex}`}>{currentSort ? `${sortIndex + 1}순위 ${currentSort.direction === 'asc' ? '오름차순' : '내림차순'}` : '정렬 안 함'}</span></>}
             {column.resizable !== false && <span className="data-grid-resize" role="separator" aria-label={`${column.header} 열 너비`} aria-orientation="vertical" aria-valuenow={columnWidth(column)} aria-valuemin={widthBounds(column).min} aria-valuemax={widthBounds(column).max} tabIndex={0} onKeyDown={event => {
               const step = event.shiftKey ? 1 : 10;
               if (['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) {
@@ -364,24 +381,32 @@ export function DataGrid<T>({
               event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture?.(event.pointerId);
               drag.current = {id:column.id, startX:event.clientX, startWidth:columnWidth(column), direction:event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget).direction === 'rtl' ? -1 : 1};
             }} onPointerMove={event => { if (drag.current?.id === column.id) resize(column, drag.current.startWidth + (event.clientX - drag.current.startX) * drag.current.direction); }} onPointerUp={event => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }} />}
-          </th>)}
+          </th>; })}
         </tr>{anyFilters && <tr className="data-grid-filter-row" aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
           const filter = filters[column.id];
           return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={typeof filter === 'object' ? filter.min || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={typeof filter === 'object' ? filter.max || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), max:event.target.value})} /></div> : null}</td>;
         })}</tr>}</thead>
-        <tbody onFocusCapture={event => {
+        <DataGridBody enabled={virtualEnabled && !blocked && count > 0}
+          rows={shownRows} getRowId={getRowId} scrollRef={scroll} headerRef={header} prepareScrollRef={prepareScroll}
+          keepRowIds={keepRowIds} options={typeof virtualized === 'object' ? virtualized : undefined}
+          density={density} headerRows={headerRows} maxHeight={virtualMaxHeight}
+          resetKey={JSON.stringify([criteria, paginated ? page : 'all', blocked])}
+          measureKey={JSON.stringify([density, widths, visibleColumns.map(column => column.id)])}
+          columnCount={columnCount} renderRow={renderRow} onFocusCapture={event => {
           const row = (event.target as HTMLElement).closest<HTMLTableRowElement>('tr[data-grid-row-id]');
           if (row?.dataset.gridRowId) setFocusedRowId(row.dataset.gridRowId);
         }} onBlurCapture={event => {
           if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget as Node)) setFocusedRowId(null);
-        }}>{blocked || !count ? <tr aria-rowindex={virtualEnabled ? headerRows + 1 : undefined}><td className="data-grid-state-cell" colSpan={Math.max(1, visibleColumns.length + (selectable ? 1 : 0))}>
-          <div className="data-grid-state" style={{width:viewportWidth ?? '100%'}}>{loading ? <><Spinner aria-hidden="true" /><p>데이터를 불러오는 중입니다.</p></> : hasError ? <><p>{error}</p>{onRetry && <Button variant="outline" onClick={onRetry}>다시 시도</Button>}</> : rows.length && (needle || activeFilters) ? <><Icon name="search" /><strong>검색 결과가 없습니다.</strong><p>검색어나 필터를 바꾸거나 초기화해주세요.</p><Button variant="outline" onClick={() => { setQuery(''); setFilters({}); resetPageFor('', sort, {}); }}>조건 초기화</Button></> : <><Icon name="grid" /><p>{emptyMessage}</p></>}</div>
-        </td></tr> : renderedRows}</tbody>
+        }} emptyContent={blocked || !count ? <tr key="state" aria-rowindex={virtualEnabled ? headerRows + 1 : undefined}><td className="data-grid-state-cell" colSpan={Math.max(1, visibleColumns.length + (selectable ? 1 : 0))}>
+          <div className="data-grid-state" style={{width:viewportWidth ?? '100%'}}>{loading ? <><Spinner aria-hidden="true" /><p>데이터를 불러오는 중입니다.</p></> : hasError ? <><p>{error}</p>{onRetry && <Button variant="outline" onClick={onRetry}>다시 시도</Button>}</> : rows.length && (needle || activeFilters) ? <><Icon name="search" /><strong>검색 결과가 없습니다.</strong><p>검색어나 필터를 바꾸거나 초기화해주세요.</p><Button variant="outline" onClick={() => { setQuery(''); setFilters({}); resetPageFor('', sorting, {}); }}>조건 초기화</Button></> : <><Icon name="grid" /><p>{emptyMessage}</p></>}</div>
+        </td></tr> : undefined} />
       </Table>
+    </div>
+    <DataGridScrollbar enabled={virtualEnabled && !blocked && count > 0} scrollRef={scroll} prepareScrollRef={prepareScroll} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
     </div>
     <div className="data-grid-footer">
       <p className="component-helper" id={`${id}-status`} role="status" aria-live="polite" aria-atomic="true">{status}{selectable && selectedSet.size > 0 ? ` · ${selectedSet.size}개 선택됨` : ''}</p>
-      {paginated && <div className="data-grid-page-tools"><div className="data-grid-page-size"><Select label="페이지당 행 수" value={String(size)} disabled={blocked} onValueChange={value => { setPageSize(Number(value)); resetPageFor(query, sort, filters, Number(value)); }} options={sizes.map(value => ({value:String(value),label:`${value}개`}))} /></div>
+      {paginated && <div className="data-grid-page-tools"><div className="data-grid-page-size"><Select label="페이지당 행 수" value={String(size)} disabled={blocked} onValueChange={value => { setPageSize(Number(value)); resetPageFor(query, sorting, filters, Number(value)); }} options={sizes.map(value => ({value:String(value),label:`${value}개`}))} /></div>
         {!blocked && <Pagination page={page} pageCount={pageCount} onPageChange={setPage} aria-label={`${label} 페이지 탐색`} />}
       </div>}
     </div>

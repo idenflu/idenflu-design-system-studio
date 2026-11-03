@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { defaultRangeExtractor, measureElement, useVirtualizer, type Range, type Virtualizer } from '@tanstack/react-virtual';
+import { defaultRangeExtractor, measureElement, observeElementOffset, useVirtualizer, type Range, type Virtualizer } from '@tanstack/react-virtual';
+import type { DataGridPrepareScrollRef } from './data-grid-scrollbar';
 
 export interface DataGridVirtualizationOptions {
   /** Initial estimate only. Mounted rows are measured at their actual height. */
@@ -21,9 +22,10 @@ interface Options<T> {
   maxHeight?: number | string;
   resetKey: string;
   measureKey: string;
+  prepareScrollRef: DataGridPrepareScrollRef;
 }
 
-export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef, headerRef, keepRowIds, options, density, headerRows, maxHeight, resetKey, measureKey}: Options<T>) {
+export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef, headerRef, keepRowIds, options, density, headerRows, maxHeight, resetKey, measureKey, prepareScrollRef}: Options<T>) {
   const defaultEstimate = density === 'compact' ? 40 : 56;
   const requestedEstimate = options?.estimateRowHeight;
   const estimate = requestedEstimate !== undefined && Number.isFinite(requestedEstimate) && requestedEstimate > 0
@@ -45,7 +47,30 @@ export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef
   const getItemKey = React.useCallback((index:number) => rowIds[index], [rowIds]);
   const estimateSize = React.useCallback(() => estimate, [estimate]);
   const getScrollElement = React.useCallback(() => scrollRef.current, [scrollRef]);
-  const rangeExtractor = React.useCallback((range:Range) => [...new Set([...defaultRangeExtractor(range), ...keptIndexes])].sort((a,b) => a-b), [keptIndexes]);
+  const offsetObserver = React.useRef<((offset:number, scrolling:boolean) => void) | null>(null);
+  const observeOffset = React.useCallback((instance:Virtualizer<HTMLDivElement, HTMLTableRowElement>, callback:(offset:number, scrolling:boolean) => void) => {
+    offsetObserver.current = callback;
+    const cleanup = observeElementOffset(instance, callback);
+    return () => {if (offsetObserver.current === callback) offsetObserver.current = null;cleanup?.();};
+  }, []);
+  const rangeExtractor = React.useMemo(() => {
+    let window: {start:number; end:number; count:number} | undefined;
+    let indexes: number[] = [];
+    return (range:Range) => {
+      const margin = Math.floor(range.overscan / 2);
+      // Keep the same DOM window until the viewport approaches its buffer.
+      // Recycling a row on every boundary crossing otherwise repeatedly
+      // changes native table layout and triggers fresh height measurements.
+      if (!window || window.count !== range.count ||
+        range.startIndex < window.start + (window.start > 0 ? margin : 0) ||
+        range.endIndex > window.end - (window.end < range.count - 1 ? margin : 0)) {
+        const visible = defaultRangeExtractor(range);
+        window = {start:visible[0], end:visible[visible.length - 1], count:range.count};
+        indexes = [...new Set([...visible, ...keptIndexes])].sort((a,b) => a-b);
+      }
+      return indexes;
+    };
+  }, [keptIndexes, overscan, enabled, resetKey, measureKey]);
   const measureRow = React.useCallback((element:HTMLTableRowElement, entry:ResizeObserverEntry | undefined, instance:Virtualizer<HTMLDivElement, HTMLTableRowElement>) => {
     const measured = measureElement(element, entry, instance);
     // A hidden tab and non-layout environments can report zero. Retaining the
@@ -56,6 +81,7 @@ export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef
     count: enabled ? rows.length : 0,
     enabled,
     getScrollElement,
+    observeElementOffset:observeOffset,
     getItemKey,
     estimateSize,
     measureElement:measureRow,
@@ -64,6 +90,11 @@ export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef
     scrollMargin:headerHeight,
     scrollPaddingStart:headerHeight,
     initialRect,
+    onChange:instance => {
+      // This visual-only flag does not need to re-render the grid's toolbar,
+      // header filters and pagination on every scroll event.
+      scrollRef.current?.toggleAttribute('data-scrolling', enabled && instance.isScrolling);
+    },
   });
   virtualizer.shouldAdjustScrollPositionOnItemSizeChange = (item, _delta, instance) => {
     const offset = instance.scrollOffset ?? 0;
@@ -110,5 +141,43 @@ export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef
     for (const row of scrollRef.current?.querySelectorAll<HTMLTableRowElement>('tbody tr[data-index]') || []) virtualizer.measureElement(row);
   }, [enabled, measureKey, estimate, scrollRef, virtualizer]);
 
+  React.useEffect(() => {
+    const element = scrollRef.current;
+    if (!enabled) element?.removeAttribute('data-scrolling');
+    return () => element?.removeAttribute('data-scrolling');
+  }, [enabled, scrollRef]);
+
+  React.useEffect(() => {
+    prepareScrollRef.current = enabled ? offset => offsetObserver.current?.(offset, true) : null;
+    return () => {prepareScrollRef.current = null;};
+  }, [enabled, prepareScrollRef]);
+
   return {items:virtualizer.getVirtualItems(), totalSize:virtualizer.getTotalSize(), headerHeight, measureElement:virtualizer.measureElement};
+}
+
+interface BodyProps<T> extends Options<T> {
+  columnCount: number;
+  emptyContent?: React.ReactNode;
+  renderRow: (row:T, index:number, measure?: (element:HTMLTableRowElement | null) => void) => React.ReactNode;
+  onFocusCapture: React.FocusEventHandler<HTMLTableSectionElement>;
+  onBlurCapture: React.FocusEventHandler<HTMLTableSectionElement>;
+}
+
+/** Keep scroll-driven updates local to the rows, apart from the grid controls. */
+export function DataGridBody<T>({columnCount, emptyContent, renderRow, onFocusCapture, onBlurCapture, ...options}: BodyProps<T>) {
+  const virtual = useDataGridVirtualization(options);
+  const rendered: React.ReactNode[] = [];
+  const spacer = (height:number, key:string) => React.createElement('tr', {key, className:'data-grid-virtual-spacer', 'aria-hidden':true, role:'presentation'}, React.createElement('td', {colSpan:columnCount, style:{height}}));
+  if (emptyContent) rendered.push(emptyContent);
+  else if (options.enabled) {
+    let offset = 0;
+    for (const item of virtual.items) {
+      const start = Math.max(0, item.start - virtual.headerHeight);
+      if (start > offset) rendered.push(spacer(start - offset, `spacer-${item.index}`));
+      rendered.push(renderRow(options.rows[item.index], item.index, virtual.measureElement));
+      offset = Math.max(offset, item.end - virtual.headerHeight);
+    }
+    if (virtual.totalSize > offset) rendered.push(spacer(virtual.totalSize - offset, 'spacer-end'));
+  } else options.rows.forEach((row,index) => rendered.push(renderRow(row,index)));
+  return React.createElement('tbody', {onFocusCapture, onBlurCapture}, rendered);
 }

@@ -82,7 +82,7 @@ import { Button, Icon } from '@idenflu/mono-react';
 
 ```tsx
 import { useState } from 'react';
-import { DataGrid, type DataGridColumn } from '@idenflu/mono-react';
+import { DataGrid, type DataGridColumn, type DataGridSort } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 type Project = { id: string; name: string; hours: number };
@@ -102,9 +102,11 @@ export function ProjectGrid() {
     { id: 'p2', name: '브랜드 가이드', hours: 16 },
   ]);
   const [selected, setSelected] = useState<string[]>([]);
+  const [sortModel, setSortModel] = useState<DataGridSort[]>([]);
   return <DataGrid label="프로젝트 목록" rows={rows} columns={columns}
     getRowId={row => row.id} getRowLabel={row => row.name}
     selectable selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
+    sortModel={sortModel} onSortModelChange={setSortModel}
     defaultPageSize={5} pageSizeOptions={[5, 10, 20]}
     exportable exportFileName="projects.csv" maxHeight={400}
     onCellEdit={({ rowId, columnId, value }) => {
@@ -122,8 +124,9 @@ export function ProjectGrid() {
 | 검색 | 기본 제공. `searchable={false}`로 숨기고 `searchLabel`로 이름을 지정합니다. `query`·`defaultQuery`·`onQueryChange`로 상태를 연결합니다. |
 | 필터 | 열에 `filter="text | number | select"`를 지정합니다. 텍스트 포함·숫자 최솟값/최댓값·선택값 일치를 지원합니다. select의 `filterOptions`는 `{value,label}[]`입니다. 검색과 각 열의 필터는 AND로 적용합니다. |
 | 필터 상태 | `filters`·`defaultFilters`·`onFiltersChange`를 사용합니다. `DataGridFilters`는 열 ID를 키로 텍스트/선택값 문자열 또는 `{min?:string,max?:string}`를 저장합니다. |
-| 정렬 | 기본 정렬 가능. 열의 `sortable={false}`로 해제합니다. 오름차순 → 내림차순 → 정렬 해제 순서이며 빈 값은 항상 마지막입니다. `sort`·`defaultSort`·`onSortChange`는 `{columnId,direction:'asc'|'desc'} | null`을 받습니다. |
-| 행 선택 | `selectable`로 켭니다. `getRowId`는 중복되지 않는 안정적인 ID를 반환해야 합니다. `getRowLabel`은 체크박스 이름에 사용합니다. `isRowSelectable`로 행별 선택을 제한합니다. |
+| 정렬 | 클릭은 단일 정렬, Shift+클릭은 기존 조건을 유지하는 다중 정렬입니다. 오름차순 → 내림차순 → 해제 순서이며 빈 값은 각 조건에서 마지막입니다. 열의 `sortable={false}`로 해제합니다. 화살표 옆 숫자는 정렬 우선순위입니다. |
+| 정렬 상태 | `sortModel`·`defaultSortModel`·`onSortModelChange`는 우선순위 순서의 `{columnId,direction:'asc'|'desc'}[]`를 사용합니다. 모든 조건이 같은 행은 원래 순서를 유지합니다. 기존 `sort`·`defaultSort`·`onSortChange`는 첫 정렬 조건과 호환되며, 제어형 다중 정렬은 `sortModel`로 연결하세요. 두 제어형 값을 함께 주면 `sortModel`이 우선합니다. |
+| 행 선택 | `selectable`로 켭니다. 행의 일반 영역 클릭으로 선택/해제하고 체크박스로 키보드 조작할 수 있습니다. `selectOnRowClick={false}`는 체크박스로만 선택합니다. 버튼·링크·입력·텍스트 드래그는 행 선택을 변경하지 않습니다. 사용자 정의 영역은 `data-grid-ignore-row-click`로 제외할 수 있습니다. `getRowId`는 중복되지 않는 안정적인 ID를 반환해야 합니다. `getRowLabel`은 체크박스 이름에 사용합니다. `isRowSelectable`로 행별 선택을 제한합니다. |
 | 선택 상태 | `selectedRowIds`·`defaultSelectedRowIds`·`onSelectedRowIdsChange`를 사용합니다. 검색·정렬·페이지 이동 후에도 선택을 유지합니다. 전체 선택은 **현재 페이지의 선택 가능한 행**에만 적용합니다. |
 | 페이지 | `page`·`defaultPage`·`onPageChange`, `pageSize`·`defaultPageSize`·`onPageSizeChange`, `pageSizeOptions`를 지원합니다. 검색·필터·정렬·페이지 크기 변경 시 첫 페이지로 이동합니다. 외부 데이터가 줄면 표시 페이지를 유효 범위로 제한합니다. |
 | 열 조작 | 표시 열을 숨길 수 있으며 최소 1개는 유지합니다. `showColumnVisibility={false}`로 UI를 숨기고 `defaultHiddenColumnIds`로 초기 표시를 지정합니다. |
@@ -136,14 +139,14 @@ export function ProjectGrid() {
 | 저장 위치 | 내보내기를 누르면 지원 브라우저에서 파일명과 저장 위치를 지정하는 시스템 저장 창을 엽니다. 취소하면 저장하지 않습니다. 미지원 브라우저에서는 파일명을 확인한 뒤 브라우저 다운로드 설정에 따라 저장합니다. |
 | CSV 형식 | 한글 BOM, 쉼표·따옴표·개행 이스케이프와 문자열 수식 보호를 적용합니다. `createDataGridCsv`·`downloadDataGridCsv`로 동일한 규칙을 직접 사용할 수 있습니다. `downloadDataGridCsv`는 사용자 클릭에서 호출하고 반환하는 Promise의 저장 오류를 처리하세요. |
 | 밀도 | `density="default | compact"`로 기존 테이블과 동일한 행 간격을 사용합니다. |
-| 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. `overscan`은 화면 앞뒤에 추가할 행 수입니다. |
+| 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. 실제 콘텐츠에 가까운 값이면 위치 보정이 줄어듭니다. `overscan`은 앞뒤 버퍼를 만들 행 수이며, 화면이 버퍼 경계에 가까워지면 렌더링 범위를 갱신합니다. 스크롤 중에는 행 hover 강조를 잠시 멈춥니다. 마우스 환경의 세로 스크롤바는 목적지 행을 먼저 렌더링한 뒤 이동합니다. 방향키·PageUp·PageDown·Home·End로도 조작할 수 있습니다. |
 | 페이지와 가상화 | `pagination` 기본값은 일반 모드에서 `true`, 가상 모드에서 `false`입니다. `virtualized pagination defaultPageSize={100}`은 현재 페이지 내부를 가상화합니다. `pagination={false}`에서는 검색 결과 전체가 선택·스크롤 대상입니다. |
 
 제어형 속성은 부모 상태가 기준입니다. 콜백을 받은 뒤 해당 상태를 갱신하세요. 서버 저장이 필요하면 `onCellEdit`에서 저장 처리와 오류 안내를 연결하고, 성공한 값으로 `rows`를 갱신합니다. 내장 서버 저장·비동기 트랜잭션·재시도 큐는 제공하지 않습니다.
 
 열의 선택형 필터는 `Select`의 `popupStrategy="fixed"`를 사용해 짧은 목록이나 스크롤 영역에서 옵션이 잘리지 않도록 합니다. 일반 `Select`의 기본값은 `absolute`이며 필요한 화면에서 이 옵션을 지정할 수 있습니다.
 
-이 버전은 **전달한 rows 전체를 브라우저에서 처리하는 데이터그리드**입니다. 가상 스크롤은 세로 방향의 DOM 렌더링을 줄이며, 전체 rows의 메모리와 검색·정렬 계산을 줄이는 서버 처리 기능은 아닙니다. 서버 페이지 이동, 열 가상화, 다중 열 정렬, 행 그룹화·피벗, 스프레드시트식 셀 범위 선택은 포함하지 않습니다.
+이 버전은 **전달한 rows 전체를 브라우저에서 처리하는 데이터그리드**입니다. 가상 스크롤은 세로 방향의 DOM 렌더링을 줄이며, 전체 rows의 메모리와 검색·정렬 계산을 줄이는 서버 처리 기능은 아닙니다. 서버 페이지 이동, 열 가상화, 행 그룹화·피벗, 스프레드시트식 셀 범위 선택은 포함하지 않습니다.
 
 ```tsx
 // rows는 부모가 로드한 전체 데이터입니다.
@@ -161,7 +164,7 @@ export function ProjectGrid() {
 
 보조기기로 모든 행을 차례대로 탐색하는 것이 우선이면 `virtualized={false}`와 페이지 이동 방식을 사용하세요. 가상 모드의 행 수 정보가 DOM 밖의 모든 행을 즉시 탐색할 수 있다는 뜻은 아닙니다. [AG Grid 접근성 지침](https://www.ag-grid.com/react-data-grid/accessibility/)도 이 차이를 설명합니다.
 
-구조는 native `table`이며 정렬 버튼·필터·체크박스·편집 컨트롤을 Tab으로 탐색합니다. 단일 진입점과 방향키 셀 이동을 전제하는 `role="grid"`를 불완전하게 붙이지 않습니다. 정렬 상태는 `aria-sort`, 부분 선택은 네이티브 `indeterminate`, 조회 상태는 상태 메시지로 전달합니다.
+구조는 native `table`이며 정렬 버튼·필터·체크박스·편집 컨트롤을 Tab으로 탐색합니다. 단일 진입점과 방향키 셀 이동을 전제하는 `role="grid"`를 불완전하게 붙이지 않습니다. 첫 정렬 조건은 `aria-sort`, 다중 정렬의 방향과 우선순위는 버튼 설명, 부분 선택은 네이티브 `indeterminate`, 조회 상태는 상태 메시지로 전달합니다.
 
 기능 범위와 검증 항목은 다음 공식 문서를 비교해 선정했습니다. 구현의 우선순위와 위 API는 이 디자인 시스템에 맞춘 결정입니다.
 

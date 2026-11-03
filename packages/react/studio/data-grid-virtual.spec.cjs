@@ -1,6 +1,11 @@
 const {test,expect}=require('@playwright/test');
 const {readFile}=require('node:fs/promises');
 
+test.use({launchOptions:{
+  ...(process.env.IDENFLU_TEST_CHROMIUM ? {executablePath:process.env.IDENFLU_TEST_CHROMIUM} : {}),
+  ignoreDefaultArgs:['--hide-scrollbars'],
+}});
+
 const route='/systems/idenflu-mono/index.html#/components/data-grid';
 const gridFor=page=>page.getByRole('group',{name:'대용량 데이터그리드',exact:true});
 const records=grid=>grid.locator('tbody tr[data-grid-row-id]');
@@ -19,6 +24,32 @@ async function jump(grid,fraction) {
 async function expectBounded(grid) {
   await expect.poll(()=>records(grid).count()).toBeGreaterThan(0);
   expect(await records(grid).count()).toBeLessThan(80);
+}
+
+async function startCoverage(grid) {
+  await grid.evaluate(element=>{
+    const sc=element.querySelector('.data-grid-scroll');
+    window.__gridScrollCoverage={frames:0,maxGap:0,running:true};
+    const sample=()=>{
+      const state=window.__gridScrollCoverage;
+      if(!state.running)return;
+      const viewport=sc.getBoundingClientRect();
+      const top=Math.max(viewport.top+sc.clientTop,...[...element.querySelectorAll('thead th,thead td')].map(cell=>cell.getBoundingClientRect().bottom));
+      const bottom=viewport.top+sc.clientTop+sc.clientHeight;
+      let covered=top,gap=0;
+      for(const row of element.querySelectorAll('tbody tr[data-grid-row-id]')){
+        const bounds=row.getBoundingClientRect();
+        if(bounds.bottom<=top||bounds.top>=bottom)continue;
+        gap=Math.max(gap,bounds.top-covered);covered=Math.max(covered,bounds.bottom);
+      }
+      state.frames++;state.maxGap=Math.max(state.maxGap,gap,bottom-covered);
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  });
+}
+async function stopCoverage(page) {
+  return page.evaluate(()=>{window.__gridScrollCoverage.running=false;return window.__gridScrollCoverage;});
 }
 
 test('10,000 virtual rows stay bounded while middle and final records remain reachable',async({page})=>{
@@ -68,6 +99,28 @@ test('search, sorting and data shrink reset the virtual scroll without losing th
   await expectBounded(grid);
 });
 
+test('buffered virtual rows keep their DOM across small scrolls and cover rapid wheel scrolling in both directions',async({page})=>{
+  const grid=await openGrid(page),scroller=grid.locator('.data-grid-scroll');
+  await scroller.scrollIntoViewIfNeeded();
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  const initial=await records(grid).evaluateAll(elements=>elements.map(element=>element.dataset.gridRowId));
+  await scroller.evaluate(element=>{element.scrollTop=100;});
+  await expect(scroller).toHaveAttribute('data-scrolling','');
+  expect(await records(grid).evaluateAll(elements=>elements.map(element=>element.dataset.gridRowId))).toEqual(initial);
+  await startCoverage(grid);
+  const bounds=await scroller.boundingBox();
+  await page.mouse.move(bounds.x+Math.min(bounds.width/2,120),bounds.y+bounds.height/2);
+  for(const delta of [...Array(8).fill(900),...Array(6).fill(-900)]){
+    await page.mouse.wheel(0,delta);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  }
+  await expect(scroller).not.toHaveAttribute('data-scrolling','');
+  const coverage=await stopCoverage(page);
+  expect(coverage.frames).toBeGreaterThan(20);
+  expect(coverage.maxGap).toBeLessThan(2);
+  await expectBounded(grid);
+});
+
 test('virtual rows remeasure after density and viewport changes without overlapping or dropping the tail',async({page,isMobile})=>{
   const grid=await openGrid(page);
   await jump(grid,0.5);
@@ -85,6 +138,83 @@ test('virtual rows remeasure after density and viewport changes without overlapp
   await jump(grid,1);
   await expect(rowFor(grid,'ROW-10000')).toHaveCount(1);
   await expectBounded(grid);
+});
+
+test.describe('vertical scrollbar dragging',()=>{
+  test('the scrollbar supports track clicks, wheel and keys and disappears for short results',async({page,isMobile})=>{
+    test.skip(isMobile,'Coarse pointers retain the native touch scrollport.');
+    const grid=await openGrid(page),scroller=grid.locator('.data-grid-scroll');
+    const scrollbar=grid.getByRole('scrollbar',{name:'대용량 데이터그리드 세로 스크롤',exact:true});
+    await scrollbar.scrollIntoViewIfNeeded();
+    const bounds=await scrollbar.boundingBox();
+    await page.mouse.click(bounds.x+bounds.width/2,bounds.y+bounds.height*.7);
+    await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeGreaterThan(400000);
+    await expect(scrollbar).toBeFocused();
+    const current=await scroller.evaluate(element=>element.scrollTop);
+    await scrollbar.press('PageUp');
+    await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeLessThan(current-100);
+    const beforeWheel=await scroller.evaluate(element=>element.scrollTop);
+    await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height/2);
+    await page.mouse.wheel(0,120);
+    await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeGreaterThan(beforeWheel);
+    await expect(scrollbar).toHaveAttribute('aria-controls',await scroller.getAttribute('id'));
+    const horizontal=await scroller.evaluate(element=>{
+      const rect=element.getBoundingClientRect();
+      return {x:rect.x+element.clientWidth*element.clientWidth/element.scrollWidth/2,y:rect.bottom-8,gutter:element.offsetHeight-element.clientHeight-element.clientTop*2};
+    });
+    expect(horizontal.gutter).toBeGreaterThan(0);
+    await page.mouse.move(horizontal.x,horizontal.y);await page.mouse.down();
+    await page.mouse.move(horizontal.x+80,horizontal.y,{steps:3});await page.mouse.up();
+    await expect.poll(()=>scroller.evaluate(element=>element.scrollLeft)).toBeGreaterThan(0);
+    await grid.getByRole('searchbox',{name:'대용량 데이터 검색',exact:true}).fill(nameFor(42));
+    await expect(records(grid)).toHaveCount(1);
+    await expect(scrollbar).toHaveCount(0);
+    await expect(scroller).not.toHaveAttribute('data-custom-scrollbar','');
+    await grid.getByRole('button',{name:'검색 초기화',exact:true}).click();
+    await expect(scrollbar).toBeVisible();
+    await expectBounded(grid);
+  });
+  test('10,000 and 50,000 records remain covered while the mouse drags the thumb rapidly',async({page,isMobile})=>{
+    test.skip(isMobile,'This regression exercises a desktop mouse scrollbar.');
+    const grid=await openGrid(page),scroller=grid.locator('.data-grid-scroll');
+    for(const count of [10000,50000]){
+      if(count===50000){
+        await page.getByRole('combobox',{name:/^가상 스크롤 데이터 수:/}).click();
+        await page.getByRole('option',{name:'50,000개',exact:true}).click();
+      }
+      await expect(grid.locator('table')).toHaveAttribute('aria-rowcount',String(count+2));
+      await scroller.scrollIntoViewIfNeeded();
+      await scroller.evaluate(async element=>{element.scrollTop=0;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+      const scrollbar=grid.getByRole('scrollbar',{name:'대용량 데이터그리드 세로 스크롤',exact:true});
+      await expect(scrollbar).toBeVisible();
+      const rect=await scrollbar.boundingBox();
+      const geometry={x:rect.x+rect.width/2,top:rect.y,height:rect.height};
+      await startCoverage(grid);
+      await page.mouse.move(geometry.x,geometry.top+12);
+      await page.mouse.down();
+      const reached=[];
+      try {
+        for(const fraction of [.2,.5,.9,.3,.8,.1,.95,.4]){
+          await page.mouse.move(geometry.x,geometry.top+12+(geometry.height-24)*fraction,{steps:2});
+          reached.push(await scroller.evaluate(element=>element.scrollTop/(element.scrollHeight-element.clientHeight)));
+        }
+      } finally {await page.mouse.up();}
+      expect(Math.max(...reached)).toBeGreaterThan(.85);
+      expect(Math.min(...reached)).toBeLessThan(.25);
+      await expect(scroller).not.toHaveAttribute('data-scrolling','');
+      const coverage=await stopCoverage(page);
+      expect(coverage.frames).toBeGreaterThan(8);
+      expect(coverage.maxGap).toBeLessThan(2);
+      await expectBounded(grid);
+      await scrollbar.focus();
+      await scrollbar.press('End');
+      await expect(rowFor(grid,`ROW-${String(count).padStart(5,'0')}`)).toHaveCount(1);
+      await scrollbar.press('Home');
+      await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeLessThan(2);
+      await scrollbar.press('ArrowDown');
+      await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBe(40);
+    }
+  });
 });
 
 test('selection survives virtual unmounting and CSV exports offscreen selected records',async({page})=>{
@@ -120,6 +250,7 @@ test('an offscreen editor remains mounted without rendering the intervening thou
   const grid=await openGrid(page);
   const original=`${nameFor(1)} 프로젝트 편집`;
   await grid.getByRole('button',{name:original,exact:true}).click();
+  await expect(grid.locator('.data-grid-selection')).toHaveCount(0);
   const editor=grid.getByRole('textbox',{name:'프로젝트',exact:true});
   await editor.fill('스크롤 중인 초안');
   await jump(grid,1);
