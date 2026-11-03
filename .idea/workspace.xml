@@ -18,11 +18,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="57cad08a-4359-4a5b-9627-8eeca2c01aee" name="변경" comment="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)">
-      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-patterns.spec.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-patterns.spec.cjs" afterDir="false" />
+    <list default="true" id="57cad08a-4359-4a5b-9627-8eeca2c01aee" name="변경" comment="feat(studio): 프로젝트 관리 화면 데이터 및 UI 개선&#10;&#10;워크스페이스의 확장성과 사용자 경험을 개선하기 위해&#10;프로젝트 관리 화면 데이터와 일부 UI를 업데이트했습니다.&#10;&#10;- 추가 프로젝트 데이터 생성 로직을 layout-workspace-data에 추가&#10;- SidebarNavigation 및 관련 컴포넌트의 불필요한 props 제거&#10;- 프로젝트 테이블의 기본 페이지 크기 조정 (5 → 10)&#10;- 검토 필요 프로젝트 및 멤버 목록을 최대 5개로 제한&#10;- layout-patterns.css에서 미사용 스타일 제거 및 간격 조정&#10;- Playwright 테스트에서 불완전한 버튼 요소 선택자 수정">
       <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-samples.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-samples.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-workspace-data.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-workspace-data.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-workspace-pages.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-workspace-pages.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/systems/idenflu-mono/layout-patterns.css" beforeDir="false" afterPath="$PROJECT_DIR$/systems/idenflu-mono/layout-patterns.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,29 +59,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JavaScript 디버그.index.html (1).executor": "Run",
-    "JavaScript 디버그.index.html.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "dev",
-    "javascript.preferred.runtime.type.id": "node",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.example:build.executor": "Run",
-    "npm.studio:build.executor": "Run",
-    "ts.external.directory.path": "/Users/wonzopein/WebstormProjects/idenflu-design-system-studio/packages/react/node_modules/typescript/lib"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JavaScript 디버그.index.html (1).executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript 디버그.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.example:build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.studio:build.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/wonzopein/WebstormProjects/idenflu-design-system-studio/packages/react/node_modules/typescript/lib&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.build">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/packages/react/package.json" />
@@ -140,7 +137,7 @@
       <updated>1793587756739</updated>
       <workItem from="1793587757753" duration="8590000" />
       <workItem from="1793672810338" duration="87000" />
-      <workItem from="1793672903802" duration="1633000" />
+      <workItem from="1793672903802" duration="1724000" />
     </task>
     <task id="LOCAL-00001" summary="feat(styles): 디자인 시스템의 사용자 경험을 개선한다&#10;&#10;레이아웃 정렬, 테두리 반지름, 여백과 같은 스타일 요소를&#10;조정해 접근성과 일관성을 강화한다.&#10;&#10;- segmented-control 컴포넌트의 간격과 높이 설정 개선&#10;- 버튼 및 선택 팝업에 테두리 반지름 추가&#10;- field-horizontal 레이아웃 및 input-group 구조 최적화&#10;- 모바일 대응을 위한 미디어 쿼리 개선 및 간격 조정&#10;- data-preference-summary 속성을 추가해 사용자 설정 반영&#10;- 테이블과 스타일 기본값 내 알림 메시지 추가&#10;- HTML 및 CSS 리소스 버전 업데이트 (v0.2.0 → v0.3.0)">
       <option name="closed" value="true" />
@@ -182,7 +179,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793614919651</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="feat(studio): 프로젝트 관리 화면 데이터 및 UI 개선&#10;&#10;워크스페이스의 확장성과 사용자 경험을 개선하기 위해&#10;프로젝트 관리 화면 데이터와 일부 UI를 업데이트했습니다.&#10;&#10;- 추가 프로젝트 데이터 생성 로직을 layout-workspace-data에 추가&#10;- SidebarNavigation 및 관련 컴포넌트의 불필요한 props 제거&#10;- 프로젝트 테이블의 기본 페이지 크기 조정 (5 → 10)&#10;- 검토 필요 프로젝트 및 멤버 목록을 최대 5개로 제한&#10;- layout-patterns.css에서 미사용 스타일 제거 및 간격 조정&#10;- Playwright 테스트에서 불완전한 버튼 요소 선택자 수정">
+      <option name="closed" value="true" />
+      <created>1793681380212</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1793681380212</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,7 +216,8 @@
     <MESSAGE value="feat(react): React 컴포넌트 데모 문서화 구조 리팩토링&#10;&#10;컴포넌트 데모의 유지관리성과 가독성을 개선하기 위해 파일 구조를 리팩토링하고 색상 및 콘텐츠 관련 데모를 별도로 분리했습니다.&#10;&#10;- `studio/demos.tsx` 파일을 제거하고 관련 데모를 개별 파일로 분리&#10;- 색상 데모(`color-demos.tsx`)를 생성하여 테마별 색상 미리보기 및 사용 예시 추가&#10;- 콘텐츠 데모(`content-demos.tsx`)를 작성하여 탭, 알림, 카드 등 주요 컴포넌트의 시연 구조화&#10;- 공통 레이아웃 컴포넌트 `Section` 및 예제 구조 통합 수정&#10;- 상태 메시지 및 색상 사용 설명 추가, 코드 정리 및 주석 보완" />
     <MESSAGE value="feat(react): React 라이브러리에 Divider 및 NovaSpinner 컴포넌트 추가&#10;&#10;사용자 인터페이스를 개선하고 컴포넌트의 유연성을 높이기 위해&#10;새로운 Divider 및 NovaSpinner 컴포넌트를 추가하고 관련 문서와&#10;데모를 작성했습니다.&#10;&#10;- Divider 컴포넌트 추가: 영역 구분, 텍스트 정렬 옵션 및 다양한 스타일 지원&#10;- NovaSpinner 컴포넌트 추가: 로딩 상태 시각화, 크기 및 색상 옵션 제공&#10;- DividerDemos 및 NovaSpinnerDemos 파일 추가로 컴포넌트 동작 예제 작성&#10;- Studio 경로에 Divider 및 NovaSpinner 데모 라우트 추가&#10;- NovaSpinner 동작 검증을 위한 Playwright 기반 테스트 작성&#10;- 다양한 입력 패턴 및 상태를 다룰 수 있는 패턴 데모 및 폼 예제 추가" />
     <MESSAGE value="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)" />
+    <MESSAGE value="feat(studio): 프로젝트 관리 화면 데이터 및 UI 개선&#10;&#10;워크스페이스의 확장성과 사용자 경험을 개선하기 위해&#10;프로젝트 관리 화면 데이터와 일부 UI를 업데이트했습니다.&#10;&#10;- 추가 프로젝트 데이터 생성 로직을 layout-workspace-data에 추가&#10;- SidebarNavigation 및 관련 컴포넌트의 불필요한 props 제거&#10;- 프로젝트 테이블의 기본 페이지 크기 조정 (5 → 10)&#10;- 검토 필요 프로젝트 및 멤버 목록을 최대 5개로 제한&#10;- layout-patterns.css에서 미사용 스타일 제거 및 간격 조정&#10;- Playwright 테스트에서 불완전한 버튼 요소 선택자 수정" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(studio): 프로젝트 관리 화면 데이터 및 UI 개선&#10;&#10;워크스페이스의 확장성과 사용자 경험을 개선하기 위해&#10;프로젝트 관리 화면 데이터와 일부 UI를 업데이트했습니다.&#10;&#10;- 추가 프로젝트 데이터 생성 로직을 layout-workspace-data에 추가&#10;- SidebarNavigation 및 관련 컴포넌트의 불필요한 props 제거&#10;- 프로젝트 테이블의 기본 페이지 크기 조정 (5 → 10)&#10;- 검토 필요 프로젝트 및 멤버 목록을 최대 5개로 제한&#10;- layout-patterns.css에서 미사용 스타일 제거 및 간격 조정&#10;- Playwright 테스트에서 불완전한 버튼 요소 선택자 수정" />
     <option name="NON_MODAL_COMMIT_POSTPONE_SLOW_CHECKS" value="false" />
   </component>
 </project>

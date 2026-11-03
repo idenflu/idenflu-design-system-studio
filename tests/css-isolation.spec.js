@@ -47,7 +47,7 @@ test('React components keep their geometry without the optional document reset',
   await page.addStyleTag({ url: '/packages/react/dist/styles.css' });
   await expect(page.locator('#components .button')).toHaveCSS('font-size', '14px');
   await expect(page.locator('#components .button')).toHaveCSS('box-sizing', 'border-box');
-  await expect(page.locator('#components .text-input')).toHaveCSS('height', '38px');
+  await expect(page.locator('#components .text-input')).toHaveCSS('height', '36px');
   await expect(page.locator('#components .text-input')).toHaveCSS('width', '240px');
   await expect(page.locator('#components .chip')).toHaveCSS('font-size', '14px');
   await expect(page.locator('#components .tab-list')).toHaveCSS('display', 'flex');

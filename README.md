@@ -39,7 +39,7 @@ Overview, Foundations, 컴포넌트와 Layout·Form·데이터 상태·빈 상�
 | 글자 크기 | 14px | 12–18px |
 | 행간 | 22px | 18–32px |
 | 여백 배율 | 100% | 75–150% |
-| 컨트롤 높이 | 38px | 32–48px |
+| 컨트롤 높이 | 36px | 32–48px |
 | 모서리 | 0px | 0–12px |
 
 색상은 선택기 또는 HEX 코드(`#RRGGBB`, `#RGB`)로 조정합니다. 기본 색상은 Primary, Text Primary, Text Secondary, Surface, Border, Control Primary, Canvas이고 의미 색상은 Danger, Success, Warning, Info입니다. 라이트·다크 테마별로 별도 저장하며, 색상 옆 초기화는 해당 항목만 복원합니다. 전체 **초기화**는 두 테마의 색상과 크기 설정을 복원합니다. **CSS 복사**에는 테마별 색상과 연결된 hover·pressed·상태 배경도 포함합니다.

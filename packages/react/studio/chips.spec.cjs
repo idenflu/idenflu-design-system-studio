@@ -160,10 +160,10 @@ test('compact display chips preserve comfortable sizes and fit dense mobile cont
   const chips = compact.locator('.chip--compact');
   await expect(chips).toHaveCount(9);
   const comfortableHeights = await section(page,'사이즈').locator('.react-studio-example').evaluateAll(cards => cards.map(card => card.querySelector('.chip').getBoundingClientRect().height));
-  expect(comfortableHeights).toEqual([32,38,44]);
+  expect(comfortableHeights).toEqual([30,36,42]);
   const groups = await compact.locator('.react-studio-example').evaluateAll(cards => cards.map(card => [...card.querySelectorAll('.chip')].map(element => ({height:element.getBoundingClientRect().height,font:parseFloat(getComputedStyle(element).fontSize),tag:element.tagName,tabIndex:element.tabIndex,cursor:getComputedStyle(element).cursor}))));
   for (const [index,group] of groups.entries()) {
-    for (const chip of group) expect(chip).toEqual({height:[24,28,32][index],font:[12,13,14][index],tag:'SPAN',tabIndex:-1,cursor:'default'});
+    for (const chip of group) expect(chip).toEqual({height:[24,26,30][index],font:[12,13,14][index],tag:'SPAN',tabIndex:-1,cursor:'default'});
   }
   await chips.first().evaluate(element => { element.textContent = '아주 긴 프로젝트 분류와 상세 상태를 표시하는 칩'; });
   await page.evaluate(() => window.IdenfluPreferences.set({fontSize:18,lineHeight:32,spacing:150,controlHeight:48,radius:12}));

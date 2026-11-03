@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const documents = require('../packages/react/studio/routes.json');
 
 const storageKey = 'idenflu-mono-preferences-v1';
-const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 38, radius: 0 };
+const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0 };
 const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6 };
 const ranges = {
   fontSize: '#react-pref-fontSize',
@@ -66,10 +66,28 @@ test('preferences defaults preserve actual typography and control geometry', asy
   expect(rendered.bodyLine).toBe(22);
   expect(rendered.buttonFont).toBe(14);
   expect(rendered.inputFont).toBe(14);
-  expect(rendered.buttonHeight).toBeCloseTo(38, 1);
-  expect(rendered.inputHeight).toBeCloseTo(38, 1);
+  expect(rendered.buttonHeight).toBeCloseTo(36, 1);
+  expect(rendered.inputHeight).toBeCloseTo(36, 1);
   expect(rendered.buttonRadius).toBe(0);
   expect(rendered.inputRadius).toBe(0);
+});
+
+test('previous defaults migrate to 36px while an explicit new 38px preference survives reload', async ({page}) => {
+  await page.addInitScript(key => { if (!localStorage.getItem(key)) localStorage.setItem(key,JSON.stringify({fontSize:14,lineHeight:22,spacing:100,controlHeight:38,radius:0})); },storageKey);
+  await openApp(page);
+  expect(await preferences(page)).toEqual(defaults);
+  expect((await metrics(page)).buttonHeight).toBe(36);
+  await page.evaluate(() => window.IdenfluPreferences.set({controlHeight:38}));
+  await page.reload();
+  await expect(page.locator('.route-text-fields')).toBeVisible();
+  expect((await preferences(page)).controlHeight).toBe(38);
+  expect((await metrics(page)).inputHeight).toBe(38);
+});
+
+test('size tokens render matching button, input and select heights at 30, 36 and 42px', async ({page}) => {
+  await openApp(page,'foundations/sizes');
+  const sizes = await page.locator('.route-sizes .react-studio-size-grid > section').evaluateAll(cards => cards.map(card => ['.button','.text-input','.select-trigger'].map(selector => card.querySelector(selector).getBoundingClientRect().height)));
+  expect(sizes).toEqual([[30,30,30],[36,36,36],[42,42,42]]);
 });
 
 test('live adjustments change rendered controls, persist on reload and copy current CSS', async ({ page }) => {
@@ -291,6 +309,6 @@ test('built React documentation loads preferences early and consumer styles reta
     frame.remove();
     return value;
   }, files);
-  expect(consumer).toEqual({ font: 14, height: 38, runtime: false, dialog: false });
+  expect(consumer).toEqual({ font: 14, height: 36, runtime: false, dialog: false });
   expect(errors).toEqual([]);
 });

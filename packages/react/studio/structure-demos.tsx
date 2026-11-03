@@ -29,7 +29,7 @@ export function ButtonDemos() {
       <div className="react-studio-row"><Segmented label="보기 방식" options={viewOptions} onValueChange={value => setFeedback(`${({list:'목록',grid:'격자',calendar:'캘린더'} as Record<string,string>)[value]} 보기를 선택했습니다.`)} /></div>
       <div className="react-studio-row"><Segmented label="조회 기간" options={[{value:'day',label:'일간'},{value:'week',label:'주간'},{value:'month',label:'월간'}]} defaultValue="week" /><Segmented label="비활성 보기 방식" options={viewOptions} disabled /></div>
     </Section>
-    <Section title="버튼 그룹 사이즈" description="버튼과 같은 sm 32px·md 38px·lg 44px 높이를 사용하며, 아이콘과 간격도 함께 조정됩니다.">
+    <Section title="버튼 그룹 사이즈" description="버튼과 같은 sm 30px·md 36px·lg 42px 높이를 사용하며, 아이콘과 간격도 함께 조정됩니다.">
       <div className="react-studio-stack">{sizes.map(size => <div key={size} className="react-studio-stack"><span className="react-studio-caption">{size.toUpperCase()}{size === 'md' ? ' · 기본' : ''}</span><Segmented label={`${size.toUpperCase()} 보기 방식`} size={size} options={viewOptions} /></div>)}</div>
     </Section>
     <Section title="동작형 버튼 그룹" description="복사·내보내기처럼 각각 실행하는 관련 행동은 구분선으로 묶습니다.">
@@ -114,7 +114,7 @@ export function ChipDemos() {
     <Section title="사이즈" description="표시용·라운드 칩도 SM·MD·LG 높이와 글자 크기 설정을 따릅니다.">
       <div className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} size={size}>기본 표시</Chip><Chip interactive={false} rounded variant="primary" size={size}>라운드</Chip></div></div>)}</div>
     </Section>
-    <Section title="컴팩트 표시용 칩" description={'표나 목록의 분류·상태를 작은 공간에 표시합니다. SM·MD·LG의 기본 높이는 24·28·32px이며 표시용 칩에서 density="compact"로 사용합니다.'}>
+    <Section title="컴팩트 표시용 칩" description={'표나 목록의 분류·상태를 작은 공간에 표시합니다. SM·MD·LG의 기본 높이는 24·26·30px이며 표시용 칩에서 density="compact"로 사용합니다.'}>
       <div className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} density="compact" size={size}>문서</Chip><Chip interactive={false} density="compact" rounded variant="success" size={size}>완료</Chip><Chip interactive={false} density="compact" variant="secondary" size={size}><Icon name="calendar" />일정</Chip></div></div>)}</div>
     </Section>
     <Section title="삭제 가능한 칩" description="선택된 값을 제거하고, 초기화로 다시 표시할 수 있습니다."><div className="react-studio-row">{removable.map(name => <Chip key={name} rounded aria-label={`${name} 제거`} onClick={() => setRemovable(current => current.filter(item => item !== name))}>{name}<Icon name="close" /></Chip>)}{!removable.length && <p className="react-studio-caption" role="status">모든 칩을 제거했습니다.</p>}</div><div className="react-studio-row"><Button variant="outline" onClick={() => setRemovable(['프로젝트','브랜드','문서'])}>초기화</Button></div></Section>

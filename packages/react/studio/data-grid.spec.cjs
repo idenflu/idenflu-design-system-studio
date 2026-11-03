@@ -24,6 +24,20 @@ test('data grid supports search, current-page selection and page size without do
   expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 
+test('project examples include 120 records with a 100-row page and reachable final record', async ({page}) => {
+  await page.goto(route);
+  const grid = projectGrid(page);
+  await expect(page.getByText('120개 프로젝트에서', {exact:false})).toBeVisible();
+  await grid.getByRole('combobox',{name:/^페이지당 행 수:/}).click();
+  await page.getByRole('option',{name:'100개',exact:true}).click();
+  await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(100);
+  await grid.getByRole('button',{name:'2페이지',exact:true}).click();
+  await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(20);
+  await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('사용자 프로필 운영 자동화');
+  await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(1);
+  await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveAttribute('data-grid-row-id','PRJ-120');
+});
+
 test('Shift-click adds, cycles and removes sort priorities while ordinary click returns to single sorting', async ({page}) => {
   await page.goto(route);
   const grid=projectGrid(page),team=grid.getByRole('button',{name:'담당 팀',exact:true}),owner=grid.getByRole('button',{name:'담당자',exact:true});

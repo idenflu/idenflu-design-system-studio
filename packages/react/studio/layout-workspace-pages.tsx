@@ -6,27 +6,25 @@ export function WorkspacePageHeader({title,description,eyebrow,action}: {title:s
   return <header className="layout-page-heading"><div>{eyebrow&&<p className="layout-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p>{description}</p></div>{action}</header>;
 }
 
-export function ProjectForm({onCreate,onCancel}: {onCreate:(draft:ProjectDraft)=>void;onCancel:()=>void}){
+export function ProjectForm({id,onCreate}: {id:string;onCreate:(draft:ProjectDraft)=>void}){
   const [name,setName]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[description,setDescription]=React.useState('');
   const [due,setDue]=React.useState<DateValue>('2026-11-20'),[error,setError]=React.useState('');
   const input=React.useRef<HTMLInputElement>(null);
-  return <form className="layout-project-form" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('프로젝트 이름을 입력해주세요.');input.current?.focus();return;}if(!event.currentTarget.reportValidity())return;onCreate({name:name.trim(),team,description:description.trim(),due:due??'미정'});}}>
+  return <form id={id} className="layout-project-form" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('프로젝트 이름을 입력해주세요.');input.current?.focus();return;}if(!event.currentTarget.reportValidity())return;onCreate({name:name.trim(),team,description:description.trim(),due:due??'미정'});}}>
     <TextField ref={input} label="프로젝트 이름" value={name} onChange={event=>{setName(event.target.value);setError('');}} required error={error||undefined} placeholder="예: 고객 경험 개선" maxLength={60}/>
     <TextArea label="프로젝트 설명" rows={3} value={description} onChange={event=>setDescription(event.target.value)} placeholder="목표와 작업 범위를 간단히 적어주세요."/>
-    <Select label="담당 팀" value={team} options={teams} onValueChange={setTeam}/><DatePicker label="목표 마감일" value={due} onValueChange={setDue}/>
-    <div className="dialog-actions"><Button variant="outline" onClick={onCancel}>취소</Button><Button type="submit">프로젝트 만들기</Button></div>
+    <div className="layout-project-form-row"><Select label="담당 팀" value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><DatePicker label="목표 마감일" value={due} onValueChange={setDue}/></div>
   </form>;
 }
 
-export function InviteMemberForm({onInvite,onCancel,existingEmails}: {onInvite:(member:Omit<Member,'id'>)=>void;onCancel:()=>void;existingEmails:string[]}){
+export function InviteMemberForm({id,onInvite,existingEmails}: {id:string;onInvite:(member:Omit<Member,'id'>)=>void;existingEmails:string[]}){
   const [name,setName]=React.useState(''),[email,setEmail]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[role,setRole]=React.useState('편집자');
   const [error,setError]=React.useState('');
-  return <form className="layout-project-form" onSubmit={event=>{event.preventDefault();if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,role});}}>
+  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,role});}}>
     <TextField label="이름" value={name} onChange={event=>setName(event.target.value)} required pattern=".*\S.*" autoFocus/>
     <TextField label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
-    <Select label="소속 팀" value={team} options={teams} onValueChange={setTeam}/><Select label="역할" value={role} options={roles} onValueChange={setRole}/>
+    <Select label="소속 팀" value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" value={role} options={roles} onValueChange={setRole} popupStrategy="fixed"/>
     <p className="component-helper">샘플 멤버 목록에 추가하며 실제 초대 메일은 전송하지 않습니다.</p>
-    <div className="dialog-actions"><Button variant="outline" onClick={onCancel}>취소</Button><Button type="submit">멤버 추가</Button></div>
   </form>;
 }
 
@@ -48,8 +46,7 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
   ];
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
     <div className="layout-filter-panel"><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]}/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]}/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setQuery('');}}>필터 초기화</Button><div className="layout-density"><Segmented label="표 밀도" value={density} onValueChange={setDensity} options={[{value:'default',label:'보통'},{value:'compact',label:'촘촘'}]}/></div></div>
-    {visibleSelected.length>0&&<div className="layout-bulk-actions"><span>{visibleSelected.length}개 프로젝트 선택</span><Button variant="outline" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}><Icon name="check"/>선택 항목 완료</Button></div>}
-    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={10} pageSizeOptions={[10,20,50]} showColumnVisibility={false} density={density==='compact'?'compact':'default'} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} exportable exportFileName="workspace-projects.csv"/>
+    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={10} pageSizeOptions={[10,20,50]} showColumnVisibility={false} density={density==='compact'?'compact':'default'} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button>} exportable exportFileName="workspace-projects.csv"/>
     <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 화면이 새 콘텐츠 탭으로 열립니다.</p>
   </>;
 }

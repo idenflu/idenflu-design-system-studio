@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, Dialog, DialogHeader, DialogBody, Drawer, DropdownMenu, Icon, Popover, Tabs, TextField, Tree, type TreeNode } from '../src';
-import { ThemeControl } from './controls';
+import { Avatar, Badge, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DropdownMenu, Icon, Popover, Tabs, TextField, Tree, type TreeNode } from '../src';
+import { StudioSettings, ThemeControl } from './controls';
 import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceTab } from './layout-workspace-data';
 import { HomePage, InviteMemberForm, MembersPage, NotificationSettingsPage, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage } from './layout-workspace-pages';
 
 function SidebarNavigation({items,query,onQuery,selected,expanded,onExpanded,onPage,mobile,onClose}: {items:TreeNode[];query:string;onQuery:(value:string)=>void;selected:string;expanded:string[];onExpanded:(values:string[])=>void;onPage:(page:WorkspacePage)=>void;mobile?:boolean;onClose?:()=>void}) {
   return <div className="layout-sidebar-inner">
-    <div className="layout-sidebar-brand"><span className="layout-brand-mark"><Icon name="grid"/></span><strong>idenflu workspace</strong>{mobile&&<Button variant="ghost" size="sm" aria-label="메뉴 닫기" onClick={onClose}><Icon name="close"/></Button>}</div>
-    <div className="layout-menu-search"><TextField label="메뉴 검색" type="search" size="sm" value={query} onChange={event=>onQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="메뉴 검색"/></div>
+    <div className="layout-sidebar-brand"><img className="layout-brand-mark" src="./assets/nova-workspace.svg" alt=""/><strong>NOVA Workspace</strong>{mobile&&<Button variant="ghost" size="sm" aria-label="메뉴 닫기" onClick={onClose}><Icon name="close"/></Button>}</div>
+    <div className="layout-menu-search"><TextField label="메뉴 검색" type="search" value={query} onChange={event=>onQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="메뉴 검색"/></div>
     <nav className="layout-tree-navigation" aria-label="워크스페이스 메뉴"><Tree label="워크스페이스 트리 메뉴" items={items} value={selected} onValueChange={value=>onPage(value as WorkspacePage)} expanded={expanded} onExpandedChange={onExpanded}/>{!items.length&&<p className="layout-empty">검색 결과가 없습니다.</p>}</nav>
   </div>;
 }
@@ -19,6 +19,7 @@ export function SidebarLayoutSample() {
   const [mobileOpen,setMobileOpen]=React.useState(false),[searchOpen,setSearchOpen]=React.useState(false),[search,setSearch]=React.useState('');
   const [createOpen,setCreateOpen]=React.useState(false),[inviteOpen,setInviteOpen]=React.useState(false),[accountOpen,setAccountOpen]=React.useState(false);
   const [notificationOpen,setNotificationOpen]=React.useState(false),[unread,setUnread]=React.useState(['reviews','project:PRJ-001']),[notice,setNotice]=React.useState('변경 사항은 현재 샘플에서만 유지됩니다.');
+  const createFormId=React.useId(),inviteFormId=React.useId();
   const searchInput=React.useRef<HTMLInputElement>(null);
   const activeTab=tabs.find(tab=>tab.key===active)??tabs[0];
   const selected=activeTab.page==='project-detail'?'projects':activeTab.page;
@@ -29,7 +30,7 @@ export function SidebarLayoutSample() {
   const openProject=(id:string)=>openTab({key:`project:${id}`,page:'project-detail',projectId:id});
   const closeTab=(key:string)=>setTabs(values=>values.filter(tab=>tab.key!==key||tab.page==='home'));
   const updateProject=(id:string,patch:Partial<Project>)=>{setProjects(values=>values.map(project=>project.id===id?{...project,...patch}:project));setNotice('프로젝트 변경사항을 적용했습니다.');};
-  React.useEffect(()=>{document.title=`${tabTitle(activeTab)} · ${settings.name} | idenflu workspace`;},[activeTab,projects,settings.name]);
+  React.useEffect(()=>{document.title=`${tabTitle(activeTab)} · ${settings.name} | NOVA Workspace`;},[activeTab,projects,settings.name]);
   React.useEffect(()=>{const shortcut=(event:KeyboardEvent)=>{if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'&&!document.querySelector('dialog[open]')){event.preventDefault();setSearch('');setSearchOpen(true);}};document.addEventListener('keydown',shortcut);return()=>document.removeEventListener('keydown',shortcut);},[]);
   React.useEffect(()=>{if(searchOpen)searchInput.current?.focus();},[searchOpen]);
   React.useEffect(()=>{const media=window.matchMedia('(min-width: 901px)');const change=()=>{if(media.matches)setMobileOpen(false);};media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
@@ -62,10 +63,11 @@ export function SidebarLayoutSample() {
       <Tabs className="layout-workspace-tabs" label="열린 업무 화면" value={active} onValueChange={activate} onTabClose={closeTab} items={tabs.map(tab=>({value:tab.key,label:<><span>{tabTitle(tab)}</span>{tab.page==='home'&&<span className="sr-only"> (고정)</span>}</>,closable:tab.page!=='home',closeLabel:`${tabTitle(tab)} 탭 닫기`,content:<div className="layout-page-content">{renderPage(tab)}</div>}))}/>
       <footer className="layout-statusbar"><span role="status">{notice}</span><span><i/>샘플 환경</span></footer>
     </main>
+    <div className="layout-floating-settings"><StudioSettings/></div>
     <Drawer open={mobileOpen} onOpenChange={setMobileOpen} className="layout-mobile-sidebar" aria-label="워크스페이스 메뉴"><SidebarNavigation {...sidebarProps} mobile onClose={()=>setMobileOpen(false)}/></Drawer>
     <Dialog open={searchOpen} onOpenChange={setSearchOpen} variant="divided" className="layout-command-dialog" aria-labelledby="workspace-search-title" closeOnBackdrop><DialogHeader><h2 id="workspace-search-title">빠른 검색</h2><Button size="sm" variant="ghost" aria-label="검색 닫기" onClick={()=>setSearchOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody><TextField ref={searchInput} label="메뉴 및 프로젝트 검색" type="search" value={search} onChange={event=>setSearch(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="어떤 화면을 찾으세요?"/><div className="layout-command-results">{menuResults.length>0&&<section><h3>메뉴</h3>{menuResults.map(page=><button type="button" key={page} onClick={()=>openPage(page)}><Icon name={pageInfo[page].icon}/><span>{pageInfo[page].title}<small>{pageInfo[page].group}</small></span><Icon name="arrow-right"/></button>)}</section>}{projectResults.length>0&&<section><h3>프로젝트</h3>{projectResults.map(project=><button type="button" key={project.id} onClick={()=>openProject(project.id)}><Icon name="folder"/><span>{project.name}<small>{project.id}</small></span><Icon name="arrow-right"/></button>)}</section>}{!menuResults.length&&!projectResults.length&&<p className="layout-empty" role="status">검색 결과가 없습니다.</p>}</div></DialogBody></Dialog>
-    <Dialog open={createOpen} onOpenChange={setCreateOpen} variant="divided" aria-labelledby="workspace-create-title" closeOnBackdrop><DialogHeader><h2 id="workspace-create-title">새 프로젝트</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setCreateOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{createOpen&&<ProjectForm onCreate={createProject} onCancel={()=>setCreateOpen(false)}/>}</DialogBody></Dialog>
-    <Dialog open={inviteOpen} onOpenChange={setInviteOpen} variant="divided" aria-labelledby="workspace-invite-title" closeOnBackdrop><DialogHeader><h2 id="workspace-invite-title">멤버 초대</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setInviteOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{inviteOpen&&<InviteMemberForm onInvite={inviteMember} onCancel={()=>setInviteOpen(false)} existingEmails={members.map(member=>member.email)}/>}</DialogBody></Dialog>
+    <Dialog open={createOpen} onOpenChange={setCreateOpen} variant="divided" aria-labelledby="workspace-create-title" closeOnBackdrop><DialogHeader><h2 id="workspace-create-title">새 프로젝트</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setCreateOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{createOpen&&<ProjectForm id={createFormId} onCreate={createProject}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setCreateOpen(false)}>취소</Button><Button type="submit" form={createFormId}>프로젝트 만들기</Button></DialogFooter></Dialog>
+    <Dialog open={inviteOpen} onOpenChange={setInviteOpen} variant="divided" aria-labelledby="workspace-invite-title" closeOnBackdrop><DialogHeader><h2 id="workspace-invite-title">멤버 초대</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setInviteOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{inviteOpen&&<InviteMemberForm id={inviteFormId} onInvite={inviteMember} existingEmails={members.map(member=>member.email)}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setInviteOpen(false)}>취소</Button><Button type="submit" form={inviteFormId}>멤버 추가</Button></DialogFooter></Dialog>
     <Dialog open={accountOpen} onOpenChange={setAccountOpen} variant="divided" aria-labelledby="workspace-account-title" closeOnBackdrop><DialogHeader><h2 id="workspace-account-title">내 프로필</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setAccountOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody><div className="layout-profile"><Avatar size="lg" shape="circle" variant="neutral">김</Avatar><h3>김민수</h3><p>minsu@example.com</p><Badge variant="neutral">워크스페이스 관리자</Badge><Button variant="outline" onClick={()=>{setAccountOpen(false);openPage('settings');}}>워크스페이스 설정</Button></div></DialogBody></Dialog>
   </div>;
 }

@@ -15,10 +15,14 @@ const names = [
   '데이터 마이그레이션', '보안 설정', '접근성 점검', '사용량 분석',
   '연간 캠페인 운영', '팀 협업 도구',
 ];
+const projectAreas = ['계정','주문','배송','정산','청구','인증','예약','구독','콘텐츠','활동 피드','파트너 지원','사용자 프로필'];
+const projectWork = ['흐름 개선','기능 확장','운영 정비','품질 점검','접근성 개선','성능 최적화','화면 개편','운영 자동화'];
+const projectNames = [...names, ...Array.from({length:projectAreas.length * projectWork.length}, (_,index) =>
+  `${projectAreas[index % projectAreas.length]} ${projectWork[Math.floor(index / projectAreas.length)]}`)];
 const statuses:Project['status'][] = ['진행 중','준비 중','검토 중','완료','보류'];
 const teams = ['프로덕트 디자인','플랫폼 개발','서비스 기획','브랜드 디자인'];
 const owners = ['김민수','이서연','박지훈','정수빈',null];
-const projects:Project[] = names.map((name,index) => ({
+const projects:Project[] = projectNames.map((name,index) => ({
   id:`PRJ-${String(index + 1).padStart(3,'0')}`, name,
   team:teams[index % teams.length], owner:owners[index % owners.length],
   status:statuses[index % statuses.length], progress:index % 5 === 3 ? 100 : (index * 13) % 100,
@@ -43,7 +47,7 @@ const responsiveColumns:DataGridColumn<Project>[] = [
 ];
 
 const virtualProject = (index:number):Project => ({
-  ...projects[index % projects.length],
+  ...projects[index % names.length],
   id:`ROW-${String(index + 1).padStart(5,'0')}`,
   name:`가상 프로젝트 ${String(index + 1).padStart(5,'0')}`,
   progress:index % 101,
@@ -88,12 +92,12 @@ export function DataGridDemos() {
     setNotice(`${rowId}의 ${taskColumns.find(column=>column.id === columnId)?.header} 값을 변경했습니다.`);
   };
   return <>
-    <Section title="프로젝트 데이터그리드" description="24개 프로젝트에서 검색·열별 필터·정렬·선택·페이지 이동을 함께 사용합니다. 프로젝트 이름은 가로 스크롤 중에도 고정됩니다.">
+    <Section title="프로젝트 데이터그리드" description={`${projects.length}개 프로젝트에서 검색·열별 필터·정렬·선택·페이지 이동을 함께 사용합니다. 프로젝트 이름은 가로 스크롤 중에도 고정됩니다.`}>
       <div className="studio-grid-demo-toolbar"><p className="react-studio-caption">Shift+클릭으로 정렬 조건을 추가하세요. 열 경계는 드래그하거나 방향키로 조절합니다.</p><Segmented label="데이터그리드 밀도" size="sm" value={density} onValueChange={value=>setDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
       <DataGrid label="프로젝트 데이터그리드" rows={projects} columns={projectColumns}
         getRowId={row=>row.id} getRowLabel={row=>row.name} selectable
         selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
-        searchLabel="프로젝트 검색" defaultPageSize={5} pageSizeOptions={[5,10,20]}
+        searchLabel="프로젝트 검색" defaultPageSize={5} pageSizeOptions={[5,10,20,50,100]}
         sortModel={sortModel} onSortModelChange={setSortModel} density={density}
         exportable exportFileName="idenflu-projects.csv" maxHeight={480} />
       <p role="status" className="component-helper">정렬: {sortModel.length ? sortModel.map((sort,index)=>`${index+1}. ${projectColumns.find(column=>column.id===sort.columnId)?.header} ${sort.direction === 'asc' ? '오름차순' : '내림차순'}`).join(' · ') : '원래 순서'}</p>

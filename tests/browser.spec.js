@@ -135,7 +135,7 @@ for (const prefix of ['', '/dist']) {
 }
 
 for (const prefix of ['', '/dist']) {
-  test(`root gallery opens the current mono components (${prefix || 'dev'})`, async ({page}) => {
+  test(`root gallery opens the current mono components (${prefix || 'dev'})`, async ({page,isMobile}) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${prefix}/index.html`);
@@ -143,12 +143,13 @@ for (const prefix of ['', '/dist']) {
     await expect(page).toHaveURL(new RegExp(`${prefix}/systems/idenflu-mono/index\\.html#/overview$`));
     for (const route of ['components/data-grid', 'components/time-picker']) {
       const title = documents.find(item => item.route === route).title;
-      await page.keyboard.press('/');
+      if (isMobile) await page.getByRole('button', {name:'메뉴',exact:true}).click();
       const search = page.getByRole('searchbox', {name:'문서 검색'});
       await search.fill(title);
       await search.press('Enter');
       await expect(page.locator(`[data-route="${route}"]`)).toBeVisible();
       await expect(page.getByRole('heading', {level:1})).toHaveText(title);
+      await expect(page.getByRole('heading', {level:1})).toBeFocused();
     }
     expect(errors).toEqual([]);
   });

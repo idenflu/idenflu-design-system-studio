@@ -6,7 +6,7 @@ test('document chrome includes the original home, breadcrumb and footer', async 
   await expect(page).toHaveTitle('Overview — idenflu mono');
   await expect(page.getByRole('heading', {level:1})).toHaveText(/Form follows\s*function\./);
   await expect(page.getByRole('navigation', {name:'현재 위치'})).toContainText('Getting started');
-  await expect(page.getByRole('contentinfo')).toHaveText('idenflu mono38px height / 0px radius / 8px spacing');
+  await expect(page.getByRole('contentinfo')).toHaveText('idenflu mono36px height / 0px radius / 8px spacing');
   await expect(page.locator('.docs-topbar')).toHaveCSS('position', 'sticky');
   await expect(page.locator('.docs-topbar').getByRole('link', {name:'디자인 시스템 갤러리'})).toBeVisible();
   await expect(page.locator('.sidebar').getByRole('link', {name:'디자인 시스템 갤러리'})).toHaveCount(0);

@@ -3,9 +3,9 @@ import { Button, Icon, Select, Spinner, Switch, Table, TableContainer, TextField
 import { Section } from './demo-layout';
 
 const sizes = [
-  {value:'sm', name:'Small', height:32, padding:10, icon:14, switchTrack:'28 × 16'},
-  {value:'md', name:'Medium', height:38, padding:12, icon:16, switchTrack:'36 × 20'},
-  {value:'lg', name:'Large', height:44, padding:16, icon:18, switchTrack:'44 × 24'},
+  {value:'sm', name:'Small', height:30, padding:10, icon:14, switchTrack:'28 × 16'},
+  {value:'md', name:'Medium', height:36, padding:12, icon:16, switchTrack:'36 × 20'},
+  {value:'lg', name:'Large', height:42, padding:16, icon:18, switchTrack:'44 × 24'},
 ] as const;
 
 export function IconDemos() {

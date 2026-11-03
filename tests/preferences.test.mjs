@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 const source = await readFile(new URL('../systems/idenflu-mono/preferences.js', import.meta.url), 'utf8');
 const storageKey = 'idenflu-mono-preferences-v1';
-const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 38, radius: 0 };
+const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0 };
 const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6 };
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
@@ -80,6 +80,19 @@ test('preference engine starts with defaults, returns copies and initializes onc
   assert.equal(app.storage.has(storageKey), false);
 });
 
+test('previous default snapshots adopt 36px without losing colors or custom sizes', () => {
+  const colors = {light:{'--primary':'#2255aa'}};
+  const previous = engine({stored:JSON.stringify({...defaults,controlHeight:38,colors})});
+  assert.deepEqual(plain(previous.api.get()), {...defaults,colors});
+  assert.equal(previous.styles.get('--control-base-height'), '36px');
+  const customized = {...custom,controlHeight:38,colors};
+  assert.deepEqual(plain(engine({stored:JSON.stringify(customized)}).api.get()), customized);
+  previous.api.set({controlHeight:38});
+  const record = previous.storage.get(storageKey);
+  assert.equal(JSON.parse(record).defaultsVersion, 2);
+  assert.equal(engine({stored:record}).api.get().controlHeight, 38);
+});
+
 test('strict partial updates ignore invalid types, unknown keys and inherited values', () => {
   const app = engine();
   for (const value of [null, [], '18', 18, { fontSize: '18', lineHeight: null, spacing: Infinity, controlHeight: NaN, radius: {} }, { unknown: 18 }]) {
@@ -89,7 +102,7 @@ test('strict partial updates ignore invalid types, unknown keys and inherited va
   assert.equal(app.storage.has(storageKey), false, 'ignored updates must not create a preference record');
   const inherited = Object.assign(Object.create({ fontSize: 18 }), { radius: 4 });
   assert.deepEqual(plain(app.api.set(inherited)), { ...defaults, radius: 4 });
-  assert.deepEqual(Object.keys(JSON.parse(app.storage.get(storageKey))), Object.keys(defaults));
+  assert.deepEqual(Object.keys(JSON.parse(app.storage.get(storageKey))), [...Object.keys(defaults), 'defaultsVersion']);
 });
 
 test('ranges snap to permitted steps and enforce font-linked line and control minimums', () => {
@@ -119,7 +132,7 @@ test('successful updates apply CSS, persist exact state and return exportable cu
     assert.equal(app.styles.get(property), value);
     assert(app.api.cssText().includes(`${property}: ${value};`));
   }
-  assert.deepEqual(JSON.parse(app.storage.get(storageKey)), custom);
+  assert.deepEqual(JSON.parse(app.storage.get(storageKey)), { ...custom, defaultsVersion: 2 });
   assert.deepEqual(app.events.at(-1), { type: 'preferenceschange', detail: { values: custom, saved: true, reason: 'set' } });
   assert.equal(app.styles.get('--unrelated-property'), 'keep');
 });

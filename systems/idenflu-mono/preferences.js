@@ -3,8 +3,9 @@
   if (window.IdenfluPreferences) return;
 
   const storageKey = "idenflu-mono-preferences-v1";
+  const defaultsVersion = 2;
   const root = document.documentElement;
-  const defaults = Object.freeze({ fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 38, radius: 0 });
+  const defaults = Object.freeze({ fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0 });
   const ranges = Object.freeze({
     fontSize: Object.freeze({ min: 12, max: 18, step: 1 }),
     lineHeight: Object.freeze({ min: 18, max: 32, step: 1 }),
@@ -183,6 +184,9 @@
     try {
       const parsed = JSON.parse(raw);
       if (!valid(parsed)) return null;
+      // Older snapshots stored the complete default size even when only colors changed.
+      const previousDefaults = keys.every(key => !own(parsed, key) || parsed[key] === (key === 'controlHeight' ? 38 : defaults[key]));
+      if (parsed.defaultsVersion === undefined && parsed.controlHeight === 38 && previousDefaults) parsed.controlHeight = defaults.controlHeight;
       return normalize(parsed);
     } catch { return null; }
   }
@@ -191,7 +195,7 @@
     values = normalize(partial, values);
     apply();
     let saved = false;
-    try { localStorage.setItem(storageKey, JSON.stringify(values)); saved = true; } catch { /* Keep this page usable without persistent storage. */ }
+    try { localStorage.setItem(storageKey, JSON.stringify({ ...values, defaultsVersion })); saved = true; } catch { /* Keep this page usable without persistent storage. */ }
     announce("set", saved);
     return get();
   }

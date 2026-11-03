@@ -1,0 +1,8 @@
+<svg id="nova-studio-favicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <title>NOVA Studio</title>
+  <g transform="translate(11.5 6)">
+    <path d="M0 10.6667L21.25 0V85.3333L0 96V10.6667Z" fill="#6393E1" />
+    <path d="M0 10.6667L21.25 0L85 85.3333L63.75 96L0 10.6667Z" fill="#266EE1" />
+    <path d="M63.75 10.6667L85 0V85.3333L63.75 96V10.6667Z" fill="#0F54BB" />
+  </g>
+</svg>

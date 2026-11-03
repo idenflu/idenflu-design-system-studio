@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useEscapeLayer } from './escape-layer';
 
+const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
 type Size = 'sm' | 'md' | 'lg';
 type BaseField = { label: React.ReactNode; id?: string; name?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; size?: Size; helperText?: React.ReactNode; error?: string; className?: string };
 
@@ -177,7 +179,7 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
   const [open, setOpen] = React.useState(false);
   const [preview, setPreview] = React.useState<string | null>(null);
   const [cursor, setCursor] = React.useState(() => clampCursor(parseDate(startingValues[0] ?? '') || new Date()));
-  const [position, setPosition] = React.useState<{ top: string; bottom: string; left: number; maxHeight: number }>({ top: 'calc(100% + 6px)', bottom: 'auto', left: 0, maxHeight: 600 });
+  const [position, setPosition] = React.useState<{ top: number; left: number; maxWidth: number; maxHeight: number } | null>(null);
   const pickerRef = React.useRef<HTMLDivElement>(null), popupRef = React.useRef<HTMLDivElement>(null), triggerRef = React.useRef<HTMLButtonElement>(null);
   const startRef = React.useRef<HTMLInputElement>(null), endRef = React.useRef<HTMLInputElement>(null);
   const previous = React.useRef<DateRangeValue | undefined>(values);
@@ -208,22 +210,46 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
   };
   const close = (restore = false) => { setOpen(false); setPreview(null); if (restore) triggerRef.current?.focus(); };
   useEscapeLayer(open, pickerRef, () => close(true));
-  React.useEffect(() => {
-    if (!open) return;
+  useClientLayoutEffect(() => {
+    if (!open) { setPosition(null); return; }
+    const layer = popupRef.current;
+    let shownAsPopover = false;
+    // A manual popover stays in the existing DOM tree (including inside a
+    // native dialog) while escaping overflow and transformed ancestors.
+    if (layer && typeof layer.showPopover === 'function') {
+      try { layer.showPopover(); shownAsPopover = true; } catch { layer.removeAttribute('popover'); }
+    }
     const update = () => {
-      const anchor = pickerRef.current?.getBoundingClientRect(), popup = popupRef.current;
-      if (!anchor || !popup) return;
+      const picker = pickerRef.current, anchor = picker?.getBoundingClientRect(), popup = popupRef.current;
+      if (!picker || !anchor || !popup) return;
       const edge = 12, gap = 6, width = document.documentElement.clientWidth, height = window.innerHeight;
+      let leftEdge = edge, rightEdge = width - edge;
+      // Keep the popup within the available width of a scroll container, while
+      // positioning it outside that container's vertical clipping area.
+      for (let parent = picker.parentElement; parent; parent = parent.parentElement) {
+        const style = window.getComputedStyle(parent);
+        if (!/(auto|scroll|hidden|clip)/.test(`${style.overflowX} ${style.overflowY}`)) continue;
+        const rect = parent.getBoundingClientRect();
+        if (anchor.bottom <= rect.top || anchor.top >= rect.bottom || anchor.right <= rect.left || anchor.left >= rect.right) { setOpen(false); return; }
+        leftEdge = Math.max(leftEdge, rect.left + parent.clientLeft);
+        rightEdge = Math.min(rightEdge, rect.left + parent.clientLeft + parent.clientWidth);
+      }
       if (anchor.bottom <= edge || anchor.top >= height - edge || anchor.right <= edge || anchor.left >= width - edge) { setOpen(false); return; }
       const below = Math.max(0, height - anchor.bottom - gap - edge), above = Math.max(0, anchor.top - gap - edge);
       const up = popup.scrollHeight > below && above > below;
-      setPosition({ top: up ? 'auto' : 'calc(100% + 6px)', bottom: up ? 'calc(100% + 6px)' : 'auto', left: Math.max(edge, Math.min(anchor.left, width - popup.offsetWidth - edge)) - anchor.left, maxHeight: up ? above : below });
+      const maxHeight = up ? above : below, maxWidth = Math.max(0, rightEdge - leftEdge);
+      const popupWidth = Math.min(popup.offsetWidth, maxWidth);
+      const next = { top: up ? anchor.top - gap - Math.min(popup.scrollHeight, maxHeight) : anchor.bottom + gap, left: Math.max(leftEdge, Math.min(anchor.left, rightEdge - popupWidth)), maxHeight, maxWidth };
+      setPosition(previous => previous && previous.top === next.top && previous.left === next.left && previous.maxHeight === next.maxHeight && previous.maxWidth === next.maxWidth ? previous : next);
     };
     const outside = (event: MouseEvent) => { if (!pickerRef.current?.contains(event.target as Node)) setOpen(false); };
     update(); window.addEventListener('resize', update); window.addEventListener('scroll', update, true); document.addEventListener('mousedown', outside);
-    return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true); document.removeEventListener('mousedown', outside); };
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    if (popupRef.current) observer?.observe(popupRef.current);
+    return () => { window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true); document.removeEventListener('mousedown', outside); observer?.disconnect(); if (shownAsPopover && layer?.isConnected && layer.matches(':popover-open')) layer.hidePopover(); };
   }, [open, cursor.getFullYear(), cursor.getMonth()]);
-  React.useEffect(() => { if (open) popupRef.current?.querySelector<HTMLButtonElement>('.calendar-day[tabindex="0"]')?.focus(); }, [open, cursor]);
+  const positioned = position !== null;
+  useClientLayoutEffect(() => { if (open && positioned) popupRef.current?.querySelector<HTMLButtonElement>('.calendar-day[tabindex="0"]')?.focus(); }, [open, cursor, positioned]);
   const choose = (date: Date) => {
     const key = dateKey(date); if ((min && key < min) || (max && key > max)) return;
     if (!range) { publish([key, '']); close(true); return; }
@@ -255,7 +281,7 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
     {range ? <span className="field-label" id={`${base}-label`}>{label}</span> : <label className="field-label" htmlFor={base}>{label}</label>}
     <div className="date-picker" ref={pickerRef}>
       {range ? <div className={`date-range-fields${error ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}><label className="sr-only" htmlFor={`${base}-start`}>{startLabel}</label>{input(0)}<span className="date-range-separator" aria-hidden="true">–</span><label className="sr-only" htmlFor={`${base}-end`}>{endLabel}</label>{input(1)}{trigger}</div> : <div className={`date-field${error ? ' has-error' : ''}`}>{input(0)}{trigger}</div>}
-      {open && <div className="date-popup" ref={popupRef} id={`${base}-calendar`} role="dialog" aria-label={range ? '기간 선택 달력' : '날짜 선택 달력'} style={{ top: position.top, bottom: position.bottom, left: position.left, maxHeight: position.maxHeight }}>
+      {open && <div className="date-popup" ref={popupRef} id={`${base}-calendar`} role="dialog" popover="manual" aria-label={range ? '기간 선택 달력' : '날짜 선택 달력'} style={{ position: 'fixed', margin: 0, top: position?.top ?? 0, bottom: 'auto', left: position?.left ?? 0, right: 'auto', maxWidth: position?.maxWidth, maxHeight: position?.maxHeight, visibility: position ? 'visible' : 'hidden' }}>
         {range && <p className="calendar-instruction">{parsed[0] && !parsed[1] ? '종료일을 선택하세요.' : '시작일을 선택하세요.'}</p>}
         <div className="calendar-header"><button type="button" className="calendar-nav" aria-label="이전 달" onClick={() => setCursor(clampCursor(moveMonth(cursor, -1)))}><span className="ui-icon icon-caret" style={{ transform: 'rotate(90deg)' }} aria-hidden="true" /></button><strong id={`${base}-month`} aria-live="polite">{year}년 {month + 1}월</strong><button type="button" className="calendar-nav" aria-label="다음 달" onClick={() => setCursor(clampCursor(moveMonth(cursor, 1)))}><span className="ui-icon icon-caret" style={{ transform: 'rotate(-90deg)' }} aria-hidden="true" /></button></div>
         <div className="calendar-weekdays" aria-hidden="true">{'일월화수목금토'.split('').map(day => <span key={day}>{day}</span>)}</div>

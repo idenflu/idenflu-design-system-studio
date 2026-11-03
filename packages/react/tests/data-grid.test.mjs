@@ -346,6 +346,20 @@ test('row click selection honors controlled values until the parent updates them
   } finally {await f.dispose();}
 });
 
+test('custom selection actions appear with selected rows and remain usable', async () => {
+  const f=fixture(); let calls=0;
+  try {
+    await f.render(h(DataGrid,{...props,selectable:true,selectionActions:h('button',{type:'button',onClick:()=>calls++},'선택 처리')}));
+    assert.equal(button(f.node,'선택 처리'),undefined);
+    await click(control(f.node,'Alpha 선택'));
+    assert.ok(f.node.querySelector('.data-grid-selection').contains(button(f.node,'선택 처리')));
+    await click(button(f.node,'선택 처리'));
+    assert.equal(calls,1);
+    await click(button(f.node,'선택 해제'));
+    assert.equal(button(f.node,'선택 처리'),undefined);
+  } finally {await f.dispose();}
+});
+
 test('DataGrid controlled state follows parent updates for search, sorting, pagination and selection', async () => {
   const f = fixture(), changes={query:[],sort:[],page:[],pageSize:[],selected:[]};
   function Harness() {
