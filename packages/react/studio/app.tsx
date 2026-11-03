@@ -16,6 +16,7 @@ import { DividerDemos } from './divider-demos';
 import { patternPages, patternSnippets } from './patterns';
 import { componentUsage } from './component-usage';
 import { DataGridDemos, dataGridUsage } from './data-grid-demos';
+import { SidebarLayoutSample } from './layout-samples';
 import icons from './dist/icons.json';
 
 const snippets: Record<string, string> = {
@@ -246,7 +247,7 @@ function ComponentPage({ route }: { route:string }) {
     default: return null;
   }
 }
-function App() {
+function DocumentationApp() {
   const current = useDocumentRoute();
   return <DocumentShell current={current}>
     <ComponentPage key={`page-${current.route}`} route={current.route} />
@@ -254,5 +255,10 @@ function App() {
       ? <DateTimeUsageExamples />
       : snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} />}
   </DocumentShell>;
+}
+function App() {
+  return new URLSearchParams(location.search).get('layout') === 'sidebar'
+    ? <SidebarLayoutSample />
+    : <DocumentationApp />;
 }
 createRoot(document.getElementById('root')!).render(<App />);

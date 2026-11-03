@@ -1,0 +1,59 @@
+import * as React from 'react';
+import { Badge, Icon, type IconName, type TreeNode } from '../src';
+
+export type Project = {id:string; name:string; team:string; owner:string; status:string; progress:number; due:string; description:string};
+export type ProjectDraft = Pick<Project,'name'|'team'|'description'|'due'>;
+export type Member = {id:string; name:string; email:string; team:string; role:string};
+export type WorkspaceSettings = {name:string; description:string; timezone:string; projectNotifications:boolean; weeklySummary:boolean; mentionNotifications:boolean};
+export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'members'|'settings'|'notifications';
+export type WorkspaceTab = {key:string; page:WorkspacePage|'project-detail'; projectId?:string};
+export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:string; icon:IconName; description:string}> = {
+  home:{title:'팀 홈',group:'업무 공간',parent:'work',icon:'home',description:'팀의 주요 업무와 최근 활동을 한눈에 확인하세요.'},
+  projects:{title:'전체 프로젝트',group:'프로젝트 관리',parent:'project-menu',icon:'grid',description:'팀의 프로젝트를 검색하고 진행 상황을 관리하세요.'},
+  'active-projects':{title:'진행 중 프로젝트',group:'프로젝트 관리',parent:'project-menu',icon:'clock',description:'현재 작업 중인 프로젝트와 마감 일정을 확인하세요.'},
+  reviews:{title:'검토 요청',group:'프로젝트 관리',parent:'project-menu',icon:'check-circle',description:'검토가 필요한 프로젝트를 확인하고 다음 단계를 진행하세요.'},
+  completed:{title:'완료된 프로젝트',group:'프로젝트 관리',parent:'project-menu',icon:'folder',description:'작업을 마친 프로젝트와 결과를 확인하세요.'},
+  members:{title:'멤버 관리',group:'조직 관리',parent:'team-menu',icon:'person',description:'함께 일하는 팀원을 찾고 역할을 관리하세요.'},
+  settings:{title:'워크스페이스 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'워크스페이스의 기본 정보와 표시 기준을 설정하세요.'},
+  notifications:{title:'알림 설정',group:'환경 설정',parent:'settings-menu',icon:'bell',description:'필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다.'},
+};
+export const defaultExpanded=['work','project-menu','team-menu','settings-menu'];
+export const statuses=['준비 중','진행 중','검토 중','완료'].map(value=>({value,label:value}));
+export const teams=['프로덕트 디자인','플랫폼 개발','브랜드 디자인'].map(value=>({value,label:value}));
+export const roles=['관리자','편집자','뷰어'].map(value=>({value,label:value}));
+export const initialProjects:Project[]=[
+  {id:'PRJ-001',name:'디자인 시스템 v2',team:'프로덕트 디자인',owner:'김민수',status:'진행 중',progress:72,due:'2026-11-12',description:'공통 컴포넌트의 사용 규칙을 정리하고 제품 화면에 일관된 경험을 적용합니다.'},
+  {id:'PRJ-002',name:'모바일 앱 온보딩',team:'프로덕트 디자인',owner:'이서연',status:'검토 중',progress:90,due:'2026-11-16',description:'새 사용자가 주요 기능을 이해하고 첫 작업을 완료할 수 있도록 진입 과정을 개선합니다.'},
+  {id:'PRJ-003',name:'파트너 포털',team:'플랫폼 개발',owner:'박지훈',status:'진행 중',progress:48,due:'2026-11-20',description:'파트너가 계약과 요청을 한곳에서 확인하고 필요한 자료를 공유하는 공간을 만듭니다.'},
+  {id:'PRJ-004',name:'브랜드 가이드 개편',team:'브랜드 디자인',owner:'정수빈',status:'준비 중',progress:15,due:'2026-11-24',description:'다양한 매체에서 사용할 수 있도록 시각 원칙과 표현 예시를 정리합니다.'},
+  {id:'PRJ-005',name:'고객 피드백 분석',team:'프로덕트 디자인',owner:'이서연',status:'완료',progress:100,due:'2026-11-05',description:'사용자 인터뷰와 문의를 분류하고 다음 분기의 개선 과제를 정리합니다.'},
+  {id:'PRJ-006',name:'파일 공유 개선',team:'플랫폼 개발',owner:'박지훈',status:'진행 중',progress:36,due:'2026-11-25',description:'파일을 공유하고 변경 이력을 쉽게 확인할 수 있도록 개선합니다.'},
+  {id:'PRJ-007',name:'접근성 점검',team:'프로덕트 디자인',owner:'김민수',status:'검토 중',progress:84,due:'2026-11-18',description:'키보드 탐색과 읽기 순서, 대비를 점검하고 공통 개선 사항을 반영합니다.'},
+  {id:'PRJ-008',name:'연간 캠페인 준비',team:'브랜드 디자인',owner:'정수빈',status:'준비 중',progress:12,due:'2026-12-02',description:'제품의 주요 가치를 전달할 콘텐츠와 캠페인 일정을 준비합니다.'},
+];
+export const initialMembers:Member[]=[
+  {id:'member-1',name:'김민수',email:'minsu@example.com',team:'프로덕트 디자인',role:'관리자'},
+  {id:'member-2',name:'이서연',email:'seoyeon@example.com',team:'프로덕트 디자인',role:'편집자'},
+  {id:'member-3',name:'박지훈',email:'jihoon@example.com',team:'플랫폼 개발',role:'편집자'},
+  {id:'member-4',name:'정수빈',email:'subin@example.com',team:'브랜드 디자인',role:'뷰어'},
+];
+export const initialSettings:WorkspaceSettings={name:'제품팀',description:'함께 더 나은 제품 경험을 만드는 공간입니다.',timezone:'seoul',projectNotifications:true,weeklySummary:true,mentionNotifications:true};
+export const badgeVariant=(status:string)=>status==='완료'?'success' as const:status==='검토 중'?'warning' as const:status==='진행 중'?'primary' as const:'neutral' as const;
+
+export function workspaceTree(projects:Project[],memberCount:number):TreeNode[]{
+  const counts:Partial<Record<WorkspacePage,number>>={projects:projects.length,'active-projects':projects.filter(p=>p.status==='진행 중').length,reviews:projects.filter(p=>p.status==='검토 중').length,completed:projects.filter(p=>p.status==='완료').length,members:memberCount};
+  const leaf=(value:WorkspacePage):TreeNode=>({value,label:<span className="layout-tree-label"><Icon name={pageInfo[value].icon}/><span>{pageInfo[value].title}</span>{counts[value]!==undefined&&<Badge variant="neutral" aria-hidden="true">{counts[value]}</Badge>}</span>});
+  const group=(value:string,title:string,children:TreeNode[]):TreeNode=>({value,label:<span className="layout-tree-label"><Icon name="folder"/><span>{title}</span></span>,children});
+  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed')])]),group('team-menu','조직 관리',[leaf('members')]),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications')])];
+}
+
+export function filterWorkspaceTree(items:readonly TreeNode[],query:string):TreeNode[]{
+  const needle=query.trim().toLocaleLowerCase().replace(/\s/g,'');
+  if(!needle)return [...items];
+  return items.flatMap(item=>{
+    const info=pageInfo[item.value as WorkspacePage];
+    if(info&&`${info.title}${info.group}`.toLocaleLowerCase().replace(/\s/g,'').includes(needle))return [item];
+    if(item.children){const children=filterWorkspaceTree(item.children,query);if(children.length)return [{...item,children}];}
+    return [];
+  });
+}

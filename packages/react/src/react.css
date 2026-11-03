@@ -63,6 +63,13 @@
 
 .tabs { min-width:0; }
 .tabs .tab-list { max-width:100%; overflow-x:auto; }
+.tab-item { position:relative; display:flex; flex:none; }
+.tab-item .tab { padding-inline-end:calc(var(--space-4) + 24px); }
+.tab-close { position:absolute; inset-inline-end:var(--space-2); top:50%; display:grid; place-items:center; width:22px; height:22px; margin-top:-11px; padding:3px; border:0; background:transparent; color:var(--text-secondary); }
+.tab-close .ui-icon { width:14px; height:14px; }
+.tab-close:hover:not(:disabled) { background:var(--surface-hover); color:var(--text); }
+.tab-close:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
+.tab-close:disabled { color:var(--disabled-text); cursor:not-allowed; }
 
 /* DataGrid keeps native table navigation and reuses the component tokens. */
 .data-grid { min-width:0; max-width:100%; border:1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); color:var(--text); font-size:var(--font-size-body); line-height:var(--line-height-body); }

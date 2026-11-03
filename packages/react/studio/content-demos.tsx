@@ -7,6 +7,7 @@ function DetailRows({items, style}: {items:readonly (readonly [string, string])[
 }
 
 export function TabsDemos() {
+  const [opened,setOpened]=React.useState(['home','projects','draft']);
   return <>
     <Section title="기본 탭" description="같은 맥락의 정보를 나눠 보고, 선택한 탭의 내용만 표시합니다.">
       <Tabs label="설정 분류" items={[
@@ -28,6 +29,11 @@ export function TabsDemos() {
         {value:'grid',label:<span className="react-studio-icon-label"><Icon name="grid" />격자</span>,content:<p>격자로 프로젝트를 확인합니다.</p>},
         {value:'calendar',label:<span className="react-studio-icon-label"><Icon name="calendar" />일정</span>,content:<p>일정별로 프로젝트를 확인합니다.</p>},
       ]} />
+    </Section>
+    <Section title="닫을 수 있는 탭" description="items의 closable과 onTabClose를 함께 지정합니다. 닫기 버튼 또는 Delete 키로 닫으면 인접한 탭으로 이동합니다. 탭 전환 중 입력값은 유지됩니다.">
+      <Tabs label="열린 작업" defaultValue="projects" onTabClose={value=>setOpened(items=>items.filter(item=>item!==value))} items={opened.map(value=>({value,label:value==='home'?'홈 (고정)':value==='projects'?'프로젝트':'작성 중',closable:value!=='home',content:value==='home'?<p>항상 유지하는 기본 화면입니다.</p>:<TextField label={value==='projects'?'프로젝트 검색':'메모'} placeholder="탭을 전환해 입력값 유지를 확인하세요."/>}))}/>
+      <Button variant="outline" size="sm" onClick={()=>setOpened(['home','projects','draft'])}>예시 탭 다시 열기</Button>
+      <p className="react-studio-caption">React 라벨에는 closeLabel로 닫기 버튼의 이름을 지정하세요. value·onValueChange로 활성 탭을 제어하고, onTabClose에서 items를 갱신합니다.</p>
     </Section>
   </>;
 }

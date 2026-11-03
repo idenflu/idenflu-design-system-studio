@@ -1,7 +1,9 @@
 import { BasicFormPattern, BookingPattern, FormStatesPattern, InquiryPattern, PasswordPattern, PreferencesPattern, ProfilePattern, ProjectPattern } from './pattern-forms';
 import { DataStatesPattern, EmptyStatePattern } from './pattern-data';
+import { LayoutPattern } from './pattern-layout';
 
 export const patternPages = {
+  'patterns/layout':LayoutPattern,
   'patterns/form/basic':BasicFormPattern,
   'patterns/form/preferences':PreferencesPattern,
   'patterns/form/password':PasswordPattern,

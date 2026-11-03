@@ -202,15 +202,50 @@ export function MultiSelect({value, defaultValue = [], onValueChange, ...props}:
   return <SelectCore {...props} multiple selected={selected} onClear={() => setSelected([])} onSelect={next => setSelected(selected.includes(next) ? selected.filter(item => item !== next) : [...selected, next])} onReset={reset} />;
 }
 
-export interface TabOption { value: string; label: React.ReactNode; content: React.ReactNode; disabled?: boolean }
-export interface TabsProps { items: readonly TabOption[]; label: string; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; orientation?: 'horizontal' | 'vertical'; className?: string }
-export function Tabs({items, label, value, defaultValue, onValueChange, orientation = 'horizontal', className}: TabsProps) {
+export interface TabOption { value: string; label: React.ReactNode; content: React.ReactNode; disabled?: boolean; closable?: boolean; closeLabel?: string }
+export interface TabsProps { items: readonly TabOption[]; label: string; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; onTabClose?: (value: string) => void; orientation?: 'horizontal' | 'vertical'; className?: string }
+export function Tabs({items, label, value, defaultValue, onValueChange, onTabClose, orientation = 'horizontal', className}: TabsProps) {
   const first = items.find(item => !item.disabled)?.value ?? '';
   const [current, setCurrent] = useValue(value, defaultValue ?? first, onValueChange);
   const id = React.useId();
   const refs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const list = React.useRef<HTMLDivElement>(null);
+  const pendingClose = React.useRef<string | null>(null);
   const selected = items.some(item => item.value === current && !item.disabled) ? current : first;
+  const closeTab = (index: number) => {
+    const item = items[index];
+    if (!item.closable || item.disabled || !onTabClose) return;
+    pendingClose.current = item.value;
+    if (item.value === selected) {
+      const next = [...items.slice(0,index)].reverse().find(item => !item.disabled) ?? items.slice(index+1).find(item => !item.disabled);
+      if (next) setCurrent(next.value);
+    }
+    onTabClose(item.value);
+  };
+  React.useEffect(() => {
+    if (pendingClose.current && !items.some(item => item.value === pendingClose.current)) {
+      refs.current[items.findIndex(item => item.value === selected)]?.focus();
+      pendingClose.current = null;
+    }
+    const container = list.current;
+    if (!container || orientation !== 'horizontal') return;
+    const reveal = () => {
+      const element = refs.current[items.findIndex(item => item.value === selected)];
+      if (!element) return;
+      const tab = element.getBoundingClientRect(), bounds = container.getBoundingClientRect();
+      if (tab.left < bounds.left) container.scrollLeft -= bounds.left - tab.left;
+      else if (tab.right > bounds.right) container.scrollLeft += tab.right - bounds.right;
+    };
+    reveal();
+    const win = container.ownerDocument.defaultView;
+    const Observer = (win as Window & {ResizeObserver?: typeof ResizeObserver} | null)?.ResizeObserver;
+    const observer = Observer ? new Observer(reveal) : null;
+    observer?.observe(container);
+    win?.addEventListener('resize', reveal);
+    return () => { observer?.disconnect(); win?.removeEventListener('resize', reveal); };
+  }, [items, selected, orientation]);
   const onKeyDown = (event: React.KeyboardEvent, index: number) => {
+    if (event.key === 'Delete' && items[index].closable && onTabClose) { event.preventDefault(); closeTab(index); return; }
     const nextKey = orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown';
     const previousKey = orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp';
     if (![nextKey, previousKey, 'Home', 'End'].includes(event.key)) return;
@@ -221,8 +256,12 @@ export function Tabs({items, label, value, defaultValue, onValueChange, orientat
     const target = event.key === 'Home' ? enabled[0] : event.key === 'End' ? enabled[enabled.length - 1] : enabled[(position + (event.key === nextKey ? 1 : -1) + enabled.length) % enabled.length];
     refs.current[target]?.focus(); setCurrent(items[target].value);
   };
-  return <div className={`tabs${className ? ` ${className}` : ''}`}><div className="tab-list" role="tablist" aria-label={label} aria-orientation={orientation}>
-    {items.map((item, index) => <button ref={node => { refs.current[index] = node; }} key={item.value} type="button" role="tab" className="tab" id={`${id}-tab-${index}`} aria-controls={`${id}-panel-${index}`} aria-selected={item.value === selected} tabIndex={item.value === selected ? 0 : -1} disabled={item.disabled} onClick={() => setCurrent(item.value)} onKeyDown={event => onKeyDown(event, index)}>{item.label}</button>)}
+  return <div className={`tabs${className ? ` ${className}` : ''}`}><div ref={list} className="tab-list" role="tablist" aria-label={label} aria-orientation={orientation}>
+    {items.map((item, index) => {
+      const closable = item.closable && !!onTabClose;
+      const tab = <button ref={node => { refs.current[index] = node; }} type="button" role="tab" className="tab" id={`${id}-tab-${index}`} aria-controls={`${id}-panel-${index}`} aria-selected={item.value === selected} aria-keyshortcuts={closable ? 'Delete' : undefined} tabIndex={item.value === selected ? 0 : -1} disabled={item.disabled} onClick={() => setCurrent(item.value)} onKeyDown={event => onKeyDown(event, index)}>{item.label}</button>;
+      return closable ? <div className="tab-item" key={item.value}>{tab}<button type="button" className="tab-close" tabIndex={-1} disabled={item.disabled} aria-label={item.closeLabel || (typeof item.label === 'string' ? `${item.label} 탭 닫기` : '탭 닫기')} onMouseDown={event => event.preventDefault()} onClick={() => closeTab(index)}><span className="ui-icon icon-close" aria-hidden="true" /></button></div> : <React.Fragment key={item.value}>{tab}</React.Fragment>;
+    })}
   </div>{items.map((item, index) => <div key={item.value} className="tab-panel" role="tabpanel" id={`${id}-panel-${index}`} aria-labelledby={`${id}-tab-${index}`} hidden={item.value !== selected} tabIndex={0}>{item.content}</div>)}</div>;
 }
 
