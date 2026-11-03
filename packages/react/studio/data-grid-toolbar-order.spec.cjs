@@ -20,8 +20,9 @@ async function choose(example, label, option) {
   await example.getByRole('listbox', {name:label,exact:true}).getByRole('option', {name:option,exact:true}).click();
 }
 
-async function expectOrder(page, tools, names) {
+async function expectOrder(page, tools, names, {keyboard = false} = {}) {
   await expect.poll(() => toolbarControls(tools).evaluateAll(controls => controls.map(control => control.getAttribute('aria-label') || (control.labels?.[0]?.textContent || control.textContent).trim()))).toEqual(names);
+  if (!keyboard) return;
   await controlFor(tools,names[0]).focus();
   for (const [index,name] of names.entries()) {
     if (index) await page.keyboard.press('Tab');
@@ -57,7 +58,7 @@ async function expectNoOverflow(page, tools) {
   expect(await tools.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
 }
 
-test('toolbar sizes apply to built-in controls independently of row density', async ({page}) => {
+test('toolbar sizes apply to built-in controls independently of row density',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const example = exampleFor(page), grid = gridFor(page), tools = grid.locator('.data-grid-tools');
   const row = grid.locator('tbody tr[data-grid-row-id]').first();
@@ -90,31 +91,28 @@ test('toolbar sizes apply to built-in controls independently of row density', as
   await expectNoOverflow(page,tools);
 });
 
-test('toolbar presets change DOM and Tab order while selection groups appear and disappear', async ({page}) => {
+test('a reordered toolbar keeps Tab order while selection groups appear and disappear', async ({page}) => {
   await page.goto(route);
   const example = exampleFor(page), grid = gridFor(page), tools = grid.locator('.data-grid-tools');
-  for (const order of orders) {
-    await choose(example,'도구 순서',order.label);
-    await expectOrder(page,tools,order.idle);
-    await grid.locator('tbody tr[data-grid-row-id]').first().getByRole('checkbox').check();
-    await expectOrder(page,tools,order.selected);
-    await grid.getByRole('button', {name:'선택 해제',exact:true}).click();
-    await expectOrder(page,tools,order.idle);
-    await expectNoOverflow(page,tools);
-  }
+  // Node tests cover order permutations; exercise native Tab navigation once per state.
+  const order = orders[2];
+  await choose(example,'도구 순서',order.label);
+  await expectOrder(page,tools,order.idle,{keyboard:true});
+  await grid.locator('tbody tr[data-grid-row-id]').first().getByRole('checkbox').check();
+  await expectOrder(page,tools,order.selected,{keyboard:true});
+  await grid.getByRole('button', {name:'선택 해제',exact:true}).click();
+  await expect(grid.locator('thead').getByRole('checkbox')).toBeFocused();
+  await expectOrder(page,tools,order.idle,{keyboard:true});
+  await expectNoOverflow(page,tools);
   const density = grid.getByRole('button', {name:'촘촘한 행 간격',exact:true});
   await density.click();
   await expect(density).toHaveAttribute('aria-pressed','false');
   await expect(grid).toHaveAttribute('data-density','default');
-  await grid.locator('tbody tr[data-grid-row-id]').last().getByRole('checkbox').check();
-  await expectOrder(page,tools,orders[2].selected);
-  await grid.getByRole('button', {name:'선택 해제',exact:true}).click();
   await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(3);
-  await expect(grid.locator('thead').getByRole('checkbox')).toBeFocused();
-  await expectOrder(page,tools,orders[2].idle);
+  await expectOrder(page,tools,order.idle);
 });
 
-test('hidden built-in controls stay absent after reordering and large tools fit narrow layouts', async ({page}) => {
+test('hidden built-in controls stay absent after reordering and large tools fit narrow layouts',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const example = exampleFor(page), grid = gridFor(page), tools = grid.locator('.data-grid-tools');
   await choose(example,'상단 도구 크기','LG');
@@ -219,7 +217,7 @@ test('column filters and selection controls can be revealed and cleared from the
   await expectNoOverflow(page,tools);
 });
 
-test('toolbar configuration keeps stable control widths and complete single-line option labels', async ({page}) => {
+test('toolbar configuration keeps stable control widths and complete single-line option labels',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const example = exampleFor(page);
   const settings = example.getByRole('group', {name:'상단 도구 구성',exact:true});
@@ -268,7 +266,7 @@ test('toolbar configuration keeps stable control widths and complete single-line
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
-test('empty toolbar tools reserve one control row while populated tools can wrap', async ({page}) => {
+test('empty toolbar tools reserve one control row while populated tools can wrap',{tag:'@mobile'}, async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/data-grid');
   const example = page.locator('#data-grid-toolbar-demo');
   const grid = example.getByRole('group', {name:'상단 도구 모음 데이터그리드',exact:true});

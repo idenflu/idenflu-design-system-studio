@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test');
 const route='/systems/idenflu-mono/index.html#/components/time-picker';
 
-test('time picker confirms hours and minutes explicitly and cancellation preserves the value',async({page})=>{
+test('time picker confirms hours and minutes explicitly and cancellation preserves the value',{tag:'@mobile'},async({page})=>{
   await page.goto(route);
   await page.getByRole('button',{name:'시작 시간 선택 열기',exact:true}).click();
   const popup=page.getByRole('dialog',{name:'시작 시간 선택',exact:true});
@@ -18,24 +18,20 @@ test('time picker confirms hours and minutes explicitly and cancellation preserv
   await expect(page.getByRole('button',{name:'시작 시간 선택 열기',exact:true})).toBeFocused();
 });
 
-test('time input normalizes text, enforces minute steps and validates required form submission',async({page})=>{
+test('time input submits canonical minutes through the required form and resets',async({page})=>{
   await page.goto(route);
-  await page.locator('#time-entry').fill('0905');await page.locator('#time-entry').press('Enter');
-  await expect(page.locator('#time-entry')).toHaveValue('09:05');
-  await page.locator('#time-bounded').fill('10:15');await page.locator('#time-bounded').press('Enter');
-  await expect(page.locator('#time-bounded')).toHaveAttribute('aria-invalid','true');
-  await page.locator('#time-bounded').fill('18:00');await page.locator('#time-bounded').press('Enter');
-  await expect(page.locator('#time-bounded')).not.toHaveAttribute('aria-invalid','true');
+  // Normalization variants and time bounds are covered by TimePicker unit tests.
   await page.getByRole('button',{name:'예약하기',exact:true}).click();
   await expect(page.locator('#time-required')).toHaveAttribute('aria-invalid','true');
   await page.locator('#time-required').fill('0915');await page.locator('#time-required').press('Enter');
+  await expect(page.locator('#time-required')).toHaveValue('09:15');
   await page.getByRole('button',{name:'예약하기',exact:true}).click();
   await expect(page.getByRole('status').filter({hasText:'알림을 예약했습니다.'})).toHaveText('09:15에 알림을 예약했습니다.');
   await page.getByRole('button',{name:'초기화',exact:true}).click();
   await expect(page.locator('#time-required')).toHaveValue('');
 });
 
-test('time picker is keyboard operable and its popup fits the viewport',async({page})=>{
+test('time picker is keyboard operable and its popup fits the viewport',{tag:'@mobile'},async({page})=>{
   await page.goto(route);
   await page.locator('#time-basic').focus();await page.locator('#time-basic').press('Alt+ArrowDown');
   const popup=page.getByRole('dialog',{name:'시작 시간 선택',exact:true});

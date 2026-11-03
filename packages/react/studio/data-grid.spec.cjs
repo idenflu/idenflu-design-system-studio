@@ -24,7 +24,7 @@ test('data grid supports search, current-page selection and page size without do
   expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 
-test('density and selection actions share a stable, accessible top toolbar', async ({page}) => {
+test('density and selection actions share a stable, accessible top toolbar',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid=projectGrid(page),toolbar=grid.locator('.data-grid-toolbar');
   await expect(page.getByRole('group',{name:'데이터그리드 밀도',exact:true})).toHaveCount(0);
@@ -57,7 +57,7 @@ test('density and selection actions share a stable, accessible top toolbar', asy
   expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 
-test('icon column settings open from the keyboard and fit the viewport', async ({page}) => {
+test('icon column settings open from the keyboard and fit the viewport',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid=projectGrid(page),button=grid.getByRole('button',{name:'표시 열',exact:true});
   await button.focus();
@@ -88,7 +88,7 @@ test('project examples include 120 records with a 100-row page and reachable fin
   await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveAttribute('data-grid-row-id','PRJ-120');
 });
 
-test('Shift-click adds, cycles and removes sort priorities while ordinary click returns to single sorting', async ({page}) => {
+test('Shift-click adds a secondary sort and ordinary click returns to single sorting', async ({page}) => {
   await page.goto(route);
   const grid=projectGrid(page),team=grid.getByRole('button',{name:'담당 팀',exact:true}),owner=grid.getByRole('button',{name:'담당자',exact:true});
   await team.click();
@@ -99,19 +99,14 @@ test('Shift-click adds, cycles and removes sort priorities while ordinary click 
   await expect(owner.locator('.data-grid-sort-priority')).toHaveText('2');
   await expect(grid.locator('th[aria-sort="ascending"]')).toHaveCount(1);
   await expect(owner).toHaveAccessibleDescription(/2순위 오름차순/);
-  await owner.click({modifiers:['Shift']});
-  await expect(owner).toHaveAccessibleDescription(/2순위 내림차순/);
-  await owner.click({modifiers:['Shift']});
-  await expect(grid.locator('.data-grid-sort-priority')).toHaveCount(0);
-  await expect(owner).toHaveAccessibleDescription(/정렬 안 함/);
-  await owner.click({modifiers:['Shift']});
+  // Node tests cover the direction/removal cycle; retain real modifier and plain clicks.
   await owner.click();
   await expect(grid.locator('.data-grid-sort-priority')).toHaveCount(0);
   await expect(owner.locator('..')).toHaveAttribute('aria-sort','descending');
   await expect(team.locator('..')).toHaveAttribute('aria-sort','none');
 });
 
-test('clicking row content selects once and the focused checkbox retains native keyboard behavior', async ({page}) => {
+test('clicking row content selects once and the focused checkbox retains native keyboard behavior',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid=projectGrid(page),row=grid.locator('tbody tr[data-grid-row-id]').first();
   const content=row.locator('td').nth(1).locator('strong'),checkbox=row.getByRole('checkbox');
@@ -142,7 +137,7 @@ test('column filters combine, keep numeric zero, and reset empty results', async
   await expect(grid.locator('tbody tr')).toHaveCount(5);
 });
 
-test('select filters escape a short scroll area and keep all options clickable', async ({page}) => {
+test('select filters escape a short scroll area and keep all options clickable',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid = projectGrid(page);
   await grid.getByRole('textbox',{name:'프로젝트 필터',exact:true}).fill('디자인 시스템');
@@ -165,7 +160,7 @@ test('select filters escape a short scroll area and keep all options clickable',
   await expect(grid.getByRole('combobox',{name:'담당 팀 필터: 전체',exact:true})).toHaveAttribute('aria-expanded','false');
 });
 
-test('column widths are keyboard adjustable and pinned identity columns survive horizontal scroll', async ({page,isMobile}) => {
+test('column widths are keyboard adjustable and headers stay pinned while scrolling',{tag:'@mobile'}, async ({page,isMobile}) => {
   await page.goto(route);
   const grid = projectGrid(page);
   const separator = grid.getByRole('separator',{name:'프로젝트 열 너비',exact:true});
@@ -191,9 +186,18 @@ test('column widths are keyboard adjustable and pinned identity columns survive 
   const after = await first.boundingBox();
   if (isMobile) expect(after.x).toBeLessThan(before.x);
   else expect(Math.abs(after.x - before.x)).toBeLessThan(1);
+  await grid.getByRole('combobox',{name:/^페이지당 행 수:/}).click();
+  await page.getByRole('option',{name:'20개',exact:true}).click();
+  const head=grid.locator('thead th').first();
+  const beforeScroll=await head.boundingBox();
+  const scroll=grid.locator('.data-grid-scroll');
+  await scroll.evaluate(element=>{element.scrollTop=180;});
+  await expect.poll(()=>scroll.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+  const afterScroll=await head.boundingBox();
+  expect(Math.abs(afterScroll.y-beforeScroll.y)).toBeLessThan(1);
 });
 
-test('cell editing validates, binds saved values and cancels pending changes', async ({page}) => {
+test('cell editing validates, binds saved values and cancels pending changes',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid = page.getByRole('group',{name:'작업 편집 데이터그리드',exact:true});
   await grid.getByRole('button',{name:'토큰 사용 기준 정리 작업 이름 편집',exact:true}).click();
@@ -237,7 +241,7 @@ test('CSV uses visible columns and filtered rows across all pages', async ({page
   expect(csv.trimEnd().split('\r\n').length - 1).toBeGreaterThan(count);
 });
 
-test('selected CSV includes selected rows outside current filters and sticky headers remain visible', async ({page}) => {
+test('selected CSV includes selected rows outside current filters', async ({page}) => {
   await page.goto(route);
   await page.evaluate(() => { window.showSaveFilePicker=undefined; });
   const grid=projectGrid(page);
@@ -250,17 +254,9 @@ test('selected CSV includes selected rows outside current filters and sticky hea
   expect(file.suggestedFilename()).toBe('idenflu-projects-selected.csv');
   const csv=await readFile(await file.path(),'utf8');
   expect(csv.trimEnd().split('\r\n').length-1).toBe(5);
-  await grid.getByRole('button',{name:'조건 초기화',exact:true}).click();
-  await grid.getByRole('combobox',{name:/^페이지당 행 수:/}).click();
-  await page.getByRole('option',{name:'20개',exact:true}).click();
-  const head=grid.locator('thead tr').first();
-  const before=await head.locator('th').first().boundingBox();
-  await grid.locator('.data-grid-scroll').evaluate(element=>{element.scrollTop=180;});
-  const after=await head.locator('th').first().boundingBox();
-  expect(Math.abs(after.y-before.y)).toBeLessThan(1);
 });
 
-test('loading, empty, error and retry keep stale rows out of the state grid', async ({page}) => {
+test('loading, empty, error and retry keep stale rows out of the state grid',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid = page.getByRole('group',{name:'조회 상태 데이터그리드',exact:true});
   const controls = page.getByRole('group',{name:'데이터그리드 조회 상태',exact:true});
@@ -300,7 +296,7 @@ async function expandGrid(grid) {
   });
 }
 
-test('expanded loading, empty and error states fill the area below the headers without stretching data rows',async({page})=>{
+test('expanded loading, empty and error states fill the area below the headers without stretching data rows',{tag:'@mobile'},async({page})=>{
   await page.goto(route);
   const grid=page.getByRole('group',{name:'조회 상태 데이터그리드',exact:true});
   const controls=page.getByRole('group',{name:'데이터그리드 조회 상태',exact:true});
@@ -330,7 +326,7 @@ test('expanded loading, empty and error states fill the area below the headers w
   expect(await grid.locator('.data-grid-state').evaluate(element=>element.getBoundingClientRect().height)).toBeCloseTo(naturalStateHeight,0);
 });
 
-test('expanded search-empty state remains centered across horizontal scrolling and resets normally',async({page})=>{
+test('expanded search-empty state remains centered across horizontal scrolling and resets normally',{tag:'@mobile'},async({page})=>{
   await page.goto(route);
   const grid=projectGrid(page);
   await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('일치하지 않는 프로젝트 xyz');
@@ -354,7 +350,7 @@ test('expanded search-empty state remains centered across horizontal scrolling a
 });
 
 
-test('virtualized search-empty state fills an expanded viewport and restores virtual rows',async({page})=>{
+test('virtualized search-empty state fills an expanded viewport and restores virtual rows',{tag:'@mobile'},async({page})=>{
   await page.goto(route);
   const grid=page.getByRole('group',{name:'대용량 데이터그리드',exact:true});
   await expandGrid(grid);

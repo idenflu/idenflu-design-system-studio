@@ -5,7 +5,7 @@ async function openExamples(page) {
   await page.clock.install();
 }
 
-test('spinner dialog completes without closing and returns focus after confirmation', async ({ page }) => {
+test('spinner dialog completes without closing and returns focus after confirmation', {tag:'@mobile'}, async ({ page }) => {
   await openExamples(page);
   const trigger = page.getByRole('button', {name:'동기화 시작', exact:true});
   await trigger.click();
@@ -66,7 +66,7 @@ test('determinate dialog reports progress and cancels cleanly before a fresh run
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
 });
 
-test('buttonless processing ignores dismissal, traps focus and closes automatically on completion', async ({ page }) => {
+test('buttonless processing ignores dismissal, traps focus and closes automatically on completion', {tag:'@mobile'}, async ({ page }) => {
   await openExamples(page);
   const trigger = page.getByRole('button', {name:'버튼 없는 처리 시작', exact:true});
   const originalOverflow = await page.evaluate(() => getComputedStyle(document.documentElement).overflow);

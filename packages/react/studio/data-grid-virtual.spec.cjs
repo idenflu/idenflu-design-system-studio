@@ -52,7 +52,7 @@ async function stopCoverage(page) {
   return page.evaluate(()=>{window.__gridScrollCoverage.running=false;return window.__gridScrollCoverage;});
 }
 
-test('10,000 virtual rows stay bounded while middle and final records remain reachable',async({page})=>{
+test('10,000 virtual rows stay bounded while middle and final records remain reachable',{tag:'@mobile'},async({page})=>{
   const grid=await openGrid(page);
   await expectBounded(grid);
   await expect(rowFor(grid,'ROW-00001')).toHaveCount(1);
@@ -73,7 +73,7 @@ test('10,000 virtual rows stay bounded while middle and final records remain rea
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
 });
 
-test('search, sorting and data shrink reset the virtual scroll without losing the result model',async({page})=>{
+test('search, sorting and data shrink reset the virtual scroll without losing the result model',{tag:'@mobile'},async({page})=>{
   const grid=await openGrid(page),scroller=grid.locator('.data-grid-scroll');
   await jump(grid,0.8);
   const search=grid.getByRole('searchbox',{name:'대용량 데이터 검색',exact:true});
@@ -99,7 +99,7 @@ test('search, sorting and data shrink reset the virtual scroll without losing th
   await expectBounded(grid);
 });
 
-test('buffered virtual rows keep their DOM across small scrolls and cover rapid wheel scrolling in both directions',async({page})=>{
+test('buffered virtual rows keep their DOM across small scrolls and cover rapid wheel scrolling in both directions',{tag:'@mobile'},async({page})=>{
   const grid=await openGrid(page),scroller=grid.locator('.data-grid-scroll');
   await scroller.scrollIntoViewIfNeeded();
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
@@ -121,7 +121,7 @@ test('buffered virtual rows keep their DOM across small scrolls and cover rapid 
   await expectBounded(grid);
 });
 
-test('virtual rows remeasure after density and viewport changes without overlapping or dropping the tail',async({page,isMobile})=>{
+test('virtual rows remeasure after density and viewport changes without overlapping or dropping the tail',{tag:'@mobile'},async({page,isMobile})=>{
   const grid=await openGrid(page);
   await jump(grid,0.5);
   await grid.getByRole('button',{name:'촘촘한 행 간격',exact:true}).click();
@@ -266,7 +266,7 @@ test('selection survives virtual unmounting and CSV exports offscreen selected r
   expect(allCsv.trimEnd().split('\r\n').length-1).toBe(10000);
 });
 
-test('an offscreen editor remains mounted without rendering the intervening thousands of rows',async({page})=>{
+test('an offscreen editor remains mounted without rendering the intervening thousands of rows',{tag:'@mobile'},async({page})=>{
   const grid=await openGrid(page);
   const original=`${nameFor(1)} 프로젝트 편집`;
   await grid.getByRole('button',{name:original,exact:true}).click();
@@ -289,7 +289,7 @@ test('an offscreen editor remains mounted without rendering the intervening thou
   await expect(grid.getByRole('button',{name:'확정한 가상 프로젝트 프로젝트 편집',exact:true})).toBeFocused();
 });
 
-test('validation may expand an edited virtual row without overlap or lost focus',async({page})=>{
+test('validation may expand an edited virtual row without overlap or lost focus',{tag:'@mobile'},async({page})=>{
   const grid=await openGrid(page),first=rowFor(grid,'ROW-00001'),second=rowFor(grid,'ROW-00002');
   const before=await first.boundingBox();
   await first.getByRole('button',{name:`${nameFor(1)} 프로젝트 편집`,exact:true}).click();
@@ -311,7 +311,7 @@ test('validation may expand an edited virtual row without overlap or lost focus'
   await editor.press('Escape');
 });
 
-test('focused row controls stay mounted until focus moves outside that row',async({page})=>{
+test('focused row controls stay mounted until focus moves outside that row',{tag:'@mobile'},async({page})=>{
   const grid=await openGrid(page);
   const check=rowFor(grid,'ROW-00001').getByRole('checkbox',{name:`${nameFor(1)} 선택`,exact:true});
   await check.focus();await jump(grid,1);

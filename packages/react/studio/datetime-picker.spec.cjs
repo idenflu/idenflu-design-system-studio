@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-test('datetime selection stays pending until confirmation and cancel restores the committed value', async ({ page }) => {
+test('datetime selection stays pending until confirmation and cancel restores the committed value', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/datetime-picker');
   const field = page.locator('.datetime-picker').filter({ has: page.locator('#datetime-basic') });
   const result = page.getByRole('status').filter({ hasText: '확정된 일시:' });
@@ -44,7 +44,7 @@ test('datetime range rejects a reversed time and updates the selected endpoint w
   await expect(end).toHaveValue('2026-11-12 12:30');
 });
 
-test('datetime popup stays within the viewport and its confirmation remains reachable', async ({ page }) => {
+test('datetime popup stays within the viewport and its confirmation remains reachable', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/datetime-picker');
   const field = page.locator('.datetime-picker').filter({ has: page.locator('#datetime-basic') });
   await field.getByRole('button', { name: '날짜 및 시간 선택 열기' }).click();
@@ -62,7 +62,7 @@ test('datetime popup stays within the viewport and its confirmation remains reac
   await expect(dialog).toHaveCount(0);
 });
 
-test('an empty datetime range completes start date and time before moving to the end', async ({ page }) => {
+test('an empty datetime range completes start date and time before moving to the end', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/datetime-picker');
   const field = page.locator('.datetime-picker').filter({ has: page.locator('#datetime-range-empty-start') });
   await field.getByRole('button', { name: '기간 및 시간 선택 열기' }).click();
@@ -92,7 +92,7 @@ test('an empty datetime range completes start date and time before moving to the
   await expect(page.locator('#datetime-range-empty-end')).toHaveValue(`${selectedDate} 17:45`);
 });
 
-test('datetime calendar uses the existing date picker typography and control styles', async ({ page }) => {
+test('datetime calendar uses the existing date picker typography and control styles', {tag:['@theme','@mobile']}, async ({ page }) => {
   const calendarStyles = () => {
     const read = selector => {
       const style = getComputedStyle(document.querySelector(selector));
@@ -109,7 +109,7 @@ test('datetime calendar uses the existing date picker typography and control sty
   expect(await page.evaluate(calendarStyles)).toEqual(dateStyles);
 });
 
-test('datetime still dismisses on keyboard exit, outside click and Escape after popup pointer interaction', async ({ page }) => {
+test('datetime still dismisses on keyboard exit, outside click and Escape after popup pointer interaction', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/datetime-picker');
   const input = page.locator('#datetime-basic');
   const field = page.locator('.datetime-picker').filter({ has: input });

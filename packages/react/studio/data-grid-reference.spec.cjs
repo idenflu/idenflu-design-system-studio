@@ -59,7 +59,7 @@ test('toolbar settings and selection expose only built-in data-grid controls', a
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
 });
 
-test('API tables and code samples stay inside the page at narrow widths', async ({page,isMobile}) => {
+test('API tables and code samples stay inside the page at narrow widths',{tag:'@mobile'}, async ({page,isMobile}) => {
   await page.goto(route);
   const reference = page.locator('#data-grid-props');
   await reference.scrollIntoViewIfNeeded();

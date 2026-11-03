@@ -35,6 +35,7 @@ async function changeHex(page, label, value) {
   await field.press('Enter');
 }
 
+// Each case selects its own themes; only viewport-sensitive cases need a mobile repeat.
 test.beforeEach(async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/foundations/colors');
   await expect(page.locator('[data-route="foundations/colors"]')).toBeVisible();
@@ -42,7 +43,7 @@ test.beforeEach(async ({ page }) => {
   await selectTheme(page, '라이트');
 });
 
-test('all base and semantic colors update the palette and rendered components without overflow', async ({ page }) => {
+test('all base and semantic colors update the palette and rendered components without overflow', {tag:'@mobile'}, async ({ page }) => {
   for (const [label, token, value] of palette) {
     const field = hexField(page, label);
     await expect(field).toHaveAccessibleName(`${label} HEX`);

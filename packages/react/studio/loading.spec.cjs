@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-test('NOVA spinners animate at the requested sizes and remain within the viewport', async ({page}) => {
+test('NOVA spinners animate at the requested sizes and remain within the viewport', {tag:'@mobile'}, async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/loading');
   const orbit = page.getByRole('status',{name:'NOVA 궤도 로딩 중',exact:true});
   const mark = page.getByRole('status',{name:'NOVA 로고 로딩 중',exact:true});

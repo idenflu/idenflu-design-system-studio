@@ -65,7 +65,7 @@ async function mountFixture(page) {
   return { opener, dialog, popover, popoverTrigger };
 }
 
-test('native dialog, select, calendar and nested popovers dismiss one Escape layer and restore focus', async ({ page }) => {
+test('native dialog, select, calendar and nested popovers dismiss one Escape layer and restore focus', {tag:'@mobile'}, async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const { opener, dialog, popover, popoverTrigger } = await mountFixture(page);
@@ -111,7 +111,7 @@ test('native dialog, select, calendar and nested popovers dismiss one Escape lay
   expect(errors).toEqual([]);
 });
 
-test('an input can consume Escape before the containing popup and native dialog dismiss', async ({ page }) => {
+test('an input can consume Escape before the containing popup and native dialog dismiss', {tag:'@mobile'}, async ({ page }) => {
   const { opener, dialog, popover, popoverTrigger } = await mountFixture(page);
   const input = popover.getByRole('textbox', { name:'임시 입력', exact:true });
   await input.fill('편집 중');

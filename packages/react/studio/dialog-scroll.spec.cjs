@@ -43,7 +43,7 @@ const state = page => page.evaluate(() => {
   return {x:bounds.x,width:bounds.width,y:scrollY,overflow:getComputedStyle(document.documentElement).overflowY,bodyOverflow:getComputedStyle(document.body).overflowY};
 });
 
-test('modal locks wheel scrolling without moving the page or its horizontal alignment', async ({page}) => {
+test('modal locks wheel scrolling without moving the page or its horizontal alignment', {tag:'@mobile'}, async ({page}) => {
   const opener = await mount(page);
   // Focus before measuring so activation does not scroll the opener into view.
   await opener.focus();
@@ -69,7 +69,7 @@ test('modal locks wheel scrolling without moving the page or its horizontal alig
   expect(after.width).toBeCloseTo(before.width, 1);
 });
 
-test('nested modal closing keeps the page locked and unmounting both restores it', async ({page}) => {
+test('nested modal closing keeps the page locked and unmounting both restores it', {tag:'@mobile'}, async ({page}) => {
   const opener = await mount(page);
   await opener.click();
   const outer = page.getByRole('dialog', {name:'스크롤 잠금 시험', exact:true});
@@ -88,7 +88,7 @@ test('nested modal closing keeps the page locked and unmounting both restores it
   expect((await state(page)).bodyOverflow).toBe('visible');
 });
 
-test('short pages do not gain an empty scrollbar gutter when a modal opens', async ({page}) => {
+test('short pages do not gain an empty scrollbar gutter when a modal opens', {tag:'@mobile'}, async ({page}) => {
   const opener = await mount(page);
   await page.evaluate(() => {
     document.documentElement.style.overflowY='auto';

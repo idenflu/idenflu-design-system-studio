@@ -43,7 +43,7 @@ test('Layout introduces the sidebar workspace and opens the sample in a new tab'
   await expect(opened.locator('.docs-layout')).toHaveCount(0);
 });
 
-test('tree navigation opens unique tabs, preserves state, and closes to the adjacent screen',async({page,isMobile})=>{
+test('tree navigation opens unique tabs, preserves state, and closes to the adjacent screen',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   await enableColumnFilters(panel(page));
   await panel(page).getByRole('textbox',{name:'프로젝트 필터',exact:true}).fill('디자인 시스템');
@@ -221,7 +221,7 @@ test('project deletion previews three items and deletes the full selection',asyn
   await expect(panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true}).getByRole('button',{name:'삭제',exact:true})).toBeDisabled();
 });
 
-test('project creation validates input and opens the newly created detail tab',async({page,isMobile})=>{
+test('project creation validates input and opens the newly created detail tab',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   await panel(page).getByRole('button',{name:'새 프로젝트',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'새 프로젝트',exact:true});
@@ -267,7 +267,7 @@ test('member invitation validates and submits through the modal footer',async({p
   await expect(panel(page).getByText('new-member@example.com')).toBeVisible();
 });
 
-test('quick search opens a matching menu and tab management preserves pinned home',async({page})=>{
+test('quick search opens a matching menu and tab management preserves pinned home',{tag:'@mobile'},async({page})=>{
   await page.goto(sample);
   await page.keyboard.press('ControlOrMeta+k');
   const search=page.getByRole('dialog',{name:'빠른 검색',exact:true});
@@ -282,7 +282,7 @@ test('quick search opens a matching menu and tab management preserves pinned hom
   await expect(panel(page).getByRole('heading',{name:'대시보드',exact:true})).toBeVisible();
 });
 
-test('mobile tabs show the selected screen and allow switching from the open tabs menu',async({page})=>{
+test('mobile tabs show the selected screen and allow switching from the open tabs menu',{tag:['@mobile','@mobile-only']},async({page})=>{
   await page.goto(sample);
   await page.setViewportSize({width:390,height:844});
   await navigate(page,'워크스페이스 설정',true);
@@ -316,7 +316,7 @@ test('opening one notification leaves the others unread',async({page})=>{
   await expect(page.getByRole('button',{name:'업무 알림 2개',exact:true})).toBeVisible();
 });
 
-test('mobile Drawer restores focus and active tabs stay visible after resizing',async({page})=>{
+test('mobile Drawer restores focus and active tabs stay visible after resizing',{tag:['@mobile','@mobile-only']},async({page})=>{
   await page.goto(sample);
   await page.setViewportSize({width:320,height:740});
   const menu=page.getByRole('button',{name:'메뉴 열기',exact:true});
@@ -329,7 +329,7 @@ test('mobile Drawer restores focus and active tabs stay visible after resizing',
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
 });
 
-test('project grids fill the content height and keep scrolling inside the rows',async({page,isMobile})=>{
+test('project grids fill the content height and keep scrolling inside the rows',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   const assertGridFit=async()=>{
     await expect.poll(()=>panel(page).evaluate(element=>{
@@ -376,7 +376,7 @@ test('project grids fill the content height and keep scrolling inside the rows',
   await assertGridFit();
 });
 
-test('project filter popups escape clipping and stay within the viewport',async({page})=>{
+test('project filter popups escape clipping and stay within the viewport',{tag:'@mobile'},async({page})=>{
   await page.goto(sample);
   const assertFixedPopup=async trigger=>{
     await trigger.click();
@@ -492,7 +492,7 @@ test('project column filters combine criteria, clear selections, and reset withi
   await expect(rows).toHaveCount(120);
 });
 
-test('project column filter toggle clears hidden criteria and restores an empty filter row',async({page})=>{
+test('project column filter toggle clears hidden criteria and restores an empty filter row',{tag:'@mobile'},async({page})=>{
   await page.goto(sample);
   const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
   const toggle=grid.getByRole('button',{name:'컬럼 필터',exact:true});

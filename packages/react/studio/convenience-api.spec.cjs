@@ -94,7 +94,7 @@ test('Select, SearchSelect and MultiSelect compare visible labels with hidden la
   await expect(multiple).toBeFocused();
 });
 
-test('IconButton sizes remain square and tooltips respond to hover, focus and Escape', async ({ page, isMobile }) => {
+test('IconButton sizes remain square and tooltips respond to hover, focus and Escape', {tag:'@mobile'}, async ({ page, isMobile }) => {
   await page.goto(route('buttons'));
   const section = page.locator('#icon-button-sizes');
   const dimensions = [];
@@ -142,7 +142,7 @@ test('IconButton sizes remain square and tooltips respond to hover, focus and Es
 });
 
 for (const kind of ['popover', 'menu']) {
-  test(`${kind} aligns start, center and end over legacy right CSS in both text directions and restores focus on Escape`, async ({ page }) => {
+  test(`${kind} aligns start, center and end over legacy right CSS in both text directions and restores focus on Escape`, {tag:'@mobile'}, async ({ page }) => {
     await page.goto(route(kind === 'popover' ? 'popover' : 'dropdown-menu'));
     await page.addStyleTag({ content: legacyPopupStyles });
     const section = page.locator(`#${kind}-align-demo`);
@@ -173,7 +173,7 @@ for (const kind of ['popover', 'menu']) {
   });
 }
 
-test('aligned popup examples stay inside a narrow viewport at either edge', async ({ page }) => {
+test('aligned popup examples stay inside a narrow viewport at either edge', {tag:['@mobile','@mobile-only']}, async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   for (const kind of ['popover', 'menu']) {
     await page.goto(route(kind === 'popover' ? 'popover' : 'dropdown-menu'));

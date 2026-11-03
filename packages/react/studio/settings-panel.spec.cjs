@@ -22,7 +22,7 @@ test('screen settings stay open while the visible workspace remains usable',asyn
   await expect(trigger(page)).toHaveAttribute('aria-expanded','false');
 });
 
-test('screen settings preview a color immediately and restore focus after Escape',async({page})=>{
+test('screen settings preview a color immediately and restore focus after Escape',{tag:'@theme'},async({page})=>{
   await page.goto(sample);
   await trigger(page).click();
   const primary=settings(page).getByRole('textbox',{name:'Primary HEX',exact:true});
@@ -35,7 +35,7 @@ test('screen settings preview a color immediately and restore focus after Escape
   await expect(trigger(page)).toBeFocused();
 });
 
-test('screen settings do not lock document scrolling or trap keyboard navigation',async({page})=>{
+test('screen settings do not lock document scrolling or trap keyboard navigation',{tag:'@mobile'},async({page})=>{
   await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const overflow=await page.evaluate(()=>({body:getComputedStyle(document.body).overflow,root:getComputedStyle(document.documentElement).overflow}));
   await trigger(page).click();
@@ -49,7 +49,7 @@ test('screen settings do not lock document scrolling or trap keyboard navigation
   await expect(settings(page)).toBeHidden();
 });
 
-test('screen settings fit a narrow viewport and keep their close control available',async({page})=>{
+test('screen settings fit a narrow viewport and keep their close control available',{tag:['@mobile','@mobile-only']},async({page})=>{
   await page.setViewportSize({width:320,height:740});
   await page.goto(sample);
   await trigger(page).click();

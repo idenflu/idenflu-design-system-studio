@@ -15,7 +15,7 @@ async function chooseStyle(page,current,next){
   await page.getByRole('option',{name:next,exact:true}).click();
 }
 
-test('saved side menu styles keep one tree, category search and branch state',async({page,isMobile})=>{
+test('saved side menu styles keep one tree, category search and branch state',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   const desktopTree=page.locator('.layout-workspace-sidebar .demo-tree');
   await expect(desktopTree.locator(':scope > details')).toHaveCount(3);

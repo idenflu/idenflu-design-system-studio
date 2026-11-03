@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-test('divided dialog confirms and returns focus to its opener', async ({ page }) => {
+test('divided dialog confirms and returns focus to its opener', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const opener = page.getByRole('button', { name: '구분선 타입 열기', exact: true });
   await opener.click();
@@ -15,7 +15,7 @@ test('divided dialog confirms and returns focus to its opener', async ({ page })
   await expect(page.getByText('프로젝트 상세를 확인했습니다.', { exact: true })).toBeVisible();
 });
 
-test('long divided dialog scrolls its body while header and footer stay visible', async ({ page }) => {
+test('long divided dialog scrolls its body while header and footer stay visible', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const opener = page.getByRole('button', { name: '스크롤 타입 열기', exact: true });
   await opener.click();

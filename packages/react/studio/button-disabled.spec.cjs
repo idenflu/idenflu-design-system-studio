@@ -6,7 +6,7 @@ const exampleFor=page=>page.locator('#button-disabled-states');
 const groupFor=(page,value)=>exampleFor(page).locator(`[data-button-variant="${value}"]`);
 const appearance=button=>button.evaluate(element=>{const s=getComputedStyle(element);return{background:s.backgroundColor,color:s.color,shadow:s.boxShadow};});
 
-test('each button variant has a distinct disabled treatment shared with its icon button',async({page})=>{
+test('each button variant has a distinct disabled treatment shared with its icon button', {tag:['@theme','@mobile']},async({page})=>{
   await page.goto(route);
   const states=[];
   for(const variant of variants){
@@ -27,7 +27,7 @@ test('each button variant has a distinct disabled treatment shared with its icon
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
 });
 
-test('disabled variants ignore hover, press and clicks and are skipped during keyboard navigation',async({page})=>{
+test('disabled variants ignore hover, press and clicks and are skipped during keyboard navigation', {tag:'@theme'},async({page})=>{
   await page.goto(route);const example=exampleFor(page),notice=example.getByRole('status');
   await groupFor(page,'primary').locator('button:not(:disabled)').click();
   await expect(notice).toHaveText('Primary 버튼을 실행했습니다.');

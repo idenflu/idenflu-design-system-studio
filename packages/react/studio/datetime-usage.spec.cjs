@@ -82,7 +82,7 @@ test('datetime usage submits canonical FormData, maps UTC payload and validates 
   await expect(page.getByRole('region', { name: '제출 결과', exact: true })).toHaveCount(0);
 });
 
-test('datetime usage code examples typecheck as standalone components and stay within the viewport', async ({ page }) => {
+test('datetime usage code examples typecheck as standalone components and stay within the viewport', {tag:'@mobile'}, async ({ page }) => {
   await page.goto(url);
   const sources = new Map();
   const root = path.resolve(__dirname, '..');

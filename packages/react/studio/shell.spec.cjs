@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const documentCount = require('./dist/navigation.json').filter(route => !/^patterns\/(layout|page)\//.test(route)).length;
 
-test('document chrome includes the original home, breadcrumb and footer', async ({ page, isMobile }) => {
+test('document chrome includes the original home, breadcrumb and footer', { tag: '@mobile' }, async ({ page, isMobile }) => {
   await page.goto('/systems/idenflu-mono/index.html#/overview');
   await expect(page).toHaveTitle('Overview — idenflu mono');
   await expect(page.getByRole('heading', {level:1})).toHaveText(/Form follows\s*function\./);
@@ -19,7 +19,7 @@ test('document chrome includes the original home, breadcrumb and footer', async 
   await expect(page.locator('#react-studio-nav a[href*="patterns/page/"]')).toHaveCount(0);
 });
 
-test('document search supports Korean aliases, Enter, Escape and the slash shortcut', async ({ page, isMobile }) => {
+test('document search supports Korean aliases, Enter, Escape and the slash shortcut', { tag: '@mobile' }, async ({ page, isMobile }) => {
   await page.goto('/systems/idenflu-mono/index.html#/overview');
   await page.keyboard.press('/');
   const search = page.getByRole('searchbox', {name:'문서 검색'});
@@ -41,7 +41,7 @@ test('document search supports Korean aliases, Enter, Escape and the slash short
   await expect(page.getByRole('link', {name:'Text fields', exact:true})).toBeVisible();
 });
 
-test('navigation remembers collapsed groups and selected links have no fill', async ({ page, isMobile }) => {
+test('navigation remembers collapsed groups and selected links have no fill', { tag: ['@theme', '@mobile'] }, async ({ page, isMobile }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   if (isMobile) await page.getByRole('button', {name:'메뉴', exact:true}).click();
   const foundations = page.locator('.nav-group').filter({has:page.locator('summary', {hasText:'Foundations'})});
@@ -58,7 +58,7 @@ test('navigation remembers collapsed groups and selected links have no fill', as
   await expect(foundations).not.toHaveAttribute('open', '');
 });
 
-test('mobile menu traps focus, dismisses on Escape and restores focus', async ({ page, isMobile }) => {
+test('mobile menu traps focus, dismisses on Escape and restores focus', { tag: ['@mobile', '@mobile-only'] }, async ({ page, isMobile }) => {
   test.skip(!isMobile, '모바일 메뉴 동작');
   await page.goto('/systems/idenflu-mono/index.html#/overview');
   const trigger = page.getByRole('button', {name:'메뉴', exact:true});
@@ -81,7 +81,7 @@ test('mobile menu traps focus, dismisses on Escape and restores focus', async ({
   await expect(page.locator('.sidebar')).toHaveJSProperty('inert', true);
 });
 
-test('TOC and document pagination move focus and use the visible menu order', async ({ page }) => {
+test('TOC and document pagination move focus and use the visible menu order', { tag: '@mobile' }, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const link = page.getByRole('navigation', {name:'이 페이지 목차'}).getByRole('link', {name:'아이콘과 입력 보조'});
   await link.click();

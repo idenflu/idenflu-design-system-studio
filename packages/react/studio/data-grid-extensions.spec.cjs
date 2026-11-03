@@ -25,7 +25,7 @@ async function expectNoOverflow(page, grid) {
   expect(await grid.locator('.data-grid-tools').evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
 }
 
-test('the extension example follows built-in tools and has its own accessible shortcut and actions', async ({page}) => {
+test('the extension example follows built-in tools and has its own accessible shortcut and actions',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const section = sectionFor(page), grid = gridFor(page), builtIn = builtInGridFor(page);
   await expect(section.getByRole('heading', {name:'상단 도구 확장',level:2,exact:true})).toBeVisible();
@@ -102,7 +102,7 @@ test('custom actions add projects, complete selected rows and reset local data, 
   await expectNoOverflow(page,grid);
 });
 
-test('the extension code is readable, keyboard reachable and scrolls inside a narrow page', async ({page,isMobile}) => {
+test('the extension code is readable, keyboard reachable and scrolls inside a narrow page',{tag:'@mobile'}, async ({page,isMobile}) => {
   await page.goto(route);
   const section = sectionFor(page);
   const code = section.getByRole('region', {name:'확장 슬롯과 상태 연결 예제',exact:true});

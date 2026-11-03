@@ -106,7 +106,7 @@ test('role permission and notification drafts survive selection changes and save
   await expect(save).toBeDisabled();
 });
 
-test('role search and cancel recover the saved associations on a narrow screen',async({page})=>{
+test('role search and cancel recover the saved associations on a narrow screen',{tag:['@mobile','@mobile-only']},async({page})=>{
   await page.setViewportSize({width:320,height:740});
   await openRoles(page,true);
   const search=panel(page).getByRole('searchbox',{name:'역할 검색',exact:true});

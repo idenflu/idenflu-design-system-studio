@@ -50,7 +50,7 @@ test('searchable multi-filters combine OR and AND, keep choices and reset to all
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
 });
 
-test('multi-filter summaries follow sm md lg sizing and fixed popups fit the viewport',async({page})=>{
+test('multi-filter summaries follow sm md lg sizing and fixed popups fit the viewport',{tag:'@mobile'},async({page})=>{
   await page.goto(route);const example=exampleFor(page),grid=gridFor(page);
   const menu=await open(grid,'담당 팀 필터');
   await menu.list.getByRole('option',{name:'프로덕트 디자인',exact:true}).click();await menu.list.getByRole('option',{name:'개발',exact:true}).click();

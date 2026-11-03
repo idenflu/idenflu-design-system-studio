@@ -133,34 +133,20 @@ test('live adjustments change rendered controls, persist on reload and copy curr
   expect(expectedCss).toContain('--control-base-height: 44px');
 });
 
-test('preference API rejects invalid types, clamps linked values and tolerates corrupt storage', async ({ page }) => {
+test('corrupt stored preferences recover to rendered defaults', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
   await page.addInitScript((key) => {
     if (localStorage.getItem(key) === null) localStorage.setItem(key, '{invalid JSON');
   }, storageKey);
   await openApp(page);
   expect(await preferences(page)).toEqual(defaults);
-  const ignored = await page.evaluate(() => {
-    const api = window.IdenfluPreferences;
-    api.set(null);
-    api.set([]);
-    return api.set({ fontSize: '18', lineHeight: null, spacing: Infinity, controlHeight: NaN, radius: {}, unknown: 20 });
-  });
-  expect(ignored).toEqual(defaults);
-  const clamped = await page.evaluate(() => window.IdenfluPreferences.set({ fontSize: 99, lineHeight: 1, spacing: 149, controlHeight: 31, radius: 99 }));
-  expect(clamped).toEqual({ fontSize: 18, lineHeight: 22, spacing: 150, controlHeight: 36, radius: 12 });
-  const snapshot = await page.evaluate(() => {
-    const api = window.IdenfluPreferences;
-    const value = api.get();
-    value.fontSize = -1000;
-    return api.get();
-  });
-  expect(snapshot).toEqual(clamped);
-  for (const value of ['null', '[]', '{"fontSize":"18","lineHeight":null,"spacing":"150","controlHeight":"48","radius":"12"}']) {
-    await page.evaluate(({ key, value }) => localStorage.setItem(key, value), { key: storageKey, value });
-    await page.reload();
-    await page.waitForFunction(() => Boolean(window.IdenfluPreferences));
-    expect(await preferences(page), value).toEqual(defaults);
-  }
+  const rendered = await metrics(page);
+  expect(rendered.bodyFont).toBe(14);
+  expect(rendered.buttonHeight).toBe(36);
+  await openSettings(page);
+  await expectRanges(page, defaults);
+  expect(errors).toEqual([]);
 });
 
 test('storage failures retain in-memory adjustments and report an unsaved preference event', async ({ page }) => {
@@ -207,6 +193,7 @@ test('reset restores defaults without losing theme, form edits or validation sta
   await page.locator('#studio-settings-dialog').getByRole('button', {name:'초기화',exact:true}).click();
   expect(await preferences(page)).toEqual(defaults);
   await expectRanges(page, defaults);
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--font-size-base').trim())).toBe('14px');
   expect(await page.evaluate((key) => localStorage.getItem(key), storageKey)).toBeNull();
   expect(await page.evaluate(() => ({ current: document.documentElement.dataset.theme, saved: localStorage.getItem('idenflu-mono-theme') }))).toEqual(theme);
   await expect(page.getByRole('textbox', {name:'이름 필수',exact:true})).toHaveValue('편집 중인 사용자');
@@ -219,7 +206,7 @@ test('reset restores defaults without losing theme, form edits or validation sta
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(theme.current);
 });
 
-test('settings support keyboard adjustment, nonmodal focus and Escape return', async ({ page }) => {
+test('settings support keyboard adjustment, nonmodal focus and Escape return', {tag:'@mobile'}, async ({ page }) => {
   await openApp(page);
   const opener = page.getByRole('button', {name:'화면 조정',exact:true});
   await opener.focus();
@@ -249,7 +236,7 @@ test('settings support keyboard adjustment, nonmodal focus and Escape return', a
   await expect(page.getByRole('button', {name:'화면 조정',exact:true})).toBeFocused();
 });
 
-test('largest preferences remain usable across every route and settings controls at 320px', async ({ page }, testInfo) => {
+test('largest preferences remain usable across every route and settings controls at 320px', {tag:['@mobile','@mobile-only']}, async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await openApp(page);
   await page.evaluate(() => window.IdenfluPreferences.set({ fontSize: 18, lineHeight: 32, spacing: 150, controlHeight: 48, radius: 12 }));

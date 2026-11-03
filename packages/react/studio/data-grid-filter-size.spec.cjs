@@ -67,7 +67,7 @@ async function expectScrollbarFitsHeader(grid) {
   })).toBeLessThan(2);
 }
 
-test('column filters follow toolbar size while retaining their conditions, sorting and row density', async ({page}) => {
+test('column filters follow toolbar size while retaining their conditions, sorting and row density',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const example = page.locator('#data-grid-toolbar-demo');
   const grid = example.getByRole('group', {name:'상단 도구 모음 데이터그리드',exact:true});
@@ -113,7 +113,7 @@ test('column filters follow toolbar size while retaining their conditions, sorti
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
-test('virtual-grid text, select and number filters share small sizing without disrupting the scroll viewport', async ({page}) => {
+test('virtual-grid text, select and number filters share small sizing without disrupting the scroll viewport',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid = page.getByRole('group', {name:'대용량 데이터그리드',exact:true});
   await grid.scrollIntoViewIfNeeded();

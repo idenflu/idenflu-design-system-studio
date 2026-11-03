@@ -17,7 +17,7 @@ async function colors(toast) {
   });
 }
 
-test('solid toast variants color the whole background and provide matching status icons', async ({page})=>{
+test('solid toast variants color the whole background and provide matching status icons', {tag:['@theme','@mobile']}, async ({page})=>{
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const backgrounds=new Set();
   for(const [name,variant,icon] of [['성공','success','check-circle'],['안내','info','info'],['주의','warning','warning'],['오류','danger','warning-fill']]) {
@@ -45,7 +45,7 @@ test('solid toast variants color the whole background and provide matching statu
   expect(backgrounds.size).toBe(4);
 });
 
-test('solid retry retains the appearance and undo restores the archived example',async({page,isMobile})=>{
+test('solid retry retains the appearance and undo restores the archived example', {tag:['@theme','@mobile']},async({page,isMobile})=>{
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const error=page.getByRole('button',{name:'오류 배경 토스트',exact:true});
   await error.click();
@@ -76,7 +76,7 @@ test('solid retry retains the appearance and undo restores the archived example'
   await expect(page.getByText('초안 문서 · 목록에 표시 중',{exact:true})).toBeVisible();
 });
 
-test('solid toast text and controls remain readable with custom status colors and forced colors',async({page})=>{
+test('solid toast text and controls remain readable with custom status colors and forced colors', {tag:'@theme'},async({page})=>{
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   await page.evaluate(()=>{
     const theme=document.documentElement.dataset.theme;

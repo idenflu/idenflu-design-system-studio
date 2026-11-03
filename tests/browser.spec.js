@@ -8,15 +8,15 @@ const newOutlineNames = ['home', 'folder', 'edit', 'save', 'external-link', 'ref
 const newFilledNames = ['home', 'folder', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'users', 'shield-check', 'dashboard', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle'].map(name => `${name}-fill`);
 const newIconNames = [...newOutlineNames, ...newFilledNames];
 
-test('every route has one heading and no page overflow', async ({ page }, testInfo) => {
+test('every route has one heading and no page overflow', {tag:'@mobile'}, async ({ page }, testInfo) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/systems/idenflu-mono/index.html#/overview');
-  const routes = documents.map(item => item.route);
-  for (const route of routes) {
+  for (const {route, title} of documents) {
     await page.evaluate((value) => { location.hash = `#/${value}`; }, route);
     await expect(page.locator(`[data-route="${route}"]`)).toBeVisible();
     await expect(page.locator('h1:visible')).toHaveCount(1);
+    await expect(page.getByRole('heading', {level:1})).toHaveText(route === 'overview' ? /Form follows\s*function\./ : title);
     const dimensions = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
     expect(dimensions.scroll, route).toBeLessThanOrEqual(dimensions.width);
   }
@@ -136,7 +136,7 @@ for (const prefix of ['', '/dist']) {
 }
 
 for (const prefix of ['', '/dist']) {
-  test(`root gallery opens the current mono components (${prefix || 'dev'})`, async ({page,isMobile}) => {
+  test(`root gallery opens the current mono components (${prefix || 'dev'})`, {tag:'@mobile'}, async ({page,isMobile}) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${prefix}/index.html`);

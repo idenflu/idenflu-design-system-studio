@@ -24,7 +24,7 @@ test('display chips have no hover or focus behavior', async ({page}) => {
   await expect(page.locator('.docs-toc a').last()).toBeFocused();
 });
 
-test('rounded chips and all six colors retain keyboard selection and readable contrast', async ({page}) => {
+test('rounded chips and all six colors retain keyboard selection and readable contrast', {tag:'@theme'}, async ({page}) => {
   await page.goto(url);
   const round = page.getByRole('button',{name:'라운드 선택',exact:true});
   await round.focus();
@@ -61,7 +61,7 @@ test('rounded chips and all six colors retain keyboard selection and readable co
   }
 });
 
-test('chip sizes and longest labels fit mobile at the largest preferences', async ({page}) => {
+test('chip sizes and longest labels fit mobile at the largest preferences', {tag:['@mobile','@mobile-only']}, async ({page}) => {
   await page.setViewportSize({width:320,height:740});
   await page.goto(url);
   const sizes = section(page,'사이즈');
@@ -153,7 +153,7 @@ test('chip focus and selected colors respect forced-color system settings', asyn
 });
 
 
-test('compact display chips preserve comfortable sizes and fit dense mobile content', async ({page}) => {
+test('compact display chips preserve comfortable sizes and fit dense mobile content', {tag:['@mobile','@mobile-only']}, async ({page}) => {
   await page.setViewportSize({width:320,height:740});
   await page.goto(url);
   const compact = section(page,'컴팩트 표시용 칩');

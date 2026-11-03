@@ -38,7 +38,7 @@ test('number prefix examples keep keyboard steps and units', async ({ page }) =>
   await expect(days).toHaveAttribute('aria-valuetext', '2.5 일');
 });
 
-test('Divider is discoverable in Korean and its examples fit the viewport', async ({ page }) => {
+test('Divider is discoverable in Korean and its examples fit the viewport', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/overview');
   await page.keyboard.press('/');
   const search = page.getByRole('searchbox', {name:'문서 검색'});
@@ -109,7 +109,7 @@ test('select examples show option descriptions and decorative icons while choosi
   await expect(tag).toHaveCount(0);
 });
 
-test('project dialog rejects whitespace and creates a named project with dismissible feedback', async ({ page }) => {
+test('project dialog rejects whitespace and creates a named project with dismissible feedback', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   await page.getByRole('button', {name:'다이얼로그 열기', exact:true}).click();
   const dialog = page.getByRole('dialog', {name:'새 프로젝트', exact:true});
@@ -201,7 +201,7 @@ test('project tabs skip unavailable categories during keyboard navigation', asyn
   await expect(active).toHaveAttribute('aria-selected', 'true');
 });
 
-test('vertical tabs keep their side by side layout and support keyboard navigation', async ({ page }) => {
+test('vertical tabs keep their side by side layout and support keyboard navigation', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/tabs');
   const list = page.getByRole('tablist', {name:'워크스페이스 세로 설정', exact:true});
   await expect(list).toHaveAttribute('aria-orientation', 'vertical');

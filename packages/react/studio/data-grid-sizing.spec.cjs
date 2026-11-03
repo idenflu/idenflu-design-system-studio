@@ -24,7 +24,7 @@ async function waitForResponsiveSizing(grid) {
   }).toBe(true);
 }
 
-test('percentage and flex columns respond to preview width while retaining pixel constraints', async ({page}) => {
+test('percentage and flex columns respond to preview width while retaining pixel constraints',{tag:'@mobile'}, async ({page}) => {
   await page.goto(route);
   const grid = sizingGrid(page);
   await previewMode(page,'720px').click();
@@ -64,7 +64,7 @@ test('manual column widths stay fixed across preview changes and reset with Ente
   await expect(separator).toHaveAccessibleDescription(/Enter 또는 더블클릭/);
 });
 
-test('hidden columns release flexible space and pinned offsets survive narrow horizontal scrolling', async ({page,isMobile}) => {
+test('hidden columns release flexible space and pinned offsets survive narrow horizontal scrolling',{tag:'@mobile'}, async ({page,isMobile}) => {
   await page.goto(route);
   const grid = sizingGrid(page);
   await previewMode(page,'720px').click();
