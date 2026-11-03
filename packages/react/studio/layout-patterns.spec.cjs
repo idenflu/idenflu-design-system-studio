@@ -71,12 +71,28 @@ test('tree groups can be collapsed while searching without changing the saved na
   await expect(nav.locator('details').filter({hasText:'프로젝트 관리'}).last()).toHaveAttribute('open','');
 });
 
-test('project details open in a tab and update other open screens',async({page,isMobile})=>{
+test('project detail opens in a dialog, preserves the list, and reuses its tab',async({page,isMobile})=>{
   await page.goto(sample);
+  await panel(page).getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('디자인 시스템');
   await panel(page).getByRole('button',{name:/디자인 시스템 v2/}).click();
+  const dialog=page.getByRole('dialog',{name:'프로젝트 상세',exact:true});
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('디자인 시스템 v2');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(panel(page).getByRole('searchbox',{name:'프로젝트 검색',exact:true})).toHaveValue('디자인 시스템');
+  await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveCount(0);
+  await panel(page).getByRole('button',{name:/디자인 시스템 v2/}).click();
+  await dialog.getByRole('button',{name:'새 탭으로 열기',exact:true}).click();
+  await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveAttribute('aria-selected','true');
   await panel(page).getByRole('button',{name:'완료로 표시',exact:true}).click();
   await expect(panel(page).getByRole('combobox',{name:'프로젝트 상태: 완료',exact:true})).toBeVisible();
+  await navigate(page,'전체 프로젝트',isMobile);
+  await panel(page).getByRole('button',{name:/디자인 시스템 v2/}).click();
+  await dialog.getByRole('button',{name:'새 탭으로 열기',exact:true}).click();
+  await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveCount(1);
+  await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveAttribute('aria-selected','true');
   await page.getByRole('tab',{name:'디자인 시스템 v2',exact:true}).focus();
   await page.keyboard.press('Delete');
   await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveCount(0);
@@ -92,11 +108,9 @@ test('bulk selection clears when a project leaves the current list',async({page,
   await row.getByRole('checkbox').check();
   await expect(panel(page).locator('.data-grid-selection-count')).toContainText('1개 선택됨');
   await row.getByRole('button',{name:/디자인 시스템 v2/}).click();
-  await panel(page).getByRole('button',{name:'완료로 표시',exact:true}).click();
-  if(isMobile){
-    await page.getByRole('button',{name:'열린 탭 메뉴',exact:true}).click();
-    await page.getByRole('menuitem',{name:'진행 중 프로젝트',exact:true}).click();
-  }else await page.getByRole('tab',{name:'진행 중 프로젝트',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'프로젝트 상세',exact:true});
+  await dialog.getByRole('button',{name:'완료로 표시',exact:true}).click();
+  await page.keyboard.press('Escape');
   await expect(panel(page).locator('.data-grid-selection')).toHaveCount(0);
 });
 
@@ -190,6 +204,7 @@ test('project overview card keeps its content height beside taller properties',a
   test.skip(isMobile);
   await page.goto(sample);
   await panel(page).getByRole('button',{name:/디자인 시스템 v2/}).click();
+  await page.getByRole('dialog',{name:'프로젝트 상세',exact:true}).getByRole('button',{name:'새 탭으로 열기',exact:true}).click();
   const overview=await panel(page).locator('.layout-project-overview').boundingBox();
   const properties=await panel(page).locator('.layout-project-properties').boundingBox();
   expect(overview).not.toBeNull();

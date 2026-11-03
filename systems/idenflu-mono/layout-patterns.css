@@ -127,7 +127,7 @@
 .layout-page-heading > div > p:last-child { color:var(--text-secondary); font-size:max(10px,calc(var(--font-size-base) - 1px)); }
 .layout-filter-panel { display:flex; align-items:end; flex-wrap:wrap; gap:var(--space-3); padding:var(--space-4); margin-bottom:var(--space-5); border:1px solid var(--border); background:var(--field-background); }
 .layout-filter-panel > div { width:180px; }
-.layout-sample-app .field-label { font-size:max(10px,calc(var(--font-size-base) - 3px)); }
+.layout-sample-app .field-label { font-size:max(12px,calc(var(--font-size-base) - 2px)); }
 .layout-sample-app .data-grid-table { min-width:100%; }
 .layout-project-link { display:grid; gap:var(--space-1); max-width:100%; padding:0; border:0; background:transparent; color:var(--text); text-align:start; }
 .layout-project-link:hover { color:var(--primary); }
@@ -140,6 +140,11 @@
 .layout-progress-cell .progress-bar { width:76px; min-width:50px; height:4px; }
 .layout-progress-cell > span { font-size:max(10px,calc(var(--font-size-base) - 3px)); }
 .layout-content-caption { margin-top:var(--space-4); font-size:max(10px,calc(var(--font-size-base) - 2px)); color:var(--text-secondary); }
+@media (min-width:601px) {
+  .layout-page-content:has(> .data-grid) > .layout-filter-panel { padding:var(--space-3) var(--space-4); margin-bottom:var(--space-3); }
+  .layout-page-content:has(> .data-grid) :is(.layout-project-link small,.layout-progress-cell > span,.layout-content-caption) { font-size:max(12px,calc(var(--font-size-base) - 2px)); }
+  .layout-page-content:has(> .data-grid) .layout-project-link small { line-height:var(--line-height-caption); }
+}
 .layout-panel { padding:var(--space-6); border:1px solid var(--border); background:var(--field-background); min-width:0; }
 .layout-panel h2 { font-size:calc(var(--font-size-base) + 2px); font-weight:var(--font-weight-semibold); }
 .layout-panel p { color:var(--text-secondary); }
@@ -173,8 +178,9 @@
 .layout-detail-note > .ui-icon { flex:none; width:16px; height:16px; }
 .layout-project-overview > .button { margin-top:0; }
 .layout-project-properties { display:grid; align-content:start; gap:var(--space-5); }
-.layout-master-detail { display:grid; grid-template-columns:minmax(260px,320px) minmax(0,1fr); align-items:start; gap:var(--space-5); }
+.layout-master-detail { display:grid; grid-template-columns:minmax(240px,min(34%,320px)) minmax(0,1fr); align-items:start; gap:var(--space-5); }
 .layout-master-panel, .layout-master-detail-panel { min-width:0; border:1px solid var(--border); background:var(--field-background); }
+.layout-master-detail-panel { container:layout-master-detail / inline-size; }
 .layout-master-toolbar { display:grid; gap:var(--space-4); padding:var(--space-5); border-bottom:1px solid var(--divider); }
 .layout-master-toolbar h2, .layout-master-content h3 { font-size:var(--font-size-body); font-weight:var(--font-weight-semibold); }
 .layout-master-list { max-height:clamp(160px,calc(100dvh - 440px),640px); overflow-y:auto; overscroll-behavior:contain; }
@@ -199,6 +205,7 @@
 .layout-master-properties { padding-top:var(--space-5); }
 .layout-master-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-5); margin-top:var(--space-5); }
 .layout-master-fields > * { min-width:0; }
+@container layout-master-detail (max-width:560px) { .layout-master-fields { grid-template-columns:minmax(0,1fr); } }
 @media (max-width:900px) { .layout-master-detail { grid-template-columns:minmax(0,1fr); } .layout-master-list { max-height:320px; } }
 @media (max-width:600px) { .layout-master-fields { grid-template-columns:minmax(0,1fr); } .layout-master-content { padding:var(--space-4); } }
 .layout-member-filters { display:flex; align-items:end; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-5); }
@@ -225,6 +232,8 @@
 .layout-project-form-row > * { min-width:0; }
 .layout-sample-app ~ dialog, .layout-sample-app dialog { font-family:inherit; }
 .layout-command-dialog { width:min(560px,calc(100% - 32px)); padding:0; }
+.dialog.layout-project-create-dialog { width:min(520px,calc(100% - 32px)); }
+.dialog.layout-project-detail-dialog { width:min(920px,calc(100% - 48px)); }
 .layout-command-dialog .dialog-body { max-height:min(64dvh,560px); overflow:auto; }
 .layout-command-dialog .field-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 .layout-command-results { margin-top:var(--space-4); }

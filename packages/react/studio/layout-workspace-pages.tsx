@@ -11,9 +11,9 @@ export function ProjectForm({id,onCreate}: {id:string;onCreate:(draft:ProjectDra
   const [due,setDue]=React.useState<DateValue>('2026-11-20'),[error,setError]=React.useState('');
   const input=React.useRef<HTMLInputElement>(null);
   return <form id={id} className="layout-project-form" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('프로젝트 이름을 입력해주세요.');input.current?.focus();return;}if(!event.currentTarget.reportValidity())return;onCreate({name:name.trim(),team,description:description.trim(),due:due??'미정'});}}>
-    <TextField ref={input} label="프로젝트 이름" value={name} onChange={event=>{setName(event.target.value);setError('');}} required error={error||undefined} placeholder="예: 고객 경험 개선" maxLength={60}/>
+    <TextField ref={input} label={<>프로젝트 이름 <span className="form-pattern-required" aria-hidden="true">필수</span></>} prefix={<Icon name="folder"/>} prefixDecorative value={name} onChange={event=>{setName(event.target.value);setError('');}} required error={error||undefined} placeholder="예: 고객 경험 개선" maxLength={60}/>
     <TextArea label="프로젝트 설명" rows={3} value={description} onChange={event=>setDescription(event.target.value)} placeholder="목표와 작업 범위를 간단히 적어주세요."/>
-    <div className="layout-project-form-row"><Select label="담당 팀" value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><DatePicker label="목표 마감일" value={due} onValueChange={setDue}/></div>
+    <div className="layout-project-form-row"><Select label="담당 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><DatePicker label="목표 마감일" value={due} onValueChange={setDue}/></div>
   </form>;
 }
 
@@ -21,9 +21,9 @@ export function InviteMemberForm({id,onInvite,existingEmails}: {id:string;onInvi
   const [name,setName]=React.useState(''),[email,setEmail]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[role,setRole]=React.useState('편집자');
   const [error,setError]=React.useState('');
   return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,roles:[role]});}}>
-    <TextField label="이름" value={name} onChange={event=>setName(event.target.value)} required pattern=".*\S.*" autoFocus/>
-    <TextField label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
-    <Select label="소속 팀" value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" value={role} options={roles} onValueChange={setRole} popupStrategy="fixed"/>
+    <TextField label="이름" prefix={<Icon name="person"/>} prefixDecorative value={name} onChange={event=>setName(event.target.value)} required pattern=".*\S.*" autoFocus/>
+    <TextField label="이메일" type="email" prefix={<Icon name="mail"/>} prefixDecorative value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
+    <Select label="소속 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" prefixIcon={<Icon name="shield-check"/>} value={role} options={roles} onValueChange={setRole} popupStrategy="fixed"/>
     <p className="component-helper">샘플 멤버 목록에 추가하며 실제 초대 메일은 전송하지 않습니다.</p>
   </form>;
 }
@@ -67,7 +67,7 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
     <div className="layout-filter-panel"><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]}/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]}/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setQuery('');}}>필터 초기화</Button></div>
     <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={10} pageSizeOptions={[10,20,50]} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button>} exportable exportFileName="workspace-projects.csv"/>
-    <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 화면이 새 콘텐츠 탭으로 열립니다.</p>
+    <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 정보를 확인할 수 있습니다.</p>
   </>;
 }
 
@@ -107,8 +107,14 @@ export function HomePage({projects,members,onOpen,onPage}: {projects:Project[];m
 
 export function ProjectDetailPage({project,members,onUpdate,onPage}: {project:Project;members:Member[];onUpdate:(id:string,patch:Partial<Project>)=>void;onPage:(page:WorkspacePage)=>void}){
   return <><WorkspacePageHeader title={project.name} description={project.id} eyebrow="PROJECT DETAIL" action={<Button variant="outline" onClick={()=>onPage('projects')}><Icon name="arrow-left"/>프로젝트 목록</Button>}/>
+    <ProjectDetailContent project={project} members={members} onUpdate={onUpdate}/>
+  </>;
+}
+
+export function ProjectDetailContent({project,members,onUpdate}: {project:Project;members:Member[];onUpdate:(id:string,patch:Partial<Project>)=>void}){
+  return <>
     <div className="layout-detail-columns"><section className="layout-panel layout-project-overview"><div className="layout-panel-title"><h2>프로젝트 개요</h2><Badge variant={badgeVariant(project.status)}>{project.status}</Badge></div><p>{project.description||'프로젝트 설명이 없습니다.'}</p><div className="layout-detail-progress"><div><span>전체 진행률</span><strong>{project.progress}%</strong></div><Progress value={project.progress} max={100} aria-label="프로젝트 전체 진행률"/></div><div className="layout-detail-note"><Icon name="info"/><p>속성을 변경하면 프로젝트 목록과 다른 열린 화면에 함께 반영됩니다.</p></div><Button disabled={project.status==='완료'} onClick={()=>onUpdate(project.id,{status:'완료',progress:100})}><Icon name="check"/>{project.status==='완료'?'완료된 프로젝트':'완료로 표시'}</Button></section>
-      <aside className="layout-panel layout-project-properties" aria-label="프로젝트 속성"><h2>프로젝트 속성</h2><Select label="프로젝트 상태" value={project.status} options={statuses} onValueChange={status=>onUpdate(project.id,{status,...(status==='완료'?{progress:100}:{})})}/><Select label="담당 팀" value={project.team} options={teams} onValueChange={team=>onUpdate(project.id,{team})}/><Select label="담당자" value={project.owner} options={members.map(member=>({value:member.name,label:member.name}))} onValueChange={owner=>onUpdate(project.id,{owner})}/><DatePicker label="목표 마감일" value={project.due==='미정'?null:project.due} onValueChange={due=>onUpdate(project.id,{due:due??'미정'})}/><NumberField label="진행률" value={String(project.progress)} min="0" max="100" step="5" unit="%" required onValueChange={value=>onUpdate(project.id,{progress:Number(value)})}/></aside></div>
+      <aside className="layout-panel layout-project-properties" aria-label="프로젝트 속성"><h2>프로젝트 속성</h2><Select label="프로젝트 상태" value={project.status} options={statuses} popupStrategy="fixed" onValueChange={status=>onUpdate(project.id,{status,...(status==='완료'?{progress:100}:{})})}/><Select label="담당 팀" value={project.team} options={teams} popupStrategy="fixed" onValueChange={team=>onUpdate(project.id,{team})}/><Select label="담당자" value={project.owner} options={members.map(member=>({value:member.name,label:member.name}))} popupStrategy="fixed" onValueChange={owner=>onUpdate(project.id,{owner})}/><DatePicker label="목표 마감일" value={project.due==='미정'?null:project.due} onValueChange={due=>onUpdate(project.id,{due:due??'미정'})}/><NumberField label="진행률" value={String(project.progress)} min="0" max="100" step="5" unit="%" required onValueChange={value=>onUpdate(project.id,{progress:Number(value)})}/></aside></div>
   </>;
 }
 
