@@ -272,65 +272,9 @@ const saveXlsx = async () => {
 };
 // <button type="button" onClick={saveXlsx}>Excel 저장</button>`;
 
-const toolbarExample = `import { useState } from 'react';
-import {
-  Button, DataGrid, Icon, IconButton, type DataGridColumn, type DataGridToolbarItem,
-} from '@idenflu/mono-react';
-import '@idenflu/mono-react/styles.css';
-
-type Task = { id: string; name: string };
-const initialRows: Task[] = [
-  { id: 't1', name: '문서 작성' }, { id: 't2', name: '검토' },
-];
-const columns: DataGridColumn<Task>[] = [
-  { id: 'id', header: 'ID', accessor: row => row.id },
-  { id: 'name', header: '작업', accessor: row => row.name, filter: 'text' },
-];
-// 일부만 지정해도 됩니다. 나머지는 기본 순서로 뒤에 붙습니다.
-const toolbarOrder: readonly DataGridToolbarItem[] = ['actions', 'export'];
-
-// 새로고침·작업 추가·선택 삭제는 호출 측에서 직접 구현하는 사용자 정의 작업입니다.
-export function ToolbarGrid({ loading = false }: { loading?: boolean }) {
-  const [rows, setRows] = useState(initialRows);
-  const [density, setDensity] = useState<'default' | 'compact'>('default');
-  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
-  const reload = () => {
-    // 예시는 초기 데이터를 복원합니다. 실제 앱에서는 조회 함수를 연결하세요.
-    setRows(initialRows);
-    setSelectedRowIds([]);
-  };
-  const removeSelected = () => {
-    setRows(current => current.filter(row => !selectedRowIds.includes(row.id)));
-    setSelectedRowIds([]);
-  };
-
-  // 컬럼 필터를 켠 뒤 작업 필터를 입력하면 필터 초기화가 표시됩니다.
-  // 행을 선택하면 선택 삭제·선택 행 CSV/Excel·선택 해제가 표시됩니다.
-  return <DataGrid label="작업 목록" rows={rows} columns={columns}
-    getRowId={row => row.id} getRowLabel={row => row.name} loading={loading}
-    density={density} onDensityChange={setDensity}
-    toolbarSize="sm" toolbarOrder={toolbarOrder}
-    showColumnFilterToggle showDensityToggle showColumnVisibility
-    searchable searchLabel="작업 검색"
-    exportable exportFormats={['csv', 'xlsx']} exportFileName="tasks.csv"
-    toolbarActions={<>
-      <IconButton label="새로고침" variant="outline" disabled={loading}
-        onClick={reload}><Icon name="refresh" /></IconButton>
-      <Button disabled={loading} onClick={() => setRows(current => [
-        ...current, { id: crypto.randomUUID(), name: '새 작업' },
-      ])}><Icon name="plus" />작업 추가</Button>
-    </>}
-    selectable selectedRowIds={selectedRowIds}
-    onSelectedRowIdsChange={setSelectedRowIds}
-    selectionActions={<Button variant="danger" disabled={loading}
-      onClick={removeSelected}>선택 삭제</Button>} />;
-}
-
-// 비제어 밀도는 density/onDensityChange 대신 defaultDensity="compact"로 시작합니다.`;
-
 export function DataGridReferenceLinks() {
   const links = [
-    ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
+    ['data-grid-extensions', '확장 예제'], ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
     ['data-grid-columns', '열·타입'],
     ['data-grid-events', '이벤트·상태 연결'], ['data-grid-styles', '스타일'],
     ['data-grid-behavior', '동작·CSV'],
@@ -393,8 +337,7 @@ export function DataGridReference() {
       <p className="studio-grid-reference-notes">DataGridToolbarItem은 위 8개 문자열의 유니언 타입이며 패키지에서 내보냅니다. 예제에서 컬럼 필터를 켜고 값을 입력하면 필터 초기화가 나타나고, 행을 선택하면 선택 행 CSV·선택 해제가 나타납니다.</p>
       <p className="studio-grid-reference-notes">toolbarSize는 행 밀도와 푸터 크기에 영향을 주지 않습니다. 표시 열 팝업 안의 도구는 md를 유지합니다. toolbarOrder는 selection과 actions 묶음 전체를 이동하며, 추가 버튼 각각의 순서는 JSX 순서로 지정합니다.</p>
       <p className="studio-grid-reference-notes">추가한 버튼은 loading·error에서도 자동으로 비활성화되지 않습니다. 각 버튼의 disabled와 오류 처리를 직접 연결하세요. 내장 CSV 내보내기 완료 전용 콜백과 열 표시 변경 콜백은 제공하지 않습니다. CSV 저장을 직접 처리하려면 아래 독립 CSV API를 사용하세요.</p>
-      <p className="studio-grid-reference-notes">다음 코드는 toolbarActions와 selectionActions 확장 슬롯의 사용 예입니다. 새로고침·작업 추가·선택 삭제의 처리 함수는 호출 측에서 직접 구현하며, DataGrid 내장 API로 제공하는 작업이 아닙니다.</p>
-      <CodeExample title="사용자 정의 도구 확장과 크기·순서 설정">{toolbarExample}</CodeExample>
+      <p className="studio-grid-reference-notes">상단 도구 확장 섹션에서 toolbarActions·selectionActions의 동작 예제와 상태 연결 코드를 확인하세요. 업무 동작은 호출 측에서 직접 구현합니다.</p>
     </Section>
 
     <Section id="data-grid-columns" title="열과 관련 타입" className="studio-grid-reference" description="화면의 표현은 cell로, 검색·정렬·필터·편집·CSV의 원시 값은 accessor로 구분합니다.">
