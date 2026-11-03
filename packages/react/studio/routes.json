@@ -98,6 +98,13 @@
     "searchTerms": "날짜 달력 기간 예약 date calendar"
   },
   {
+    "route": "components/time-picker",
+    "title": "Time picker",
+    "group": "Components",
+    "description": "시간을 직접 입력하거나 시·분 목록에서 선택합니다.",
+    "searchTerms": "시간 시각 시 분 타임 피커 time picker HH:mm 알림 예약 minute step 속성 이벤트 스타일"
+  },
+  {
     "route": "components/datetime-picker",
     "title": "Datetime picker",
     "group": "Components",

@@ -5,6 +5,7 @@ import { Section } from './demo-layout';
 import { ColorDemos } from './color-demos';
 import { TextFields, SelectDemos, NumberDemos, DateDemos } from './form-demos';
 import { DateTimeDemos } from './datetime-demos';
+import { TimePickerDemos, timePickerUsage } from './time-picker-demos';
 import { DateTimeUsageExamples } from './datetime-usage-examples';
 import { IconDemos, TypographyDemos, SizeDemos, StateDemos } from './foundation-demos';
 import { TabsDemos, FeedbackDemos, AccordionDemos, OverlayDemos, TooltipDemos, CardDemos } from './content-demos';
@@ -18,6 +19,7 @@ import { DataGridDemos, dataGridUsage } from './data-grid-demos';
 import icons from './dist/icons.json';
 
 const snippets: Record<string, string> = {
+  'components/time-picker': timePickerUsage,
   'components/data-grid': dataGridUsage,
   'components/divider':`import { Divider } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
@@ -219,6 +221,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/number-fields': return <NumberDemos />;
     case 'components/date-picker': return <DateDemos />;
     case 'components/datetime-picker': return <DateTimeDemos />;
+    case 'components/time-picker': return <TimePickerDemos />;
     case 'components/tree': return <TreeDemos />;
     case 'components/tabs': return <TabsDemos />;
     case 'components/progress': return <ProgressDemos />;
