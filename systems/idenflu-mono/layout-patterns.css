@@ -318,6 +318,7 @@
 .layout-command-results section + section { margin-top:var(--space-4); }
 .layout-command-results h3 { font-size:max(10px,calc(var(--font-size-base) - 3px)); color:var(--text-secondary); padding:var(--space-2); }
 .layout-command-results button { display:flex; align-items:center; gap:var(--space-3); width:100%; padding:var(--space-3); border:0; border-bottom:1px solid var(--divider); background:transparent; color:var(--text); text-align:start; }
+.layout-command-results button > .ui-icon:first-child { align-self:flex-start; margin-top:max(0px,calc((var(--line-height-body) - var(--icon-size)) / 2)); }
 .layout-command-results button:hover { background:var(--surface-hover); }
 .layout-command-results button > span:not(.ui-icon) { display:grid; flex:1; gap:2px; }
 .layout-command-results small { font-size:max(10px,calc(var(--font-size-base) - 4px)); color:var(--text-secondary); }
