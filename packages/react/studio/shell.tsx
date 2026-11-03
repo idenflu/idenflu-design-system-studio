@@ -128,10 +128,15 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
     return () => cancelAnimationFrame(frame);
   }, [current.route]);
 
-  const index = menuRoutes.findIndex(item => item.route === current.route);
-  const previous = index > 0 ? menuRoutes[index - 1] : null, next = index >= 0 ? menuRoutes[index + 1] : null;
-  const docLink = (item:DocumentRoute, className?:string) => <a className={className} key={item.route} href={`#/${item.route}`} aria-current={item.route === current.route ? 'page' : undefined} hidden={!shown.includes(item)} onClick={() => navigate(item.route)}>{item.title}</a>;
   const groupItems = (group:string) => menuRoutes.filter(item => item.group === group || item.group.startsWith(`${group} / `));
+  const subgroups = (group:string) => [...new Set(groupItems(group).filter(item => item.group !== group).map(item => item.group))];
+  const paginationRoutes = [menuRoutes[0], ...groups.flatMap(group => [
+    ...subgroups(group).flatMap(subgroup => menuRoutes.filter(item => item.group === subgroup)),
+    ...menuRoutes.filter(item => item.group === group),
+  ])];
+  const index = paginationRoutes.findIndex(item => item.route === current.route);
+  const previous = index > 0 ? paginationRoutes[index - 1] : null, next = index >= 0 ? paginationRoutes[index + 1] : null;
+  const docLink = (item:DocumentRoute, className?:string) => <a className={className} key={item.route} href={`#/${item.route}`} aria-current={item.route === current.route ? 'page' : undefined} hidden={!shown.includes(item)} onClick={() => navigate(item.route)}>{item.title}</a>;
   const groupOpen = (group:string) => needle ? shown.some(item => groupItems(group).includes(item)) : !!expanded[group];
   const groupSummary = (group:string) => <summary onClick={event => { event.preventDefault(); if (!needle) setExpanded(previous => ({...previous, [group]:!previous[group]})); }}>{group.split(' / ').pop()}<Icon name="caret" /></summary>;
   return <div className="docs-layout react-studio">
@@ -147,7 +152,7 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
         {docLink(menuRoutes[0], 'nav-overview')}
         {groups.map(group => <details className="nav-group" key={group} hidden={!!needle && !shown.some(item => groupItems(group).includes(item))} open={groupOpen(group)}>
           {groupSummary(group)}<div className="nav-children">
-            {[...new Set(groupItems(group).filter(item => item.group !== group).map(item => item.group))].map(subgroup => <details className="nav-subgroup" key={subgroup} hidden={!!needle && !shown.some(item => item.group === subgroup)} open={groupOpen(subgroup)}>{groupSummary(subgroup)}<div className="nav-children">{menuRoutes.filter(item => item.group === subgroup).map(item => docLink(item))}</div></details>)}
+            {subgroups(group).map(subgroup => <details className="nav-subgroup" key={subgroup} hidden={!!needle && !shown.some(item => item.group === subgroup)} open={groupOpen(subgroup)}>{groupSummary(subgroup)}<div className="nav-children">{menuRoutes.filter(item => item.group === subgroup).map(item => docLink(item))}</div></details>)}
             {menuRoutes.filter(item => item.group === group).map(item => docLink(item))}
           </div>
         </details>)}

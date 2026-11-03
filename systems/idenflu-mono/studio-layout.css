@@ -432,6 +432,8 @@ button:disabled, [aria-disabled="true"] { color:GrayText; }
 .number-field-presets { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-2); margin-top:var(--space-3); }
 .number-field-presets .button { width:auto; }
 @media (max-width:600px) {
+.react-pattern-form .form-pattern-budget .number-field-feedback { min-height:calc(var(--line-height-caption) * 2); }
+.react-pattern-form .form-pattern-budget .number-field-feedback[hidden] { display:block !important; visibility:hidden; }
 .number-fields-grid { grid-template-columns:minmax(0,1fr); gap:var(--space-6); }
 }
 .number-fields-grid--sizes { grid-template-columns:repeat(3,minmax(0,1fr)); }

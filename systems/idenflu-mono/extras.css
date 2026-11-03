@@ -121,7 +121,7 @@
 .date-field:focus-within, .date-range-fields:focus-within { border-color:transparent; }
 .date-field:focus-within::after, .date-range-fields:focus-within::after { content:""; position:absolute; inset:-1px; z-index:var(--z-focus); box-shadow:inset 0 0 0 2px var(--focus-on-light); pointer-events:none; }
 .date-field.has-error:focus-within::after, .date-range-fields.has-error:focus-within::after { box-shadow:inset 0 0 0 2px var(--focus-on-danger); }
-.date-popup { max-height:var(--date-popup-available-height, calc(100dvh - 24px)); overflow-y:auto; overscroll-behavior:contain; border-radius:var(--radius-control); position:absolute; top:calc(100% + 6px); left:0; z-index:var(--z-dropdown); width:min(320px, calc(100vw - 48px)); padding:var(--space-4); border:1px solid var(--border); background:var(--field-background); box-shadow:var(--shadow-popup); }
+.date-popup { max-height:var(--date-popup-available-height, calc(100dvh - 24px)); overflow-y:auto; overscroll-behavior:contain; border-radius:var(--radius-control); position:absolute; top:calc(100% + 6px); left:0; z-index:var(--z-dropdown); width:min(320px, calc(100vw - 48px)); padding:var(--space-4); border:1px solid var(--border); background:var(--field-background); color:var(--text); box-shadow:var(--shadow-popup); }
 .date-picker.opens-up .date-popup { top:auto; bottom:calc(100% + 6px); }
 .date-picker.align-right .date-popup { left:auto; right:0; }
 .calendar-instruction { margin-bottom:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }

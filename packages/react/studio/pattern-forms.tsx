@@ -76,7 +76,7 @@ export function ProjectPattern() {
     </div></fieldset>
     <fieldset className="form-example-group"><legend>팀과 진행 정보</legend><div className="form-pattern-grid">
       <div className="form-pattern-field--wide"><MultiSelect label="참여 팀 · 선택" name="teams" defaultValue={['design']} options={[{value:'design',label:'디자인'},{value:'engineering',label:'개발'},{value:'research',label:'리서치'}]} presentation="inline" searchable clearable onValueChange={form.clearResult} /></div>
-      <NumberField label={fieldLabel('예산')} name="budget" min="0" max="9007199254740991" unit="만원" helperText="0~9,007,199,254,740,991의 10진 정수로 입력하세요." error={form.errors.budget || undefined} onValueChange={form.afterChange} />
+      <NumberField className="form-pattern-budget" label={fieldLabel('예산')} name="budget" min="0" max="9007199254740991" unit="만원" helperText="0~9,007,199,254,740,991의 10진 정수로 입력하세요." error={form.errors.budget || undefined} onValueChange={form.afterChange} />
       <div className="react-pattern-stack"><label className="field-label" htmlFor="project-progress">진행률 <output htmlFor="project-progress">{progress}%</output></label><Slider id="project-progress" name="progress" value={progress} step={5} onValueChange={value => {setProgress(value); form.clearResult();}} /><p className="react-studio-caption">5% 단위로 조정합니다.</p></div>
     </div></fieldset><FormActions /><FormResult>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 프로젝트는 생성되지 않습니다.</p></form></Section>;
 }
