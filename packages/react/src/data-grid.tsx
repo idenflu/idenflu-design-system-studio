@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Checkbox, Icon, Pagination, Spinner, Table, TextField } from './primitives';
 import { Popover, Tooltip } from './interactive';
-import { Select } from './navigation';
+import { MultiSelect, Select } from './navigation';
 import { DataGridCellEditor, downloadDataGridCsv } from './data-grid-tools';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
 import { DataGridScrollbar } from './data-grid-scrollbar';
@@ -24,7 +24,7 @@ export interface DataGridColumn<T> {
   maxWidth?: number;
   resizable?: boolean;
   pinned?: 'start';
-  filter?: 'text' | 'number' | 'select';
+  filter?: 'text' | 'number' | 'select' | 'multi-select';
   filterOptions?: readonly {value:string; label:string}[];
   editable?: boolean | ((row: T) => boolean);
   editor?: 'text' | 'number';
@@ -32,7 +32,7 @@ export interface DataGridColumn<T> {
 }
 export interface DataGridSort { columnId: string; direction: 'asc' | 'desc' }
 export type DataGridSortModel = readonly DataGridSort[];
-export type DataGridFilters = Record<string, string | {min?: string; max?: string}>;
+export type DataGridFilters = Record<string, string | string[] | {min?: string; max?: string}>;
 export interface DataGridCellEdit<T> { row: T; rowId: string; columnId: string; value: string }
 export interface DataGridProps<T> {
   label: string;
@@ -114,7 +114,7 @@ function useGridValue<T>(controlled: T | undefined, initial: T, onChange?: (valu
 const collator = new Intl.Collator('ko', { numeric: true, sensitivity: 'base' });
 const positiveInteger = (value: number, fallback: number) => Number.isFinite(value) && value >= 1 ? Math.floor(value) : fallback;
 const searchableText = (value: string) => value.trim().toLocaleLowerCase();
-const hasFilter = (value: DataGridFilters[string]) => typeof value === 'string' ? !!value.trim() : !!value && !!(value.min?.trim() || value.max?.trim());
+const hasFilter = (value: DataGridFilters[string]) => typeof value === 'string' ? !!value.trim() : Array.isArray(value) ? value.length > 0 : !!value && !!(value.min?.trim() || value.max?.trim());
 
 /** A client-side data table. Selection is keyed by stable row IDs across pages. */
 export function DataGrid<T>({
@@ -177,13 +177,19 @@ export function DataGrid<T>({
   const eventResetCriteria = React.useRef<string | null>(null);
   const criteriaChanged = previousCriteria.current !== criteria;
   const filtered = React.useMemo(() => {
+    const multiFilters = new Map<string, Set<string>>();
+    for (const column of columns) {
+      const values = appliedFilters[column.id];
+      if (column.filter === 'multi-select' && Array.isArray(values) && values.length) multiFilters.set(column.id, new Set(values));
+    }
     const matching = rows.filter(row => {
       if (needle && !columns.some(column => searchableText(String(column.accessor(row) ?? '')).includes(needle))) return false;
       return columns.every(column => {
         const filter = appliedFilters[column.id];
         if (!column.filter || !filter || !hasFilter(filter)) return true;
         const value = column.accessor(row);
-        if (column.filter === 'number' && typeof filter === 'object') {
+        if (column.filter === 'multi-select') return multiFilters.get(column.id)?.has(String(value ?? '')) ?? true;
+        if (column.filter === 'number' && typeof filter === 'object' && !Array.isArray(filter)) {
           if (value == null || String(value).trim() === '') return false;
           const number = Number(value), min = filter.min?.trim(), max = filter.max?.trim();
           return Number.isFinite(number) && (!min || !Number.isFinite(Number(min)) || number >= Number(min)) && (!max || !Number.isFinite(Number(max)) || number <= Number(max));
@@ -446,7 +452,8 @@ export function DataGrid<T>({
           </th>; })}
         </tr>{filterRowVisible && <tr id={`${id}-filters`} className="data-grid-filter-row" data-size={toolbarSize} aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
           const filter = filters[column.id];
-          return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select hideLabel label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={typeof filter === 'object' ? filter.min || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={typeof filter === 'object' ? filter.max || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), max:event.target.value})} /></div> : null}</td>;
+          const numericFilter = typeof filter === 'object' && filter !== null && !Array.isArray(filter) ? filter : undefined;
+          return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select hideLabel label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'multi-select' ? <MultiSelect hideLabel searchable maxVisibleLabels={1} label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={Array.isArray(filter) ? filter.map(value => `option:${value}`) : []} onValueChange={values => changeFilter(column.id, values.map(value => value.slice(7)))} options={(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={numericFilter?.min ?? ''} onChange={event => changeFilter(column.id, {...numericFilter, min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={numericFilter?.max ?? ''} onChange={event => changeFilter(column.id, {...numericFilter, max:event.target.value})} /></div> : null}</td>;
         })}</tr>}</thead>
         <DataGridBody enabled={virtualEnabled && !blocked && count > 0}
           rows={shownRows} getRowId={getRowId} scrollRef={scroll} headerRef={header} prepareScrollRef={prepareScroll}

@@ -16,6 +16,9 @@
 .custom-select .select-trigger[aria-invalid="true"] { border-color:var(--danger); }
 .select-option-content, .select-value-content { display:flex; align-items:center; gap:var(--space-2); min-width:0; }
 .select-option-copy, .select-value-text { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.select-value-summary { display:flex; align-items:center; gap:var(--space-1); min-width:0; }
+.select-summary-labels { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.select-summary-count { flex:none; white-space:nowrap; }
 .select-option-icon, .action-option-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--text-secondary); }
 .icon-person { --icon:url('./assets/icons/idenflu/person.svg'); }
 .select-prefix-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--text-secondary); }

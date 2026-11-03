@@ -254,8 +254,8 @@ export function ProjectGrid() {
 | --- | --- |
 | 열 정의 | `id`·`header`·`accessor`가 필수입니다. `cell`로 표시를 바꿔도 검색·정렬·CSV는 accessor의 원본 값을 사용합니다. |
 | 검색 | 기본 제공. `searchable={false}`로 숨기고 `searchLabel`로 이름을 지정합니다. `query`·`defaultQuery`·`onQueryChange`로 상태를 연결합니다. |
-| 필터 | 열에 `filter="text | number | select"`를 지정합니다. 텍스트 포함·숫자 최솟값/최댓값·선택값 일치를 지원합니다. select의 `filterOptions`는 `{value,label}[]`입니다. 검색과 각 열의 필터는 AND로 적용합니다. |
-| 필터 상태 | `filters`·`defaultFilters`·`onFiltersChange`를 사용합니다. `DataGridFilters`는 열 ID를 키로 텍스트/선택값 문자열 또는 `{min?:string,max?:string}`를 저장합니다. |
+| 필터 | 열에 `filter="text | number | select | multi-select"`를 지정합니다. 텍스트 포함·숫자 최솟값/최댓값·선택값 일치를 지원합니다. select·multi-select의 `filterOptions`는 `{value,label}[]`입니다. multi-select는 같은 열의 선택값을 OR로, 전체 검색과 다른 열의 필터는 AND로 적용합니다. 복수 필터에는 팝업 검색과 첫 항목·나머지 개수 요약을 제공합니다. |
+| 필터 상태 | `filters`·`defaultFilters`·`onFiltersChange`를 사용합니다. `DataGridFilters`는 열 ID를 키로 text/select의 문자열, multi-select의 `string[]` 또는 number의 `{min?:string,max?:string}`를 저장합니다. 빈 배열·키 생략은 전체 조회이며 마지막 항목 해제 시 빈 배열을 전달합니다. |
 | 컬럼 필터 토글 | `showColumnFilterToggle`은 기본 `false`이며 이때 필터 가능한 열의 필터 행과 조건을 항상 적용합니다. `true`이면 상단 `columnFilters` 토글을 표시하고 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하며, 끄면 숨기고 `onFiltersChange({})`로 초기화를 요청합니다. 비제어 필터는 비우고 제어 필터는 부모 상태에서 갱신합니다. |
 | 정렬 | 클릭은 단일 정렬, Shift+클릭은 기존 조건을 유지하는 다중 정렬입니다. 오름차순 → 내림차순 → 해제 순서이며 빈 값은 각 조건에서 마지막입니다. 열의 `sortable={false}`로 해제합니다. 화살표 옆 숫자는 정렬 우선순위입니다. |
 | 정렬 상태 | `sortModel`·`defaultSortModel`·`onSortModelChange`는 우선순위 순서의 `{columnId,direction:'asc'|'desc'}[]`를 사용합니다. 모든 조건이 같은 행은 원래 순서를 유지합니다. 기존 `sort`·`defaultSort`·`onSortChange`는 첫 정렬 조건과 호환되며, 제어형 다중 정렬은 `sortModel`로 연결하세요. 두 제어형 값을 함께 주면 `sortModel`이 우선합니다. |
@@ -263,7 +263,7 @@ export function ProjectGrid() {
 | 선택 상태 | `selectedRowIds`·`defaultSelectedRowIds`·`onSelectedRowIdsChange`를 사용합니다. 검색·정렬·페이지 이동 후에도 선택을 유지합니다. 전체 선택은 **현재 페이지의 선택 가능한 행**에만 적용합니다. |
 | 선택 작업 | 선택 가능한 행을 선택하면 상단 `selection` 묶음에 내장 선택 해제가 표시됩니다. `exportable`이면 선택 행 CSV도 함께 표시합니다. `selectionActions`는 호출 측에서 직접 구현한 선택 작업의 UI를 추가하는 확장 슬롯입니다. 선택 삭제 등 업무 동작과 선택 상태는 호출 측에서 구현합니다. |
 | 상시 도구 | `toolbarActions`는 호출 측에서 직접 구현한 상시 작업의 UI를 추가하는 확장 슬롯입니다. `Button`·`IconButton` 등을 전달하면 선택 여부와 무관하게 표시합니다. 기본 위치는 내장 도구 뒤이며 `toolbarOrder`의 `actions`로 묶음을 이동합니다. 새로고침·추가 등 업무 동작과 `disabled`·오류 처리는 호출 측에서 구현합니다. |
-| 상단 도구·컬럼 필터 크기 | `toolbarSize`는 `'sm' \| 'md' \| 'lg'`이며 기본값은 `'sm'`입니다. 상단 도구와 컬럼 필터(text·number·select)의 공통 크기이며, 기본 토큰 높이는 sm 30px·md 36px·lg 42px입니다. 화면 조정의 컨트롤 높이에 따라 변하며 검색·내장 도구·크기를 생략한 자식 도구에 적용합니다. 자식에 명시한 `size`가 우선합니다. 본문 행 밀도·푸터는 유지하고 표시 열 팝업 안의 도구는 md를 사용합니다. |
+| 상단 도구·컬럼 필터 크기 | `toolbarSize`는 `'sm' \| 'md' \| 'lg'`이며 기본값은 `'sm'`입니다. 상단 도구와 컬럼 필터(text·number·select·multi-select)의 공통 크기이며, 기본 토큰 높이는 sm 30px·md 36px·lg 42px입니다. 화면 조정의 컨트롤 높이에 따라 변하며 검색·내장 도구·크기를 생략한 자식 도구에 적용합니다. 자식에 명시한 `size`가 우선합니다. 본문 행 밀도·푸터는 유지하고 표시 열 팝업 안의 도구는 md를 사용합니다. |
 | 상단 도구 순서 | `toolbarOrder?: readonly DataGridToolbarItem[]`로 배치와 Tab 순서를 함께 바꿉니다. 키와 기본 순서는 `search` → `selection` → `columnFilters` → `density` → `columns` → `export` → `resetFilters` → `actions`입니다. 지정한 키를 먼저 배치하고 누락한 키는 기본 순서로 뒤에 붙이며 중복·알 수 없는 키는 무시합니다. `toolbarOrder={['actions', 'export']}`처럼 일부만 지정할 수 있고 표시 조건은 각 속성을 따릅니다. `selection`·`actions`는 묶음 전체를 이동하며 추가 버튼 각각은 전달한 JSX 순서를 따릅니다. |
 | 필터 초기화 도구 | 적용 중인 열별 필터 값이 있으면 상단 `resetFilters` 위치에 필터 초기화를 표시합니다. 클릭하면 필터를 비우고 `onFiltersChange({})`를 호출합니다. |
 | 페이지 | `page`·`defaultPage`·`onPageChange`, `pageSize`·`defaultPageSize`·`onPageSizeChange`, `pageSizeOptions`를 지원합니다. 검색·필터·정렬·페이지 크기 변경 시 첫 페이지로 이동합니다. 외부 데이터가 줄면 표시 페이지를 유효 범위로 제한합니다. |
@@ -409,6 +409,8 @@ function ProjectForm() {
 ```
 
 `Select`, `SearchSelect`, `MultiSelect`에 `prefixIcon`을 지정하면 선택값 앞에 고정 아이콘을 표시합니다. 옵션에는 `description`과 `icon`을 지정할 수 있고, `DropdownMenu` 항목에도 `icon`을 지정할 수 있습니다. 아이콘은 장식으로 처리하므로 의미는 `label`로 전달합니다.
+
+`MultiSelect`의 `maxVisibleLabels`에 양의 정수를 지정하면 기본 표시에서 나머지 선택값을 `외 N개`로 요약합니다. 생략하면 모든 라벨을 표시하며, 접근 가능한 이름에는 항상 전체 선택값을 유지합니다. 태그형(`presentation="inline"`)에는 적용하지 않습니다. DataGrid 복수 필터는 `maxVisibleLabels={1}`을 사용해 높이를 유지합니다.
 
 `NumberField`도 `prefixIcon`을 지원합니다. 아이콘은 입력값 앞에 표시되고, `unit`은 오른쪽에 표시됩니다. 아이콘을 눌러 입력에 포커스할 수 있으며 아이콘은 제출 값과 읽기 설명에서 제외됩니다.
 

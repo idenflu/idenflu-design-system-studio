@@ -48,7 +48,12 @@ interface SelectShared {
   'aria-invalid'?: boolean | 'true' | 'false';
 }
 export interface SelectProps extends SelectShared { value?: string; defaultValue?: string; onValueChange?: (value: string) => void }
-export interface MultiSelectProps extends SelectShared { value?: readonly string[]; defaultValue?: readonly string[]; onValueChange?: (value: string[]) => void; searchable?: boolean; presentation?: 'default' | 'inline'; clearable?: boolean }
+export interface MultiSelectProps extends SelectShared {
+  value?: readonly string[]; defaultValue?: readonly string[]; onValueChange?: (value: string[]) => void;
+  searchable?: boolean; presentation?: 'default' | 'inline'; clearable?: boolean;
+  /** Summarize additional labels as a count. Positive integers only; ignored for inline tags. */
+  maxVisibleLabels?: number;
+}
 
 interface SelectCoreProps extends SelectShared {
   selected: readonly string[];
@@ -58,10 +63,11 @@ interface SelectCoreProps extends SelectShared {
   searchable?: boolean;
   presentation?: 'default' | 'inline';
   clearable?: boolean;
+  maxVisibleLabels?: number;
   onClear?: () => void;
 }
 
-function SelectCore({options, label, hideLabel = false, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, onClear, ...aria}: SelectCoreProps) {
+function SelectCore({options, label, hideLabel = false, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, maxVisibleLabels, onClear, ...aria}: SelectCoreProps) {
   const id = React.useId();
   const root = React.useRef<HTMLDivElement>(null);
   const trigger = React.useRef<HTMLButtonElement>(null);
@@ -75,6 +81,9 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
   const [, setResetRevision] = React.useState(0);
   const selectedOptions = options.filter(option => selected.includes(option.value));
   const selectedLabels = selectedOptions.map(option => option.label);
+  const labelLimit = maxVisibleLabels !== undefined && Number.isInteger(maxVisibleLabels) && maxVisibleLabels > 0 ? maxVisibleLabels : Infinity;
+  const displayValue = multiple && selectedLabels.length > labelLimit
+    ? <span className="select-value-summary"><span className="select-summary-labels">{selectedLabels.slice(0, labelLimit).join(', ')}</span><span className="select-summary-count">{` 외 ${selectedLabels.length - labelLimit}개`}</span></span> : selectedLabels.join(', ');
   const validSelected = selected.filter(value => value !== '' && options.some(option => option.value === value && !option.disabled));
   const invalid = Boolean(attempted && required && !validSelected.length);
   const describedBy = [aria['aria-describedby'], invalid ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
@@ -123,7 +132,8 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
     return () => document.removeEventListener('pointerdown', handlePointer);
   }, [open]);
   React.useEffect(() => { if (disabled) { setOpen(false); setQuery(''); } }, [disabled]);
-  React.useEffect(() => { if (open && multiple && searchable) search.current?.focus(); }, [open, multiple, searchable]);
+  const popupReady = popupStrategy !== 'fixed' || popupPosition !== null;
+  React.useEffect(() => { if (open && multiple && searchable && popupReady) search.current?.focus(); }, [open, multiple, searchable, popupReady]);
   const openMenu = () => {
     if (disabled) return;
     setOpen(true);
@@ -185,7 +195,7 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
           {selectedLabels.length ? selectedOptions.map(option => <button key={option.value} type="button" className="chip multi-inline-chip" aria-label={`${option.label} 제거`} disabled={disabled || option.disabled} onClick={() => onSelect(option.value)}>{option.icon && <span className="select-option-icon" aria-hidden="true">{option.icon}</span>}{option.label}<span className="ui-icon icon-close" aria-hidden="true" /></button>) : <span className="multi-inline-placeholder">{placeholder}</span>}
         </div>{clearable && <button type="button" className="input-action multi-inline-clear" aria-label={`${label} 모두 지우기`} disabled={disabled || !selected.length} onClick={onClear}><span className="ui-icon icon-close" aria-hidden="true" /></button>}
         <button id={`${id}-trigger`} ref={trigger} type="button" className="input-action multi-inline-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span className="ui-icon icon-caret" aria-hidden="true" /></button></div>
-      : <button id={`${id}-trigger`} ref={trigger} type="button" className="select-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span data-select-label className="select-value-content">{prefix}{!multiple && selectedOptions[0]?.icon && <span className="select-option-icon" aria-hidden="true">{selectedOptions[0].icon}</span>}<span className="select-value-text">{selectedLabels.join(', ') || placeholder}</span></span><span className="ui-icon icon-caret" aria-hidden="true" /></button>}
+      : <button id={`${id}-trigger`} ref={trigger} type="button" className="select-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span data-select-label className="select-value-content">{prefix}{!multiple && selectedOptions[0]?.icon && <span className="select-option-icon" aria-hidden="true">{selectedOptions[0].icon}</span>}<span className="select-value-text">{displayValue || placeholder}</span></span><span className="ui-icon icon-caret" aria-hidden="true" /></button>}
     {popup}
     {multiple && presentation !== 'inline' && clearable && <button type="button" className="button button--ghost button-inline multi-clear" disabled={disabled || !selected.length} onClick={onClear}>모두 지우기</button>}
     {invalid && <p id={`${id}-error`} className="component-helper is-error" role="alert">항목을 선택해주세요.</p>}

@@ -3,6 +3,7 @@ import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, ty
 import { Section } from './demo-layout';
 import { DataGridReference, DataGridReferenceLinks } from './data-grid-reference';
 import { DataGridToolbarDemos } from './data-grid-toolbar-demos';
+import { DataGridMultiFilterDemo } from './data-grid-multi-filter-demo';
 
 type Project = {
   id:string; name:string; team:string; owner:string | null;
@@ -106,6 +107,7 @@ export function DataGridDemos() {
       <p role="status" className="component-helper">정렬: {sortModel.length ? sortModel.map((sort,index)=>`${index+1}. ${projectColumns.find(column=>column.id===sort.columnId)?.header} ${sort.direction === 'asc' ? '오름차순' : '내림차순'}`).join(' · ') : '원래 순서'}</p>
       <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV는 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다.</p>
     </Section>
+    <DataGridMultiFilterDemo />
     <Section title="셀 편집과 값 바인딩" description="텍스트·숫자 편집, 입력 검증과 읽기 전용 행을 비교합니다. 저장한 값은 React 상태에 반영되어 다시 검색·정렬할 수 있습니다.">
       <DataGrid label="작업 편집 데이터그리드" rows={tasks} columns={taskColumns}
         className="studio-grid-edit-example"
