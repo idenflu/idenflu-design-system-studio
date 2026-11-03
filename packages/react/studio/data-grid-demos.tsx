@@ -35,6 +35,12 @@ const projectColumns:DataGridColumn<Project>[] = [
   {id:'budget',header:'예산',accessor:row=>row.budget,width:170,align:'end',filter:'number',cell:row=>`${money.format(row.budget)}원`},
   {id:'due',header:'마감일',accessor:row=>row.due,width:150,filter:'text'},
 ];
+const responsiveColumns:DataGridColumn<Project>[] = [
+  {id:'name',header:'프로젝트',accessor:row=>row.name,flex:2,minWidth:180,pinned:'start'},
+  {id:'team',header:'담당 팀',accessor:row=>row.team,flex:1,minWidth:120,maxWidth:260},
+  {id:'owner',header:'담당자',accessor:row=>row.owner,width:'25%',minWidth:110,maxWidth:300,cell:row=>row.owner ?? <span className="table-muted">미지정</span>},
+  {id:'status',header:'상태',accessor:row=>row.status,width:120,minWidth:120,maxWidth:120,resizable:false,cell:row=><Badge>{row.status}</Badge>},
+];
 
 const virtualProject = (index:number):Project => ({
   ...projects[index % projects.length],
@@ -70,6 +76,7 @@ export function DataGridDemos() {
   const [tasks,setTasks] = React.useState(initialTasks);
   const [notice,setNotice] = React.useState('셀의 편집 버튼으로 값을 수정할 수 있습니다.');
   const [state,setState] = React.useState('loading');
+  const [previewWidth,setPreviewWidth] = React.useState('fluid');
   const [virtualRows,setVirtualRows] = React.useState(virtualProjects);
   const [virtualCount,setVirtualCount] = React.useState(10000);
   const [virtualDensity,setVirtualDensity] = React.useState<'default'|'compact'>('default');
@@ -126,11 +133,20 @@ export function DataGridDemos() {
         loading={state === 'loading'} error={state === 'error' ? '프로젝트를 불러오지 못했습니다. 연결을 확인해주세요.' : undefined}
         onRetry={()=>setState('success')} emptyMessage="아직 등록한 프로젝트가 없습니다." />
     </Section>
+    <Section title="반응형 열 너비" description="상태는 120px, 담당자는 25%, 프로젝트와 담당 팀은 남은 공간을 2:1로 나눕니다. 화면이 좁아지면 최소 너비를 유지하고 표 안에서 가로로 스크롤합니다.">
+      <div className="react-studio-row"><Segmented label="열 너비 예시 폭" size="sm" value={previewWidth} onValueChange={setPreviewWidth} options={[{value:'fluid',label:'화면에 맞춤'},{value:'720',label:'720px'},{value:'480',label:'480px'}]} /></div>
+      <div role="group" aria-label="열 너비 미리보기" style={{inlineSize:'100%',maxInlineSize:previewWidth === 'fluid' ? '100%' : `${previewWidth}px`,minInlineSize:0}}>
+        <DataGrid label="반응형 열 너비 데이터그리드" rows={projects.slice(0,5)} columns={responsiveColumns}
+          getRowId={row=>row.id} getRowLabel={row=>row.name} selectable
+          searchable={false} pagination={false} maxHeight={320} />
+      </div>
+      <p className="react-studio-caption">열을 숨기면 남은 공간을 다시 배분합니다. 직접 조절한 열은 px로 고정되며, 열 경계를 더블클릭하거나 Enter를 누르면 원래 비율로 돌아갑니다.</p>
+    </Section>
     <Section title="사용 기준" description="일반 테이블은 읽기 중심의 표에, 데이터그리드는 검색·열 조작·선택·편집이 결합된 목록에 사용합니다.">
       <dl className="detail-list studio-grid-guidelines">
         <div><dt>필터와 정렬</dt><dd>검색과 열별 필터는 AND로 적용합니다. 클릭은 단일 정렬, Shift+클릭은 다중 정렬입니다. 오름차순 → 내림차순 → 해제 순서이며 숫자는 정렬 우선순위입니다. 빈 값은 각 조건에서 마지막에 표시합니다.</dd></div>
         <div><dt>행 선택</dt><dd>행의 일반 영역 또는 체크박스로 선택합니다. 편집 버튼·링크·입력 컨트롤과 텍스트 드래그는 선택을 변경하지 않습니다. selectOnRowClick을 false로 설정하면 체크박스로만 선택합니다.</dd></div>
-        <div><dt>키보드</dt><dd>Tab으로 컨트롤을 탐색합니다. 열 경계에서 ←·→는 10px, Shift와 함께 누르면 1px씩 조절하며 Home·End는 최소·최대 너비로 이동합니다.</dd></div>
+        <div><dt>키보드</dt><dd>Tab으로 컨트롤을 탐색합니다. 열 경계에서 ←·→는 10px, Shift와 함께 누르면 1px씩 조절하며 Home·End는 최소·최대 너비로 이동합니다. Enter는 원래 너비 설정을 복구합니다.</dd></div>
         <div><dt>데이터 연결</dt><dd>행은 고유하고 안정적인 ID가 필요합니다. 편집 결과는 onCellEdit에서 rows 상태를 갱신하세요. 서버 저장은 이 콜백에서 별도로 연결합니다.</dd></div>
         <div><dt>가상 스크롤</dt><dd>virtualized를 켜면 화면 근처 행과 입력·포커스 유지에 필요한 행을 렌더링합니다. 기본은 페이지 이동 없이 전체 검색 결과를 스크롤하며, pagination을 지정하면 페이지 이동과 함께 사용할 수 있습니다.</dd></div>
         <div><dt>처리 범위</dt><dd>가상화는 세로 방향의 행 렌더링을 줄입니다. 전체 rows의 검색·정렬 계산과 데이터 메모리는 유지합니다. 서버 페이지 이동·열 가상화·행 그룹화는 포함하지 않습니다.</dd></div>

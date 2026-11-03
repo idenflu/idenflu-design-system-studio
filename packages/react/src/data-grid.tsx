@@ -5,6 +5,7 @@ import { Select } from './navigation';
 import { DataGridCellEditor, downloadDataGridCsv } from './data-grid-tools';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
 import { DataGridScrollbar } from './data-grid-scrollbar';
+import { getDataGridColumnWidthBounds as widthBounds, resolveDataGridColumnWidths } from './data-grid-sizing';
 export type { DataGridVirtualizationOptions } from './data-grid-virtual';
 
 export interface DataGridColumn<T> {
@@ -15,6 +16,8 @@ export interface DataGridColumn<T> {
   sortable?: boolean;
   align?: 'start' | 'center' | 'end';
   width?: number | string;
+  /** Positive weight for distributing remaining viewport width; overrides width. */
+  flex?: number;
   minWidth?: number;
   maxWidth?: number;
   resizable?: boolean;
@@ -95,10 +98,6 @@ function useGridValue<T>(controlled: T | undefined, initial: T, onChange?: (valu
 const collator = new Intl.Collator('ko', { numeric: true, sensitivity: 'base' });
 const positiveInteger = (value: number, fallback: number) => Number.isFinite(value) && value >= 1 ? Math.floor(value) : fallback;
 const searchableText = (value: string) => value.trim().toLocaleLowerCase();
-const widthBounds = <T,>(column: DataGridColumn<T>) => {
-  const min = positiveInteger(column.minWidth ?? 96, 96);
-  return {min, max: Math.max(min, positiveInteger(column.maxWidth ?? 600, 600))};
-};
 const hasFilter = (value: DataGridFilters[string]) => typeof value === 'string' ? !!value.trim() : !!value && !!(value.min?.trim() || value.max?.trim());
 
 /** A client-side data table. Selection is keyed by stable row IDs across pages. */
@@ -209,11 +208,9 @@ export function DataGrid<T>({
   const headerRows = anyFilters ? 2 : 1;
   const keepRowIds = React.useMemo(() => [...new Set([editing?.rowId, focusedRowId].filter((value): value is string => value != null))], [editing?.rowId, focusedRowId]);
   const shownIds = React.useMemo(() => new Set(shownRows.map(getRowId)), [shownRows, getRowId]);
-  const columnWidth = (column: DataGridColumn<T>) => {
-    const bounds = widthBounds(column);
-    const initial = typeof column.width === 'number' ? column.width : typeof column.width === 'string' && /^\d+(\.\d+)?(px)?$/.test(column.width) ? Number.parseFloat(column.width) : 160;
-    return Math.max(bounds.min, Math.min(bounds.max, widths[column.id] ?? initial));
-  };
+  const resolvedWidths = React.useMemo(() => resolveDataGridColumnWidths(visibleColumns, viewportWidth, widths, selectable ? 52 : 0), [visibleColumns, viewportWidth, widths, selectable]);
+  const widthById = new Map(visibleColumns.map((column, index) => [column.id, resolvedWidths[index]]));
+  const columnWidth = (column: DataGridColumn<T>) => widthById.get(column.id)!;
   const pinnedOffsets = new Map<string, number>();
   let pinnedWidth = selectable ? 52 : 0;
   for (const column of visibleColumns) if (column.pinned === 'start') { pinnedOffsets.set(column.id, pinnedWidth); pinnedWidth += columnWidth(column); }
@@ -221,6 +218,15 @@ export function DataGrid<T>({
   const resize = (column: DataGridColumn<T>, value: number) => {
     const bounds = widthBounds(column);
     setWidths(previous => ({...previous, [column.id]:Math.max(bounds.min, Math.min(bounds.max, Math.round(value)))}));
+  };
+  const resetWidth = (column: DataGridColumn<T>) => {
+    drag.current = null;
+    setWidths(previous => {
+      if (!Object.prototype.hasOwnProperty.call(previous, column.id)) return previous;
+      const next = {...previous};
+      delete next[column.id];
+      return next;
+    });
   };
 
   React.useEffect(() => {
@@ -342,6 +348,7 @@ export function DataGrid<T>({
 
   return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined}>
     <p className="sr-only" id={`${id}-sort-help`}>클릭하면 단일 정렬을 변경합니다. Shift 키를 누르고 클릭하면 정렬 조건을 추가하거나 변경합니다.</p>
+    <p className="sr-only" id={`${id}-resize-help`}>방향키로 10px, Shift와 함께 1px 조절합니다. Home과 End로 최소·최대 너비를 선택하고 Enter 또는 더블클릭으로 원래 너비 설정을 복구합니다.</p>
     <div className="data-grid-toolbar">
       <div className="data-grid-heading"><strong>{label}</strong><span>{rows.length}개 항목</span></div>
       <div className="data-grid-tools">
@@ -370,7 +377,10 @@ export function DataGrid<T>({
             const currentSort = sorting[sortIndex];
             return <th key={column.id} scope="col" className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)} aria-sort={column.sortable === false || sortIndex > 0 ? undefined : currentSort ? currentSort.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
             {column.sortable === false ? column.header : <><button className="data-grid-sort" type="button" disabled={blocked} aria-describedby={`${id}-sort-help ${id}-sort-${columnIndex}`} onClick={event => changeSort(column.id, event.shiftKey)}><span>{column.header}</span>{currentSort && <span className="data-grid-sort-icon is-active" aria-hidden="true"><Icon name={currentSort.direction === 'asc' ? 'arrow-up' : 'arrow-down'} />{sorting.length > 1 && <span className="data-grid-sort-priority">{sortIndex + 1}</span>}</span>}</button><span className="sr-only" id={`${id}-sort-${columnIndex}`}>{currentSort ? `${sortIndex + 1}순위 ${currentSort.direction === 'asc' ? '오름차순' : '내림차순'}` : '정렬 안 함'}</span></>}
-            {column.resizable !== false && <span className="data-grid-resize" role="separator" aria-label={`${column.header} 열 너비`} aria-orientation="vertical" aria-valuenow={columnWidth(column)} aria-valuemin={widthBounds(column).min} aria-valuemax={widthBounds(column).max} tabIndex={0} onKeyDown={event => {
+            {column.resizable !== false && <span className="data-grid-resize" role="separator" aria-label={`${column.header} 열 너비`} aria-orientation="vertical" aria-valuenow={columnWidth(column)} aria-valuemin={widthBounds(column).min} aria-valuemax={widthBounds(column).max} aria-describedby={`${id}-resize-help`} title="드래그·방향키로 조절 · 더블클릭·Enter로 원래 너비 복구" tabIndex={0} onDoubleClick={() => resetWidth(column)} onKeyDown={event => {
+              if (event.key === 'Enter') {
+                event.preventDefault(); event.stopPropagation(); resetWidth(column); return;
+              }
               const step = event.shiftKey ? 1 : 10;
               if (['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) {
                 event.preventDefault(); event.stopPropagation();
@@ -391,7 +401,7 @@ export function DataGrid<T>({
           keepRowIds={keepRowIds} options={typeof virtualized === 'object' ? virtualized : undefined}
           density={density} headerRows={headerRows} maxHeight={virtualMaxHeight}
           resetKey={JSON.stringify([criteria, paginated ? page : 'all', blocked])}
-          measureKey={JSON.stringify([density, widths, visibleColumns.map(column => column.id)])}
+          measureKey={JSON.stringify([density, resolvedWidths, visibleColumns.map(column => column.id)])}
           columnCount={columnCount} renderRow={renderRow} onFocusCapture={event => {
           const row = (event.target as HTMLElement).closest<HTMLTableRowElement>('tr[data-grid-row-id]');
           if (row?.dataset.gridRowId) setFocusedRowId(row.dataset.gridRowId);
@@ -402,7 +412,7 @@ export function DataGrid<T>({
         </td></tr> : undefined} />
       </Table>
     </div>
-    <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
+    <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} viewportWidth={viewportWidth} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
     </div>
     <div className="data-grid-footer">
       <p className="component-helper" id={`${id}-status`} role="status" aria-live="polite" aria-atomic="true">{status}{selectable && selectedSet.size > 0 ? ` · ${selectedSet.size}개 선택됨` : ''}</p>

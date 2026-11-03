@@ -8,10 +8,11 @@ interface Props {
   prepareScrollRef: DataGridPrepareScrollRef;
   controls: string;
   label: string;
+  viewportWidth?: number;
 }
 
 /** Native scrollbar surfaces keep compositor dragging separate from the rows. */
-export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollRef, controls, label}: Props) {
+export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollRef, controls, label, viewportWidth}: Props) {
   const vertical = React.useRef<HTMLDivElement>(null), horizontal = React.useRef<HTMLDivElement>(null);
   const [metrics,setMetrics] = React.useState({width:0,height:0,extent:0,breadth:0,top:0,left:0,header:0,split:0,size:15});
   const [extent,setExtent] = React.useState({height:0,width:0});
@@ -45,6 +46,10 @@ export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollR
     const element = scrollRef.current, win = element?.ownerDocument.defaultView;
     if (!element || !win || !enabled || !win.ResizeObserver) return;
     const update = () => {
+      // A gutter can change the viewport before responsive columns have adopted
+      // that width. Measuring this intermediate table would create a false X
+      // scrollbar, reduce the height and repeatedly toggle the Y gutter.
+      if (viewportWidth !== undefined && element.clientWidth !== viewportWidth) return;
       if (!element.hasAttribute('data-native-scrollbars')) {
         const style = win.getComputedStyle(element);
         const gutter = Math.max(element.offsetWidth - element.clientWidth - (parseFloat(style.borderLeftWidth)||0) - (parseFloat(style.borderRightWidth)||0), element.offsetHeight - element.clientHeight - (parseFloat(style.borderTopWidth)||0) - (parseFloat(style.borderBottomWidth)||0));
@@ -71,7 +76,7 @@ export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollR
     if (element.firstElementChild) observer.observe(element.firstElementChild);
     if (headerRef.current) observer.observe(headerRef.current);
     return () => {observer.disconnect();element.removeEventListener('scroll',update);element.removeEventListener('wheel',cancel);element.removeEventListener('touchstart',cancel);element.removeEventListener('keydown',cancel);active.current = {top:false,left:false};win.clearTimeout(settle.current.top);win.clearTimeout(settle.current.left);};
-  },[enabled,scrollRef,headerRef,syncControls,refreshExtent]);
+  },[enabled,scrollRef,headerRef,syncControls,refreshExtent,viewportWidth]);
   const showVertical = enabled && metrics.extent > metrics.height && metrics.height > metrics.header;
   const showHorizontal = enabled && metrics.breadth > metrics.width && metrics.width > 0;
   React.useEffect(syncControls,[extent.height,extent.width,metrics.height,metrics.width,showVertical,showHorizontal,syncControls]);

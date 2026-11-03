@@ -130,7 +130,9 @@ export function ProjectGrid() {
 | 선택 상태 | `selectedRowIds`·`defaultSelectedRowIds`·`onSelectedRowIdsChange`를 사용합니다. 검색·정렬·페이지 이동 후에도 선택을 유지합니다. 전체 선택은 **현재 페이지의 선택 가능한 행**에만 적용합니다. |
 | 페이지 | `page`·`defaultPage`·`onPageChange`, `pageSize`·`defaultPageSize`·`onPageSizeChange`, `pageSizeOptions`를 지원합니다. 검색·필터·정렬·페이지 크기 변경 시 첫 페이지로 이동합니다. 외부 데이터가 줄면 표시 페이지를 유효 범위로 제한합니다. |
 | 열 조작 | 표시 열을 숨길 수 있으며 최소 1개는 유지합니다. `showColumnVisibility={false}`로 UI를 숨기고 `defaultHiddenColumnIds`로 초기 표시를 지정합니다. |
-| 열 너비 | `width`·`minWidth`·`maxWidth`는 px 기준입니다. `width`에는 숫자 또는 `"160px"` 같은 문자열을 사용하며 백분율은 지원하지 않습니다. 기본 리사이즈를 끄려면 `resizable={false}`를 사용합니다. 드래그 또는 열 경계에서 ←/→ 10px, Shift와 함께 1px, Home/End 최소/최대로 조절합니다. |
+| 열 너비 | `width`는 기본 160px이며 `180`, `"180px"`, `"25%"`를 지원합니다. 백분율은 선택 체크박스 열(52px)을 제외한 표 영역 너비를 기준으로 계산합니다. `minWidth`·`maxWidth`는 px 단위이며 기본 96·600입니다. |
+| 유연한 너비 | 양수인 `flex`로 고정·백분율 열을 배치한 뒤 남은 공간을 비율대로 나눕니다. `flex: 2`는 `flex: 1`의 두 배를 배정받으며 최소·최대 너비를 우선합니다. 같은 열에 `width`가 있으면 `flex`가 우선합니다. |
+| 너비 조절 | 드래그 또는 열 경계에서 ←/→ 10px, Shift와 함께 1px, Home/End 최소/최대로 조절합니다. 조절한 열은 px 너비로 유지하며 경계 더블클릭 또는 Enter로 원래 `width`·`flex` 설정을 복구합니다. `resizable={false}`로 조절을 끕니다. |
 | 열 고정 | `pinned="start"`로 왼쪽 식별 열을 고정합니다. 선택 열도 함께 고정되며 작은 화면에서는 본문을 가리지 않도록 고정을 해제합니다. `maxHeight`를 지정하면 그리드 내부 세로 스크롤과 고정 헤더를 사용할 수 있습니다. |
 | 편집 | 열의 `editable`은 boolean 또는 행별 판별 함수입니다. `editor="text | number"`, `validate(value,row)`로 검증합니다. `onCellEdit({row,rowId,columnId,value})`에서 부모 `rows`를 갱신해야 합니다. 전달하는 값은 문자열입니다. |
 | 확정·취소 | 셀의 편집 버튼으로 진입하고 Enter/저장으로 확정, Escape/취소로 원본을 유지합니다. 오류는 셀 안에 표시하며 종료 후 편집 버튼으로 포커스를 복원합니다. blur로 저장하지 않습니다. |
@@ -141,6 +143,25 @@ export function ProjectGrid() {
 | 밀도 | `density="default | compact"`로 기존 테이블과 동일한 행 간격을 사용합니다. |
 | 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. 실제 콘텐츠에 가까운 값이면 위치 보정이 줄어듭니다. `overscan`은 앞뒤 버퍼를 만들 행 수이며, 화면이 버퍼 경계에 가까워지면 렌더링 범위를 갱신합니다. 스크롤 중에는 행 hover 강조를 잠시 멈춥니다. 세로 스크롤바는 헤더 아래 본문 영역에 배치하며 브라우저 기본 형태를 사용합니다. 드래그할 때 목적지 행을 먼저 렌더링한 뒤 이동합니다. 방향키·PageUp·PageDown·Home·End로도 조작할 수 있습니다. |
 | 페이지와 가상화 | `pagination` 기본값은 일반 모드에서 `true`, 가상 모드에서 `false`입니다. `virtualized pagination defaultPageSize={100}`은 현재 페이지 내부를 가상화합니다. `pagination={false}`에서는 검색 결과 전체가 선택·스크롤 대상입니다. |
+
+```tsx
+type Project = {
+  id: string; name: string; team: string; owner: string; budget: number;
+};
+
+const columns: DataGridColumn<Project>[] = [
+  { id: 'name', header: '프로젝트', accessor: row => row.name,
+    flex: 2, minWidth: 180, maxWidth: 600 },
+  { id: 'team', header: '팀', accessor: row => row.team,
+    width: '25%', minWidth: 120, maxWidth: 280 },
+  { id: 'owner', header: '담당자', accessor: row => row.owner,
+    flex: 1, minWidth: 120, maxWidth: 320 },
+  { id: 'budget', header: '예산', accessor: row => row.budget,
+    width: 160, align: 'end' },
+];
+```
+
+화면 크기나 표시 열이 바뀌면 백분율·flex 너비를 다시 계산합니다. 최소 너비의 합이 표 영역보다 크면 가로 스크롤을 제공하고, 최대 너비에 도달한 뒤 남는 공간은 여백으로 유지합니다. 서버 렌더링처럼 영역 너비를 아직 측정하지 못한 경우에는 숫자·px `width` 또는 기본 160px로 표시한 뒤 측정값을 반영합니다.
 
 제어형 속성은 부모 상태가 기준입니다. 콜백을 받은 뒤 해당 상태를 갱신하세요. 서버 저장이 필요하면 `onCellEdit`에서 저장 처리와 오류 안내를 연결하고, 성공한 값으로 `rows`를 갱신합니다. 내장 서버 저장·비동기 트랜잭션·재시도 큐는 제공하지 않습니다.
 

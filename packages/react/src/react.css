@@ -178,6 +178,7 @@
   .data-grid-tools { width:100%; }
   .data-grid-search { flex:1; width:auto; min-width:120px; }
   .data-grid-tools .popover-wrap { flex:none; }
+  .data-grid-tools .popover-content { left:0; right:auto; }
   .data-grid-tools .popover-wrap > .button { padding-inline:var(--space-2); }
   .data-grid-footer { align-items:flex-start; }
   .data-grid-footer .page-button { min-width:32px; padding-inline:var(--space-1); }
