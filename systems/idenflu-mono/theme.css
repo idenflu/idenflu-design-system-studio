@@ -53,7 +53,7 @@
 .choice-mark, .radio-mark, .switch-track { visibility:hidden; }
 .ui-icon { forced-color-adjust:none; background-color:currentColor; }
 .button { forced-color-adjust:none; outline:1px solid ButtonText; outline-offset:-1px; }
-.button:disabled { color:GrayText; }
+.button:disabled { --button-disabled-bg:ButtonFace; --button-disabled-text:GrayText; --button-disabled-shadow:none; color:GrayText; outline-color:GrayText; }
 :is(.select-option, .calendar-day, .chip)[aria-selected="true"], .select-option.is-active, .calendar-day[aria-pressed="true"], .chip[aria-pressed="true"], .tree-item.is-selected, .tab[aria-selected="true"], .segmented-control > button[aria-pressed="true"] { forced-color-adjust:none;
     background:Highlight !important;
     color:HighlightText !important; }

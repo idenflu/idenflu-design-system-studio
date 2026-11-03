@@ -2,6 +2,7 @@ import { IconButtonDemos, PopupAlignDemos } from './convenience-api-demos';
 import * as React from 'react';
 import { Badge, Button, Checkbox, Chip, Drawer, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
 import { Section } from './demo-layout';
+import { ButtonDisabledDemos } from './button-disabled-demos';
 export { TableDemos } from './table-demos';
 
 const sizes = ['sm', 'md', 'lg'] as const;
@@ -18,8 +19,9 @@ export function ButtonDemos() {
   };
   return <>
     <Section title="기본 버튼" description="행동의 중요도에 따라 스타일을 선택합니다. 위험한 행동은 별도 색상으로 구분합니다.">
-      <div className="react-studio-row">{(['primary','secondary','outline','ghost','danger'] as const).map(variant => <Button key={variant} variant={variant} onClick={() => setFeedback(`${variant} 버튼을 눌렀습니다.`)}>{variant}</Button>)}<Button disabled>비활성</Button></div>
+      <div className="react-studio-row">{(['primary','secondary','outline','ghost','danger'] as const).map(variant => <Button key={variant} variant={variant} onClick={() => setFeedback(`${variant} 버튼을 눌렀습니다.`)}>{variant}</Button>)}</div>
     </Section>
+    <ButtonDisabledDemos />
     <Section title="아이콘과 버튼" description="아이콘은 문구의 의미를 보조하며, 아이콘만 사용할 때도 접근 가능한 이름을 제공합니다.">
       <div className="react-studio-row"><Button onClick={() => setFeedback('새로 만들기를 선택했습니다.')}><Icon name="plus" />새로 만들기</Button><Button variant="outline" onClick={() => setFeedback('다운로드를 선택했습니다.')}><Icon name="download" />다운로드</Button></div>
       <div className="react-studio-row"><Button iconOnly aria-label="추가" onClick={() => setFeedback('추가를 선택했습니다.')}><Icon name="plus" /></Button><Button variant="outline" iconOnly aria-label="다운로드" onClick={() => setFeedback('다운로드를 선택했습니다.')}><Icon name="download" /></Button><Button variant="secondary" iconOnly aria-label="복사" onClick={() => setFeedback('복사를 선택했습니다.')}><Icon name="copy" /></Button><Button variant="ghost" iconOnly aria-label="설정 열기" onClick={() => setFeedback('설정을 선택했습니다.')}><Icon name="settings" /></Button><Button variant="danger" iconOnly aria-label="삭제" onClick={() => setFeedback('삭제를 선택했습니다.')}><Icon name="trash" /></Button></div>

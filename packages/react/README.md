@@ -135,6 +135,22 @@ export function ProjectFilters() {
 }
 ```
 
+### Button 비활성 상태
+
+기존 `disabled` 속성을 사용합니다. 비활성 상태에서도 `variant`의 형태를 유지하며 `Button`과 `IconButton`에 같은 규칙을 적용합니다.
+
+| variant | 비활성 표시 |
+| --- | --- |
+| `primary` | 차분한 프라이머리 채움과 텍스트 |
+| `secondary` | 중립 회색 채움과 텍스트 |
+| `outline` | 투명 배경과 옅은 회색 테두리 |
+| `ghost` | 배경·테두리 없는 회색 텍스트 |
+| `danger` | 차분한 위험 색상 채움과 텍스트 |
+
+색상은 라이트·다크 테마와 사용자 색상 설정을 따릅니다. 전체 요소의 opacity를 낮추지 않으며 SM·MD·LG 크기를 유지합니다. 비활성 버튼은 클릭·Tab 포커스에서 제외하고 hover·눌림 색상도 바뀌지 않습니다. 강제 색상 모드에서는 시스템의 ButtonFace·GrayText를 사용합니다.
+
+필요하면 버튼 범위에서 `--button-disabled-bg`, `--button-disabled-text`, `--button-disabled-shadow`를 재정의할 수 있습니다.
+
 ### IconButton
 
 `IconButton`은 아이콘 전용 `Button`이며 기본 스타일은 `ghost`입니다. 필수 `label`을 접근 가능한 이름과 기본 툴팁에 함께 사용합니다. `tooltip`을 전달하면 안내 내용만 바꾸고, `tooltip={false}`로 툴팁을 제거해도 버튼 이름은 유지합니다. `Button`의 `variant`, `size`, `disabled`, 네이티브 이벤트와 실제 버튼을 가리키는 `ref`를 지원합니다.
