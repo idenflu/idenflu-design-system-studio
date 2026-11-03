@@ -2,6 +2,9 @@
 
 ## 미배포
 
+- 개발 서버에서 React·문서·CSS·아이콘 변경을 감지해 모노 번들을 자동 갱신하고 생성 파일의 재빌드 반복을 방지
+- 루트의 기존 문서 링크가 쿼리와 해시를 유지해 최신 React 문서로 연결되도록 보완
+
 - MUI·Material Symbols·Ant Design·Heroicons·Lucide 공식 자료를 참고해 기존 톤의 Outline 32종과 Filled 20종 추가. 전체 SVG 99종을 React `IconName`·공통 CSS에서 지원하고 기존 별칭 유지
 - 파운데이션 아이콘에 Outline/Filled 필터와 북마크 상태 전환 예시 추가. 검색·필터·공개 마스크 경로의 개발본·배포본 회귀 검증 추가
 

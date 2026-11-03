@@ -8,6 +8,7 @@
     const documentationRoute = /^#\/?(?:foundations|components|patterns)\/[a-z0-9-]+(?:\/[a-z0-9-]+)*\/?$/;
     if (!aliases.has(hash) && !documentationRoute.test(hash)) return;
     const destination = new URL("./systems/idenflu-mono/index.html", window.location.href);
+    destination.search = window.location.search;
     destination.hash = hash;
     window.location.replace(destination.href);
   }

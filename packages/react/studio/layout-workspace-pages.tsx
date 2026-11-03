@@ -34,7 +34,10 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
   const [team,setTeam]=React.useState('all'),[status,setStatus]=React.useState('all'),[query,setQuery]=React.useState('');
   const [density,setDensity]=React.useState('default'),[selected,setSelected]=React.useState<string[]>([]);
   const filterStatus=page==='active-projects'?'진행 중':page==='reviews'?'검토 중':page==='completed'?'완료':null;
-  const rows=projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(team==='all'||project.team===team)&&(status==='all'||project.status===status));
+  const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(team==='all'||project.team===team)&&(status==='all'||project.status===status)),[projects,filterStatus,team,status]);
+  const availableIds=React.useMemo(()=>new Set(rows.map(row=>row.id)),[rows]);
+  const visibleSelected=selected.filter(id=>availableIds.has(id));
+  React.useEffect(()=>{setSelected(current=>{const next=current.filter(id=>availableIds.has(id));return next.length===current.length?current:next;});},[availableIds]);
   const columns:DataGridColumn<Project>[]=[
     {id:'name',header:'프로젝트',accessor:row=>row.name,width:290,minWidth:200,cell:row=><button type="button" className="layout-project-link" onClick={()=>onOpen(row.id)}><strong>{row.name}</strong><small>{row.id}</small></button>},
     {id:'status',header:'상태',accessor:row=>row.status,width:120,cell:row=><Badge variant={badgeVariant(row.status)}>{row.status}</Badge>},
@@ -45,8 +48,8 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
   ];
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
     <div className="layout-filter-panel"><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]}/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]}/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setQuery('');}}>필터 초기화</Button><div className="layout-density"><Segmented label="표 밀도" size="sm" value={density} onValueChange={setDensity} options={[{value:'default',label:'보통'},{value:'compact',label:'촘촘'}]}/></div></div>
-    {selected.length>0&&<div className="layout-bulk-actions"><span>{selected.length}개 프로젝트 선택</span><Button variant="outline" size="sm" onClick={()=>{onComplete(selected);setSelected([]);}}><Icon name="check"/>선택 항목 완료</Button></div>}
-    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={5} pageSizeOptions={[5,10,20]} showColumnVisibility={false} density={density==='compact'?'compact':'default'} selectable selectedRowIds={selected} onSelectedRowIdsChange={setSelected} exportable exportFileName="workspace-projects.csv"/>
+    {visibleSelected.length>0&&<div className="layout-bulk-actions"><span>{visibleSelected.length}개 프로젝트 선택</span><Button variant="outline" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}><Icon name="check"/>선택 항목 완료</Button></div>}
+    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={5} pageSizeOptions={[5,10,20]} showColumnVisibility={false} density={density==='compact'?'compact':'default'} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} exportable exportFileName="workspace-projects.csv"/>
     <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 화면이 새 콘텐츠 탭으로 열립니다.</p>
   </>;
 }

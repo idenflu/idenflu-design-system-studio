@@ -133,3 +133,28 @@ for (const prefix of ['', '/dist']) {
     expect(failures).toEqual([]);
   });
 }
+
+for (const prefix of ['', '/dist']) {
+  test(`root gallery opens the current mono components (${prefix || 'dev'})`, async ({page}) => {
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(`${prefix}/index.html`);
+    await page.getByRole('link', {name:'idenflu mono 디자인 시스템 보기'}).click();
+    await expect(page).toHaveURL(new RegExp(`${prefix}/systems/idenflu-mono/index\\.html#/overview$`));
+    for (const route of ['components/data-grid', 'components/time-picker']) {
+      const title = documents.find(item => item.route === route).title;
+      await page.keyboard.press('/');
+      const search = page.getByRole('searchbox', {name:'문서 검색'});
+      await search.fill(title);
+      await search.press('Enter');
+      await expect(page.locator(`[data-route="${route}"]`)).toBeVisible();
+      await expect(page.getByRole('heading', {level:1})).toHaveText(title);
+    }
+    expect(errors).toEqual([]);
+  });
+  test(`root documentation bookmarks preserve query and route (${prefix || 'dev'})`, async ({page}) => {
+    await page.goto(`${prefix}/index.html?source=bookmark#/components/time-picker`);
+    await expect(page).toHaveURL(new RegExp(`${prefix}/systems/idenflu-mono/index\\.html\\?source=bookmark#/components/time-picker$`));
+    await expect(page.locator('[data-route="components/time-picker"]')).toBeVisible();
+  });
+}

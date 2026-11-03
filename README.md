@@ -16,11 +16,13 @@ npm run dev
 - 모노 문서: `http://127.0.0.1:4173/systems/idenflu-mono/index.html#/overview`
 - 이전 `/packages/react/studio/index.html` 주소는 쿼리와 문서 해시를 유지해 모노 문서로 이동합니다.
 
-`npm run dev`는 React 패키지와 문서를 먼저 빌드합니다. 소스를 수정한 뒤에는 `npm --prefix packages/react run studio:build`를 다시 실행하고 새로고침합니다.
+`npm run dev`는 React 패키지와 문서를 먼저 빌드한 뒤, 컴포넌트·문서·CSS·아이콘 변경을 감지해 자동으로 다시 빌드합니다. 갱신 완료 후 브라우저를 새로고침합니다. WebStorm 미리보기도 같은 문서 번들을 사용하므로 개발 중에는 이 명령을 실행해 둡니다.
+
+의존성이 변경된 브랜치를 받았다면 `npm --prefix packages/react ci`를 먼저 실행합니다. 별도 서버로 미리보기만 열 때는 `npm --prefix packages/react run studio:build`로 문서를 직접 갱신합니다. 배포 폴더 `dist/`는 `npm run build`로 별도 갱신합니다.
 
 ## 문서와 사용
 
-Overview, Foundations 5개, 컴포넌트 26개 분류, Form 8개와 데이터 상태·빈 상태까지 42개 문서를 제공합니다. Patterns의 Layout과 Page는 제외합니다. 폼 검증·초기화·파일 선택·로딩·재시도는 로컬 예시이며 서버 저장·전송·예약은 앱에서 연결합니다.
+Overview, Foundations, 컴포넌트와 Layout·Form·데이터 상태·빈 상태 예시를 제공합니다. 문서 목록은 `packages/react/studio/routes.json`에서 관리합니다. 폼 검증·초기화·파일 선택·로딩·재시도는 로컬 예시이며 서버 저장·전송·예약은 앱에서 연결합니다.
 
 - [React 설치·사용·GitHub Packages 배포](packages/react/README.md)
 - [프로젝트 적용과 HTML 구현 마이그레이션](docs/consumer-guide.md)

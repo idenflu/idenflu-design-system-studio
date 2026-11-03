@@ -46,6 +46,19 @@ test('switching with arrow keys preserves panel inputs and skips disabled tabs',
   }finally{await f.dispose();}
 });
 
+test('keyboard navigation focuses a tab after hidden tabs become selected',async()=>{
+  const f=await fixture();try{
+    const tabs=[...f.node.querySelectorAll('[role=tab]')];
+    for(const tab of tabs){
+      tab.focus=()=>{if(tab.getAttribute('aria-selected')==='true')HTMLElement.prototype.focus.call(tab);};
+    }
+    selected(f.node).focus();
+    await key(selected(f.node),'ArrowLeft');
+    assert.equal(selected(f.node).textContent,'first');
+    assert.equal(document.activeElement,selected(f.node));
+  }finally{await f.dispose();}
+});
+
 test('closing the first enabled tab selects its next neighbour',async()=>{
   const node=document.createElement('div');document.body.append(node);const root=createRoot(node);
   function Example(){const [items,setItems]=React.useState(['a','b']);return h(Tabs,{label:'문서',onTabClose:value=>setItems(values=>values.filter(key=>key!==value)),items:items.map(value=>({value,label:value,closable:true,content:value}))});}

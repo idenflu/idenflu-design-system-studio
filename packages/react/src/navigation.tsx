@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useEscapeLayer } from './escape-layer';
 
+const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
 /** Values must be unique and stable; option icons are decorative. */
 export interface SelectOption { value: string; label: string; disabled?: boolean; description?: string; icon?: React.ReactNode }
 type Size = 'sm' | 'md' | 'lg';
@@ -211,7 +213,13 @@ export function Tabs({items, label, value, defaultValue, onValueChange, onTabClo
   const refs = React.useRef<Array<HTMLButtonElement | null>>([]);
   const list = React.useRef<HTMLDivElement>(null);
   const pendingClose = React.useRef<string | null>(null);
+  const pendingKeyboardFocus = React.useRef<string | null>(null);
   const selected = items.some(item => item.value === current && !item.disabled) ? current : first;
+  useClientLayoutEffect(() => {
+    if (!pendingKeyboardFocus.current) return;
+    if (pendingKeyboardFocus.current === selected) refs.current[items.findIndex(item => item.value === selected)]?.focus();
+    pendingKeyboardFocus.current = null;
+  }, [items, selected]);
   const closeTab = (index: number) => {
     const item = items[index];
     if (!item.closable || item.disabled || !onTabClose) return;
@@ -254,7 +262,9 @@ export function Tabs({items, label, value, defaultValue, onValueChange, onTabClo
     event.preventDefault();
     const position = enabled.indexOf(index);
     const target = event.key === 'Home' ? enabled[0] : event.key === 'End' ? enabled[enabled.length - 1] : enabled[(position + (event.key === nextKey ? 1 : -1) + enabled.length) % enabled.length];
-    refs.current[target]?.focus(); setCurrent(items[target].value);
+    if (items[target].value === selected) { refs.current[target]?.focus(); return; }
+    pendingKeyboardFocus.current = items[target].value;
+    setCurrent(items[target].value);
   };
   return <div className={`tabs${className ? ` ${className}` : ''}`}><div ref={list} className="tab-list" role="tablist" aria-label={label} aria-orientation={orientation}>
     {items.map((item, index) => {

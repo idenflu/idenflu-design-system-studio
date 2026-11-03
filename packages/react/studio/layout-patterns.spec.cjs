@@ -39,6 +39,19 @@ test('tree navigation opens unique tabs, preserves state, and closes to the adja
   await expect(page.getByRole('button',{name:'팀 홈 탭 닫기',exact:true})).toHaveCount(0);
 });
 
+test('tree groups can be collapsed while searching without changing the saved navigation state',async({page,isMobile})=>{
+  await page.goto(sample);
+  if(isMobile)await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();
+  const nav=page.locator('.layout-tree-navigation:visible');
+  await page.getByRole('searchbox',{name:'메뉴 검색',exact:true}).last().fill('프로젝트');
+  const group=nav.locator('details').filter({hasText:'프로젝트 관리'}).last();
+  await expect(group).toHaveAttribute('open','');
+  await group.locator('summary').click();
+  await expect(group).not.toHaveAttribute('open','');
+  await page.getByRole('searchbox',{name:'메뉴 검색',exact:true}).last().fill('');
+  await expect(nav.locator('details').filter({hasText:'프로젝트 관리'}).last()).toHaveAttribute('open','');
+});
+
 test('project details open in a tab and update other open screens',async({page,isMobile})=>{
   await page.goto(sample);
   await panel(page).getByRole('button',{name:/디자인 시스템 v2/}).click();
@@ -51,6 +64,18 @@ test('project details open in a tab and update other open screens',async({page,i
   await expect(panel(page).locator('tbody tr').first()).toContainText('완료');
   await navigate(page,'완료된 프로젝트',isMobile);
   await expect(panel(page).locator('tbody tr')).toHaveCount(2);
+});
+
+test('bulk selection clears when a project leaves the current list',async({page,isMobile})=>{
+  await page.goto(sample);
+  await navigate(page,'진행 중 프로젝트',isMobile);
+  const row=panel(page).locator('.data-grid-table tbody tr').first();
+  await row.getByRole('checkbox').check();
+  await expect(panel(page).locator('.layout-bulk-actions')).toContainText('1개 프로젝트 선택');
+  await row.getByRole('button',{name:/디자인 시스템 v2/}).click();
+  await panel(page).getByRole('button',{name:'완료로 표시',exact:true}).click();
+  await page.getByRole('tab',{name:'진행 중 프로젝트',exact:true}).click();
+  await expect(panel(page).locator('.layout-bulk-actions')).toHaveCount(0);
 });
 
 test('project creation validates input and opens the newly created detail tab',async({page})=>{
@@ -70,13 +95,48 @@ test('quick search opens a matching menu and tab management preserves pinned hom
   await page.goto(sample);
   await page.keyboard.press('ControlOrMeta+k');
   const search=page.getByRole('dialog',{name:'빠른 검색',exact:true});
+  await expect(search.getByRole('searchbox')).toBeFocused();
+  await expect(search.locator('.dialog-header')).toHaveCSS('display','flex');
   await search.getByRole('searchbox').fill('검토');
   await search.getByRole('button',{name:/검토 요청/}).click();
   await expect(page.getByRole('tab',{name:'검토 요청',exact:true})).toHaveAttribute('aria-selected','true');
   await page.locator('.layout-tabs-toolbar').getByRole('button').click();
-  await page.getByRole('menuitem',{name:'모든 탭 닫기',exact:true}).click();
+  await page.getByRole('menuitem',{name:'작업 탭 모두 닫기',exact:true}).click();
   await expect(page.getByRole('tab')).toHaveCount(1);
   await expect(panel(page).getByRole('heading',{name:'팀 홈',exact:true})).toBeVisible();
+});
+
+test('mobile tabs show the selected screen and allow switching from the open tabs menu',async({page})=>{
+  await page.goto(sample);
+  await page.setViewportSize({width:390,height:844});
+  await navigate(page,'워크스페이스 설정',true);
+  await navigate(page,'멤버 관리',true);
+  await expect(page.locator('.layout-workspace-tabs > .tab-list [role="tab"]:visible')).toHaveCount(1);
+  await expect(page.getByRole('tab',{name:'멤버 관리',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'열린 탭 메뉴',exact:true}).click();
+  await page.getByRole('menuitem',{name:'전체 프로젝트',exact:true}).click();
+  await expect(page.getByRole('tab',{name:'전체 프로젝트',exact:true})).toBeVisible();
+  await expect(page.locator('.layout-workspace-tabs > .tab-list [role="tab"]:visible')).toHaveCount(1);
+  await expect(panel(page).getByRole('heading',{level:1,name:'전체 프로젝트',exact:true})).toBeVisible();
+});
+
+test('project overview card keeps its content height beside taller properties',async({page,isMobile})=>{
+  test.skip(isMobile);
+  await page.goto(sample);
+  await panel(page).getByRole('button',{name:/디자인 시스템 v2/}).click();
+  const overview=await panel(page).locator('.layout-project-overview').boundingBox();
+  const properties=await panel(page).locator('.layout-project-properties').boundingBox();
+  expect(overview).not.toBeNull();
+  expect(properties).not.toBeNull();
+  expect(Math.abs(overview.y-properties.y)).toBeLessThan(2);
+  expect(properties.height-overview.height).toBeGreaterThan(20);
+});
+
+test('opening one notification leaves the other unread',async({page})=>{
+  await page.goto(sample);
+  await page.getByRole('button',{name:'업무 알림 2개',exact:true}).click();
+  await page.getByRole('region',{name:'업무 알림'}).getByRole('button',{name:/프로젝트 검토 요청/}).click();
+  await expect(page.getByRole('button',{name:'업무 알림 1개',exact:true})).toBeVisible();
 });
 
 test('mobile Drawer restores focus and active tabs stay visible after resizing',async({page})=>{

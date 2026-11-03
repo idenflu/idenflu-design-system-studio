@@ -4,9 +4,9 @@
   "private": true,
   "description": "idenflu mono React components and documentation",
   "scripts": {
-    "dev": "npm --prefix packages/react run studio:build && node scripts/serve.mjs",
+    "dev": "node scripts/dev.mjs",
     "check": "node scripts/check.mjs",
-    "test": "node --test tests/tooling.test.mjs tests/preferences.test.mjs",
+    "test": "node --test tests/tooling.test.mjs tests/preferences.test.mjs tests/dev.test.mjs",
     "test:browser": "playwright test",
     "build": "node scripts/build.mjs"
   },

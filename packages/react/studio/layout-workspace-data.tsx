@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Badge, Icon, type IconName, type TreeNode } from '../src';
+import { Icon, type IconName, type TreeNode } from '../src';
 
 export type Project = {id:string; name:string; team:string; owner:string; status:string; progress:number; due:string; description:string};
 export type ProjectDraft = Pick<Project,'name'|'team'|'description'|'due'>;
@@ -40,11 +40,10 @@ export const initialMembers:Member[]=[
 export const initialSettings:WorkspaceSettings={name:'제품팀',description:'함께 더 나은 제품 경험을 만드는 공간입니다.',timezone:'seoul',projectNotifications:true,weeklySummary:true,mentionNotifications:true};
 export const badgeVariant=(status:string)=>status==='완료'?'success' as const:status==='검토 중'?'warning' as const:status==='진행 중'?'primary' as const:'neutral' as const;
 
-export function workspaceTree(projects:Project[],memberCount:number):TreeNode[]{
-  const counts:Partial<Record<WorkspacePage,number>>={projects:projects.length,'active-projects':projects.filter(p=>p.status==='진행 중').length,reviews:projects.filter(p=>p.status==='검토 중').length,completed:projects.filter(p=>p.status==='완료').length,members:memberCount};
-  const leaf=(value:WorkspacePage):TreeNode=>({value,label:<span className="layout-tree-label"><Icon name={pageInfo[value].icon}/><span>{pageInfo[value].title}</span>{counts[value]!==undefined&&<Badge variant="neutral" aria-hidden="true">{counts[value]}</Badge>}</span>});
-  const group=(value:string,title:string,children:TreeNode[]):TreeNode=>({value,label:<span className="layout-tree-label"><Icon name="folder"/><span>{title}</span></span>,children});
-  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed')])]),group('team-menu','조직 관리',[leaf('members')]),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications')])];
+export function workspaceTree():TreeNode[]{
+  const leaf=(value:WorkspacePage):TreeNode=>({value,label:<span className="layout-tree-label"><span>{pageInfo[value].title}</span></span>});
+  const group=(value:string,title:string,children:TreeNode[],root=false):TreeNode=>({value,label:<span className="layout-tree-label">{root&&<Icon name="folder"/>}<span>{title}</span></span>,children});
+  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed')])],true),group('team-menu','조직 관리',[leaf('members')],true),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications')],true)];
 }
 
 export function filterWorkspaceTree(items:readonly TreeNode[],query:string):TreeNode[]{
