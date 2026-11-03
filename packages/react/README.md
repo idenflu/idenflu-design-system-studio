@@ -139,7 +139,7 @@ export function ProjectGrid() {
 | 저장 위치 | 내보내기를 누르면 지원 브라우저에서 파일명과 저장 위치를 지정하는 시스템 저장 창을 엽니다. 취소하면 저장하지 않습니다. 미지원 브라우저에서는 파일명을 확인한 뒤 브라우저 다운로드 설정에 따라 저장합니다. |
 | CSV 형식 | 한글 BOM, 쉼표·따옴표·개행 이스케이프와 문자열 수식 보호를 적용합니다. `createDataGridCsv`·`downloadDataGridCsv`로 동일한 규칙을 직접 사용할 수 있습니다. `downloadDataGridCsv`는 사용자 클릭에서 호출하고 반환하는 Promise의 저장 오류를 처리하세요. |
 | 밀도 | `density="default | compact"`로 기존 테이블과 동일한 행 간격을 사용합니다. |
-| 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. 실제 콘텐츠에 가까운 값이면 위치 보정이 줄어듭니다. `overscan`은 앞뒤 버퍼를 만들 행 수이며, 화면이 버퍼 경계에 가까워지면 렌더링 범위를 갱신합니다. 스크롤 중에는 행 hover 강조를 잠시 멈춥니다. 마우스 환경의 세로 스크롤바는 목적지 행을 먼저 렌더링한 뒤 이동합니다. 방향키·PageUp·PageDown·Home·End로도 조작할 수 있습니다. |
+| 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. 실제 콘텐츠에 가까운 값이면 위치 보정이 줄어듭니다. `overscan`은 앞뒤 버퍼를 만들 행 수이며, 화면이 버퍼 경계에 가까워지면 렌더링 범위를 갱신합니다. 스크롤 중에는 행 hover 강조를 잠시 멈춥니다. 세로 스크롤바는 헤더 아래 본문 영역에 배치하며 브라우저 기본 형태를 사용합니다. 드래그할 때 목적지 행을 먼저 렌더링한 뒤 이동합니다. 방향키·PageUp·PageDown·Home·End로도 조작할 수 있습니다. |
 | 페이지와 가상화 | `pagination` 기본값은 일반 모드에서 `true`, 가상 모드에서 `false`입니다. `virtualized pagination defaultPageSize={100}`은 현재 페이지 내부를 가상화합니다. `pagination={false}`에서는 검색 결과 전체가 선택·스크롤 대상입니다. |
 
 제어형 속성은 부모 상태가 기준입니다. 콜백을 받은 뒤 해당 상태를 갱신하세요. 서버 저장이 필요하면 `onCellEdit`에서 저장 처리와 오류 안내를 연결하고, 성공한 값으로 `rows`를 갱신합니다. 내장 서버 저장·비동기 트랜잭션·재시도 큐는 제공하지 않습니다.

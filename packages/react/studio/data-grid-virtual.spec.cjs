@@ -141,15 +141,22 @@ test('virtual rows remeasure after density and viewport changes without overlapp
 });
 
 test.describe('vertical scrollbar dragging',()=>{
-  test('the scrollbar supports track clicks, wheel and keys and disappears for short results',async({page,isMobile})=>{
-    test.skip(isMobile,'Coarse pointers retain the native touch scrollport.');
+  test('the scrollbar supports track clicks, wheel and keys and disappears for short results',async({page,isMobile},testInfo)=>{
+    test.skip(isMobile,'This test exercises desktop mouse scrollbars.');
     const grid=await openGrid(page),scroller=grid.locator('.data-grid-scroll');
     const scrollbar=grid.getByRole('scrollbar',{name:'대용량 데이터그리드 세로 스크롤',exact:true});
     await scrollbar.scrollIntoViewIfNeeded();
     const bounds=await scrollbar.boundingBox();
+    const headerHeight=await grid.locator('thead').evaluate(element=>element.getBoundingClientRect().height);
+    const viewport=await scroller.boundingBox();
+    expect(bounds.y-viewport.y).toBeGreaterThanOrEqual(headerHeight);
+    expect(bounds.y-viewport.y).toBeLessThan(headerHeight+3);
+    await page.screenshot({path:testInfo.outputPath('native-grid-scrollbars.png')});
     await page.mouse.click(bounds.x+bounds.width/2,bounds.y+bounds.height*.7);
-    await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeGreaterThan(400000);
-    await expect(scrollbar).toBeFocused();
+    await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+    await scrollbar.focus();
+    await scrollbar.press('End');
+    await expect(rowFor(grid,'ROW-10000')).toHaveCount(1);
     const current=await scroller.evaluate(element=>element.scrollTop);
     await scrollbar.press('PageUp');
     await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeLessThan(current-100);
@@ -158,9 +165,10 @@ test.describe('vertical scrollbar dragging',()=>{
     await page.mouse.wheel(0,120);
     await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeGreaterThan(beforeWheel);
     await expect(scrollbar).toHaveAttribute('aria-controls',await scroller.getAttribute('id'));
-    const horizontal=await scroller.evaluate(element=>{
+    const horizontalBar=grid.getByRole('scrollbar',{name:'대용량 데이터그리드 가로 스크롤',exact:true});
+    const horizontal=await horizontalBar.evaluate(element=>{
       const rect=element.getBoundingClientRect();
-      return {x:rect.x+element.clientWidth*element.clientWidth/element.scrollWidth/2,y:rect.bottom-8,gutter:element.offsetHeight-element.clientHeight-element.clientTop*2};
+      return {x:rect.x+element.clientWidth*element.clientWidth/element.scrollWidth/2,y:rect.bottom-8,gutter:element.offsetHeight-element.clientHeight};
     });
     expect(horizontal.gutter).toBeGreaterThan(0);
     await page.mouse.move(horizontal.x,horizontal.y);await page.mouse.down();
@@ -169,7 +177,7 @@ test.describe('vertical scrollbar dragging',()=>{
     await grid.getByRole('searchbox',{name:'대용량 데이터 검색',exact:true}).fill(nameFor(42));
     await expect(records(grid)).toHaveCount(1);
     await expect(scrollbar).toHaveCount(0);
-    await expect(scroller).not.toHaveAttribute('data-custom-scrollbar','');
+    await expect(grid.locator('.data-grid-scrollbar-thumb')).toHaveCount(0);
     await grid.getByRole('button',{name:'검색 초기화',exact:true}).click();
     await expect(scrollbar).toBeVisible();
     await expectBounded(grid);
@@ -187,20 +195,32 @@ test.describe('vertical scrollbar dragging',()=>{
       await scroller.evaluate(async element=>{element.scrollTop=0;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
       const scrollbar=grid.getByRole('scrollbar',{name:'대용량 데이터그리드 세로 스크롤',exact:true});
       await expect(scrollbar).toBeVisible();
+      await expect.poll(async()=>{
+        const native=await scrollbar.evaluate(element=>element.scrollHeight-element.clientHeight);
+        const content=await scroller.evaluate(element=>element.scrollHeight-element.clientHeight);
+        return Math.abs(native-content);
+      }).toBeLessThan(2);
+      await expect.poll(()=>scrollbar.evaluate(element=>element.scrollTop)).toBeLessThan(2);
       const rect=await scrollbar.boundingBox();
-      const geometry={x:rect.x+rect.width/2,top:rect.y,height:rect.height};
+      const thumbInset=await scrollbar.evaluate(element=>/Mac/.test(navigator.platform) ? 9 : element.offsetWidth-element.clientWidth+9);
+      const geometry={x:rect.x+rect.width/2,top:rect.y,height:rect.height,thumbInset};
       await startCoverage(grid);
-      await page.mouse.move(geometry.x,geometry.top+12);
+      await page.mouse.move(geometry.x,geometry.top+geometry.thumbInset);
       await page.mouse.down();
       const reached=[];
       try {
         for(const fraction of [.2,.5,.9,.3,.8,.1,.95,.4]){
-          await page.mouse.move(geometry.x,geometry.top+12+(geometry.height-24)*fraction,{steps:2});
+          await page.mouse.move(geometry.x,geometry.top+geometry.thumbInset+(geometry.height-geometry.thumbInset*2)*fraction,{steps:2});
+          await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));
           reached.push(await scroller.evaluate(element=>element.scrollTop/(element.scrollHeight-element.clientHeight)));
         }
+        await page.mouse.move(geometry.x,geometry.top+geometry.height-geometry.thumbInset,{steps:4});
       } finally {await page.mouse.up();}
-      expect(Math.max(...reached)).toBeGreaterThan(.85);
-      expect(Math.min(...reached)).toBeLessThan(.25);
+      // Native thumb travel and snap-back rules vary by OS. The grid must
+      // follow the native offset, cover the viewport and keep distant rows reachable.
+      await expect.poll(async()=>Math.abs(await scrollbar.evaluate(element=>element.scrollTop)-await scroller.evaluate(element=>element.scrollTop))).toBeLessThan(2);
+      reached.push(await scroller.evaluate(element=>element.scrollTop/(element.scrollHeight-element.clientHeight)));
+      expect(Math.max(...reached)-Math.min(...reached)).toBeGreaterThan(.3);
       await expect(scroller).not.toHaveAttribute('data-scrolling','');
       const coverage=await stopCoverage(page);
       expect(coverage.frames).toBeGreaterThan(8);

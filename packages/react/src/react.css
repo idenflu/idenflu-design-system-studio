@@ -82,17 +82,15 @@
 .data-grid-column-options .choice { margin:0; min-height:32px; }
 .data-grid-selection { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-2) var(--space-4); border-top:1px solid var(--divider); background:var(--info-surface); color:var(--info); }
 .data-grid-scroll { max-width:100%; overflow:auto; border-block:1px solid var(--border); }
-.data-grid-viewport { display:grid; grid-template-columns:minmax(0,1fr) auto; min-width:0; }
-.data-grid-viewport > .data-grid-scroll { min-width:0; }
-.data-grid .data-grid-scroll[data-custom-scrollbar]::-webkit-scrollbar { width:0; height:14px; }
-.data-grid .data-grid-scroll[data-custom-scrollbar]::-webkit-scrollbar-track { background:var(--surface); }
-.data-grid .data-grid-scroll[data-custom-scrollbar]::-webkit-scrollbar-thumb { border:3px solid var(--surface); background:var(--border-hover); background-clip:padding-box; }
-.data-grid .data-grid-scroll[data-custom-scrollbar]::-webkit-scrollbar-thumb:hover { background-color:var(--text-muted); }
-.data-grid-scrollbar { position:relative; align-self:start; width:14px; margin-block:1px; border-inline-start:1px solid var(--divider); background:var(--surface); touch-action:none; user-select:none; cursor:default; }
-.data-grid-scrollbar:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
-.data-grid-scrollbar-thumb { position:absolute; top:0; left:0; width:100%; border:3px solid transparent; background:var(--border-hover); background-clip:padding-box; }
-.data-grid-scrollbar:hover .data-grid-scrollbar-thumb { background-color:var(--text-muted); }
-@media (forced-colors:active) { .data-grid-scrollbar-thumb { background-color:CanvasText; } }
+.data-grid-viewport { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:minmax(0,1fr) auto; min-width:0; }
+.data-grid-viewport > .data-grid-scroll { grid-area:1 / 1; min-width:0; min-height:0; }
+.data-grid-scroll[data-native-scrollbars] { scrollbar-width:none; }
+.data-grid-scroll[data-native-scrollbars]::-webkit-scrollbar { display:none; }
+.data-grid-native-vertical { grid-area:1 / 2; align-self:start; overflow-y:scroll; overflow-x:hidden; }
+.data-grid-native-horizontal { grid-area:2 / 1; min-width:0; overflow-x:scroll; overflow-y:hidden; }
+.data-grid-scrollbar-header { grid-area:1 / 2; align-self:start; background:var(--surface); border-block:1px solid var(--border); }
+.data-grid-scrollbar-corner { grid-area:2 / 2; }
+.data-grid-native-vertical:focus-visible, .data-grid-native-horizontal:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .data-grid-scroll:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .data-grid .data-grid-table { min-width:0; table-layout:fixed; border-collapse:separate; border-spacing:0; }
 .data-grid-table th, .data-grid-table td { overflow-wrap:anywhere; }

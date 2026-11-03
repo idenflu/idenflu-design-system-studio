@@ -358,8 +358,8 @@ export function DataGrid<T>({
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>
     {selectable && selectedSet.size > 0 && <div className="data-grid-selection"><span>{selectedSet.size}개 선택됨</span><div className="data-grid-selection-actions">{exportable && <Button variant="ghost" size="sm" title="검색·필터와 관계없이 전체 데이터에서 선택한 행과 표시 중인 열을 내보냅니다." disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}>선택한 행 내보내기</Button>}<Button variant="ghost" size="sm" onClick={() => setSelected([])}>선택 해제</Button></div></div>}
-    <div className="data-grid-viewport">
-    <div id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" role="region" aria-label={`${label} 표`} aria-busy={loading} tabIndex={0} style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight, overflowAnchor:virtualEnabled ? 'none' : undefined} : undefined}>
+    <div className="data-grid-viewport" style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight} : undefined}>
+    <div id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" role="region" aria-label={`${label} 표`} aria-busy={loading} tabIndex={0} style={virtualEnabled ? {overflowAnchor:'none'} : undefined}>
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>
         <caption className="sr-only">{label}</caption>
         <colgroup>{selectable && <col className="data-grid-select-column" />}{visibleColumns.map(column => <col key={column.id} style={{width:columnWidth(column)}} />)}</colgroup>
@@ -402,7 +402,7 @@ export function DataGrid<T>({
         </td></tr> : undefined} />
       </Table>
     </div>
-    <DataGridScrollbar enabled={virtualEnabled && !blocked && count > 0} scrollRef={scroll} prepareScrollRef={prepareScroll} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
+    <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
     </div>
     <div className="data-grid-footer">
       <p className="component-helper" id={`${id}-status`} role="status" aria-live="polite" aria-atomic="true">{status}{selectable && selectedSet.size > 0 ? ` · ${selectedSet.size}개 선택됨` : ''}</p>
