@@ -21,7 +21,7 @@ export function LayoutPattern() {
       ].map(([title,description])=><div key={title}><Icon name="check" /><h3>{title}</h3><p>{description}</p></div>)}</div>
     </Section>
     <Section title="반응형 구성" description="탐색과 주요 작업을 화면 크기에 맞춰 유지합니다.">
-      <TableContainer label="사이드바형 반응형 구성"><Table><thead><tr><th scope="col">화면</th><th scope="col">구성</th></tr></thead><tbody><tr><th scope="row">넓은 화면</th><td>사이드바와 탑바를 고정하고 활성 콘텐츠 영역 안에서 스크롤합니다.</td></tr><tr><th scope="row">900px 이하</th><td>메뉴 버튼으로 Drawer를 엽니다. 메뉴를 고르면 닫히고 해당 콘텐츠 탭이 활성화됩니다.</td></tr><tr><th scope="row">작은 화면의 탭과 표</th><td>각 영역 안에서 가로 스크롤하며, 활성 탭은 보이는 위치로 이동합니다.</td></tr></tbody></Table></TableContainer>
+      <TableContainer label="사이드바형 반응형 구성"><Table><thead><tr><th scope="col">화면</th><th scope="col">구성</th></tr></thead><tbody><tr><th scope="row">넓은 화면</th><td>사이드바와 탑바를 고정하고 활성 콘텐츠 영역 안에서 스크롤합니다.</td></tr><tr><th scope="row">데이터그리드 화면</th><td>제목과 필터 아래 남은 높이를 그리드가 채웁니다. 검색 도구와 페이지 영역은 유지하고 행 목록만 그리드 내부에서 세로 스크롤합니다.</td></tr><tr><th scope="row">900px 이하</th><td>메뉴 버튼으로 Drawer를 엽니다. 메뉴를 고르면 닫히고 해당 콘텐츠 탭이 활성화됩니다.</td></tr><tr><th scope="row">작은 화면의 탭과 표</th><td>각 영역 안에서 가로 스크롤하며, 활성 탭은 보이는 위치로 이동합니다.</td></tr></tbody></Table></TableContainer>
       <p className="react-studio-caption">탭은 닫기 버튼 또는 Delete 키로 닫습니다. 팀 홈은 고정되며 방향키로 탭을 전환할 수 있습니다. 빠른 검색 단축키는 ⌘/Ctrl + K입니다.</p>
       <p className="react-studio-caption">샘플의 변경 사항은 현재 화면에서만 유지되며 새로고침하면 초기화됩니다.</p>
     </Section>

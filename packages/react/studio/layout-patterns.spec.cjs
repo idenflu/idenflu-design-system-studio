@@ -232,3 +232,80 @@ test('mobile Drawer restores focus and active tabs stay visible after resizing',
   expect(bounds.x).toBeGreaterThanOrEqual(0);expect(bounds.x+bounds.width).toBeLessThanOrEqual(277);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
 });
+
+test('project grids fill the content height and keep scrolling inside the rows',async({page,isMobile})=>{
+  await page.goto(sample);
+  const assertGridFit=async()=>{
+    await expect.poll(()=>panel(page).evaluate(element=>{
+      const content=element.querySelector('.layout-page-content');
+      const grid=content.querySelector('.data-grid');
+      const viewport=grid.querySelector('.data-grid-scroll');
+      const caption=content.querySelector('.layout-content-caption');
+      const contentRect=content.getBoundingClientRect(),gridRect=grid.getBoundingClientRect();
+      const panelRect=element.getBoundingClientRect(),footerRect=grid.querySelector('.data-grid-footer').getBoundingClientRect();
+      const captionHeight=caption?.getClientRects().length?caption.getBoundingClientRect().height+parseFloat(getComputedStyle(caption).marginTop):0;
+      const bottomPadding=parseFloat(getComputedStyle(content).paddingBottom);
+      return {
+        pageFits:document.documentElement.scrollHeight<=window.innerHeight+1,
+        panelFits:element.scrollHeight<=element.clientHeight+1,
+        gridFills:Math.abs(contentRect.bottom-bottomPadding-gridRect.bottom-captionHeight)<=2,
+        rowAreaVisible:viewport.clientHeight>grid.querySelector('thead').getBoundingClientRect().height+20,
+        footerFits:footerRect.top>=panelRect.top&&footerRect.bottom<=panelRect.bottom+1,
+      };
+    })).toEqual({pageFits:true,panelFits:true,gridFills:true,rowAreaVisible:true,footerFits:true});
+  };
+  await assertGridFit();
+  await navigate(page,'진행 중 프로젝트',isMobile);
+  await assertGridFit();
+  await navigate(page,'전체 프로젝트',isMobile);
+  const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
+  await grid.getByRole('combobox',{name:'페이지당 행 수: 10개',exact:true}).click();
+  await page.getByRole('option',{name:'50개',exact:true}).click();
+  await expect(grid.locator('tbody tr')).toHaveCount(50);
+  await assertGridFit();
+  const scrollbar=grid.getByRole('scrollbar',{name:'전체 프로젝트 목록 세로 스크롤',exact:true});
+  await scrollbar.focus();
+  await scrollbar.press('End');
+  await expect.poll(()=>grid.locator('.data-grid-scroll').evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+  await expect.poll(()=>panel(page).evaluate(element=>element.scrollTop)).toBe(0);
+  await grid.getByRole('button',{name:'촘촘한 행 간격',exact:true}).click();
+  await expect(grid.getByRole('button',{name:'촘촘한 행 간격',exact:true})).toHaveAttribute('aria-pressed','false');
+  await assertGridFit();
+  await grid.locator('tbody tr').first().getByRole('checkbox').check();
+  await expect(grid.getByRole('button',{name:'선택 항목 완료',exact:true})).toBeVisible();
+  await assertGridFit();
+  await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('일치하지않는프로젝트xyz');
+  await expect(grid.getByText('검색 결과가 없습니다.',{exact:true})).toBeVisible();
+  await assertGridFit();
+});
+
+test('project filters and page size popups escape clipping and stay within the viewport',async({page})=>{
+  await page.goto(sample);
+  const assertFixedPopup=async trigger=>{
+    await trigger.click();
+    const popup=panel(page).locator('.select-popup[data-popup-strategy="fixed"]:visible');
+    await expect(popup).toHaveCSS('position','fixed');
+    await expect.poll(()=>popup.evaluate(element=>{
+      const bounds=element.getBoundingClientRect();
+      const option=element.querySelector('[role="option"]');
+      const optionBounds=option.getBoundingClientRect();
+      const hit=document.elementFromPoint(optionBounds.left+optionBounds.width/2,optionBounds.top+optionBounds.height/2);
+      return {
+        insideViewport:bounds.width>0&&bounds.height>0&&bounds.left>=0&&bounds.top>=0&&bounds.right<=window.innerWidth+1&&bounds.bottom<=window.innerHeight+1,
+        optionUnclipped:hit?.closest('[role="option"]')===option,
+      };
+    })).toEqual({insideViewport:true,optionUnclipped:true});
+    return popup;
+  };
+  for(const name of ['담당 팀 필터: 전체 팀','프로젝트 상태 필터: 전체 상태']){
+    const trigger=panel(page).getByRole('combobox',{name,exact:true});
+    await assertFixedPopup(trigger);
+    await trigger.press('Escape');
+    await expect(trigger).toBeFocused();
+  }
+  const pageSize=panel(page).getByRole('combobox',{name:'페이지당 행 수: 10개',exact:true});
+  const popup=await assertFixedPopup(pageSize);
+  await popup.getByRole('option',{name:'50개',exact:true}).click();
+  await expect(panel(page).getByRole('combobox',{name:'페이지당 행 수: 50개',exact:true})).toBeFocused();
+  await expect(panel(page).locator('.select-popup:visible')).toHaveCount(0);
+});

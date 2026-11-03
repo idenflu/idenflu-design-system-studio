@@ -442,7 +442,7 @@ export function DataGrid<T>({
     </div>
     <div className="data-grid-footer">
       <p className="component-helper" id={`${id}-status`} role="status" aria-live="polite" aria-atomic="true">{status}{selectable && selectedSet.size > 0 ? ` · ${selectedSet.size}개 선택됨` : ''}</p>
-      {paginated && <div className="data-grid-page-tools"><div className="data-grid-page-size"><Select label="페이지당 행 수" value={String(size)} disabled={blocked} onValueChange={value => { setPageSize(Number(value)); resetPageFor(query, sorting, filters, Number(value)); }} options={sizes.map(value => ({value:String(value),label:`${value}개`}))} /></div>
+      {paginated && <div className="data-grid-page-tools"><div className="data-grid-page-size"><Select label="페이지당 행 수" value={String(size)} disabled={blocked} popupStrategy="fixed" onValueChange={value => { setPageSize(Number(value)); resetPageFor(query, sorting, filters, Number(value)); }} options={sizes.map(value => ({value:String(value),label:`${value}개`}))} /></div>
         {!blocked && <Pagination page={page} pageCount={pageCount} onPageChange={setPage} aria-label={`${label} 페이지 탐색`} />}
       </div>}
     </div>
