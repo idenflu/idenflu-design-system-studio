@@ -58,7 +58,7 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete,onDelete}
   const visibleSelected=selected.filter(id=>availableIds.has(id));
   React.useEffect(()=>{setSelected(current=>{const next=current.filter(id=>availableIds.has(id));return next.length===current.length?current:next;});},[availableIds]);
   const columns:DataGridColumn<Project>[]=[
-    {id:'name',header:'프로젝트',accessor:row=>row.name,width:290,minWidth:200,cell:row=><button type="button" className="layout-project-link" onClick={()=>onOpen(row.id)}><strong>{row.name}</strong><small>{row.id}</small></button>},
+    {id:'name',header:'프로젝트',accessor:row=>row.name,width:290,minWidth:200,cell:row=><button type="button" className="layout-project-link" onClick={()=>onOpen(row.id)}><span className="layout-project-link-title"><strong>{row.name}</strong><Icon name="arrow-up"/></span><small>{row.id}</small></button>},
     {id:'status',header:'상태',accessor:row=>row.status,width:120,cell:row=><Badge variant={badgeVariant(row.status)}>{row.status}</Badge>},
     {id:'team',header:'담당 팀',accessor:row=>row.team,width:165},
     {id:'owner',header:'담당자',accessor:row=>row.owner,width:130,cell:row=><span className="layout-person"><Avatar size="sm" shape="circle" variant="neutral">{row.owner.slice(0,1)}</Avatar>{row.owner}</span>},
@@ -68,7 +68,6 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete,onDelete}
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
     <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();setFilters({team,status});}}><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]} popupStrategy="fixed"/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setFilters({team:'all',status:'all'});setQuery('');}}><Icon name="refresh"/>필터 초기화</Button><Button type="submit"><Icon name="search"/>검색</Button></form>
     <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} pagination={false} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<><Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button><Button variant="danger" size="sm" onClick={()=>onDelete(visibleSelected)}><Icon name="trash"/>삭제</Button></>} exportable exportFileName="workspace-projects.csv"/>
-    <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 정보를 확인할 수 있습니다.</p>
   </>;
 }
 
