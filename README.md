@@ -6,6 +6,8 @@ React 기반 디자인 시스템과 문서 스튜디오입니다. 컴포넌트�
 
 이 프로젝트의 자체 제작 소프트웨어는 [MIT 라이선스](LICENSE)에 따라 상업적 용도를 포함해 사용할 수 있습니다. 소프트웨어의 복사본이나 상당 부분을 배포할 때 저작권 표시와 라이선스 문구를 포함해야 합니다. 폰트, 아이콘 등 서드파티 자료에는 각각의 라이선스가 적용됩니다.
 
+번들에 포함된 라이브러리의 고지는 React 패키지의 `dist/THIRD_PARTY_NOTICES.txt`와 문서 사이트 배포물의 `systems/idenflu-mono/docs-dist/THIRD_PARTY_NOTICES.txt`에 제공합니다. 폰트·아이콘의 라이선스와 출처 문서는 해당 에셋 폴더에 함께 배포합니다.
+
 ## 실행
 
 Node.js 20 이상에서 루트와 React 패키지의 의존성을 설치합니다.
@@ -32,6 +34,7 @@ Overview, Foundations, 컴포넌트와 Layout·Form·데이터 상태·빈 상�
 - [프로젝트 적용과 HTML 구현 마이그레이션](docs/consumer-guide.md)
 - [변경·검증·릴리스 기준](CONTRIBUTING.md)
 - [문서 전환 현황](packages/react/studio/MIGRATION.md)
+- [검증 범위와 재현 방법](systems/idenflu-mono/design-qa.md)
 - [변경 이력](CHANGELOG.md)
 
 문서 검색은 한글·영문 동의어를 지원합니다. `/`로 검색하고 Escape로 초기화하며 Enter로 첫 결과로 이동합니다. 테마 버튼은 라이트·다크 모드를 바꾸고 이 브라우저에 저장합니다.

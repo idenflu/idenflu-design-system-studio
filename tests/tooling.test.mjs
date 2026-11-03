@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, readdir, rm, access } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
-import { build } from '../scripts/build.mjs';
+import { build, project } from '../scripts/build.mjs';
 
 test('distribution is deterministic and contains React documentation and licenses', async () => {
   const folder = await mkdtemp(resolve(tmpdir(), 'idenflu-build-'));
@@ -34,5 +34,12 @@ test('distribution is deterministic and contains React documentation and license
     const notices = await readFile(resolve(target, 'docs-dist/THIRD_PARTY_NOTICES.txt'), 'utf8');
     assert(notices.includes('@tanstack/react-virtual') && notices.includes('@tanstack/virtual-core'));
     assert(notices.includes('MIT License') && notices.includes('Tanner Linsley'));
+    for (const name of ['react', 'react-dom', 'scheduler']) {
+      const folder = resolve(project, 'packages/react/node_modules', name);
+      const pkg = JSON.parse(await readFile(resolve(folder, 'package.json'), 'utf8'));
+      const license = await readFile(resolve(folder, 'LICENSE'), 'utf8');
+      assert(notices.includes(`${name} ${pkg.version}\n\n${license}`), `${name} version and full license must be distributed`);
+    }
+    assert(notices.includes('Meta Platforms, Inc. and affiliates.'));
   } finally { await rm(folder, { recursive: true, force: true }); }
 });

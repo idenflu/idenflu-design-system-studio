@@ -1,4 +1,4 @@
-import { readFile, readdir, mkdir, writeFile, rm, copyFile } from 'node:fs/promises';
+import { readFile, readdir, mkdir, writeFile, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,9 +20,18 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
   const result = await build({ entryPoints: [resolve(root, 'studio/app.tsx')], outfile: 'app.js', bundle: true, write: false, format: 'esm', target: 'es2020', minify: hashed });
   const components = ((await readFile(resolve(system, 'reset.css'), 'utf8')) + '\n' + (await readFile(resolve(root, 'dist/styles.css'), 'utf8'))).replaceAll('./assets/', '../assets/');
   const docs = (await Promise.all(documentStyles.map(name => readFile(resolve(system, name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(root, 'studio/studio.css'), 'utf8');
+  const packageNotices = await readFile(resolve(root, 'dist/THIRD_PARTY_NOTICES.txt'), 'utf8');
+  // React is external in the npm package but bundled into the documentation app.
+  const documentNotices = await Promise.all(['react', 'react-dom', 'scheduler'].map(async name => {
+    const folder = resolve(root, 'node_modules', name);
+    const pkg = JSON.parse(await readFile(resolve(folder, 'package.json'), 'utf8'));
+    const license = await readFile(resolve(folder, 'LICENSE'), 'utf8');
+    if (!license.trim()) throw new Error(`${name} LICENSE가 비어 있습니다.`);
+    return `${name} ${pkg.version}\n\n${license}`;
+  }));
   await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
-  await copyFile(resolve(root, 'dist/THIRD_PARTY_NOTICES.txt'), resolve(destination, 'THIRD_PARTY_NOTICES.txt'));
+  await writeFile(resolve(destination, 'THIRD_PARTY_NOTICES.txt'), [packageNotices, ...documentNotices].join('\n\n-----\n\n'));
   const files = {};
   for (const [name, extension, content] of [['app', 'js', result.outputFiles[0].text], ['components', 'css', components], ['docs', 'css', docs]]) {
     const hash = hashed ? '.' + createHash('sha256').update(content).digest('hex').slice(0, 12) : '';

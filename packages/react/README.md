@@ -14,12 +14,14 @@ GitHub Packages에서 `@idenflu` 범위를 사용하도록 프로젝트의 `.npm
 @idenflu:registry=https://npm.pkg.github.com
 ```
 
-패키지 접근 권한이 있는 계정으로 GitHub Packages에 로그인한 후 설치합니다. 인증에는 패키지 읽기 권한이 있는 개인 액세스 토큰이 필요합니다.
+공개 패키지도 GitHub Packages 인증이 필요합니다. 패키지 접근 권한이 있는 계정에서 **개인 액세스 토큰(classic)**을 만들고 설치에 필요한 최소 `read:packages` 권한을 지정합니다. Fine-grained 토큰은 이 npm 레지스트리 인증에 사용할 수 없습니다. [GitHub Packages 인증 안내](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry)를 참고하세요.
 
 ```sh
 npm login --scope=@idenflu --registry=https://npm.pkg.github.com --auth-type=legacy
 npm install @idenflu/mono-react
 ```
+
+로그인할 때 Username에는 GitHub 계정명, Password에는 위 토큰을 입력합니다. 인증정보는 개인 `~/.npmrc`에서 관리하고, 프로젝트에 공유하는 `.npmrc`에는 위 레지스트리 범위 설정만 넣습니다. CI에서는 토큰을 저장소 시크릿에 보관하고 환경변수로 전달합니다.
 
 ## 사용
 
@@ -75,12 +77,12 @@ export function IconActions() {
 
 일반 동작은 Outline, 선택·저장 상태나 강한 시각적 강조는 Filled를 우선 고려합니다. 상태를 전환할 때는 형태와 함께 `aria-pressed`나 텍스트도 갱신합니다. `Icon`은 장식으로 처리되므로 의미는 함께 표시하는 텍스트로 전달하고, 아이콘만 있는 버튼에는 `IconButton`의 `label`을 지정합니다.
 
-문서의 파운데이션 → Icons에서 전체 목록을 이름으로 검색하고 Outline/Filled로 필터링할 수 있습니다. 선정 근거와 공식 자료는 [아이콘 리서치](../../docs/icon-research.md)에 정리했습니다.
+문서의 파운데이션 → Icons에서 전체 목록을 이름으로 검색하고 Outline/Filled로 필터링할 수 있습니다. 선정 근거와 공식 자료는 [아이콘 리서치](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/icon-research.md)에 정리했습니다.
 
 ## 컴포넌트
 
 - 버튼: `Button`, `IconButton`
-- 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
+- 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `TimePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
 - 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `DataGrid`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
 - 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `NovaSpinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
@@ -204,6 +206,35 @@ export function ToolbarPopups() {
       ]} onSelect={setView} />
     <p role="status">선택한 보기: {view}</p>
   </div>;
+}
+```
+
+### TimePicker
+
+`TimePicker`는 날짜나 시간대가 없는 24시간제 시간을 입력합니다. `value`·`defaultValue`·`onValueChange`는 `HH:mm` 문자열 또는 빈 값 `null`을 사용하며, `value`가 `undefined`일 때만 비제어 방식으로 동작합니다. 직접 입력한 `HHmm`은 Enter나 포커스 이동으로 확정할 때 `HH:mm`으로 정규화합니다. 형식·범위가 잘못된 입력은 오류를 표시하고 이전 확정값을 유지합니다.
+
+| 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | 필수 | 입력 라벨이며 문자열이면 시간 선택 패널의 이름에도 사용합니다. |
+| `value` / `defaultValue` | `string \| null` | `defaultValue: null` | 확정된 시간 또는 비제어 초기값입니다. |
+| `onValueChange` | `(value: TimeValue) => void` | — | 확정값이 바뀔 때 호출합니다. 제어형에서는 부모 상태를 갱신합니다. |
+| `min` / `max` | `string` | 제한 없음 | `00:00`~`23:59`의 `HH:mm` 형식이며 양 끝을 포함합니다. `min <= max`로 지정합니다. |
+| `minuteStep` | `number` | `1` | 60을 나누어떨어지게 하는 1~60 사이의 정수입니다. 목록과 직접 입력 모두 적용합니다. |
+| `name` | `string` | — | 폼에 확정된 `HH:mm`을 제출하며 빈 값은 빈 문자열로 제출합니다. |
+
+패널에서 고른 시·분은 `확인`을 누르기 전까지 임시값입니다. `취소`·Escape·바깥 클릭으로 닫으면 기존 확정값을 유지합니다. `required`, `readOnly`, `disabled`, `size="sm | md | lg"`, `helperText`, `error`도 지원합니다. 필수가 아닌 입력을 비우고 확정하면 `null`을 전달합니다.
+
+```tsx
+import { useState } from 'react';
+import { TimePicker, type TimeValue } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function ReminderTime() {
+  const [time, setTime] = useState<TimeValue>('09:00');
+  return <TimePicker label="알림 시간" name="reminderTime"
+    value={time} onValueChange={setTime}
+    min="09:00" max="18:00" minuteStep={15} required
+    helperText="09:00부터 18:00까지 15분 단위로 선택합니다." />;
 }
 ```
 
@@ -555,7 +586,7 @@ npm ci
 npm run example:build
 ```
 
-정식 모노 문서는 `/systems/idenflu-mono/index.html`에서 React로 동작합니다. `npm run studio:build`로 다시 빌드하며, 이전 `/packages/react/studio/index.html` 주소는 같은 문서로 이동합니다. Overview, Foundations, 26개 컴포넌트 분류와 Patterns의 Form 8개·데이터 상태·빈 상태를 React로 표시합니다. Patterns의 Layout과 Page는 메뉴·검색·이전 다음 문서에서 제외합니다. 폼의 검증·초기화·파일 선택과 데이터 상태 전환은 로컬 예시로 동작하며 실제 저장·전송·예약은 수행하지 않습니다. Divider는 React 문서에서 추가한 컴포넌트이며 `/components/divider`에서 예시를 확인할 수 있습니다.
+정식 모노 문서는 `/systems/idenflu-mono/index.html`에서 React로 동작합니다. `npm run studio:build`로 다시 빌드하며, 이전 `/packages/react/studio/index.html` 주소는 같은 문서로 이동합니다. Overview, Foundations, 29개 컴포넌트 분류와 Patterns의 Layout·Form 8개·데이터 상태·빈 상태를 포함한 46개 문서를 제공합니다. Layout 문서에서는 사이드바 워크스페이스 샘플을 별도 화면으로 열 수 있습니다. 독립 Page 예시는 제공하지 않습니다. 폼의 검증·초기화·파일 선택과 데이터 상태 전환은 로컬 예시로 동작하며 실제 저장·전송·예약은 수행하지 않습니다. Divider는 `/components/divider`에서 예시를 확인할 수 있습니다.
 
 ## 개발과 배포
 

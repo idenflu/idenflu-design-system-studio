@@ -39,7 +39,7 @@ Each filename is also its React `Icon` name and CSS `icon-<name>` suffix.
 The original 47 assets and their source/license records above are preserved.
 Together with these 52 additions and the application icon below, the canonical
 catalog contains 100 SVG files.
-Research sources and selection rationale: [icon-research.md](../../../../../docs/icon-research.md).
+Research sources and selection rationale: [icon-research.md](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/icon-research.md).
 
 ## Application icons
 

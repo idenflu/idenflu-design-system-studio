@@ -8,8 +8,8 @@ React 컴포넌트는 `packages/react/src/`, 문서 예시는 `packages/react/st
 
 ## 리뷰와 검증
 
-1. 루트와 `packages/react`에서 `npm ci`를 실행한 뒤 `npm run check`, `npm test`, `npm run build`를 통과시킵니다.
-2. `npx playwright install chromium`, `npm run test:browser`로 밝은/어두운 데스크톱과 320px 모바일을 검증합니다. `npx playwright test --config packages/react/studio/playwright.config.cjs`로 React 문서 컴포넌트 회귀도 실행합니다.
+1. 루트와 `packages/react`에서 `npm ci`를 실행합니다. 루트의 `npm run check`, `npm test`, `npm run build`와 패키지의 `npm test`, `npm run typecheck`, `npm run studio:check`를 통과시킵니다.
+2. `npx playwright install chromium`, `npm run test:browser`와 `npx playwright test --config packages/react/studio/playwright.config.cjs`로 브라우저 회귀를 실행합니다. 기본 동작은 데스크톱 라이트에서 검사하고, 색상·대비에는 `@theme`, 반응형·터치·팝업·포커스·스크롤에는 필요한 `@mobile` 태그를 지정합니다. 모바일 전용 검사는 `@mobile-only`도 함께 지정합니다. 세부 기준은 [검사와 빌드](README.md#검사와-빌드)를 따릅니다.
 3. 기능 변경에는 사용자 영향을 드러내는 회귀 시나리오를 추가합니다. `packages/react/tests/`에서 단독 사용과 다중 인스턴스의 상태·이벤트·unmount 정리를 확인합니다.
 4. 포커스·키보드·기본/hover/selected/disabled/readonly/error/loading/empty 중 해당 상태를 확인합니다. reduced-motion·forced-colors·긴 라벨·좁은 화면을 포함합니다.
 5. 해당 컴포넌트의 적용 가이드·코드·값/이벤트 계약과 CHANGELOG를 갱신합니다.
@@ -22,6 +22,6 @@ React 컴포넌트는 `packages/react/src/`, 문서 예시는 `packages/react/st
 - 동일 소스에서 동일 해시를 생성합니다. 빌드 결과 파일을 직접 수정하거나 `?v=`를 수작업으로 갱신해 릴리스하지 않습니다.
 - 토큰·클래스·속성·값 타입·이벤트 이름/shape·키보드 동작은 소비 계약입니다. 삭제·의미 변경은 breaking change로 기록하고 마이그레이션 예제를 제공합니다.
 - 기능 추가는 minor, 호환 가능한 오류 수정은 patch를 올립니다. 0.x 기간에도 기존 소비자를 임의로 깨지 않습니다.
-- `package.json` 버전과 CHANGELOG를 맞추고 모든 검사를 통과한 뒤 태그/게시를 진행합니다. 저장소의 빌드·CI는 자동 게시나 외부 권한 변경을 수행하지 않습니다.
+- `packages/react/package.json` 버전과 CHANGELOG를 맞추고 모든 검사를 통과한 뒤 `Publish React package` 워크플로를 `main`에서 수동 실행합니다. 패키지는 자동 게시하지 않으며, 문서 사이트는 `main` 푸시 시 GitHub Pages로 자동 배포합니다.
 - 개발 브랜치는 `dev`, 검사·배포 브랜치는 `main`을 사용합니다. `dev` 푸시·PR에는 자동 Actions를 실행하지 않습니다. 배포할 변경을 `main`에 병합해 푸시합니다.
-- GitHub Actions는 `main` 푸시 시 검사·브라우저 검증·배포물 artifact를 생성합니다. 수동 실행도 `main`을 선택합니다. [Playwright의 공식 CI 안내](https://playwright.dev/docs/ci-intro)를 따릅니다.
+- 품질 워크플로는 `main` 푸시 시 검사·브라우저 검증·배포물 artifact를 생성하고, 별도 Pages 워크플로가 문서 사이트를 빌드·배포합니다. 수동 실행도 `main`을 선택합니다. [Playwright의 공식 CI 안내](https://playwright.dev/docs/ci-intro)를 따릅니다.
