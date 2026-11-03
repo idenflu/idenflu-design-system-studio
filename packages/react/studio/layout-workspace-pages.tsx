@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, NumberField, Progress, Segmented, Select, Switch, Table, TableContainer, TextArea, TextField, type DataGridColumn, type DateValue } from '../src';
+import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, NumberField, Progress, Select, Switch, Table, TableContainer, TextArea, TextField, type DataGridColumn, type DateValue } from '../src';
 import { badgeVariant, pageInfo, roles, statuses, teams, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings } from './layout-workspace-data';
 
 export function WorkspacePageHeader({title,description,eyebrow,action}: {title:string;description:string;eyebrow?:string;action?:React.ReactNode}){
@@ -28,9 +28,28 @@ export function InviteMemberForm({id,onInvite,existingEmails}: {id:string;onInvi
   </form>;
 }
 
+export function ProfileForm({id,member,members,onSave}: {id:string;member:Member;members:Member[];onSave:(profile:Pick<Member,'name'|'email'>)=>void}){
+  const [name,setName]=React.useState(member.name),[email,setEmail]=React.useState(member.email);
+  const [nameError,setNameError]=React.useState(''),[emailError,setEmailError]=React.useState('');
+  const nameInput=React.useRef<HTMLInputElement>(null),emailInput=React.useRef<HTMLInputElement>(null);
+  return <form id={id} className="layout-project-form" noValidate onSubmit={event=>{
+    event.preventDefault();
+    const nextName=name.trim(),nextEmail=email.trim(),others=members.filter(item=>item.id!==member.id);
+    if(!nextName){setNameError('이름을 입력해주세요.');nameInput.current?.focus();return;}
+    if(nextName!==member.name && others.some(item=>item.name.toLocaleLowerCase()===member.name.toLocaleLowerCase())){setNameError('같은 이름의 멤버가 있어 이름을 변경할 수 없습니다.');nameInput.current?.focus();return;}
+    if(nextName!==member.name && others.some(item=>item.name.toLocaleLowerCase()===nextName.toLocaleLowerCase())){setNameError('이미 사용 중인 이름입니다.');nameInput.current?.focus();return;}
+    if(!emailInput.current?.checkValidity()){emailInput.current?.reportValidity();return;}
+    if(others.some(item=>item.email.toLocaleLowerCase()===nextEmail.toLocaleLowerCase())){setEmailError('이미 등록된 이메일입니다.');emailInput.current?.focus();return;}
+    onSave({name:nextName,email:nextEmail});
+  }}>
+    <TextField ref={nameInput} label="이름" value={name} onChange={event=>{setName(event.target.value);setNameError('');}} required maxLength={60} error={nameError||undefined} autoFocus/>
+    <TextField ref={emailInput} label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setEmailError('');}} required maxLength={254} error={emailError||undefined}/>
+  </form>;
+}
+
 export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'projects'|'active-projects'|'reviews'|'completed';projects:Project[];onOpen:(id:string)=>void;onCreate:()=>void;onComplete:(ids:string[])=>void}){
   const [team,setTeam]=React.useState('all'),[status,setStatus]=React.useState('all'),[query,setQuery]=React.useState('');
-  const [density,setDensity]=React.useState('default'),[selected,setSelected]=React.useState<string[]>([]);
+  const [selected,setSelected]=React.useState<string[]>([]);
   const filterStatus=page==='active-projects'?'진행 중':page==='reviews'?'검토 중':page==='completed'?'완료':null;
   const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(team==='all'||project.team===team)&&(status==='all'||project.status===status)),[projects,filterStatus,team,status]);
   const availableIds=React.useMemo(()=>new Set(rows.map(row=>row.id)),[rows]);
@@ -45,8 +64,8 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
     {id:'due',header:'마감일',accessor:row=>row.due,width:135},
   ];
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
-    <div className="layout-filter-panel"><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]}/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]}/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setQuery('');}}>필터 초기화</Button><div className="layout-density"><Segmented label="표 밀도" value={density} onValueChange={setDensity} options={[{value:'default',label:'보통'},{value:'compact',label:'촘촘'}]}/></div></div>
-    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={10} pageSizeOptions={[10,20,50]} showColumnVisibility={false} density={density==='compact'?'compact':'default'} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button>} exportable exportFileName="workspace-projects.csv"/>
+    <div className="layout-filter-panel"><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]}/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]}/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setQuery('');}}>필터 초기화</Button></div>
+    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns.map(column=>({...column,resizable:false}))} getRowId={row=>row.id} getRowLabel={row=>row.name} searchLabel="프로젝트 검색" query={query} onQueryChange={setQuery} defaultPageSize={10} pageSizeOptions={[10,20,50]} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} selectionActions={<Button variant="ghost" size="sm" onClick={()=>{onComplete(visibleSelected);setSelected([]);}}>선택 항목 완료</Button>} exportable exportFileName="workspace-projects.csv"/>
     <p className="layout-content-caption">프로젝트 이름을 선택하면 상세 화면이 새 콘텐츠 탭으로 열립니다.</p>
   </>;
 }

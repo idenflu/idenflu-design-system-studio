@@ -6,16 +6,26 @@ type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void }
 export type DialogProps = DismissibleProps & { closeOnBackdrop?: boolean; variant?: 'default' | 'divided' } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>;
 
 /** Native modal dialog with keyboard focus wrapping and restoration. */
-export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, variant = 'default', onClick, onKeyDown, ...props }: DialogProps) {
+export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, variant = 'default', onClick, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
   const ref = React.useRef<HTMLDialogElement>(null);
+  const backdropPointerDown = React.useRef(false);
   useClientLayoutEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
-    else if (!open && dialog.open) dialog.close();
+    else if (!open) { backdropPointerDown.current = false; if (dialog.open) dialog.close(); }
   }, [open]);
   const isTopLayer = useEscapeLayer(open, ref, () => onOpenChange(false));
-  return <dialog {...props} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} onKeyDown={event => {
+  const isBackdrop = (event: React.MouseEvent<HTMLDialogElement> | React.PointerEvent<HTMLDialogElement>) => {
+    if (event.target !== event.currentTarget) return false;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
+  };
+  return <dialog {...props} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} onPointerDownCapture={event => {
+    backdropPointerDown.current = closeOnBackdrop && event.isPrimary && event.button === 0 && isBackdrop(event);
+    onPointerDownCapture?.(event);
+    if (event.defaultPrevented) backdropPointerDown.current = false;
+  }} onPointerCancelCapture={event => { backdropPointerDown.current = false; onPointerCancelCapture?.(event); }} onKeyDown={event => {
     onKeyDown?.(event);
     if (event.defaultPrevented || event.key !== 'Tab') return;
     const dialog = event.currentTarget;
@@ -24,7 +34,7 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     if (!first) { event.preventDefault(); dialog.focus(); }
     else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
-  }} onClick={event => { onClick?.(event); if (!event.defaultPrevented && closeOnBackdrop && event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onOpenChange(false); } }} onCancel={(event) => { event.preventDefault(); if (isTopLayer()) onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
+  }} onClick={event => { const beganOnBackdrop = backdropPointerDown.current; backdropPointerDown.current = false; onClick?.(event); if (!event.defaultPrevented && event.detail > 0 && closeOnBackdrop && beganOnBackdrop && isBackdrop(event)) onOpenChange(false); }} onCancel={(event) => { event.preventDefault(); if (isTopLayer()) onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
 }
 
 export const DialogHeader = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DialogHeader({className = '', ...props}, ref) {
@@ -85,8 +95,8 @@ export function Tooltip({ content, children }: { content: React.ReactNode; child
   </span>;
 }
 
-export type PopoverProps = { trigger: React.ReactNode; children: React.ReactNode; label?: string; open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void };
-export function Popover({ trigger, children, label, open: controlledOpen, defaultOpen = false, onOpenChange }: PopoverProps) {
+export type PopoverProps = { trigger: React.ReactNode; children: React.ReactNode; label?: string; triggerLabel?: string; iconOnly?: boolean; open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void };
+export function Popover({ trigger, children, label, triggerLabel, iconOnly = false, open: controlledOpen, defaultOpen = false, onOpenChange }: PopoverProps) {
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const open = controlledOpen ?? internalOpen;
   const setOpen = (next: boolean) => { if (controlledOpen === undefined) setInternalOpen(next); onOpenChange?.(next); };
@@ -105,7 +115,8 @@ export function Popover({ trigger, children, label, open: controlledOpen, defaul
     document.addEventListener('pointerdown', outside);
     return () => { document.removeEventListener('pointerdown', outside); };
   }, [open, controlledOpen, onOpenChange]);
-  return <div className="popover-wrap" ref={wrap}><button ref={button} type="button" className="button button--outline button-inline" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{trigger}</button><div id={id} className="popover-content" role="region" aria-label={label} hidden={!open}>{children}</div></div>;
+  const triggerButton = <button ref={button} type="button" className={`button button--outline button-inline${iconOnly ? ' button--icon' : ''}`} aria-label={triggerLabel} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>{trigger}</button>;
+  return <div className="popover-wrap" ref={wrap}>{iconOnly && triggerLabel ? <Tooltip content={triggerLabel}>{triggerButton}</Tooltip> : triggerButton}<div id={id} className="popover-content" role="region" aria-label={label} hidden={!open}>{children}</div></div>;
 }
 
 /** Menu item icons are decorative; label supplies the accessible name. */

@@ -74,7 +74,6 @@ const taskColumns:DataGridColumn<Task>[] = [
 ];
 
 export function DataGridDemos() {
-  const [density,setDensity] = React.useState<'default'|'compact'>('default');
   const [selected,setSelected] = React.useState<string[]>([]);
   const [sortModel,setSortModel] = React.useState<DataGridSort[]>([{columnId:'name',direction:'asc'}]);
   const [tasks,setTasks] = React.useState(initialTasks);
@@ -93,13 +92,14 @@ export function DataGridDemos() {
   };
   return <>
     <Section title="프로젝트 데이터그리드" description={`${projects.length}개 프로젝트에서 검색·열별 필터·정렬·선택·페이지 이동을 함께 사용합니다. 프로젝트 이름은 가로 스크롤 중에도 고정됩니다.`}>
-      <div className="studio-grid-demo-toolbar"><p className="react-studio-caption">Shift+클릭으로 정렬 조건을 추가하세요. 열 경계는 드래그하거나 방향키로 조절합니다.</p><Segmented label="데이터그리드 밀도" size="sm" value={density} onValueChange={value=>setDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
+
       <DataGrid label="프로젝트 데이터그리드" rows={projects} columns={projectColumns}
         getRowId={row=>row.id} getRowLabel={row=>row.name} selectable
         selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
         searchLabel="프로젝트 검색" defaultPageSize={5} pageSizeOptions={[5,10,20,50,100]}
-        sortModel={sortModel} onSortModelChange={setSortModel} density={density}
+        sortModel={sortModel} onSortModelChange={setSortModel}
         exportable exportFileName="idenflu-projects.csv" maxHeight={480} />
+      <p className="react-studio-caption">상단의 행 간격 아이콘으로 밀도를 전환합니다. Shift+클릭으로 정렬 조건을 추가하고, 열 경계는 드래그하거나 방향키로 조절합니다.</p>
       <p role="status" className="component-helper">정렬: {sortModel.length ? sortModel.map((sort,index)=>`${index+1}. ${projectColumns.find(column=>column.id===sort.columnId)?.header} ${sort.direction === 'asc' ? '오름차순' : '내림차순'}`).join(' · ') : '원래 순서'}</p>
       <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV는 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다.</p>
     </Section>
@@ -115,10 +115,10 @@ export function DataGridDemos() {
       <div className="studio-grid-virtual-toolbar"><Select label="가상 스크롤 데이터 수" value={String(virtualCount)} onValueChange={value=>{
         const count=Number(value);setVirtualCount(count);
         setVirtualRows(current=>current.length >= count ? current : [...current,...Array.from({length:count-current.length},(_,index)=>virtualProject(current.length+index))]);
-      }} options={[{value:'100',label:'100개'},{value:'1000',label:'1,000개'},{value:'10000',label:'10,000개'},{value:'50000',label:'50,000개'}]} /><Segmented label="가상 스크롤 밀도" size="sm" value={virtualDensity} onValueChange={value=>setVirtualDensity(value === 'compact' ? 'compact' : 'default')} options={[{value:'default',label:'Default'},{value:'compact',label:'Compact'}]} /></div>
+      }} options={[{value:'100',label:'100개'},{value:'1000',label:'1,000개'},{value:'10000',label:'10,000개'},{value:'50000',label:'50,000개'}]} /></div>
       <DataGrid label="대용량 데이터그리드" rows={largeRows} columns={virtualColumns}
         getRowId={row=>row.id} getRowLabel={row=>row.name}
-        virtualized={{estimateRowHeight:virtualDensity === 'compact' ? 61 : 73,overscan:8}} maxHeight={420} density={virtualDensity}
+        virtualized={{estimateRowHeight:virtualDensity === 'compact' ? 61 : 73,overscan:8}} maxHeight={420} density={virtualDensity} onDensityChange={setVirtualDensity}
         selectable selectedRowIds={virtualSelected} onSelectedRowIdsChange={setVirtualSelected}
         searchLabel="대용량 데이터 검색" exportable exportFileName="idenflu-virtual-projects.csv"
         onCellEdit={({rowId,value})=>{

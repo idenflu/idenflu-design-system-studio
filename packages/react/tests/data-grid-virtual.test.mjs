@@ -103,7 +103,7 @@ test('virtual result selection covers filtered records beyond rendered rows and 
     await click(checkbox(f.node,'검색 결과 전체 선택'));
     assert.deepEqual(changes.at(-1),rows.map(row=>row.id));
     await input(f.node.querySelector('input[type="search"]'),'항목 30');
-    assert.match(f.node.querySelector('.data-grid-selection').textContent,/30개 선택됨/);
+    assert.match(f.node.querySelector('.data-grid-selection-count').textContent,/30개 선택됨/);
     await click(checkbox(f.node,'검색 결과 전체 선택'));
     assert.equal(changes.at(-1).length,29);
     assert.equal(changes.at(-1).includes('id-30'),false);
@@ -132,12 +132,12 @@ test('switching virtualization on and off preserves selection and restores each 
     await f.render(h(DataGrid,{...base,virtualized:true}));
     assert.ok(checkbox(f.node,'검색 결과 전체 선택'));
     assert.equal(f.node.querySelector('.pagination'),null);
-    assert.match(f.node.querySelector('.data-grid-selection').textContent,/5개 선택됨/);
+    assert.match(f.node.querySelector('.data-grid-selection-count').textContent,/5개 선택됨/);
     await f.render(h(DataGrid,{...base,virtualized:false}));
     assert.ok(checkbox(f.node,'현재 페이지 전체 선택'));
     assert.ok(f.node.querySelector('.pagination'));
     assert.equal(f.node.querySelectorAll('tbody tr').length,5);
-    assert.match(f.node.querySelector('.data-grid-selection').textContent,/5개 선택됨/);
+    assert.match(f.node.querySelector('.data-grid-selection-count').textContent,/5개 선택됨/);
   } finally {await f.dispose();}
 });
 

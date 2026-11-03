@@ -124,7 +124,7 @@ test('buffered virtual rows keep their DOM across small scrolls and cover rapid 
 test('virtual rows remeasure after density and viewport changes without overlapping or dropping the tail',async({page,isMobile})=>{
   const grid=await openGrid(page);
   await jump(grid,0.5);
-  await page.getByRole('group',{name:'가상 스크롤 밀도',exact:true}).getByRole('button',{name:'Compact',exact:true}).click();
+  await grid.getByRole('button',{name:'촘촘한 행 간격',exact:true}).click();
   await page.setViewportSize({width:isMobile?320:1080,height:isMobile?860:760});
   await expectBounded(grid);
   const bounds=await records(grid).evaluateAll(elements=>elements.map(element=>{
@@ -134,7 +134,7 @@ test('virtual rows remeasure after density and viewport changes without overlapp
   await jump(grid,1);
   await expect(rowFor(grid,'ROW-10000')).toHaveCount(1);
   await expectBounded(grid);
-  await page.getByRole('group',{name:'가상 스크롤 밀도',exact:true}).getByRole('button',{name:'Default',exact:true}).click();
+  await grid.getByRole('button',{name:'촘촘한 행 간격',exact:true}).click();
   await jump(grid,1);
   await expect(rowFor(grid,'ROW-10000')).toHaveCount(1);
   await expectBounded(grid);
@@ -246,7 +246,7 @@ test('selection survives virtual unmounting and CSV exports offscreen selected r
   await expect(rowFor(grid,'ROW-10000')).toHaveCount(1);
   await rowFor(grid,'ROW-10000').getByRole('checkbox',{name:`${nameFor(10000)} 선택`,exact:true}).check();
   await grid.getByRole('searchbox',{name:'대용량 데이터 검색',exact:true}).fill(nameFor(42));
-  await expect(grid.locator('.data-grid-selection')).toContainText('2개 선택됨');
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('2개 선택됨');
   const downloading=page.waitForEvent('download');
   page.once('dialog',dialog => dialog.accept());
   await grid.getByRole('button',{name:'선택한 행 내보내기',exact:true}).click();
@@ -256,7 +256,7 @@ test('selection survives virtual unmounting and CSV exports offscreen selected r
   expect(csv.trimEnd().split('\r\n').length-1).toBe(2);
   await grid.getByRole('button',{name:'검색 초기화',exact:true}).click();
   await grid.getByRole('checkbox',{name:'검색 결과 전체 선택',exact:true}).check();
-  await expect(grid.locator('.data-grid-selection')).toContainText('10000개 선택됨');
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('10000개 선택됨');
   await expectBounded(grid);
   const allDownloading=page.waitForEvent('download');
   page.once('dialog',dialog => dialog.accept());

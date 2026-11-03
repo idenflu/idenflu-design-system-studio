@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Checkbox, Icon, Pagination, Spinner, Table, TextField } from './primitives';
-import { Popover } from './interactive';
+import { Popover, Tooltip } from './interactive';
 import { Select } from './navigation';
 import { DataGridCellEditor, downloadDataGridCsv } from './data-grid-tools';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
@@ -45,7 +45,7 @@ export interface DataGridProps<T> {
   selectedRowIds?: readonly string[];
   defaultSelectedRowIds?: readonly string[];
   onSelectedRowIdsChange?: (ids: string[]) => void;
-  /** Additional actions shown in the selection toolbar while rows are selected. */
+  /** Additional actions shown in the top toolbar while rows are selected. */
   selectionActions?: React.ReactNode;
   searchable?: boolean;
   searchLabel?: string;
@@ -70,6 +70,10 @@ export interface DataGridProps<T> {
   onPageSizeChange?: (pageSize: number) => void;
   pageSizeOptions?: readonly number[];
   density?: 'default' | 'compact';
+  defaultDensity?: 'default' | 'compact';
+  onDensityChange?: (density: 'default' | 'compact') => void;
+  /** A controlled density without onDensityChange remains read-only. */
+  showDensityToggle?: boolean;
   showColumnVisibility?: boolean;
   defaultHiddenColumnIds?: readonly string[];
   loading?: boolean;
@@ -112,12 +116,13 @@ export function DataGrid<T>({
   sortModel: controlledSortModel, defaultSortModel, onSortModelChange,
   page: controlledPage, defaultPage = 1, onPageChange,
   pageSize: controlledPageSize, defaultPageSize = 10, onPageSizeChange, pageSizeOptions = [5, 10, 20, 50],
-  density = 'default', showColumnVisibility = true, defaultHiddenColumnIds = [],
+  density: controlledDensity, defaultDensity = 'default', onDensityChange, showDensityToggle = true, showColumnVisibility = true, defaultHiddenColumnIds = [],
   loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, className,
   exportable = false, exportFileName = 'data-grid.csv', onCellEdit,
   virtualized = false, pagination,
 }: DataGridProps<T>) {
   const id = React.useId();
+  const [density, setDensity] = useGridValue(controlledDensity, defaultDensity, onDensityChange);
   const [query, setQuery] = useGridValue(controlledQuery, defaultQuery, onQueryChange);
   const [internalSortModel, setInternalSortModel] = React.useState<DataGridSortModel>(() => defaultSortModel ?? (defaultSort ? [defaultSort] : []));
   const requestedSortModel = React.useMemo(() => controlledSortModel ?? (controlledSort !== undefined ? controlledSort ? [controlledSort] : [] : internalSortModel), [controlledSortModel, controlledSort, internalSortModel]);
@@ -348,25 +353,44 @@ export function DataGrid<T>({
   const columnCount = Math.max(1, visibleColumns.length + (selectable ? 1 : 0));
   const status = loading ? '데이터를 불러오는 중입니다.' : hasError ? '데이터를 불러오지 못했습니다.' : !rows.length ? '등록된 데이터가 없습니다.' : !count ? '검색 결과가 없습니다.' : paginated ? `${(page - 1) * size + 1}–${Math.min(page * size, count)} / ${count}개 항목` : `${count}개 항목`;
 
-  return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined}>
+  const clearSelection = () => {
+    setSelected([]);
+    const target = root.current?.querySelector<HTMLElement>('thead input[type="checkbox"]:not(:disabled)')
+      || root.current?.querySelector<HTMLElement>('.data-grid-search input') || root.current;
+    target?.focus({preventScroll:true});
+  };
+
+  return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} tabIndex={-1} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined}>
     <p className="sr-only" id={`${id}-sort-help`}>클릭하면 단일 정렬을 변경합니다. Shift 키를 누르고 클릭하면 정렬 조건을 추가하거나 변경합니다.</p>
     <p className="sr-only" id={`${id}-resize-help`}>방향키로 10px, Shift와 함께 1px 조절합니다. Home과 End로 최소·최대 너비를 선택하고 Enter 또는 더블클릭으로 원래 너비 설정을 복구합니다.</p>
     <div className="data-grid-toolbar">
-      <div className="data-grid-heading"><strong>{label}</strong><span>{rows.length}개 항목</span></div>
+      <div className="data-grid-heading"><strong>{label}</strong><span className={selectable && selectedSet.size > 0 ? 'data-grid-selection-count' : undefined}>{selectable && selectedSet.size > 0 ? `${selectedSet.size}개 선택됨` : `${rows.length}개 항목`}</span></div>
       <div className="data-grid-tools">
         {searchable && <TextField containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="close" /></button> : undefined} />}
-        {showColumnVisibility && columns.length > 1 && <Popover trigger={<><Icon name="grid" />표시 열</>} label={`${label} 표시 열`}>
+        {selectable && selectedSet.size > 0 && <div className="data-grid-selection">
+          <div className="data-grid-selection-actions">
+            {selectionActions}
+            {exportable && <Tooltip content="선택한 행 CSV 내보내기"><Button variant="ghost" iconOnly aria-label="선택한 행 내보내기" disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}><Icon name="download" /></Button></Tooltip>}
+            <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="close" /></Button></Tooltip>
+          </div>
+        </div>}
+        {showDensityToggle && (controlledDensity === undefined || !!onDensityChange) && <Tooltip content={density === 'compact' ? '기본 행 간격으로 전환' : '촘촘한 행 간격으로 전환'}>
+          <Button variant={density === 'compact' ? 'primary' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
+            <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
+          </Button>
+        </Tooltip>}
+        {showColumnVisibility && columns.length > 1 && <Popover trigger={<Icon name="grid" />} triggerLabel="표시 열" iconOnly label={`${label} 표시 열`}>
           <div className="data-grid-column-options"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
             const checked = visibleColumns.some(item => item.id === column.id);
             return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;
           })}</div>
         </Popover>}
-        {exportable && <Button variant="outline" title="현재 검색·필터·정렬 결과의 모든 페이지와 표시 중인 열을 내보냅니다." disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" />CSV 내보내기</Button>}
+        {exportable && <Tooltip content="검색 결과 전체 CSV 내보내기"><Button variant="outline" iconOnly aria-label="CSV 내보내기" disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" /></Button></Tooltip>}
         {activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>}
       </div>
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>
-    {selectable && selectedSet.size > 0 && <div className="data-grid-selection"><span>{selectedSet.size}개 선택됨</span><div className="data-grid-selection-actions">{selectionActions}{exportable && <Button variant="ghost" size="sm" title="검색·필터와 관계없이 전체 데이터에서 선택한 행과 표시 중인 열을 내보냅니다." disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}>선택한 행 내보내기</Button>}<Button variant="ghost" size="sm" onClick={() => setSelected([])}>선택 해제</Button></div></div>}
+
     <div className="data-grid-viewport" style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight} : undefined}>
     <div id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" role="region" aria-label={`${label} 표`} aria-busy={loading} tabIndex={0} style={virtualEnabled ? {overflowAnchor:'none'} : undefined}>
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>

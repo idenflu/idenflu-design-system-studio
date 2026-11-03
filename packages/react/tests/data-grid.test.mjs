@@ -346,6 +346,45 @@ test('row click selection honors controlled values until the parent updates them
   } finally {await f.dispose();}
 });
 
+test('density is an internal toolbar toggle and supports controlled and read-only values', async () => {
+  const f=fixture(),changes=[];
+  try {
+    await f.render(h(DataGrid,{...props,defaultDensity:'compact'}));
+    const toggle=button(f.node,'촘촘한 행 간격');
+    assert.equal(f.node.querySelector('.data-grid').dataset.density,'compact');
+    assert.equal(toggle.getAttribute('aria-pressed'),'true');
+    assert.ok(f.node.querySelector('.data-grid-toolbar').contains(toggle));
+    await click(toggle);
+    assert.equal(f.node.querySelector('.data-grid').dataset.density,'default');
+    await f.render(h(DataGrid,{...props,density:'default',onDensityChange:value=>changes.push(value)}));
+    await click(button(f.node,'촘촘한 행 간격'));
+    assert.deepEqual(changes,['compact']);
+    assert.equal(f.node.querySelector('.data-grid').dataset.density,'default');
+    await f.render(h(DataGrid,{...props,density:'compact',onDensityChange:value=>changes.push(value)}));
+    assert.equal(button(f.node,'촘촘한 행 간격').getAttribute('aria-pressed'),'true');
+    await f.render(h(DataGrid,{...props,density:'compact'}));
+    assert.equal(button(f.node,'촘촘한 행 간격'),undefined);
+    await f.render(h(DataGrid,{...props,showDensityToggle:false}));
+    assert.equal(button(f.node,'촘촘한 행 간격'),undefined);
+  } finally {await f.dispose();}
+});
+
+test('selection summary and actions stay in the header and clearing restores checkbox focus', async () => {
+  const f=fixture();
+  try {
+    await f.render(h(DataGrid,{...props,selectable:true,exportable:true}));
+    await click(control(f.node,'Alpha 선택'));
+    const toolbar=f.node.querySelector('.data-grid-toolbar');
+    assert.match(toolbar.querySelector('.data-grid-selection-count').textContent,/1개 선택됨/);
+    assert.ok(toolbar.contains(button(f.node,'선택한 행 내보내기')));
+    assert.ok(toolbar.contains(button(f.node,'선택 해제')));
+    assert.equal(f.node.querySelector('.data-grid > .data-grid-selection'),null);
+    await click(button(f.node,'선택 해제'));
+    assert.equal(toolbar.querySelector('.data-grid-selection-count'),null);
+    assert.equal(document.activeElement,control(f.node,'현재 페이지 전체 선택'));
+  } finally {await f.dispose();}
+});
+
 test('custom selection actions appear with selected rows and remain usable', async () => {
   const f=fixture(); let calls=0;
   try {

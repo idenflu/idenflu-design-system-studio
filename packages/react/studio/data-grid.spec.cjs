@@ -9,19 +9,69 @@ test('data grid supports search, current-page selection and page size without do
   const grid = projectGrid(page);
   await expect(page.getByRole('heading',{level:1})).toHaveText('Data grid');
   await grid.getByRole('checkbox',{name:'현재 페이지 전체 선택',exact:true}).check();
-  await expect(grid.locator('.data-grid-selection')).toContainText('5개 선택됨');
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('5개 선택됨');
   await grid.getByRole('button',{name:'2페이지',exact:true}).click();
   await expect(grid.getByRole('checkbox',{name:'현재 페이지 전체 선택',exact:true})).not.toBeChecked();
-  await expect(grid.locator('.data-grid-selection')).toContainText('5개 선택됨');
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('5개 선택됨');
   await grid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('없는프로젝트XYZ');
   await expect(grid.locator('tbody')).toContainText('검색 결과가 없습니다.');
-  await expect(grid.locator('.data-grid-selection')).toContainText('5개 선택됨');
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('5개 선택됨');
   await grid.locator('.data-grid-state').getByRole('button',{name:'조건 초기화',exact:true}).click();
   await expect(grid.getByRole('button',{name:'1페이지',exact:true})).toHaveAttribute('aria-current','page');
   await grid.getByRole('combobox',{name:/^페이지당 행 수:/}).click();
   await page.getByRole('option',{name:'10개',exact:true}).click();
   await expect(grid.locator('tbody tr')).toHaveCount(10);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+});
+
+test('density and selection actions share a stable, accessible top toolbar', async ({page}) => {
+  await page.goto(route);
+  const grid=projectGrid(page),toolbar=grid.locator('.data-grid-toolbar');
+  await expect(page.getByRole('group',{name:'데이터그리드 밀도',exact:true})).toHaveCount(0);
+  const density=toolbar.getByRole('button',{name:'촘촘한 행 간격',exact:true});
+  const first=grid.locator('tbody tr[data-grid-row-id]').first();
+  const beforeDensity=await first.evaluate(row=>row.getBoundingClientRect().height);
+  await density.focus();await density.press('Space');
+  await expect(density).toHaveAttribute('aria-pressed','true');
+  await expect(grid).toHaveAttribute('data-density','compact');
+  expect(await first.evaluate(row=>row.getBoundingClientRect().height)).toBeLessThan(beforeDensity);
+  const ids=await grid.locator('tbody tr[data-grid-row-id]').evaluateAll(rows=>rows.map(row=>row.dataset.gridRowId));
+  const height=await toolbar.evaluate(el=>el.getBoundingClientRect().height);
+  await first.getByRole('checkbox').check();
+  await expect(toolbar.locator('.data-grid-selection-count')).toHaveText('1개 선택됨');
+  await expect(grid.locator(':scope > .data-grid-selection')).toHaveCount(0);
+  expect(await toolbar.evaluate(el=>el.getBoundingClientRect().height)).toBeCloseTo(height,0);
+  for(const name of ['표시 열','CSV 내보내기','선택한 행 내보내기','선택 해제']) {
+    const button=toolbar.getByRole('button',{name,exact:true});
+    await expect(button).toBeVisible();
+    await expect(button).toHaveText('');
+  }
+  await density.press('Space');
+  await expect(grid).toHaveAttribute('data-density','default');
+  await expect(first.getByRole('checkbox')).toBeChecked();
+  expect(await grid.locator('tbody tr[data-grid-row-id]').evaluateAll(rows=>rows.map(row=>row.dataset.gridRowId))).toEqual(ids);
+  await toolbar.getByRole('button',{name:'선택 해제',exact:true}).focus();
+  await toolbar.getByRole('button',{name:'선택 해제',exact:true}).press('Enter');
+  await expect(toolbar.locator('.data-grid-selection-count')).toHaveCount(0);
+  await expect(grid.getByRole('checkbox',{name:'현재 페이지 전체 선택',exact:true})).toBeFocused();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+});
+
+test('icon column settings open from the keyboard and fit the viewport', async ({page}) => {
+  await page.goto(route);
+  const grid=projectGrid(page),button=grid.getByRole('button',{name:'표시 열',exact:true});
+  await button.focus();
+  await expect(grid.getByRole('tooltip',{name:'표시 열',exact:true})).toBeVisible();
+  await button.press('Enter');
+  const popup=grid.getByRole('region',{name:'프로젝트 데이터그리드 표시 열',exact:true});
+  await expect(popup).toBeVisible();
+  await expect(grid.getByRole('tooltip',{name:'표시 열',exact:true})).toBeHidden();
+  const bounds=await popup.boundingBox(),width=page.viewportSize().width;
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x+bounds.width).toBeLessThanOrEqual(width);
+  await page.keyboard.press('Escape');
+  await expect(popup).toBeHidden();
+  await expect(button).toBeFocused();
 });
 
 test('project examples include 120 records with a 100-row page and reachable final record', async ({page}) => {
@@ -68,7 +118,7 @@ test('clicking row content selects once and the focused checkbox retains native 
   await content.click();
   await expect(checkbox).toBeChecked();
   await expect(checkbox).toBeFocused();
-  await expect(grid.locator('.data-grid-selection')).toContainText('1개 선택됨');
+  await expect(grid.locator('.data-grid-selection-count')).toContainText('1개 선택됨');
   await checkbox.press('Space');
   await expect(checkbox).not.toBeChecked();
   await checkbox.check();

@@ -90,7 +90,7 @@ test('bulk selection clears when a project leaves the current list',async({page,
   await navigate(page,'진행 중 프로젝트',isMobile);
   const row=panel(page).locator('.data-grid-table tbody tr').first();
   await row.getByRole('checkbox').check();
-  await expect(panel(page).locator('.data-grid-selection')).toContainText('1개 선택됨');
+  await expect(panel(page).locator('.data-grid-selection-count')).toContainText('1개 선택됨');
   await row.getByRole('button',{name:/디자인 시스템 v2/}).click();
   await panel(page).getByRole('button',{name:'완료로 표시',exact:true}).click();
   if(isMobile){
@@ -105,7 +105,7 @@ test('bulk completion uses the grid selection toolbar',async({page})=>{
   const row=panel(page).locator('.data-grid-table tbody tr').first();
   await row.getByRole('checkbox').check();
   const selection=panel(page).locator('.data-grid-selection');
-  await expect(selection).toContainText('1개 선택됨');
+  await expect(panel(page).locator('.data-grid-selection-count')).toContainText('1개 선택됨');
   await selection.getByRole('button',{name:'선택 항목 완료',exact:true}).click();
   await expect(row).toContainText('완료');
   await expect(selection).toHaveCount(0);
