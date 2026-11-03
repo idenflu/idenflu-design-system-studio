@@ -3,6 +3,27 @@ const {test,expect}=require('@playwright/test');
 const sample='/systems/idenflu-mono/index.html?layout=sidebar';
 const panel=page=>page.locator('.layout-workspace-tabs > .tab-panel:not([hidden])');
 
+test('account menu stays above the tabs toolbar',async({page,isMobile})=>{
+  test.skip(isMobile);
+  await page.setViewportSize({width:950,height:900});
+  await page.goto(sample);
+  await page.getByRole('button',{name:/사용자 메뉴/}).click();
+  const target=await page.evaluate(()=>{
+    const item=document.querySelector('.layout-account-menu [role="menuitem"]');
+    const toolbar=document.querySelector('.layout-tabs-toolbar');
+    const a=item.getBoundingClientRect(),b=toolbar.getBoundingClientRect();
+    const left=Math.max(a.left,b.left),right=Math.min(a.right,b.right);
+    const top=Math.max(a.top,b.top),bottom=Math.min(a.bottom,b.bottom);
+    if(right<=left||bottom<=top)return null;
+    const x=(left+right)/2,y=(top+bottom)/2;
+    return {x,y,hit:item.contains(document.elementFromPoint(x,y))};
+  });
+  expect(target,'menu item and toolbar must overlap').not.toBeNull();
+  expect(target.hit).toBe(true);
+  await page.mouse.click(target.x,target.y);
+  await expect(page.getByRole('dialog',{name:'내 프로필',exact:true})).toBeVisible();
+});
+
 async function editProfile(page){
   await page.getByRole('button',{name:/사용자 메뉴/}).click();
   await page.getByRole('menuitem',{name:'내 프로필',exact:true}).click();

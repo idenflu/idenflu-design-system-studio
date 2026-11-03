@@ -4,3 +4,5 @@ test-results/
 playwright-report/
 .DS_Store
 systems/idenflu-mono/docs-dist/
+.idea/
+/.ai/mcp/mcp.json

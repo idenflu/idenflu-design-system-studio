@@ -49,7 +49,7 @@
 .layout-tree-label > .ui-icon { flex:none; width:16px; height:16px; }
 .layout-tree-label > span:last-child { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .layout-statusbar i { display:inline-block; width:6px; height:6px; flex:none; background:var(--success); border-radius:50%; }
-.layout-workspace-topbar { grid-area:topbar; display:flex; align-items:center; justify-content:space-between; min-width:0; gap:var(--space-4); padding:0 var(--space-6); border-bottom:1px solid var(--border); background:var(--field-background); z-index:10; }
+.layout-workspace-topbar { grid-area:topbar; display:flex; align-items:center; justify-content:space-between; min-width:0; gap:var(--space-4); padding:0 var(--space-6); border-bottom:1px solid var(--border); background:var(--field-background); z-index:calc(var(--z-dropdown) + 1); }
 .layout-workspace-topbar .tooltip-content { top:calc(100% + var(--space-2)); bottom:auto; }
 .layout-workspace-topbar .tooltip-content::after { inset:auto 0 100%; }
 .layout-topbar-location { display:flex; align-items:center; gap:var(--space-2); flex:1; min-width:0; }
