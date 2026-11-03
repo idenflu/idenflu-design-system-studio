@@ -80,7 +80,7 @@ const displayProps: readonly PropertyRow[] = [
   ['showColumnFilterToggle', 'boolean', 'false', 'true이고 filter가 설정된 열이 있으면 툴바에 컬럼 필터 토글을 표시합니다. 토글은 초기에는 꺼져 있으며, 켜면 필터 행과 현재 필터 값을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. 비제어 필터는 비워지고, 제어 필터는 부모가 유지한 값이 있다면 다시 켤 때 적용됩니다. false이면 토글 없이 기존처럼 필터 행과 필터 조건을 항상 적용합니다.'],
   ['showColumnVisibility', 'boolean', 'true', '열이 둘 이상이면 표시 열 메뉴를 제공합니다. 마지막으로 보이는 열은 숨길 수 없습니다.'],
   ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 모든 열을 숨기도록 설정해도 첫 열 하나는 표시합니다. 이후 표시 상태는 내부에서 관리합니다.'],
-  ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '상단 검색·내장 도구·추가 도구의 기본 크기입니다. 기본 토큰에서 sm은 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식의 명시적인 size가 우선하고 행 밀도·푸터와 열 선택 팝업의 크기는 바꾸지 않습니다.'],
+  ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '상단 검색·내장 도구·추가 도구와 컬럼 필터(text·number·select)의 공통 크기입니다. 기본 토큰에서 sm은 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식의 명시적인 size가 우선하고 본문 행 밀도·푸터와 열 선택 팝업의 크기는 바꾸지 않습니다.'],
   ['toolbarOrder', 'readonly DataGridToolbarItem[]', '기본 순서', '지정한 도구를 먼저 배치하고 누락한 도구는 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 표시 조건은 각 도구의 속성을 따르며 DOM과 Tab 순서도 함께 바뀝니다.'],
   ['toolbarActions', 'ReactNode', 'undefined', '호출 측에서 직접 구현한 상시 작업의 UI입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음을 이동합니다. loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
   ['maxHeight', 'number | string', 'undefined', '툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
@@ -299,7 +299,7 @@ export function DataGridReference() {
       <PropertyTable title="CSV·Excel 내보내기" rows={exportProps} />
     </Section>
 
-    <Section id="data-grid-toolbar" title="상단 도구 모음" className="studio-grid-reference" description="toolbarSize로 도구 크기를, toolbarOrder로 도구의 배치와 Tab 순서를 설정합니다. 내장 도구는 표시 속성으로 설정하고, 업무 버튼은 toolbarActions 또는 selectionActions로 추가합니다.">
+    <Section id="data-grid-toolbar" title="상단 도구 모음" className="studio-grid-reference" description="toolbarSize로 상단 도구와 컬럼 필터의 공통 크기를, toolbarOrder로 도구의 배치와 Tab 순서를 설정합니다. 내장 도구는 표시 속성으로 설정하고, 업무 버튼은 toolbarActions 또는 selectionActions로 추가합니다.">
       <DetailTable title="내장 도구의 역할" rows={[
         ['컬럼 필터 토글', 'showColumnFilterToggle=true이고 필터 가능한 열이 있으면 표시합니다. 초기에는 꺼져 있으며 켜면 열별 필터 행을 표시하고 조건을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다.'],
         ['밀도 전환', '기본 행 간격과 compact를 전환합니다. 로딩·오류 상태에서는 비활성화합니다.'],
@@ -310,7 +310,7 @@ export function DataGridReference() {
         ['필터 초기화', '적용 중인 열별 필터 값이 있을 때 resetFilters 위치에 표시합니다. 클릭하면 필터를 비우고 onFiltersChange({})를 호출합니다.'],
       ]} />
       <PropertyTable title="상단 도구의 표시와 제어" rows={[
-        ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '검색 입력과 내장 도구, size를 생략한 자식 도구에 적용합니다. 기본 토큰의 높이는 sm 30px·md 36px·lg 42px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식에 명시한 size가 우선합니다.'],
+        ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '검색 입력과 내장 도구, size를 생략한 자식 도구 및 컬럼 필터(text·number·select)에 함께 적용합니다. 기본 토큰의 높이는 sm 30px·md 36px·lg 42px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식에 명시한 size가 우선합니다.'],
         ['toolbarOrder', 'readonly DataGridToolbarItem[]', '기본 순서', '배열에 지정한 키부터 배치하고, 누락한 키는 아래 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 각 도구의 표시 조건은 유지하며 화면·DOM·Tab 순서가 함께 바뀝니다.'],
         ['showColumnFilterToggle', 'boolean', 'false', 'true이고 필터 가능한 열이 있으면 컬럼 필터 토글을 표시하고 필터 행을 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하고 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. false이면 토글 없이 필터 가능한 열의 필터 행과 조건을 항상 적용합니다.'],
         ['showDensityToggle', 'boolean', 'true', '밀도 버튼을 표시합니다. false로 숨겨도 지정한 밀도는 유지합니다.'],
@@ -335,7 +335,7 @@ export function DataGridReference() {
         ['actions', '선택 여부와 무관하게 표시하는 toolbarActions 묶음입니다.'],
       ]} />
       <p className="studio-grid-reference-notes">DataGridToolbarItem은 위 8개 문자열의 유니언 타입이며 패키지에서 내보냅니다. 예제에서 컬럼 필터를 켜고 값을 입력하면 필터 초기화가 나타나고, 행을 선택하면 선택 행 CSV·선택 해제가 나타납니다.</p>
-      <p className="studio-grid-reference-notes">toolbarSize는 행 밀도와 푸터 크기에 영향을 주지 않습니다. 표시 열 팝업 안의 도구는 md를 유지합니다. toolbarOrder는 selection과 actions 묶음 전체를 이동하며, 추가 버튼 각각의 순서는 JSX 순서로 지정합니다.</p>
+      <p className="studio-grid-reference-notes">toolbarSize는 상단 도구와 컬럼 필터의 공통 크기를 조정하며 본문 행 밀도와 푸터 크기에 영향을 주지 않습니다. 표시 열 팝업 안의 도구는 md를 유지합니다. toolbarOrder는 selection과 actions 묶음 전체를 이동하며, 추가 버튼 각각의 순서는 JSX 순서로 지정합니다.</p>
       <p className="studio-grid-reference-notes">추가한 버튼은 loading·error에서도 자동으로 비활성화되지 않습니다. 각 버튼의 disabled와 오류 처리를 직접 연결하세요. 내장 CSV 내보내기 완료 전용 콜백과 열 표시 변경 콜백은 제공하지 않습니다. CSV 저장을 직접 처리하려면 아래 독립 CSV API를 사용하세요.</p>
       <p className="studio-grid-reference-notes">상단 도구 확장 섹션에서 toolbarActions·selectionActions의 동작 예제와 상태 연결 코드를 확인하세요. 업무 동작은 호출 측에서 직접 구현합니다.</p>
     </Section>
@@ -401,6 +401,7 @@ const filters: DataGridFilters = {
           ['.data-grid-table tbody tr[data-selected="true"] > td', '선택 행의 일반·고정 셀 배경에 함께 적용하는 선택자입니다.'],
           ['.data-grid[data-density="compact"] / [data-virtualized]', '현재 밀도 / 가상화가 켜진 그리드를 구분합니다.'],
           ['.data-grid-pinned / .data-grid-select-cell / .data-grid-filter-row', '시작 고정 셀, 선택 체크박스 셀, 필터 행입니다. 고정 위치는 그리드가 계산합니다.'],
+          ['.data-grid-tools[data-size] / .data-grid-filter-row[data-size]', 'toolbarSize를 적용하는 상단 도구와 컬럼 필터의 크기 범위입니다. 본문 데이터 행과 푸터는 이 범위에 포함하지 않습니다.'],
           ['.data-grid-cell-content / .data-grid-editor / .data-grid-editor-error', '읽기 상태의 셀 내용, 편집 입력·버튼 묶음, 편집 오류입니다.'],
           ['.data-grid-selection-actions / .data-grid-state / .data-grid-footer', '선택 액션 묶음, 로딩·오류·빈 상태 안내, 상태·페이지 영역입니다.'],
         ]} />

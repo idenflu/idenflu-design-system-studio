@@ -175,6 +175,75 @@ test('toolbar size scopes inherited controls while explicit sizes, rows and foot
   } finally { await f.dispose(); }
 });
 
+test('column filters inherit toolbar size without resetting filters, selection or sorting', async () => {
+  const f = fixture(), filterChanges = [], selectionChanges = [], sortChanges = [];
+  const filterColumns = [
+    {...columns[0]},
+    {id:'amount',header:'금액',accessor:row => row.amount,filter:'number'},
+    {...columns[1],filter:'select',filterOptions:[{value:'디자인',label:'디자인'},{value:'개발',label:'개발'}]},
+  ];
+  const base = {...props,columns:filterColumns,showColumnFilterToggle:true,
+    rows:[
+      {id:'a',name:'Alpha',amount:10,team:'디자인'},
+      {id:'b',name:'Beta',amount:20,team:'디자인'},
+      {id:'c',name:'Gamma',amount:30,team:'개발'},
+      {id:'d',name:'Delta',amount:40,team:'디자인'},
+    ],
+    onFiltersChange:value => filterChanges.push(value),
+    onSelectedRowIdsChange:value => selectionChanges.push(value),
+    onSortChange:value => sortChanges.push(value),
+  };
+  try {
+    await f.render(base);
+    await click(button(f.node,'컬럼 필터'));
+    const filterRow = f.node.querySelector('.data-grid-filter-row');
+    const text = filterRow.querySelector('input[aria-label="이름 필터"]');
+    const minimum = filterRow.querySelector('input[aria-label="금액 최솟값"]');
+    const maximum = filterRow.querySelector('input[aria-label="금액 최댓값"]');
+    const select = filterRow.querySelector('[role="combobox"]');
+    await input(text,'a');
+    await input(minimum,'5');
+    await input(maximum,'25');
+    await click(select);
+    const list = document.getElementById(select.getAttribute('aria-controls'));
+    await click([...list.querySelectorAll('[role="option"]')].find(element => element.textContent.trim() === '디자인'));
+    await click(button(f.node,'금액'));
+    await click(button(f.node,'금액'));
+    await click(f.node.querySelector('tbody tr[data-grid-row-id="a"] input[type="checkbox"]'));
+    await click(button(f.node,'표시 열'));
+    const changeCounts = [filterChanges.length,selectionChanges.length,sortChanges.length];
+    assert.deepEqual(filterChanges.at(-1),{name:'a',amount:{min:'5',max:'25'},team:'디자인'});
+    assert.deepEqual(selectionChanges.at(-1),['a']);
+    assert.deepEqual(sortChanges.at(-1),{columnId:'amount',direction:'desc'});
+
+    for (const size of ['sm','md','lg']) {
+      await f.render({...base,toolbarSize:size});
+      assert.equal(f.node.querySelector('.data-grid-filter-row'),filterRow,'size changes retain the filter controls');
+      assert.equal(filterRow.getAttribute('data-size'),size);
+      assert.equal(toolbar(f.node).getAttribute('data-size'),size);
+      for (const control of [text,minimum,maximum,select]) {
+        assert.equal(control.closest('[data-size]'),filterRow,'text, numeric and select filters inherit the row scope');
+      }
+      assert.equal(text.value,'a');
+      assert.equal(minimum.value,'5');
+      assert.equal(maximum.value,'25');
+      assert.equal(select.getAttribute('aria-label'),'팀 필터: 디자인');
+      assert.deepEqual(shownNames(f.node),['Beta','Alpha']);
+      assert.equal(button(f.node,'금액').closest('th').getAttribute('aria-sort'),'descending');
+      assert.equal(f.node.querySelector('tbody tr[data-grid-row-id="a"] input[type="checkbox"]').checked,true);
+      assert.deepEqual([filterChanges.length,selectionChanges.length,sortChanges.length],changeCounts,'size changes do not publish data changes');
+      assert.equal(f.node.querySelector('tbody').closest('[data-size]'),null);
+      assert.equal(f.node.querySelector('tbody input[type="checkbox"]').closest('[data-size]'),null);
+      assert.equal(f.node.querySelector('.data-grid-footer').closest('[data-size]'),null);
+      assert.equal(f.node.querySelector('.data-grid').getAttribute('data-density'),'default');
+      const columnOptions = f.node.querySelector('.data-grid-column-options');
+      assert.equal(columnOptions.getAttribute('data-size'),'md');
+      assert.equal(columnOptions.querySelector('input').closest('[data-size]'),columnOptions);
+      assert.equal(button(f.node,'표시 열').getAttribute('aria-expanded'),'true');
+    }
+  } finally { await f.dispose(); }
+});
+
 test('toolbar size and ordering render on the server without browser globals', () => {
   const source = `
 import React from 'react';

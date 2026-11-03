@@ -51,7 +51,7 @@ export interface DataGridProps<T> {
   selectionActions?: React.ReactNode;
   /** Additional top-toolbar actions shown regardless of row selection. */
   toolbarActions?: React.ReactNode;
-  /** Size inherited by toolbar controls. Defaults to sm; row and footer sizes are unchanged. */
+  /** Shared size for toolbar controls and column filters. Defaults to sm; body and footer sizes are unchanged. */
   toolbarSize?: 'sm' | 'md' | 'lg';
   /** Render these toolbar groups first, then append unspecified groups in default order. */
   toolbarOrder?: readonly DataGridToolbarItem[];
@@ -444,7 +444,7 @@ export function DataGrid<T>({
               drag.current = {id:column.id, startX:event.clientX, startWidth:columnWidth(column), direction:event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget).direction === 'rtl' ? -1 : 1};
             }} onPointerMove={event => { if (drag.current?.id === column.id) resize(column, drag.current.startWidth + (event.clientX - drag.current.startX) * drag.current.direction); }} onPointerUp={event => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }} />}
           </th>; })}
-        </tr>{filterRowVisible && <tr id={`${id}-filters`} className="data-grid-filter-row" aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
+        </tr>{filterRowVisible && <tr id={`${id}-filters`} className="data-grid-filter-row" data-size={toolbarSize} aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
           const filter = filters[column.id];
           return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select hideLabel label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={typeof filter === 'object' ? filter.min || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={typeof filter === 'object' ? filter.max || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), max:event.target.value})} /></div> : null}</td>;
         })}</tr>}</thead>
