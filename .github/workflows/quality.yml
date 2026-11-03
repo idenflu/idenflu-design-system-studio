@@ -5,6 +5,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   react-package:
     if: github.ref == 'refs/heads/main'
@@ -37,15 +40,18 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            packages/react/package-lock.json
       - run: npm ci
       - run: npm ci
         working-directory: packages/react
       - run: npm run check
       - run: npm test
       - run: npm run build
+      - run: node packages/react/scripts/build-studio.mjs
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
-      - run: npx playwright test --config packages/react/studio/playwright.config.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -55,4 +61,39 @@ jobs:
             test-results/
             packages/react/test-results/
             dist/
+          retention-days: 14
+  studio-browser:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    env:
+      PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report
+      PLAYWRIGHT_HTML_OPEN: never
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            packages/react/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: packages/react
+      - run: npm run build
+      - run: node packages/react/scripts/build-studio.mjs
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --config packages/react/studio/playwright.config.cjs --shard=${{ matrix.shard }}/4 --workers=2 --reporter=line,html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-studio-${{ matrix.shard }}
+          path: |
+            playwright-report/
+            packages/react/test-results/
           retention-days: 14

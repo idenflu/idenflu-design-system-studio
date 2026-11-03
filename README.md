@@ -68,6 +68,14 @@ npx playwright test --config packages/react/studio/playwright.config.cjs
 
 정적 검사, 설정 계약·결정적 빌드, React 단위 테스트와 라이트·다크·320px 브라우저 회귀를 실행합니다.
 
+품질 CI는 기본 브라우저 검사와 Studio 검사를 독립 작업으로 실행합니다. Studio의 전체 테스트를 4개 shard로 나누어 동시에 검사하고 각 shard는 worker 2개를 사용합니다. CI에서는 문서를 미리 빌드한 뒤 파일 감시가 없는 정적 서버를 사용합니다. 같은 브랜치에 새 커밋을 푸시하면 이전 품질 검사를 취소합니다.
+
+로컬에서 Studio 분할 실행을 확인하려면 아래 명령의 `1`을 `1`~`4`로 바꿔 각 shard를 실행합니다.
+
+```sh
+npx playwright test --config packages/react/studio/playwright.config.cjs --shard=1/4 --workers=2
+```
+
 `npm run build`는 React 패키지를 빌드한 뒤 `dist/`에 갤러리와 정식 모노 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포합니다. React 문서·CSS·테마·설정은 내용 기반 해시를 사용하며 `dist/systems/idenflu-mono/manifest.json`에서 파일명을 확인합니다. 폰트·아이콘과 라이선스도 함께 복사합니다. 이전 React 미리보기 주소의 리다이렉트도 배포물에 포함합니다.
 
 ## GitHub Pages 배포
