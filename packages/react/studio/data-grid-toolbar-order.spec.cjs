@@ -224,3 +224,60 @@ test('toolbar configuration keeps stable control widths and complete single-line
   }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
+
+test('empty toolbar tools reserve one control row while populated tools can wrap', async ({page}) => {
+  await page.goto('/systems/idenflu-mono/index.html#/components/data-grid');
+  const example = page.locator('#data-grid-toolbar-demo');
+  const grid = example.getByRole('group', {name:'상단 도구 모음 데이터그리드',exact:true});
+  const toolbar = grid.locator('.data-grid-toolbar');
+  const tools = grid.locator('.data-grid-tools');
+  const activeControls = tools.getByRole('searchbox').or(tools.getByRole('button'));
+  const visibilityLabels = [];
+  for (const label of ['검색 입력 표시','컬럼 필터 토글 사용','행 밀도 버튼 표시','표시 열 버튼 표시','CSV 버튼 표시','Excel 버튼 표시']) {
+    const checkbox = example.getByRole('checkbox', {name:label,exact:true});
+    if (label === 'Excel 버튼 표시' && await checkbox.count() === 0) continue;
+    await expect(checkbox).toHaveCount(1);
+    await checkbox.uncheck();
+    visibilityLabels.push(label);
+  }
+  for (const [size,option] of [['sm','SM (기본)'],['md','MD'],['lg','LG']]) {
+    await example.getByRole('combobox', {name:/^상단 도구 크기:/}).click();
+    await example.getByRole('listbox', {name:'상단 도구 크기',exact:true}).getByRole('option', {name:option,exact:true}).click();
+    await expect(tools).toHaveAttribute('data-size',size);
+    await expect(activeControls).toHaveCount(0);
+    const expectedHeight = await tools.evaluate((element,value) => {
+      const probe = element.ownerDocument.createElement('span');
+      Object.assign(probe.style, {position:'fixed',visibility:'hidden',pointerEvents:'none',width:'0',padding:'0',border:'0',height:`var(--size-${value}-height)`});
+      element.append(probe);
+      const height = probe.getBoundingClientRect().height;
+      probe.remove();
+      return height;
+    },size);
+    expect(expectedHeight).toBeGreaterThan(0);
+    const measureTools = () => tools.evaluate(element => ({height:element.getBoundingClientRect().height,minHeight:parseFloat(getComputedStyle(element).minHeight)}));
+    const empty = await measureTools();
+    expect(empty.minHeight).toBeCloseTo(expectedHeight,1);
+    expect(empty.height).toBeCloseTo(expectedHeight,1);
+    const emptyToolbarHeight = await toolbar.evaluate(element => element.getBoundingClientRect().height);
+    for (const label of visibilityLabels) {
+      const checkbox = example.getByRole('checkbox', {name:label,exact:true});
+      await checkbox.check();
+      await expect(activeControls).toHaveCount(1);
+      const single = await measureTools();
+      expect(single.minHeight,`${size}: ${label}`).toBeCloseTo(expectedHeight,1);
+      expect(single.height,`${size}: ${label}`).toBeCloseTo(expectedHeight,1);
+      expect(await toolbar.evaluate(element => element.getBoundingClientRect().height),`${size}: ${label} toolbar`).toBeCloseTo(emptyToolbarHeight,1);
+      await checkbox.uncheck();
+      await expect(activeControls).toHaveCount(0);
+    }
+    for (const label of visibilityLabels) await example.getByRole('checkbox', {name:label,exact:true}).check();
+    await expect(activeControls).toHaveCount(visibilityLabels.length);
+    const populated = await measureTools();
+    expect(populated.minHeight).toBeCloseTo(expectedHeight,1);
+    expect(populated.height).toBeGreaterThanOrEqual(expectedHeight);
+    expect(await tools.evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    for (const label of visibilityLabels) await example.getByRole('checkbox', {name:label,exact:true}).uncheck();
+    await expect(activeControls).toHaveCount(0);
+  }
+});
