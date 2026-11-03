@@ -13,7 +13,7 @@ interface Props {
 /** Native scrollbar surfaces keep compositor dragging separate from the rows. */
 export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollRef, controls, label}: Props) {
   const vertical = React.useRef<HTMLDivElement>(null), horizontal = React.useRef<HTMLDivElement>(null);
-  const [metrics,setMetrics] = React.useState({width:0,height:0,extent:0,breadth:0,top:0,left:0,header:0,size:15});
+  const [metrics,setMetrics] = React.useState({width:0,height:0,extent:0,breadth:0,top:0,left:0,header:0,split:0,size:15});
   const [extent,setExtent] = React.useState({height:0,width:0});
   const size = React.useRef(15);
   const synced = React.useRef<{top:number|null;left:number|null}>({top:null,left:null});
@@ -50,7 +50,8 @@ export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollR
         const gutter = Math.max(element.offsetWidth - element.clientWidth - (parseFloat(style.borderLeftWidth)||0) - (parseFloat(style.borderRightWidth)||0), element.offsetHeight - element.clientHeight - (parseFloat(style.borderTopWidth)||0) - (parseFloat(style.borderBottomWidth)||0));
         if (gutter > 0) size.current = gutter;
       }
-      const next = {width:element.clientWidth,height:element.clientHeight,extent:element.scrollHeight,breadth:element.scrollWidth,top:element.scrollTop,left:element.scrollLeft,header:headerRef.current?.getBoundingClientRect().height ?? 0,size:size.current};
+      const header = headerRef.current;
+      const next = {width:element.clientWidth,height:element.clientHeight,extent:element.scrollHeight,breadth:element.scrollWidth,top:element.scrollTop,left:element.scrollLeft,header:header?.getBoundingClientRect().height ?? 0,split:header && header.rows.length > 1 ? header.rows[0].getBoundingClientRect().height : 0,size:size.current};
       refreshExtent();
       syncControls();
       setMetrics(previous => Object.keys(next).every(key => next[key as keyof typeof next] === previous[key as keyof typeof next]) ? previous : next);
@@ -144,7 +145,9 @@ export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollR
     move(axis,event.key === 'Home' ? 0 : event.key === 'End' ? max : current + (event.key === 'PageUp' ? -page : event.key === 'PageDown' ? page : ['ArrowUp','ArrowLeft'].includes(event.key) ? -40 : 40));
   };
   return <>
-    {showVertical && <><div className="data-grid-scrollbar-header" aria-hidden="true" style={{width:metrics.size,height:metrics.header+1}} />
+    {showVertical && <><div className="data-grid-scrollbar-header" aria-hidden="true" style={{width:metrics.size,height:metrics.header+1}}>
+      {metrics.split > 0 && <span className="data-grid-scrollbar-header-divider" style={{top:metrics.split-1}} />}
+    </div>
       <div ref={vertical} className="data-grid-native-vertical" role="scrollbar" tabIndex={0} aria-label={label} aria-controls={controls} aria-orientation="vertical" aria-valuemin={0} aria-valuemax={Math.max(0,metrics.extent-metrics.height)} aria-valuenow={Math.max(0,metrics.top)}
         style={{width:metrics.size,height:Math.max(0,metrics.height-metrics.header),marginTop:metrics.header+1}}
         onPointerDownCapture={event=>start('top',event)} onScroll={event=>onScroll('top',event)} onKeyDown={event=>key('top',event)}>
