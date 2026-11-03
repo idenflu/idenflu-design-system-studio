@@ -54,15 +54,35 @@ test('role permission and notification drafts survive selection changes and save
   await expect(permission).not.toBeChecked();
   await permission.check();
   await openConnections(page,'알림');
-  const notification=detail(page).getByRole('checkbox',{name:'마감일 알림',exact:true});
-  await expect(notification).not.toBeChecked();
-  await notification.check();
+  const appNotification=detail(page).getByRole('checkbox',{name:'마감일 알림 앱',exact:true});
+  const emailNotification=detail(page).getByRole('checkbox',{name:'마감일 알림 이메일',exact:true});
+  await expect(appNotification).not.toBeChecked();
+  await expect(emailNotification).not.toBeChecked();
+  await expect(emailNotification).toBeDisabled();
+  await appNotification.check();
+  await expect(emailNotification).not.toBeChecked();
+  for(const name of ['프로젝트 상태 변경','마감일 알림','검토 요청','멤버 초대 알림','주간 활동 요약']){
+    const app=detail(page).getByRole('checkbox',{name:`${name} 앱`,exact:true});
+    const email=detail(page).getByRole('checkbox',{name:`${name} 이메일`,exact:true});
+    await expect(app).toBeVisible();
+    await expect(app).toBeEnabled();
+    await expect(email).toBeVisible();
+    await expect(email).toBeDisabled();
+    await expect(email).not.toBeChecked();
+  }
   await selectRole(page,'관리자');
+  await openConnections(page,'알림');
+  for(const name of ['프로젝트 상태 변경','마감일 알림','검토 요청','멤버 초대 알림','주간 활동 요약']){
+    const email=detail(page).getByRole('checkbox',{name:`${name} 이메일`,exact:true});
+    await expect(email).toBeDisabled();
+    await expect(email).not.toBeChecked();
+  }
   await selectRole(page,'뷰어');
   await openConnections(page,'권한');
   await expect(permission).toBeChecked();
   await openConnections(page,'알림');
-  await expect(notification).toBeChecked();
+  await expect(appNotification).toBeChecked();
+  await expect(emailNotification).not.toBeChecked();
   const save=detail(page).getByRole('button',{name:'변경사항 저장',exact:true});
   await expect(save).toBeEnabled();
   await save.click();
@@ -73,7 +93,16 @@ test('role permission and notification drafts survive selection changes and save
   await openConnections(page,'권한');
   await expect(permission).toBeChecked();
   await openConnections(page,'알림');
-  await expect(notification).toBeChecked();
+  await expect(appNotification).toBeChecked();
+  await expect(emailNotification).not.toBeChecked();
+  await expect(emailNotification).toBeDisabled();
+  await expect(save).toBeDisabled();
+  await appNotification.uncheck();
+  await expect(appNotification).not.toBeChecked();
+  await expect(emailNotification).not.toBeChecked();
+  await detail(page).getByRole('button',{name:'변경 취소',exact:true}).click();
+  await expect(appNotification).toBeChecked();
+  await expect(emailNotification).not.toBeChecked();
   await expect(save).toBeDisabled();
 });
 

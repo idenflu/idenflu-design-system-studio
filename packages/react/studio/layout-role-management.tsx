@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { Avatar, Badge, Button, Checkbox, Icon, Tabs, TextField } from '../src';
 import { WorkspacePageHeader } from './layout-workspace-pages';
-import { roleNotifications, rolePermissions, type RoleConnections, type WorkspaceRole } from './layout-role-data';
+import { roleNotificationChannels, roleNotifications, rolePermissions, type RoleConnections, type RoleNotificationChannel, type WorkspaceRole } from './layout-role-data';
 import { type Member } from './layout-workspace-data';
 
 const permissionGroups = [...new Set(rolePermissions.map(item=>item.group))];
 const sameConnections = (a:RoleConnections,b:RoleConnections) =>
   a.permissions.length===b.permissions.length && a.permissions.every(id=>b.permissions.includes(id)) &&
-  a.notifications.length===b.notifications.length && a.notifications.every(id=>b.notifications.includes(id));
+  roleNotifications.every(({id})=>roleNotificationChannels.every(channel=>!!a.notifications[id]?.includes(channel)===!!b.notifications[id]?.includes(channel)));
+const notificationCount = (connections:RoleConnections) => roleNotifications.filter(({id})=>connections.notifications[id]?.length).length;
 
 export function RoleManagementPage({roles,members,onSave}: {
   roles:WorkspaceRole[];
@@ -26,14 +27,23 @@ export function RoleManagementPage({roles,members,onSave}: {
   React.useEffect(()=>{if(selected&&selected.id!==selectedId)setSelectedId(selected.id);},[selected?.id,selectedId]);
   React.useEffect(()=>setFeedback(''),[selected?.id]);
 
-  const update = (field:keyof RoleConnections,ids:string[]) => {
+  const updatePermissions = (ids:string[]) => {
     if(!selected || !draft)return;
-    setDrafts(current=>({...current,[selected.id]:{...draft,[field]:ids}}));
+    setDrafts(current=>({...current,[selected.id]:{...draft,permissions:ids}}));
     setFeedback('');
   };
-  const toggle = (field:keyof RoleConnections,id:string,checked:boolean) => {
+  const togglePermission = (id:string,checked:boolean) => {
     if(!draft)return;
-    update(field,checked?[...draft[field],id]:draft[field].filter(value=>value!==id));
+    updatePermissions(checked?[...draft.permissions,id]:draft.permissions.filter(value=>value!==id));
+  };
+  const toggleNotification = (id:string,channel:RoleNotificationChannel,checked:boolean) => {
+    if(!selected || !draft)return;
+    const channels=draft.notifications[id]??[];
+    const next=checked?[...channels,channel]:channels.filter(value=>value!==channel);
+    const notifications={...draft.notifications};
+    if(next.length)notifications[id]=next;else delete notifications[id];
+    setDrafts(current=>({...current,[selected.id]:{...draft,notifications}}));
+    setFeedback('');
   };
   const clearDraft = () => {
     if(!selected)return;
@@ -41,7 +51,7 @@ export function RoleManagementPage({roles,members,onSave}: {
   };
   const save = () => {
     if(!selected || !draft)return;
-    onSave(selected.id,{permissions:[...draft.permissions],notifications:[...draft.notifications]});
+    onSave(selected.id,{permissions:[...draft.permissions],notifications:Object.fromEntries(Object.entries(draft.notifications).map(([id,channels])=>[id,[...channels]]))});
     clearDraft();
     setFeedback(`${selected.name} 역할의 설정을 저장했습니다.`);
   };
@@ -58,7 +68,7 @@ export function RoleManagementPage({roles,members,onSave}: {
           {visible.map(role=>{
             const connections=drafts[role.id]??role;
             return <button className="layout-master-item layout-role-item" type="button" key={role.id} aria-label={role.name} aria-pressed={selected?.id===role.id} onClick={()=>setSelectedId(role.id)}>
-              <span><strong>{role.name}</strong><small>권한 {connections.permissions.length}개 · 알림 {connections.notifications.length}개</small></span>
+              <span><strong>{role.name}</strong><small>권한 {connections.permissions.length}개 · 알림 {notificationCount(connections)}개</small></span>
               <Badge variant="neutral">{memberCount(role)}명</Badge>
             </button>;
           })}
@@ -69,7 +79,7 @@ export function RoleManagementPage({roles,members,onSave}: {
         {selected&&draft?<>
           <header className="layout-role-header">
             <Avatar variant="neutral"><Icon name="shield-check"/></Avatar>
-            <div><div className="layout-role-title"><h2>{selected.name}</h2>{dirty&&<Badge variant="warning">변경 중</Badge>}</div><p>{selected.description}</p><span className="layout-role-members"><Icon name="users"/>이 역할을 사용하는 멤버 {memberCount(selected)}명</span></div>
+            <div><div className="layout-role-title"><h2>{selected.name}</h2><Badge variant="warning" style={{visibility:dirty?'visible':'hidden'}} aria-hidden={!dirty}>변경 중</Badge></div><p>{selected.description}</p><span className="layout-role-members"><Icon name="users"/>이 역할을 사용하는 멤버 {memberCount(selected)}명</span></div>
           </header>
           <Tabs className="layout-role-tabs" label="역할 연결 정보" items={[
             {value:'permissions',label:`권한 ${draft.permissions.length}`,content:<>
@@ -78,19 +88,19 @@ export function RoleManagementPage({roles,members,onSave}: {
                 const items=rolePermissions.filter(item=>item.group===group);
                 const count=items.filter(item=>draft.permissions.includes(item.id)).length;
                 return <section className="layout-role-permission-group" key={group} aria-label={`${group} 권한`}>
-                  <header><h4>{group}</h4><Checkbox label={`${group} 전체 선택`} checked={count===items.length} indeterminate={count>0&&count<items.length} onChange={event=>update('permissions',event.target.checked?[...new Set([...draft.permissions,...items.map(item=>item.id)])]:draft.permissions.filter(id=>!items.some(item=>item.id===id)))}/></header>
+                  <header><h4>{group}</h4><Checkbox label={`${group} 전체 선택`} checked={count===items.length} indeterminate={count>0&&count<items.length} onChange={event=>updatePermissions(event.target.checked?[...new Set([...draft.permissions,...items.map(item=>item.id)])]:draft.permissions.filter(id=>!items.some(item=>item.id===id)))}/></header>
                   <div className="layout-role-options">{items.map(item=><div className="layout-role-option" key={item.id}>
-                    <Checkbox label={item.name} checked={draft.permissions.includes(item.id)} aria-describedby={`${selected.id}-${item.id}-description`} onChange={event=>toggle('permissions',item.id,event.target.checked)}/>
+                    <Checkbox label={item.name} checked={draft.permissions.includes(item.id)} aria-describedby={`${selected.id}-${item.id}-description`} onChange={event=>togglePermission(item.id,event.target.checked)}/>
                     <p id={`${selected.id}-${item.id}-description`}>{item.description}</p>
                   </div>)}</div>
                 </section>;
               })}
             </>},
-            {value:'notifications',label:`알림 ${draft.notifications.length}`,content:<>
-              <div className="layout-role-section-heading"><div><h3>수신 알림</h3><p>이 역할을 가진 멤버에게 전달할 알림을 선택하세요.</p></div><Badge variant="neutral">{draft.notifications.length} / {roleNotifications.length}</Badge></div>
+            {value:'notifications',label:`알림 ${notificationCount(draft)}`,content:<>
+              <div className="layout-role-section-heading"><div><h3>수신 알림</h3><p>이 역할을 가진 멤버에게 전달할 알림과 수신 방법을 선택하세요.</p></div><Badge variant="neutral">{notificationCount(draft)} / {roleNotifications.length}</Badge></div>
               <div className="layout-role-notifications">{roleNotifications.map(item=><div className="layout-role-notification" key={item.id}>
-                <div className="layout-role-option"><Checkbox label={item.name} checked={draft.notifications.includes(item.id)} aria-describedby={`${selected.id}-${item.id}-description`} onChange={event=>toggle('notifications',item.id,event.target.checked)}/><p id={`${selected.id}-${item.id}-description`}>{item.description}</p></div>
-                <Badge variant="neutral">{item.channel}</Badge>
+                <div className="layout-role-notification-info"><strong>{item.name}</strong><p id={`${selected.id}-${item.id}-description`}>{item.description}</p></div>
+                <div className="layout-role-notification-channels">{roleNotificationChannels.map(channel=>{const label=channel==='app'?'앱':'이메일';return <Checkbox key={channel} label={label} containerClassName={`layout-role-channel--${channel}`} aria-label={`${item.name} ${label}`} aria-describedby={`${selected.id}-${item.id}-description`} checked={channel==='app'&&(draft.notifications[item.id]?.includes(channel)??false)} disabled={channel==='email'} onChange={event=>toggleNotification(item.id,channel,event.target.checked)}/>;})}</div>
               </div>)}</div>
             </>},
           ]}/>
