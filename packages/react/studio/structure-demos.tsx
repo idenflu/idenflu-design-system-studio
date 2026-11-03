@@ -1,3 +1,4 @@
+import { IconButtonDemos, PopupAlignDemos } from './convenience-api-demos';
 import * as React from 'react';
 import { Badge, Button, Checkbox, Chip, Drawer, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
 import { Section } from './demo-layout';
@@ -36,7 +37,7 @@ export function ButtonDemos() {
       <div className="react-studio-row"><div className="button-group" role="group" aria-label="파일 작업"><Button variant="outline" onClick={() => setFeedback('복사를 선택했습니다.')}><Icon name="copy" />복사</Button><Button variant="outline" onClick={() => setFeedback('내보내기를 선택했습니다.')}><Icon name="download" />내보내기</Button></div></div>
     </Section>
     <p role="status" className="component-helper">{feedback}</p>
-  </>;
+  <IconButtonDemos /></>;
 }
 
 export function SelectionDemos() {
@@ -139,18 +140,18 @@ export function StepperDemos() {
 
 export function MenuDemos() {
   const [feedback, setFeedback] = React.useState('');
-  return <Section title="작업 메뉴" description="관련 동작을 아이콘과 함께 메뉴에 묶습니다. 방향키로 이동하고 Enter로 선택하거나 Escape로 닫을 수 있습니다."><div className="react-studio-row"><DropdownMenu trigger="더보기" label="작업 메뉴" items={[{value:'수정',label:'수정',icon:<Icon name="settings" />},{value:'복사',label:'복사',icon:<Icon name="copy" />},{value:'공유',label:'공유',disabled:true,icon:<Icon name="link" />},{value:'삭제',label:'삭제',icon:<Icon name="trash" />}]} onSelect={value => setFeedback(`${value} 동작을 선택했습니다.`)} /></div><p role="status" className="component-helper">{feedback}</p></Section>;
+  return <><Section title="작업 메뉴" description="관련 동작을 아이콘과 함께 메뉴에 묶습니다. 방향키로 이동하고 Enter로 선택하거나 Escape로 닫을 수 있습니다."><div className="react-studio-row"><DropdownMenu trigger="더보기" label="작업 메뉴" items={[{value:'수정',label:'수정',icon:<Icon name="settings" />},{value:'복사',label:'복사',icon:<Icon name="copy" />},{value:'공유',label:'공유',disabled:true,icon:<Icon name="link" />},{value:'삭제',label:'삭제',icon:<Icon name="trash" />}]} onSelect={value => setFeedback(`${value} 동작을 선택했습니다.`)} /></div><p role="status" className="component-helper">{feedback}</p></Section><PopupAlignDemos kind="menu" /></>;
 }
 
 export function PopoverDemos() {
   const [open, setOpen] = React.useState(false), [description, setDescription] = React.useState(true), [status, setStatus] = React.useState(true), [message, setMessage] = React.useState('설명과 상태 표시 중');
-  return <Section title="설정 팝오버" description="현재 화면에서 간단한 설정을 바꾸고 적용 결과를 확인합니다."><div className="react-studio-row"><Popover trigger={<span className="react-studio-icon-label"><Icon name="settings" />표시 설정</span>} label="표시 설정" open={open} onOpenChange={setOpen}>
+  return <><Section title="설정 팝오버" description="현재 화면에서 간단한 설정을 바꾸고 적용 결과를 확인합니다."><div className="react-studio-row"><Popover trigger={<span className="react-studio-icon-label"><Icon name="settings" />표시 설정</span>} label="표시 설정" open={open} onOpenChange={setOpen}>
     <div className="react-studio-popover-body">
       <div className="react-studio-popover-heading"><strong>표시 설정</strong><p>목록에서 볼 정보를 선택하세요.</p></div>
       <div className="react-studio-popover-options"><Checkbox label="설명" checked={description} onChange={event => setDescription(event.target.checked)} /><Checkbox label="상태" checked={status} onChange={event => setStatus(event.target.checked)} /></div>
       <Button onClick={() => { const labels = [description && '설명', status && '상태'].filter(Boolean); setMessage(labels.length ? `${labels.join('과 ')} 표시 중` : '표시할 추가 정보가 없습니다.'); setOpen(false); }}>적용</Button>
     </div>
-  </Popover></div><p role="status" className="component-helper">{message}</p></Section>;
+  </Popover></div><p role="status" className="component-helper">{message}</p></Section><PopupAlignDemos /></>;
 }
 
 export function DrawerDemos() {

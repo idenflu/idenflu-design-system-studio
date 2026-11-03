@@ -1,3 +1,4 @@
+import { HiddenLabelDemos } from './convenience-api-demos';
 import * as React from 'react';
 import { Button, DatePicker, DateRangePicker, Icon, MultiSelect, NumberField, SearchSelect, Select, Switch, TextArea, TextField } from '../src';
 import { Section } from './demo-layout';
@@ -58,7 +59,7 @@ export function TextFields() { return <>
   <Section title="아이콘과 입력 보조" description="검색 초기화, 이메일 검증, 비밀번호 표시와 글자 수를 직접 확인할 수 있습니다."><TextFieldHelpers /></Section>
   <Section title="입력 상태"><div className="react-studio-field-grid"><TextField label="기본 상태" placeholder="내용을 입력해주세요" helperText="입력 전의 기본 상태입니다." /><TextField label="오류 상태" defaultValue="잘못된 값" error="입력한 내용을 확인해주세요." /><TextField label="읽기 전용" readOnly defaultValue="IDN-1024" helperText="값을 읽고 복사할 수 있습니다." /><TextField label="비활성" disabled defaultValue="수정할 수 없음" helperText="현재 사용할 수 없는 항목입니다." /></div></Section>
   <Section title="사이즈"><div className="react-studio-size-grid">{sizes.map(size => <TextField key={size} size={size} label={`${size.toUpperCase()} 텍스트 입력`} defaultValue="idenflu mono" />)}</div></Section>
-</>; }
+<HiddenLabelDemos /></>; }
 
 export function SelectDemos() {
   const [result, setResult] = React.useState('');
@@ -69,7 +70,7 @@ export function SelectDemos() {
     <Section title="복수 선택" description="여러 값을 목록에서 선택합니다. 검색이 필요한 경우와 간단한 목록을 비교합니다."><div className="react-studio-field-grid"><MultiSelect label="여러 팀" options={options} defaultValue={['development']} searchable clearable /><MultiSelect label="검색 없는 복수 선택" options={options} defaultValue={['design']} clearable /></div></Section>
     <Section title="태그형 복수 선택" description="선택한 값을 입력 영역 안에 표시하며, 태그별 삭제와 전체 초기화를 제공합니다."><div className="react-studio-field-grid"><MultiSelect label="참여 팀" options={options} defaultValue={['design']} searchable presentation="inline" clearable /><MultiSelect label="검색 없는 태그 선택" options={options} presentation="inline" clearable /></div></Section>
     <Section title="필수 선택"><form className="react-studio-stack" onSubmit={event => { event.preventDefault(); setResult('담당 팀을 확인했습니다.'); }} onReset={() => setResult('')}><div className="react-studio-field-grid"><Select label="필수 담당 팀" name="team" options={options} required /><div><Select label="오류 상태" options={options} aria-invalid="true" aria-describedby="select-demo-error" /><p id="select-demo-error" className="field-error">담당 팀 선택을 확인해주세요.</p></div></div><div className="react-studio-row"><Button type="submit">선택 확인</Button><Button type="reset" variant="outline">선택 초기화</Button></div><p role="status" className="component-helper">{result}</p></form></Section>
-    <Section title="사이즈"><div className="react-studio-size-grid">{sizes.map(size => <Select key={size} size={size} label={`${size.toUpperCase()} 선택`} options={options} defaultValue="design" />)}</div></Section></>;
+    <Section title="사이즈"><div className="react-studio-size-grid">{sizes.map(size => <Select key={size} size={size} label={`${size.toUpperCase()} 선택`} options={options} defaultValue="design" />)}</div></Section><HiddenLabelDemos kind="select" /></>;
 }
 
 export function NumberDemos() {

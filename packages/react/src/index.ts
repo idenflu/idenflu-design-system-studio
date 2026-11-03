@@ -2,6 +2,7 @@
 
 export * from './primitives';
 export * from './interactive';
+export * from './icon-button';
 export * from './navigation';
 export * from './datetime';
 export * from './datetime-picker';

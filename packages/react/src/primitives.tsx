@@ -19,6 +19,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
 
 export interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix'> {
   label: React.ReactNode;
+  /** Keep the label accessible while hiding it visually. */
+  hideLabel?: boolean;
   helperText?: React.ReactNode;
   error?: React.ReactNode;
   prefix?: React.ReactNode;
@@ -32,7 +34,7 @@ export interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInput
   containerClassName?: string;
 }
 export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
-  { id, label, helperText, error, prefix, suffix, action, prefixDecorative = false, suffixDecorative = false, labelPosition = 'top', alignment, size, containerClassName, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid, ...props }, ref,
+  { id, label, hideLabel = false, helperText, error, prefix, suffix, action, prefixDecorative = false, suffixDecorative = false, labelPosition = 'top', alignment, size, containerClassName, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid, ...props }, ref,
 ) {
   const generated = React.useId();
   const inputId = id || `field-${generated}`;
@@ -40,10 +42,11 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
   const errorId = `${inputId}-error`;
   const prefixId = `${inputId}-prefix`;
   const suffixId = `${inputId}-suffix`;
+  const effectiveLabelPosition = hideLabel ? 'top' : labelPosition;
   const described = [describedBy, prefix != null && !prefixDecorative && prefixId, suffix != null && !suffixDecorative && suffixId, helperText != null && helperId, error != null && errorId].filter(Boolean).join(' ') || undefined;
-  const labelElement = <label className={classes('field-label', labelPosition === 'left' && 'field-horizontal__label')} htmlFor={inputId}>{label}</label>;
+  const labelElement = <label className={classes('field-label', hideLabel && 'sr-only', effectiveLabelPosition === 'left' && 'field-horizontal__label')} htmlFor={inputId}>{label}</label>;
   const input = <input {...props} ref={ref} id={inputId} aria-invalid={error != null ? true : ariaInvalid} aria-describedby={described} className={classes(alignment && `text-align-${alignment}`, className, prefix == null && suffix == null && action == null && 'text-input')} />;
-  const body = <div className={labelPosition === 'left' ? 'field-horizontal__body' : undefined}>
+  const body = <div className={effectiveLabelPosition === 'left' ? 'field-horizontal__body' : undefined}>
     {prefix != null || suffix != null || action != null ? <div className="input-group" data-size={size}>
       {prefix != null && <span id={!prefixDecorative ? prefixId : undefined} aria-hidden={prefixDecorative || undefined} className={classes('input-prefix', prefixDecorative && 'input-prefix--icon')}>{prefix}</span>}
       {input}
@@ -53,7 +56,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
     {helperText != null && <p className="component-helper" id={helperId} style={{ marginTop: 'var(--space-1)' }}>{helperText}</p>}
     {error != null && <p className="field-error" id={errorId}>{error}</p>}
   </div>;
-  return <div className={classes(labelPosition === 'left' && 'field-horizontal', containerClassName)}>{labelElement}{body}</div>;
+  return <div className={classes(effectiveLabelPosition === 'left' && 'field-horizontal', containerClassName)}>{labelElement}{body}</div>;
 });
 
 export interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {

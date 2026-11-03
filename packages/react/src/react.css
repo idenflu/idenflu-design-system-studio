@@ -1,4 +1,6 @@
 /* React markup uses the same mask icons as the portable CSS bundle. */
+.field-label.sr-only { margin:-1px; }
+.icon-button-content { display:inline-flex; align-items:center; justify-content:center; }
 .choice-mark .ui-icon { display:none; width:calc(var(--choice-size) - 4px); height:calc(var(--choice-size) - 4px); flex:0 0 auto; color:var(--text-on-primary); }
 .choice-mark .minus-icon { --icon:url('./assets/icons/idenflu/remove.svg'); }
 .choice-input:checked + .choice-mark .check-icon,
@@ -114,10 +116,8 @@
 .data-grid-tools { position:relative; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:var(--space-2); max-width:100%; }
 .data-grid-export-error { flex-basis:100%; margin:0; }
 .data-grid-search { width:240px; max-width:100%; min-width:0; }
-.data-grid-search > .field-label { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .data-grid-search input::-webkit-search-cancel-button { display:none; }
-.data-grid-tools > .popover-wrap { position:static; }
-.data-grid-tools .popover-content { right:0; left:auto; width:240px; max-width:calc(100vw - 48px); }
+.data-grid-tools .popover-content { width:240px; max-width:calc(100vw - 48px); }
 .data-grid-column-options { display:grid; gap:var(--space-2); }
 .data-grid-column-options > p { color:var(--text-secondary); font-size:var(--font-size-caption); }
 .data-grid-column-options .choice { margin:0; min-height:32px; }
@@ -181,7 +181,6 @@
 .data-grid-resize:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
 .data-grid .data-grid-filter-row > td { position:sticky; top:var(--data-grid-header-height); z-index:2; padding:var(--space-2); background:var(--surface); border-bottom:1px solid var(--border); vertical-align:top; }
 .data-grid .data-grid-table thead th { z-index:3; }
-.data-grid-filter-row .field-label { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 .data-grid-filter-row .custom-select { min-width:0; }
 .data-grid .data-grid-filter-row > td:has(.custom-select.is-open) { z-index:10; }
 .select-popup[data-popup-strategy="fixed"] { display:flex; flex-direction:column; overflow:hidden; }

@@ -35,7 +35,6 @@
 .layout-sidebar-brand strong { font-size:calc(var(--font-size-base) + 1px); font-weight:var(--font-weight-semibold); white-space:nowrap; letter-spacing:-.4px; }
 .layout-brand-mark { display:block; flex:none; width:28px; height:28px; object-fit:contain; }
 .layout-menu-search { padding:var(--space-4); }
-.layout-menu-search .field-label, .layout-inline-select .field-label { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 .layout-tree-navigation { flex:1; min-height:0; overflow:auto; padding:0 var(--space-3) var(--space-4); }
 .layout-tree-navigation .demo-tree { padding:0; border:0; background:transparent; }
 .layout-tree-navigation .tree-children { --layout-tree-line-offset:9px; margin-left:9px; padding-left:calc(var(--layout-tree-line-offset) - 1px); }
@@ -69,11 +68,9 @@
 .layout-account-menu .action-menu > button { padding:4px 8px; gap:var(--space-1); }
 .layout-account-name { max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .layout-account-menu .action-menu > button > .ui-icon { width:12px; height:12px; }
-.layout-account-menu .action-options { right:0; left:auto; }
-.layout-notification-popover .popover-wrap > button { width:max(40px,var(--control-height)); padding:0; }
 .layout-notification-trigger { display:flex; position:relative; }
 .layout-notification-trigger i { position:absolute; width:5px; height:5px; right:0; top:0; border-radius:50%; background:var(--danger); }
-.layout-notification-popover .popover-content { right:0; left:auto; width:min(340px,calc(100vw - 32px)); max-width:none; padding:0; }
+.layout-notification-popover .popover-content { width:min(340px,calc(100vw - 32px)); max-width:none; padding:0; }
 .layout-notification-popover header { display:flex; justify-content:space-between; align-items:center; padding:var(--space-3) var(--space-4); border-bottom:1px solid var(--border); }
 .layout-notification-popover h2 { font-size:var(--font-size-body); font-weight:var(--font-weight-semibold); }
 .layout-notification-popover header .button { margin-top:0; }
@@ -90,17 +87,13 @@
 .layout-tabs-toolbar { position:absolute; display:flex; align-items:center; justify-content:center; right:0; top:0; width:44px; height:var(--layout-tab-height); border-bottom:1px solid var(--border); background:var(--field-background); z-index:var(--z-dropdown); }
 .layout-tabs-toolbar[data-overflow="true"] { width:108px; }
 .layout-tabs-scroll-controls { display:flex; align-items:center; height:100%; }
-.layout-tabs-scroll-button { display:grid; place-items:center; width:32px; height:100%; padding:0; border:0; background:transparent; color:var(--text-secondary); cursor:pointer; }
-.layout-tabs-scroll-button:hover:not(:disabled) { background:var(--surface-hover); color:var(--text); }
-.layout-tabs-scroll-button:disabled { opacity:.35; cursor:default; }
-.layout-tabs-scroll-button:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
-.layout-tabs-scroll-button .ui-icon { width:16px; height:16px; }
+.layout-tabs-scroll-button { flex:none; }
 .layout-tabs-toolbar .action-menu { flex:0 0 44px; width:44px; height:100%; }
 .layout-tabs-toolbar .action-menu > button { width:100%; height:100%; min-width:0; min-height:0; padding:0; border-radius:0; box-shadow:none; font-size:max(10px,calc(var(--font-size-base) - 2px)); --button-bg:transparent; --button-hover:var(--surface-hover); --button-active:var(--surface-pressed); }
 .layout-tabs-toolbar .action-menu > button[aria-expanded="true"] { background:var(--surface-hover); }
 .layout-tabs-toolbar .action-menu > button:focus-visible { box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .layout-tabs-trigger-icon .ui-icon { width:20px; height:20px; }
-.layout-tabs-toolbar .action-options { right:0; left:auto; max-height:min(70dvh,480px); overflow-y:auto; }
+.layout-tabs-toolbar .action-options { max-height:min(70dvh,480px); overflow-y:auto; }
 .layout-tabs-toolbar .action-option:focus:not(:focus-visible):not(:hover) { background:var(--field-background); }
 .layout-tabs-toolbar .action-option:nth-last-child(2) { margin-top:var(--space-1); border-top:1px solid var(--divider); }
 .layout-tabs-trigger-label { display:none; }
@@ -312,7 +305,6 @@
 .layout-command-dialog .dialog-body { display:flex; flex-direction:column; }
 .dialog.layout-project-create-dialog { width:min(520px,calc(100% - 32px)); }
 .dialog.layout-project-detail-dialog { width:min(920px,calc(100% - 48px)); }
-.layout-command-dialog .field-label { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 .layout-command-results { flex:1; min-height:0; margin-top:var(--space-4); }
 .layout-command-results:has(> .layout-empty) { display:grid; place-items:center; }
 .layout-command-results section + section { margin-top:var(--space-4); }

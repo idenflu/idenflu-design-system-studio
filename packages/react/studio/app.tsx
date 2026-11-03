@@ -70,20 +70,21 @@ export function ColorExample() {
     </div>
   </>;
 }`,
-  'foundations/icons': `import { Button, Icon, TextField } from '@idenflu/mono-react';
+  'foundations/icons': `import { Button, Icon, IconButton, TextField } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function IconExample() {
   return <>
     <Button><Icon name="save" />저장</Button>
-    <Button iconOnly aria-label="알림"><Icon name="bell" /></Button>
+    <IconButton label="알림"><Icon name="bell" /></IconButton>
     <Button variant="outline" aria-pressed="true"><Icon name="bookmark-fill" />북마크됨</Button>
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
   </>;
 }`,
-  'components/buttons':`import { Button, Icon, Segmented } from '@idenflu/mono-react';
+  'components/buttons':`import { Button, Icon, IconButton, Segmented } from '@idenflu/mono-react';
 
 <Button variant="outline">저장</Button>
+<IconButton label="설정 열기"><Icon name="settings" /></IconButton>
 <Segmented label="보기 방식" size="md" defaultValue="list"
   options={[
     { value: 'list', label: <><Icon name="list" />목록</> },
@@ -103,7 +104,9 @@ export function IconExample() {
   placeholder="회사명을 입력해주세요"
 />
 <TextField label="웹사이트" labelPosition="left"
-           prefix="https://" defaultValue="idenflu.app" />`,
+           prefix="https://" defaultValue="idenflu.app" />
+<TextField label="프로젝트 검색" hideLabel type="search"
+           placeholder="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />`,
   'components/selection':`import { Checkbox, Switch } from '@idenflu/mono-react';
 
 <Checkbox label="이메일 알림" defaultChecked />
@@ -228,7 +231,7 @@ export function ProcessingDialogExample({ blocking = false }: { blocking?: boole
   'components/list':'<List><ListItem>디자인 시스템</ListItem></List>',
   'components/slider':'<Slider aria-label="진행률" defaultValue={50} />',
   'components/tooltip':'<Tooltip content="도움말"><Button>정보</Button></Tooltip>',
-  'components/popover':'<Popover trigger="표시 설정" label="표시 설정">내용</Popover>',
+  'components/popover':'<Popover trigger="표시 설정" label="표시 설정" align="end">내용</Popover>',
   'components/stepper':'<Stepper aria-label="프로젝트 생성" steps={["기본 정보", "확인"]} currentStep={0} />',
   'components/card':'<Card><h3>프로젝트</h3><p>상세 내용</p></Card>',
   'patterns/form/basic':'<TextField label="이름" name="name" required error={errors.name} />\n<TextField label="이메일" name="email" type="email" required error={errors.email} />',

@@ -57,21 +57,29 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 이번 추가는 탐색·편집·협업·차트·커머스에 쓰는 Outline 32종과 Filled 20종입니다. Outline은 기존의 24×24 기준, 1.5px 선과 각진 선 끝을 유지합니다. Filled는 `-fill` 접미사로 선택하며 모든 아이콘에 Filled가 있는 것은 아닙니다.
 
 ```tsx
-import { Button, Icon } from '@idenflu/mono-react';
+import { useState } from 'react';
+import { Button, Icon, IconButton } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
 
-<Button><Icon name="save" />저장</Button>
-<Button iconOnly variant="outline" aria-label="북마크" aria-pressed={bookmarked}
-  onClick={() => setBookmarked(value => !value)}>
-  <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
-</Button>
+export function IconActions() {
+  const [bookmarked, setBookmarked] = useState(false);
+  return <div>
+    <Button><Icon name="save" />저장</Button>
+    <IconButton label="북마크" variant="outline" aria-pressed={bookmarked}
+      onClick={() => setBookmarked(value => !value)}>
+      <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
+    </IconButton>
+  </div>;
+}
 ```
 
-일반 동작은 Outline, 선택·저장 상태나 강한 시각적 강조는 Filled를 우선 고려합니다. 상태를 전환할 때는 형태와 함께 `aria-pressed`나 텍스트도 갱신합니다. `Icon`은 장식으로 처리되므로 의미는 함께 표시하는 텍스트로 전달하고, 아이콘만 있는 버튼에는 `aria-label`을 지정합니다.
+일반 동작은 Outline, 선택·저장 상태나 강한 시각적 강조는 Filled를 우선 고려합니다. 상태를 전환할 때는 형태와 함께 `aria-pressed`나 텍스트도 갱신합니다. `Icon`은 장식으로 처리되므로 의미는 함께 표시하는 텍스트로 전달하고, 아이콘만 있는 버튼에는 `IconButton`의 `label`을 지정합니다.
 
 문서의 파운데이션 → Icons에서 전체 목록을 이름으로 검색하고 Outline/Filled로 필터링할 수 있습니다. 선정 근거와 공식 자료는 [아이콘 리서치](../../docs/icon-research.md)에 정리했습니다.
 
 ## 컴포넌트
 
+- 버튼: `Button`, `IconButton`
 - 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
 - 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `DataGrid`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
@@ -79,6 +87,109 @@ import { Button, Icon } from '@idenflu/mono-react';
 - 데이터 상태: `DataState`, `useDataState` (로딩·실패·빈 목록·검색 결과 없음·정상 목록)
 
 입력과 선택 컴포넌트는 React의 `value`/`onValueChange` 또는 `defaultValue`를 사용합니다. `TextField` 등 네이티브 입력 래퍼는 일반적인 `onChange`를 사용합니다. 날짜와 숫자의 `onValueChange`는 값을 확정하거나 증감할 때 호출하며 숫자는 정밀도를 유지하는 문자열을 전달합니다. `DateRangePicker`의 값은 `[시작일, 종료일]`이며 값은 `YYYY-MM-DD` 또는 `null`입니다.
+
+### 숨김 라벨
+
+`TextField`, `Select`, `SearchSelect`, `MultiSelect`는 `hideLabel`로 화면의 라벨과 라벨 여백을 숨깁니다. `label`은 계속 필수이며 스크린 리더에 연결됩니다. 제목이나 플레이스홀더로 입력 목적이 드러나는 검색·필터 툴바에 사용합니다. `TextField`의 `labelPosition="left"`와 함께 사용하면 좌측 라벨 공간도 제거합니다.
+
+| 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | 필수 | 화면에서 숨겨도 접근 가능한 이름을 제공합니다. |
+| `hideLabel` | `boolean` | `false` | 라벨 표시와 라벨 여백을 제거합니다. |
+
+```tsx
+import { useState } from 'react';
+import { Icon, MultiSelect, SearchSelect, Select, TextField } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+const teams = [
+  { value: 'design', label: '디자인' },
+  { value: 'development', label: '개발' },
+];
+
+export function ProjectFilters() {
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('all');
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  const [ownerTeam, setOwnerTeam] = useState('');
+
+  return <div style={{ display: 'grid', gap: 16 }}>
+    <div role="group" aria-label="프로젝트 필터"
+      style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <TextField label="프로젝트 검색" hideLabel type="search"
+        placeholder="프로젝트 검색" value={query}
+        onChange={event => setQuery(event.target.value)}
+        prefix={<Icon name="search" />} prefixDecorative />
+      <Select label="프로젝트 상태" hideLabel value={status}
+        onValueChange={setStatus} options={[
+          { value: 'all', label: '전체 상태' },
+          { value: 'active', label: '진행 중' },
+        ]} />
+      <MultiSelect label="참여 팀" hideLabel options={teams}
+        placeholder="참여 팀" value={selectedTeams}
+        onValueChange={setSelectedTeams} clearable />
+    </div>
+    <SearchSelect label="담당 팀 검색" hideLabel options={teams}
+      placeholder="담당 팀 검색" value={ownerTeam} onValueChange={setOwnerTeam} />
+  </div>;
+}
+```
+
+### IconButton
+
+`IconButton`은 아이콘 전용 `Button`이며 기본 스타일은 `ghost`입니다. 필수 `label`을 접근 가능한 이름과 기본 툴팁에 함께 사용합니다. `tooltip`을 전달하면 안내 내용만 바꾸고, `tooltip={false}`로 툴팁을 제거해도 버튼 이름은 유지합니다. `Button`의 `variant`, `size`, `disabled`, 네이티브 이벤트와 실제 버튼을 가리키는 `ref`를 지원합니다.
+
+| 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `label` | `string` | 필수 | 접근 가능한 이름과 기본 툴팁입니다. |
+| `children` | `ReactNode` | 필수 | 표시할 아이콘입니다. |
+| `tooltip` | `ReactNode \| false` | `label` | 툴팁 내용을 바꾸거나 제거합니다. |
+| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'danger'` | `'ghost'` | `Button`과 같은 스타일입니다. |
+| `size` | `'sm' \| 'md' \| 'lg'` | 기본 컨트롤 크기 | `Button`과 같은 크기입니다. |
+
+```tsx
+import { useState } from 'react';
+import { Icon, IconButton } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function BookmarkButton() {
+  const [bookmarked, setBookmarked] = useState(false);
+  return <IconButton label="북마크" variant="outline" size="md"
+    aria-pressed={bookmarked} onClick={() => setBookmarked(value => !value)}>
+    <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
+  </IconButton>;
+}
+```
+
+### Popover·DropdownMenu 정렬
+
+`align`은 팝업 패널을 트리거의 시작점·가운데·끝점에 맞춥니다. `start`와 `end`는 글의 방향을 따라 RTL에서 반대로 배치됩니다. 패널이 화면의 가로 경계를 벗어나면 위치를 자동 보정합니다.
+
+| 속성 | 타입 | 기본값 | 적용 컴포넌트 |
+| --- | --- | --- | --- |
+| `align` | `'start' \| 'center' \| 'end'` | `'start'` | `Popover`, `DropdownMenu` |
+
+```tsx
+import { useState } from 'react';
+import { DropdownMenu, Popover } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function ToolbarPopups() {
+  const [view, setView] = useState('list');
+  return <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+    <Popover trigger="표시 설정" label="표시 설정" align="end">
+      <strong>표시 설정</strong>
+      <p>목록의 추가 정보를 확인합니다.</p>
+    </Popover>
+    <DropdownMenu trigger="보기 방식" label="보기 방식" align="center"
+      items={[
+        { value: 'list', label: '목록 보기' },
+        { value: 'grid', label: '격자 보기' },
+      ]} onSelect={setView} />
+    <p role="status">선택한 보기: {view}</p>
+  </div>;
+}
+```
 
 ### Tabs
 

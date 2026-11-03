@@ -2,8 +2,8 @@ const { test, expect } = require('@playwright/test');
 
 const sample = '/systems/idenflu-mono/index.html?layout=sidebar';
 
-for (const scrollPanel of [false, true]) {
-  test(`open tabs menu stays above grid headers${scrollPanel ? ' after scrolling' : ''}`, async ({ page, isMobile }) => {
+for (const scrollGrid of [false, true]) {
+  test(`open tabs menu stays above grid headers${scrollGrid ? ' after scrolling' : ''}`, async ({ page, isMobile }) => {
     test.skip(isMobile);
     await page.setViewportSize({ width: 950, height: 900 });
     await page.goto(sample);
@@ -14,11 +14,11 @@ for (const scrollPanel of [false, true]) {
     await navigation.getByRole('button', { name: '전체 프로젝트', exact: true }).click();
     const panel = page.locator('.layout-workspace-tabs > .tab-panel:not([hidden])');
     const grid = panel.locator('.data-grid-scroll');
-    if (scrollPanel) {
-      await panel.evaluate(element => { element.scrollTop = 100; });
-      await grid.evaluate(element => { element.scrollLeft = element.scrollWidth; });
-      await expect.poll(() => panel.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+    if (scrollGrid) {
+      await grid.evaluate(element => { element.scrollTop = 100; element.scrollLeft = element.scrollWidth; });
+      await expect.poll(() => grid.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
       await expect.poll(() => grid.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+      await expect.poll(() => panel.evaluate(element => element.scrollTop)).toBe(0);
     }
     await page.getByRole('button', { name: '열린 탭 메뉴', exact: true }).click();
     const menu = page.getByRole('menu', { name: '열린 탭과 탭 관리', exact: true });

@@ -53,7 +53,7 @@ const items: MenuItem[] = [
 export function MenuExample() {
   const [action, setAction] = useState('');
   return <>
-    <DropdownMenu trigger="더보기" label="프로젝트 작업"
+    <DropdownMenu trigger="더보기" label="프로젝트 작업" align="end"
                   items={items} onSelect={setAction} />
     <p role="status">{action === 'edit' ? '수정을 선택했습니다.' :
                       action === 'copy' ? '복사를 선택했습니다.' : ''}</p>
@@ -107,6 +107,8 @@ export function SelectExample() {
   const [teams, setTeams] = useState<string[]>(['design']);
   return <div style={{ display: 'grid', gap: 24, maxWidth: 440 }}>
     <Select label="담당 팀" options={options}
+            value={team} onValueChange={setTeam} />
+    <Select label="툴바 담당 팀 필터" hideLabel options={options}
             value={team} onValueChange={setTeam} />
     <SearchSelect label="담당 팀 검색" options={options}
                   value={team} onValueChange={setTeam} />

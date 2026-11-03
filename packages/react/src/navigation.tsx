@@ -32,6 +32,8 @@ function useFormReset(ref: React.RefObject<HTMLElement | null>, reset: () => voi
 interface SelectShared {
   options: readonly SelectOption[];
   label: string;
+  /** Keep the label accessible while hiding it visually. */
+  hideLabel?: boolean;
   name?: string;
   disabled?: boolean;
   placeholder?: string;
@@ -59,7 +61,7 @@ interface SelectCoreProps extends SelectShared {
   onClear?: () => void;
 }
 
-function SelectCore({options, label, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, onClear, ...aria}: SelectCoreProps) {
+function SelectCore({options, label, hideLabel = false, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, onClear, ...aria}: SelectCoreProps) {
   const id = React.useId();
   const root = React.useRef<HTMLDivElement>(null);
   const trigger = React.useRef<HTMLButtonElement>(null);
@@ -172,7 +174,7 @@ function SelectCore({options, label, name, disabled, placeholder = '선택하세
     {!visible.length && <p className="search-select-empty" role="status">검색 결과가 없습니다.</p>}
   </div>;
   return <div>
-    <label className="field-label" htmlFor={`${id}-trigger`}>{label}</label>
+    <label className={`field-label${hideLabel ? ' sr-only' : ''}`} htmlFor={`${id}-trigger`}>{label}</label>
     <div ref={root} className={`custom-select${searchable && !multiple ? ' search-select' : ''}${open ? ' is-open' : ''}${invalid ? ' is-invalid' : ''}${className ? ` ${className}` : ''}`} data-size={size} data-multiselect={multiple ? '' : undefined}>
     <select className="sr-only" aria-hidden="true" tabIndex={-1} name={name} multiple={multiple} required={required} disabled={disabled} value={multiple ? validSelected : validSelected[0] ?? ''} onChange={() => {}} onInvalid={event => { event.preventDefault(); setAttempted(true); const control = event.currentTarget; const firstInvalid = control.form && Array.from(control.form.elements).find(element => { const candidate = element as HTMLInputElement; return candidate.willValidate && !candidate.validity.valid; }); if (!firstInvalid || firstInvalid === control) (searchable && !multiple ? search : trigger).current?.focus(); }}>
       {!multiple && <option value="">{placeholder}</option>}
