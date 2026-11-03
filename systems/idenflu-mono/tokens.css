@@ -113,6 +113,10 @@
   --info-surface: var(--color-blue-50);
   --inverse-canvas: var(--color-ink);
   --inverse-text: var(--color-white);
+  --toast-on-info: var(--inverse-text);
+  --toast-on-success: var(--inverse-text);
+  --toast-on-warning: var(--inverse-text);
+  --toast-on-danger: var(--inverse-text);
   --selection-background: var(--color-blue-100);
   --selection-text: var(--color-ink);
   --switch-off: var(--color-switch-off-light);

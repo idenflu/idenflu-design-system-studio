@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table, Icon } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -168,6 +168,24 @@ test('Toast exposes urgency and keeps its action separate from dismissing the no
     await f.render(h(Toast, {variant:'success'}, '저장 완료'));
     assert.equal(f.container.querySelector('.toast').getAttribute('role'), 'status');
   } finally { await f.dispose(); }
+});
+
+test('Toast supplies status icons and supports replacing or hiding them', async () => {
+  const f = fixture();
+  try {
+    for (const [variant,icon] of [['info','info'],['success','check-circle'],['warning','warning'],['danger','warning-fill']]) {
+      await f.render(h(Toast, {variant,appearance:'solid'}, '상태 안내'));
+      assert.ok(f.container.querySelector(`.toast-icon .icon-${icon}`));
+      assert.equal(f.container.querySelector('.toast-icon').getAttribute('aria-hidden'), 'true');
+      assert.equal(f.container.querySelector('.toast').getAttribute('appearance'), null);
+    }
+    await f.render(h(Toast, {icon:h(Icon,{name:'download'})}, '다운로드 완료'));
+    assert.ok(f.container.querySelector('.toast-icon .icon-download'));
+    assert.equal(f.container.querySelector('.toast-icon .icon-info'), null);
+    await f.render(h(Toast, {icon:null}, '텍스트 안내'));
+    assert.equal(f.container.querySelector('.toast-icon'), null);
+    assert.equal(f.container.querySelector('.toast').getAttribute('role'), 'status');
+  } finally {await f.dispose();}
 });
 
 test('inline MultiSelect removes chips and clears the remaining values', async () => {

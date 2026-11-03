@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip } from '../src';
+import { Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip, type ToastProps } from '../src';
 import { Section } from './demo-layout';
+import { ProcessingDialogDemo } from './processing-dialog-demo';
 
 function DetailRows({items, style}: {items:readonly (readonly [string, string])[]; style?:React.CSSProperties}) {
   return <dl className="detail-list" style={style}>{items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>;
@@ -14,6 +15,14 @@ export function TabsDemos() {
         {value:'general', label:'기본 정보', content:<><h3 className="react-studio-example-title">워크스페이스 정보</h3><p>함께 작업하는 공간의 기본 정보입니다.</p><DetailRows items={[["이름", "idenflu"], ["역할", "편집자"]]} /></>},
         {value:'notifications', label:'알림', content:<><h3 className="react-studio-example-title">알림 설정</h3><p>중요한 소식만 필요한 곳에서 받아보세요.</p><DetailRows items={[["이메일 알림", "수신 중"], ["활동 요약", "매주 월요일"]]} /></>},
         {value:'security', label:'보안', content:<><h3 className="react-studio-example-title">계정 보안</h3><p>계정의 로그인 방식을 확인할 수 있습니다.</p><DetailRows items={[["로그인 방식", "이메일"], ["2단계 인증", "사용 중"]]} /></>},
+      ]} />
+    </Section>
+    <Section title="세로 탭" description="탭 목록을 왼쪽에, 선택한 내용을 오른쪽에 배치합니다. 위·아래 방향키로 이동하며 Home·End 키를 지원합니다. 비활성 탭은 건너뛰고 입력값은 탭을 전환해도 유지합니다.">
+      <Tabs label="워크스페이스 세로 설정" orientation="vertical" items={[
+        {value:'general',label:<span className="react-studio-icon-label"><Icon name="settings" />기본 정보</span>,content:<><h3 className="react-studio-example-title">워크스페이스 설정</h3><p>프로젝트에 표시할 이름과 기본 정보를 관리합니다.</p><TextField label="워크스페이스 이름" defaultValue="idenflu" /></>},
+        {value:'notifications',label:<span className="react-studio-icon-label"><Icon name="email" />알림</span>,content:<><h3 className="react-studio-example-title">알림 설정</h3><p>중요한 알림을 받을 이메일을 지정합니다.</p><TextField label="알림 받을 이메일" type="email" defaultValue="team@idenflu.com" /></>},
+        {value:'security',label:<span className="react-studio-icon-label"><Icon name="shield-check" />보안</span>,disabled:true,content:<p>보안 설정은 관리자만 변경할 수 있습니다.</p>},
+        {value:'members',label:<span className="react-studio-icon-label"><Icon name="users" />멤버</span>,content:<><h3 className="react-studio-example-title">멤버 관리</h3><p>총 12명의 멤버가 함께 작업하고 있습니다.</p><p>관리자 2명 · 편집자 8명 · 뷰어 2명</p></>},
       ]} />
     </Section>
     <Section title="비활성 탭" description="사용할 수 없는 탭은 선택과 방향키 탐색에서 제외합니다. Home·End 키로 처음과 마지막 탭으로 이동할 수 있습니다.">
@@ -71,7 +80,7 @@ export function OverlayDemos() {
   const [feedback, setFeedback] = React.useState('');
   const [deleted, setDeleted] = React.useState(false);
   const [archived, setArchived] = React.useState(false);
-  const [toast, setToast] = React.useState<{message:string; variant:'info' | 'success' | 'danger'; action?:'retry' | 'undo'} | null>(null);
+  const [toast, setToast] = React.useState<{message:string; variant:NonNullable<ToastProps['variant']>; appearance?:ToastProps['appearance']; action?:'retry' | 'undo'} | null>(null);
   const nameRef = React.useRef<HTMLInputElement>(null);
   const infoConfirm = React.useRef<HTMLButtonElement>(null);
   const deleteCancel = React.useRef<HTMLButtonElement>(null);
@@ -127,6 +136,7 @@ export function OverlayDemos() {
       </Dialog>
       <p className="react-studio-caption">다이얼로그 안에서는 Tab으로 이동하고 Escape로 취소할 수 있습니다. 취소하면 실행 버튼으로 돌아갑니다.</p>
     </Section>
+    <ProcessingDialogDemo />
     <Section title="구분선이 있는 다이얼로그" description="헤더·본문·하단을 회색 구분선으로 나눕니다. 긴 내용은 본문 안에서만 스크롤되며, 제목과 하단 버튼은 계속 표시됩니다.">
       <div className="react-studio-field-grid">
         <div className="react-studio-example"><h3 className="react-studio-example-title">기본 구성</h3><p className="react-studio-caption">제목과 닫기, 상세 내용, 확인 버튼을 세 영역으로 구성합니다.</p><div className="react-studio-row"><Button variant="outline" onClick={() => setDialog('divided')}>구분선 타입 열기</Button></div></div>
@@ -161,8 +171,18 @@ export function OverlayDemos() {
         <div className="react-studio-example"><h3 className="react-studio-example-title">오류와 재시도</h3><p className="react-studio-caption">저장 실패를 재현합니다. 다시 시도하면 완료 안내로 바뀝니다.</p><div className="react-studio-row"><Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'저장하지 못했습니다. 다시 시도해주세요.', variant:'danger', action:'retry'}); }}>오류 알림 표시</Button></div></div>
         <div className="react-studio-example"><h3 className="react-studio-example-title">실행 취소</h3><p className="react-studio-caption">초안 문서를 보관한 뒤 알림에서 실행 취소할 수 있습니다.</p><div className="react-studio-row"><Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setArchived(true); setToast({message:'초안 문서를 보관했습니다.', variant:'info', action:'undo'}); }}>항목 보관</Button></div><p role="status" className="component-helper">{archived ? '초안 문서 · 보관됨' : '초안 문서 · 목록에 표시 중'}</p></div>
       </div>
+      <div className="react-studio-stack">
+        <h3 className="react-studio-example-title">배경 색상형</h3>
+        <p className="react-studio-caption">상태 색상으로 배경 전체를 강조합니다. 안내에는 실행 취소, 오류에는 재시도 동작을 포함합니다.</p>
+        <div className="react-studio-row" role="group" aria-label="배경 색상 토스트 예시">
+          <Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'변경사항이 저장되었습니다.', variant:'success', appearance:'solid'}); }}>성공 배경 토스트</Button>
+          <Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setArchived(true); setToast({message:'초안 문서를 보관했습니다.', variant:'info', appearance:'solid', action:'undo'}); }}>안내 배경 토스트</Button>
+          <Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'저장 공간이 부족합니다. 사용량을 확인해주세요.', variant:'warning', appearance:'solid'}); }}>주의 배경 토스트</Button>
+          <Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'저장하지 못했습니다. 다시 시도해주세요.', variant:'danger', appearance:'solid', action:'retry'}); }}>오류 배경 토스트</Button>
+        </div>
+      </div>
       <p className="react-studio-caption">새 알림은 이전 알림을 교체합니다. 필수 오류 안내는 해당 입력란에도 함께 표시합니다.</p>
-      {toast && <Toast variant={toast.variant} onDismiss={dismissToast} action={toast.action && <Button variant="ghost" onClick={() => { if (toast.action === 'undo') { setArchived(false); dismissToast(); } else { setToast({message:'다시 시도해 변경사항을 저장했습니다.', variant:'success'}); toastOrigin.current?.focus(); } }}>{toast.action === 'undo' ? '실행 취소' : '다시 시도'}</Button>}>{toast.message}</Toast>}
+      {toast && <Toast variant={toast.variant} appearance={toast.appearance} onDismiss={dismissToast} action={toast.action && <Button variant="ghost" onClick={() => { if (toast.action === 'undo') { setArchived(false); dismissToast(); } else { setToast({message:'다시 시도해 변경사항을 저장했습니다.', variant:'success', appearance:toast.appearance}); toastOrigin.current?.focus(); } }}>{toast.action === 'undo' ? '실행 취소' : '다시 시도'}</Button>}>{toast.message}</Toast>}
     </Section>
   </>;
 }

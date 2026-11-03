@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { useEscapeLayer } from './escape-layer';
+import { lockDialogScroll } from './dialog-scroll-lock';
+import { Icon } from './primitives';
 const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
@@ -12,7 +14,14 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
   useClientLayoutEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open) {
+      const lock = lockDialogScroll(dialog.ownerDocument);
+      try {
+        if (!dialog.open) dialog.showModal();
+        lock.restorePosition();
+      } catch (error) { lock.release(); throw error; }
+      return lock.release;
+    }
     else if (!open) { backdropPointerDown.current = false; if (dialog.open) dialog.close(); }
   }, [open]);
   const isTopLayer = useEscapeLayer(open, ref, () => onOpenChange(false));
@@ -34,7 +43,7 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
     if (!first) { event.preventDefault(); dialog.focus(); }
     else if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { event.preventDefault(); first.focus(); }
-  }} onClick={event => { const beganOnBackdrop = backdropPointerDown.current; backdropPointerDown.current = false; onClick?.(event); if (!event.defaultPrevented && event.detail > 0 && closeOnBackdrop && beganOnBackdrop && isBackdrop(event)) onOpenChange(false); }} onCancel={(event) => { event.preventDefault(); if (isTopLayer()) onOpenChange(false); }} onClose={() => { if (open) onOpenChange(false); }}>{children}</dialog>;
+  }} onClick={event => { const beganOnBackdrop = backdropPointerDown.current; backdropPointerDown.current = false; onClick?.(event); if (!event.defaultPrevented && event.detail > 0 && closeOnBackdrop && beganOnBackdrop && isBackdrop(event)) onOpenChange(false); }} onCancel={(event) => { if (event.target !== event.currentTarget) return; event.preventDefault(); if (isTopLayer()) onOpenChange(false); }} onClose={event => { if (event.target === event.currentTarget && open) onOpenChange(false); }}>{children}</dialog>;
 }
 
 export const DialogHeader = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DialogHeader({className = '', ...props}, ref) {
@@ -202,11 +211,16 @@ export function FileUpload({ label = '파일 선택', onFilesChange, onInvalidFi
 
 export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'info' | 'success' | 'warning' | 'danger';
+  appearance?: 'default' | 'solid';
+  icon?: React.ReactNode;
   action?: React.ReactNode;
   onDismiss?: () => void;
 }
-export function Toast({ children, variant = 'info', action, onDismiss, className = '', role, ...props }: ToastProps) {
-  return <div aria-atomic="true" {...props} role={role || (variant === 'danger' ? 'alert' : 'status')} className={`toast toast--${variant} ${className}`}><p>{children}</p>{action && <div className="toast-action">{action}</div>}{onDismiss && <button type="button" className="icon-button" aria-label="알림 닫기" onClick={onDismiss}><span className="ui-icon icon-close" aria-hidden="true" /></button>}</div>;
+export function Toast({ children, variant = 'info', appearance = 'default', icon, action, onDismiss, className = '', role, ...props }: ToastProps) {
+  const indicator = icon === undefined ? <Icon name={({info:'info', success:'check-circle', warning:'warning', danger:'warning-fill'} as const)[variant]} /> : icon;
+  return <div aria-atomic="true" {...props} role={role || (variant === 'danger' ? 'alert' : 'status')} className={`toast toast--${variant}${appearance === 'solid' ? ' toast--solid' : ''} ${className}`}>
+    {indicator != null && indicator !== false && <span className="toast-icon" aria-hidden="true">{indicator}</span>}
+    <p>{children}</p>{action && <div className="toast-action">{action}</div>}{onDismiss && <button type="button" className="icon-button" aria-label="알림 닫기" onClick={onDismiss}><span className="ui-icon icon-close" aria-hidden="true" /></button>}</div>;
 }
 
 export function Slides({ slides, label = '슬라이드', initialIndex = 0 }: { slides: React.ReactNode[]; label?: string; initialIndex?: number }) {

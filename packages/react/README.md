@@ -2,6 +2,10 @@
 
 idenflu mono 디자인 시스템의 React 컴포넌트와 스타일입니다. React와 React DOM 18.3.1 또는 19가 필요합니다.
 
+## 라이선스
+
+이 패키지의 자체 제작 소프트웨어는 [MIT 라이선스](https://github.com/idenflu/idenflu-design-system-studio/blob/main/LICENSE)에 따라 상업적 용도를 포함해 사용할 수 있습니다. 소프트웨어의 복사본이나 상당 부분을 배포할 때 저작권 표시와 라이선스 문구를 포함해야 합니다. 함께 제공되는 서드파티 자료에는 각각의 라이선스가 적용됩니다.
+
 ## 설치
 
 GitHub Packages에서 `@idenflu` 범위를 사용하도록 프로젝트의 `.npmrc`에 설정합니다.
@@ -75,6 +79,20 @@ import { Button, Icon } from '@idenflu/mono-react';
 - 데이터 상태: `DataState`, `useDataState` (로딩·실패·빈 목록·검색 결과 없음·정상 목록)
 
 입력과 선택 컴포넌트는 React의 `value`/`onValueChange` 또는 `defaultValue`를 사용합니다. `TextField` 등 네이티브 입력 래퍼는 일반적인 `onChange`를 사용합니다. 날짜와 숫자의 `onValueChange`는 값을 확정하거나 증감할 때 호출하며 숫자는 정밀도를 유지하는 문자열을 전달합니다. `DateRangePicker`의 값은 `[시작일, 종료일]`이며 값은 `YYYY-MM-DD` 또는 `null`입니다.
+
+### Tabs
+
+`Tabs`는 기본 가로형이며 `orientation="vertical"`을 지정하면 왼쪽 탭 목록과 오른쪽 내용으로 배치합니다. 가로형은 ←·→, 세로형은 ↑·↓로 이동하고 Home·End로 처음과 마지막 탭을 선택합니다. 비활성 탭은 건너뛰며 탭 전환 시 입력값을 유지합니다. `value`·`onValueChange`로 선택 상태를 제어할 수 있습니다.
+
+```tsx
+import { Tabs } from '@idenflu/mono-react';
+
+<Tabs label="설정 분류" orientation="vertical" items={[
+  { value: 'general', label: '기본 정보', content: <p>워크스페이스 기본 정보</p> },
+  { value: 'notifications', label: '알림', content: <p>이메일과 활동 알림</p> },
+  { value: 'security', label: '보안', disabled: true, content: <p>관리자 전용</p> },
+]} />
+```
 
 ### DataGrid
 
@@ -296,6 +314,12 @@ import { Icon, Select } from '@idenflu/mono-react';
 
 `Dialog`는 `open`과 `onOpenChange`로 제어하며, 제목과 설명을 `aria-labelledby`·`aria-describedby`로 연결합니다. `closeOnBackdrop`은 배경 클릭으로 닫을지 정하며 기본값은 `false`입니다. Escape는 취소로 처리합니다.
 
+열려 있는 동안 문서 루트와 본문의 배경 스크롤을 잠그고, 기존 스크롤바의 공간을 유지해 가로 밀림을 방지합니다. 중첩 모달은 마지막 창이 닫힐 때 해제하며 닫기·언마운트 시 기존 인라인 스크롤 스타일과 원래 스크롤 위치를 복원합니다. `Drawer`와 처리 중 다이얼로그에도 동일하게 적용하고 모달 내부 스크롤은 유지합니다.
+
+처리 중인 작업은 `Dialog` 안에 `NovaSpinner` 또는 `Progress`를 조합합니다. 진행률을 모르면 스피너와 상태 메시지를, 알면 `value`·`max`가 있는 진행률과 처리 건수를 표시합니다. 메시지를 `role="status"`로 알릴 때 장식용 스피너는 `aria-hidden="true"`로 중복 안내를 피합니다. 문서의 처리 예시는 완료·취소·재시작을 지원하며, 취소하거나 화면을 벗어나면 타이머를 정리합니다. 실제 비동기 작업의 취소는 앱에서 연결해야 합니다.
+
+버튼 없는 처리형은 취소·닫기 버튼을 생략하고 `onOpenChange`의 닫기 요청을 무시해 Escape·배경 클릭으로 닫히지 않게 합니다. 작업이 완료되면 앱에서 `open`을 `false`로 바꿔 자동으로 닫으며 완료 안내와 실행 버튼 포커스를 복원합니다. 문서의 React 예시는 `<ProcessingDialogExample blocking />`으로 이 유형을 재현합니다.
+
 `variant="divided"`는 `DialogHeader`·`DialogBody`·`DialogFooter` 사이에 구분선을 표시합니다. 세 영역을 `Dialog`의 직접 자식으로 배치하면 긴 내용은 본문에서만 스크롤되고 헤더와 하단 버튼은 유지됩니다. `DialogBody`는 키보드 스크롤을 위해 기본 `tabIndex={0}`을 제공하며 필요한 경우 재정의할 수 있습니다. 하단에서 본문의 폼을 제출할 때는 버튼의 `form` 속성을 본문 폼의 `id`에 연결합니다.
 
 ```tsx
@@ -316,8 +340,12 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu
 
 `Toast`의 `variant`에는 `info`·`success`·`warning`·`danger`를 지정하고, `action`에 재시도·실행 취소 버튼을 넣을 수 있습니다. 기본 알림 역할은 `status`이며 `danger`는 `alert`입니다. 자동으로 닫히지 않으므로 표시 상태와 닫기 동작을 앱에서 연결합니다.
 
+기본 `appearance="default"`는 왼쪽 표시선에 상태 색상을 사용합니다. `appearance="solid"`는 배경 전체에 상태 색상을 적용하며 글자·닫기 버튼·ghost 동작 버튼도 함께 맞춥니다. 직접 색상을 재정의할 때는 `--toast-on-info`·`--toast-on-success`·`--toast-on-warning`·`--toast-on-danger`로 배경 위 글자색을 지정할 수 있습니다. 스튜디오 화면 조정에서는 색상 변경 시 이 글자색을 자동으로 보정합니다.
+
+상태에 따라 체크·안내·주의·오류 아이콘이 기본 표시됩니다. `icon`에 다른 React 아이콘을 전달해 바꾸거나 `icon={null}`로 숨길 수 있습니다. 아이콘은 장식으로 처리하며 의미는 메시지와 알림 역할로 전달합니다.
+
 ```tsx
-<Toast variant="danger" onDismiss={dismissToast}
+<Toast variant="danger" appearance="solid" onDismiss={dismissToast}
   action={<Button variant="ghost" onClick={retrySave}>다시 시도</Button>}>
   저장하지 못했습니다. 다시 시도해주세요.
 </Toast>

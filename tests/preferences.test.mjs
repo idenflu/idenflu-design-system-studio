@@ -349,6 +349,21 @@ test('contrast-derived tokens hydrate, export by theme and clear with individual
 
 
 const chipRoles = ['primary','success','warning','danger','neutral','secondary'];
+test('solid toast foregrounds remain readable after status color overrides and reset with them', () => {
+  const app = engine();
+  for (const theme of ['light','dark']) {
+    app.theme(theme);
+    for (const background of ['#ffffff','#000000','#ffeb3b','#777777','#4263cc']) {
+      app.api.set({colors:{[theme]:Object.fromEntries(['info','success','warning','danger'].map(role => [`--${role}`,background]))}});
+      for (const role of ['info','success','warning','danger']) {
+        const foreground = app.styles.get(`--toast-on-${role}`);
+        assert(app.api.contrastRatio(foreground,background) >= 4.5, `${theme} ${role} ${foreground} on ${background}`);
+      }
+    }
+  }
+  app.api.reset();
+  for (const role of ['info','success','warning','danger']) assert.equal(app.styles.has(`--toast-on-${role}`), false);
+});
 const chipProperty = role => `--chip-${role}-selected-text`;
 const chipThemeDefaults = {
   light: {primary:'#4263cc',success:'#38754d',warning:'#8c641b',danger:'#ad3131',neutral:'#edf0fb',secondary:'#e1e4e9'},

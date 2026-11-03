@@ -21,6 +21,7 @@ export async function build(destination = resolve(project, 'dist')) {
   await execFileAsync(process.execPath, [resolve(reactRoot, 'scripts/build.mjs')], { cwd: reactRoot });
   await rm(destination, { recursive: true, force: true });
   await mkdir(output, { recursive: true });
+  await cp(resolve(project, 'LICENSE'), resolve(destination, 'LICENSE'));
   async function bundle(names, extension, prefix) {
     const chunks = await Promise.all(names.map(async (name) => `/* ${name} */\n${await readFile(resolve(source, name), 'utf8')}`));
     const text = chunks.join(extension === 'js' ? '\n;\n' : '\n');

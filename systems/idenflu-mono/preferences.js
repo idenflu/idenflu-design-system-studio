@@ -125,6 +125,7 @@
     ["danger", "success", "warning", "info"].forEach((role) => {
       if (!overrides[`--${role}`]) return;
       put(`--${role}-surface`, mix(`--${role}`, 12, "var(--canvas)"));
+      put(`--toast-on-${role}`, readableColor(theme === "dark" ? "#151719" : "#ffffff", [overrides[`--${role}`]]));
       if (role === "danger") {
         const canvas = overrides["--canvas"] || (theme === "dark" ? "#151719" : "#ffffff");
         const surface = blendColor(canvas, overrides["--danger"], 0.12);

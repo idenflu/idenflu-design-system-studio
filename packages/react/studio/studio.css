@@ -122,6 +122,15 @@
 .react-studio-section .popover-content .react-studio-popover-options .choice { margin:0; }
 .react-studio-popover-body > .button { justify-self:start; margin-top:0; }
 .react-studio-dialog-detail { display:grid; gap:var(--space-1); margin-top:var(--space-5); padding:var(--space-4); background:var(--surface); border:1px solid var(--divider); }
+.react-studio-processing-state { display:grid; justify-items:center; gap:var(--space-4); margin-top:var(--space-7); text-align:center; }
+.react-studio-processing-visual { display:grid; place-items:center; width:64px; height:64px; }
+.react-studio-processing-visual.is-complete { border-radius:50%; background:var(--success-surface); color:var(--success); }
+.react-studio-processing-visual.is-complete .ui-icon { width:32px; height:32px; }
+.react-studio-processing-message { display:grid; gap:var(--space-1); }
+.react-studio-processing-message p { color:var(--text-secondary); }
+.react-studio-processing-progress { display:grid; gap:var(--space-2); width:100%; min-width:0; font-variant-numeric:tabular-nums; }
+.react-studio-processing-progress > div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--space-2); font-size:var(--font-size-caption); color:var(--text-secondary); }
+.react-studio-processing-progress .progress-bar { width:100%; }
 .react-studio-section .demo-drawer form { display:grid; gap:var(--space-5); }
 .react-studio-section .demo-drawer .drawer-actions { margin-top:var(--space-3); }
 .react-studio-section .simple-list, .react-studio-section .selectable-list, .react-studio-section .step-panel { margin-top:0; }

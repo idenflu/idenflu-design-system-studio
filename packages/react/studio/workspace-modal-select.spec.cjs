@@ -11,6 +11,8 @@ for (const height of [1000, 520]) {
     await team.click();
     if (height === 520) {
       const body=project.locator('.dialog-body');
+      await body.evaluate(element=>{element.scrollTop=element.scrollHeight;});
+      await expect.poll(()=>body.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
       const previous=await body.evaluate(element=>element.scrollTop);
       await body.evaluate(element=>{element.scrollTop=Math.max(0,element.scrollTop-30);});
       await expect.poll(()=>body.evaluate(element=>element.scrollTop)).toBeLessThan(previous);

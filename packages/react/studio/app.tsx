@@ -136,8 +136,8 @@ export function LoadingExample() {
   </div>;
 }`,
   'components/accordion':'<Accordion><AccordionItem title="제목">내용</AccordionItem></Accordion>',
-  'components/overlays':`import { useState } from 'react';
-import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, Toast } from '@idenflu/mono-react';
+  'components/overlays':`import { useEffect, useId, useRef, useState } from 'react';
+import { Button, Dialog, DialogHeader, DialogBody, DialogFooter, NovaSpinner, Toast } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function OverlayExample() {
@@ -155,9 +155,49 @@ export function OverlayExample() {
         <Button onClick={() => { setOpen(false); setNotice(true); }}>확인</Button>
       </DialogFooter>
     </Dialog>
-    {notice && <Toast variant="success" onDismiss={() => setNotice(false)}>
+    {notice && <Toast variant="success" appearance="solid" onDismiss={() => setNotice(false)}>
       공유 범위를 확인했습니다.
     </Toast>}
+  </>;
+}
+
+// 버튼 없는 유형은 <ProcessingDialogExample blocking />으로 사용합니다.
+export function ProcessingDialogExample({ blocking = false }: { blocking?: boolean }) {
+  const titleId = useId();
+  const action = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    // 실제 앱에서는 비동기 작업 결과에 맞춰 완료 상태를 갱신합니다.
+    const timer = window.setTimeout(() => {
+      setDone(true);
+      if (blocking) setOpen(false);
+    }, 4500);
+    return () => window.clearTimeout(timer);
+  }, [open, blocking]);
+  useEffect(() => {
+    if (open && done) action.current?.focus();
+  }, [open, done]);
+  return <>
+    <Button onClick={() => { setDone(false); setOpen(true); }}>
+      {blocking ? '버튼 없는 처리 시작' : '동기화 시작'}
+    </Button>
+    <Dialog open={open} onOpenChange={next => { if (!blocking) setOpen(next); }} aria-labelledby={titleId}>
+      <h2 id={titleId}>데이터 동기화</h2>
+      <div style={{ display: 'grid', justifyItems: 'center', gap: 16, marginTop: 24 }}>
+        {!done && <NovaSpinner size={56} aria-hidden="true" />}
+        <p role="status" aria-atomic="true">
+          {done ? '동기화를 완료했습니다.' : '데이터를 동기화하고 있습니다.'}
+        </p>
+        {blocking && <p>완료되면 자동으로 닫힙니다.</p>}
+      </div>
+      {!blocking && <div className="dialog-actions">
+        <Button ref={action} variant={done ? 'primary' : 'outline'} onClick={() => setOpen(false)}>
+          {done ? '확인' : '작업 취소'}
+        </Button>
+      </div>}
+    </Dialog>
   </>;
 }`,
   'components/table':`import { Checkbox, Table, TableContainer } from '@idenflu/mono-react';

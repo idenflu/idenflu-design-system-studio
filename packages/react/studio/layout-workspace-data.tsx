@@ -3,9 +3,9 @@ import { Icon, type IconName, type TreeNode } from '../src';
 
 export type Project = {id:string; name:string; team:string; owner:string; status:string; progress:number; due:string; description:string};
 export type ProjectDraft = Pick<Project,'name'|'team'|'description'|'due'>;
-export type Member = {id:string; name:string; email:string; team:string; role:string};
+export type Member = {id:string; name:string; email:string; team:string; roles:string[]};
 export type WorkspaceSettings = {name:string; description:string; timezone:string; projectNotifications:boolean; weeklySummary:boolean; mentionNotifications:boolean};
-export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'members'|'settings'|'notifications';
+export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'master-detail'|'members'|'settings'|'notifications'|'vertical-settings';
 export type WorkspaceTab = {key:string; page:WorkspacePage|'project-detail'; projectId?:string};
 export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:string; icon:IconName; description:string}> = {
   home:{title:'팀 홈',group:'업무 공간',parent:'work',icon:'home',description:'팀의 주요 업무와 최근 활동을 한눈에 확인하세요.'},
@@ -13,9 +13,11 @@ export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:s
   'active-projects':{title:'진행 중 프로젝트',group:'프로젝트 관리',parent:'project-menu',icon:'clock',description:'현재 작업 중인 프로젝트와 마감 일정을 확인하세요.'},
   reviews:{title:'검토 요청',group:'프로젝트 관리',parent:'project-menu',icon:'check-circle',description:'검토가 필요한 프로젝트를 확인하고 다음 단계를 진행하세요.'},
   completed:{title:'완료된 프로젝트',group:'프로젝트 관리',parent:'project-menu',icon:'folder',description:'작업을 마친 프로젝트와 결과를 확인하세요.'},
+  'master-detail':{title:'마스터-디테일',group:'프로젝트 관리',parent:'project-menu',icon:'grid',description:'프로젝트 목록과 선택한 항목의 상세 정보를 함께 확인하세요.'},
   members:{title:'멤버 관리',group:'조직 관리',parent:'team-menu',icon:'person',description:'함께 일하는 팀원을 찾고 역할을 관리하세요.'},
   settings:{title:'워크스페이스 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'워크스페이스의 기본 정보와 표시 기준을 설정하세요.'},
   notifications:{title:'알림 설정',group:'환경 설정',parent:'settings-menu',icon:'bell',description:'필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다.'},
+  'vertical-settings':{title:'버티컬 탭 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'설정 항목을 세로 탭으로 나누어 관리하세요.'},
 };
 export const defaultExpanded=['work','project-menu','team-menu','settings-menu'];
 export const statuses=['준비 중','진행 중','검토 중','완료'].map(value=>({value,label:value}));
@@ -50,10 +52,10 @@ export const initialProjects:Project[]=[
   ...extraProjects,
 ];
 export const initialMembers:Member[]=[
-  {id:'member-1',name:'김민수',email:'minsu@example.com',team:'프로덕트 디자인',role:'관리자'},
-  {id:'member-2',name:'이서연',email:'seoyeon@example.com',team:'프로덕트 디자인',role:'편집자'},
-  {id:'member-3',name:'박지훈',email:'jihoon@example.com',team:'플랫폼 개발',role:'편집자'},
-  {id:'member-4',name:'정수빈',email:'subin@example.com',team:'브랜드 디자인',role:'뷰어'},
+  {id:'member-1',name:'김민수',email:'minsu@example.com',team:'프로덕트 디자인',roles:['관리자']},
+  {id:'member-2',name:'이서연',email:'seoyeon@example.com',team:'프로덕트 디자인',roles:['편집자']},
+  {id:'member-3',name:'박지훈',email:'jihoon@example.com',team:'플랫폼 개발',roles:['편집자']},
+  {id:'member-4',name:'정수빈',email:'subin@example.com',team:'브랜드 디자인',roles:['뷰어']},
 ];
 export const initialSettings:WorkspaceSettings={name:'제품팀',description:'함께 더 나은 제품 경험을 만드는 공간입니다.',timezone:'seoul',projectNotifications:true,weeklySummary:true,mentionNotifications:true};
 export const badgeVariant=(status:string)=>status==='완료'?'success' as const:status==='검토 중'?'warning' as const:status==='진행 중'?'primary' as const:'neutral' as const;
@@ -61,7 +63,7 @@ export const badgeVariant=(status:string)=>status==='완료'?'success' as const:
 export function workspaceTree():TreeNode[]{
   const leaf=(value:WorkspacePage):TreeNode=>({value,label:<span className="layout-tree-label"><span>{pageInfo[value].title}</span></span>});
   const group=(value:string,title:string,children:TreeNode[],root=false):TreeNode=>({value,label:<span className="layout-tree-label">{root&&<Icon name="folder"/>}<span>{title}</span></span>,children});
-  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed')])],true),group('team-menu','조직 관리',[leaf('members')],true),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications')],true)];
+  return [group('work','업무 공간',[leaf('home'),group('project-menu','프로젝트 관리',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed'),leaf('master-detail')])],true),group('team-menu','조직 관리',[leaf('members')],true),group('settings-menu','환경 설정',[leaf('settings'),leaf('notifications'),leaf('vertical-settings')],true)];
 }
 
 export function filterWorkspaceTree(items:readonly TreeNode[],query:string):TreeNode[]{

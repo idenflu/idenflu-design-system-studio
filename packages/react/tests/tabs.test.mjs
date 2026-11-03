@@ -8,9 +8,9 @@ const React=await import('react');const {createRoot}=await import('react-dom/cli
 const {act,createElement:h}=React;
 after(()=>dom.window.close());
 
-async function fixture(){
+async function fixture(props={}){
   const node=document.createElement('div');document.body.append(node);const root=createRoot(node);const events=[];
-  function Workspace(){const [items,setItems]=React.useState(['home','first','disabled','last']);const [value,setValue]=React.useState('last');return h(Tabs,{label:'업무 화면',value,onValueChange:setValue,onTabClose:key=>{events.push(key);setItems(values=>values.filter(value=>value!==key));},items:items.map(key=>({value:key,label:key,closable:key!=='home',disabled:key==='disabled',content:h('input',{'aria-label':`${key} 입력`,defaultValue:''})}))});}
+  function Workspace(){const [items,setItems]=React.useState(['home','first','disabled','last']);const [value,setValue]=React.useState('last');return h(Tabs,{...props,label:'업무 화면',value,onValueChange:setValue,onTabClose:key=>{events.push(key);setItems(values=>values.filter(value=>value!==key));},items:items.map(key=>({value:key,label:key,closable:key!=='home',disabled:key==='disabled',content:h('input',{'aria-label':`${key} 입력`,defaultValue:''})}))});}
   await act(async()=>root.render(h(Workspace)));
   return {node,events,dispose:async()=>{await act(async()=>root.unmount());node.remove();}};
 }
@@ -56,6 +56,23 @@ test('keyboard navigation focuses a tab after hidden tabs become selected',async
     await key(selected(f.node),'ArrowLeft');
     assert.equal(selected(f.node).textContent,'first');
     assert.equal(document.activeElement,selected(f.node));
+  }finally{await f.dispose();}
+});
+
+test('vertical tabs use up and down, skip disabled tabs and preserve panel inputs',async()=>{
+  const f=await fixture({orientation:'vertical'});try{
+    assert.equal(f.node.querySelector('[role=tablist]').getAttribute('aria-orientation'),'vertical');
+    const input=f.node.querySelector('[aria-label="last 입력"]');input.value='작성 중';
+    selected(f.node).focus();
+    await key(selected(f.node),'ArrowUp');assert.equal(selected(f.node).textContent,'first');assert.equal(document.activeElement,selected(f.node));
+    assert.equal(input.closest('[role=tabpanel]').hidden,true);
+    await key(selected(f.node),'ArrowDown');assert.equal(selected(f.node).textContent,'last');assert.equal(input.value,'작성 중');
+    await key(selected(f.node),'ArrowDown');assert.equal(selected(f.node).textContent,'home');
+    await key(selected(f.node),'ArrowUp');assert.equal(selected(f.node).textContent,'last');
+    await key(selected(f.node),'Home');assert.equal(selected(f.node).textContent,'home');
+    await key(selected(f.node),'End');assert.equal(selected(f.node).textContent,'last');
+    await key(selected(f.node),'ArrowLeft');await key(selected(f.node),'ArrowRight');assert.equal(selected(f.node).textContent,'last');
+    await key(selected(f.node),'Delete');assert.equal(selected(f.node).textContent,'first');assert.equal(document.activeElement,selected(f.node));
   }finally{await f.dispose();}
 });
 

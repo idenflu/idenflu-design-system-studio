@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, NumberField, Progress, Select, Switch, Table, TableContainer, TextArea, TextField, type DataGridColumn, type DateValue } from '../src';
+import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, MultiSelect, NumberField, Progress, Select, Switch, Table, TableContainer, Tabs, TextArea, TextField, type DataGridColumn, type DateValue } from '../src';
 import { badgeVariant, pageInfo, roles, statuses, teams, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings } from './layout-workspace-data';
 
 export function WorkspacePageHeader({title,description,eyebrow,action}: {title:string;description:string;eyebrow?:string;action?:React.ReactNode}){
@@ -20,7 +20,7 @@ export function ProjectForm({id,onCreate}: {id:string;onCreate:(draft:ProjectDra
 export function InviteMemberForm({id,onInvite,existingEmails}: {id:string;onInvite:(member:Omit<Member,'id'>)=>void;existingEmails:string[]}){
   const [name,setName]=React.useState(''),[email,setEmail]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[role,setRole]=React.useState('편집자');
   const [error,setError]=React.useState('');
-  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,role});}}>
+  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,roles:[role]});}}>
     <TextField label="이름" value={name} onChange={event=>setName(event.target.value)} required pattern=".*\S.*" autoFocus/>
     <TextField label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
     <Select label="소속 팀" value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" value={role} options={roles} onValueChange={setRole} popupStrategy="fixed"/>
@@ -44,6 +44,7 @@ export function ProfileForm({id,member,members,onSave}: {id:string;member:Member
   }}>
     <TextField ref={nameInput} label="이름" value={name} onChange={event=>{setName(event.target.value);setNameError('');}} required maxLength={60} error={nameError||undefined} autoFocus/>
     <TextField ref={emailInput} label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setEmailError('');}} required maxLength={254} error={emailError||undefined}/>
+    <div><MultiSelect label="역할" value={member.roles} options={roles.map(role=>role.value==='관리자'?{...role,label:'워크스페이스 관리자'}:role)} presentation="inline" disabled aria-describedby={`${id}-role-help`} placeholder="지정된 역할이 없습니다"/><p id={`${id}-role-help`} className="component-helper" style={{marginTop:'var(--space-1)'}}>역할은 멤버 관리에서 변경할 수 있습니다.</p></div>
   </form>;
 }
 
@@ -70,6 +71,30 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onComplete}: {page:'
   </>;
 }
 
+export function MasterDetailPage({projects,members,onUpdate,onOpen}: {projects:Project[];members:Member[];onUpdate:(id:string,patch:Partial<Project>)=>void;onOpen:(id:string)=>void}){
+  const [query,setQuery]=React.useState(''),[selectedId,setSelectedId]=React.useState(projects[0]?.id??'');
+  const needle=query.trim().toLocaleLowerCase();
+  const visible=React.useMemo(()=>projects.filter(project=>`${project.name} ${project.id} ${project.team} ${project.owner}`.toLocaleLowerCase().includes(needle)),[projects,needle]);
+  const selected=visible.find(project=>project.id===selectedId)??visible[0];
+  React.useEffect(()=>{const id=selected?.id??'';if(id!==selectedId)setSelectedId(id);},[selected?.id,selectedId]);
+  return <><WorkspacePageHeader title="마스터-디테일" description="목록에서 프로젝트를 선택하고 상세 내용을 확인하세요." eyebrow="PROJECT MANAGEMENT"/>
+    <div className="layout-master-detail">
+      <section className="layout-master-panel" aria-label="프로젝트 목록">
+        <div className="layout-master-toolbar"><h2>프로젝트 목록</h2><TextField label="프로젝트 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="프로젝트 검색"/></div>
+        <div className="layout-master-list" role="group" aria-label="프로젝트 목록">
+          {visible.length?visible.map(project=><button key={project.id} type="button" className="layout-master-item" aria-label={`${project.name} ${project.id}`} aria-pressed={project.id===selected?.id} onClick={()=>setSelectedId(project.id)}><span><strong>{project.name}</strong><small>{project.id} · {project.team}</small></span><Badge variant={badgeVariant(project.status)}>{project.status}</Badge></button>):<p className="layout-empty" role="status">검색 결과가 없습니다.</p>}
+        </div>
+      </section>
+      <section className="layout-master-detail-panel" aria-label="프로젝트 상세">
+        {selected?<div key={selected.id} className="layout-master-content"><header className="layout-master-header"><div><span>{selected.id}</span><h2>{selected.name}</h2></div><Button variant="outline" onClick={()=>onOpen(selected.id)}>상세 화면 열기<Icon name="arrow-right"/></Button></header>
+          <div className="layout-master-overview"><div className="layout-panel-title"><h3>프로젝트 개요</h3><Badge variant={badgeVariant(selected.status)}>{selected.status}</Badge></div><p>{selected.description||'프로젝트 설명이 없습니다.'}</p><div className="layout-detail-progress"><div><span>전체 진행률</span><strong>{selected.progress}%</strong></div><Progress value={selected.progress} max={100} aria-label="프로젝트 전체 진행률"/></div></div>
+          <div className="layout-master-properties"><h3>프로젝트 속성</h3><div className="layout-master-fields"><Select label="프로젝트 상태" value={selected.status} options={statuses} popupStrategy="fixed" onValueChange={status=>onUpdate(selected.id,{status,...(status==='완료'?{progress:100}:{})})}/><Select label="담당 팀" value={selected.team} options={teams} popupStrategy="fixed" onValueChange={team=>onUpdate(selected.id,{team})}/><Select label="담당자" value={selected.owner} options={members.map(member=>({value:member.name,label:member.name}))} popupStrategy="fixed" onValueChange={owner=>onUpdate(selected.id,{owner})}/><DatePicker label="목표 마감일" value={selected.due==='미정'?null:selected.due} onValueChange={due=>onUpdate(selected.id,{due:due??'미정'})}/><NumberField label="진행률" value={String(selected.progress)} min="0" max="100" step="5" unit="%" required onValueChange={value=>onUpdate(selected.id,{progress:Number(value)})}/></div></div>
+        </div>:<p className="layout-empty">프로젝트를 찾을 수 없습니다.</p>}
+      </section>
+    </div>
+  </>;
+}
+
 export function HomePage({projects,members,onOpen,onPage}: {projects:Project[];members:Member[];onOpen:(id:string)=>void;onPage:(page:WorkspacePage)=>void}){
   const reviewing=projects.filter(project=>project.status==='검토 중');
   return <><WorkspacePageHeader title="팀 홈" description="팀의 주요 업무와 최근 활동을 한눈에 확인하세요." eyebrow="WORKSPACE OVERVIEW" action={<Button variant="outline" onClick={()=>onPage('projects')}>프로젝트 전체 보기<Icon name="arrow-right"/></Button>}/>
@@ -87,21 +112,42 @@ export function ProjectDetailPage({project,members,onUpdate,onPage}: {project:Pr
   </>;
 }
 
-export function MembersPage({members,onInvite,onRole}: {members:Member[];onInvite:()=>void;onRole:(id:string,role:string)=>void}){
+export function MembersPage({members,onInvite,onRole}: {members:Member[];onInvite:()=>void;onRole:(id:string,roles:string[])=>void}){
   const [query,setQuery]=React.useState(''),[team,setTeam]=React.useState('all');
   const visible=members.filter(member=>`${member.name} ${member.email}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())&&(team==='all'||member.team===team));
   return <><WorkspacePageHeader title="멤버 관리" description="함께 일하는 팀원을 찾고 역할을 관리하세요." eyebrow="TEAM MEMBERS" action={<Button onClick={onInvite}><Icon name="add"/>멤버 초대</Button>}/><div className="layout-member-filters"><TextField label="멤버 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="이름 또는 이메일 검색"/><Select label="소속 팀 필터" value={team} options={[{value:'all',label:'전체 팀'},...teams]} onValueChange={setTeam}/></div>
-    <TableContainer label="워크스페이스 멤버 목록" className="layout-members-table"><Table><thead><tr><th scope="col">멤버</th><th scope="col">소속 팀</th><th scope="col">역할</th><th scope="col">상태</th></tr></thead><tbody>{visible.map(member=><tr key={member.id}><td><span className="layout-person"><Avatar shape="circle" variant="neutral">{member.name.slice(0,1)}</Avatar><span><strong>{member.name}</strong><small>{member.email}</small></span></span></td><td>{member.team}</td><td><div className="layout-inline-select"><Select label={`${member.name} 역할`} value={member.role} options={roles} onValueChange={role=>onRole(member.id,role)}/></div></td><td><Badge variant="success">활성</Badge></td></tr>)}</tbody></Table></TableContainer>{!visible.length&&<p role="status" className="layout-empty">검색 결과가 없습니다.</p>}<p className="layout-content-caption">전체 {members.length}명 중 {visible.length}명을 표시합니다.</p>
+    <TableContainer label="워크스페이스 멤버 목록" className="layout-members-table"><Table><thead><tr><th scope="col">멤버</th><th scope="col">소속 팀</th><th scope="col">역할</th><th scope="col">상태</th></tr></thead><tbody>{visible.map(member=><tr key={member.id}><td><span className="layout-person"><Avatar shape="circle" variant="neutral">{member.name.slice(0,1)}</Avatar><span><strong>{member.name}</strong><small>{member.email}</small></span></span></td><td>{member.team}</td><td><div className="layout-inline-select"><MultiSelect label={`${member.name} 역할`} value={member.roles} options={roles} presentation="inline" popupStrategy="fixed" placeholder="역할 선택" onValueChange={selected=>onRole(member.id,selected)}/></div></td><td><Badge variant="success">활성</Badge></td></tr>)}</tbody></Table></TableContainer>{!visible.length&&<p role="status" className="layout-empty">검색 결과가 없습니다.</p>}<p className="layout-content-caption">전체 {members.length}명 중 {visible.length}명을 표시합니다.</p>
   </>;
 }
 
-export function SettingsPage({settings,onSave}: {settings:WorkspaceSettings;onSave:(patch:Partial<WorkspaceSettings>)=>void}){
-  const [name,setName]=React.useState(settings.name),[description,setDescription]=React.useState(settings.description),[timezone,setTimezone]=React.useState(settings.timezone),[error,setError]=React.useState(''),[saved,setSaved]=React.useState(false);
-  return <><WorkspacePageHeader title="워크스페이스 설정" description="워크스페이스의 기본 정보와 표시 기준을 설정하세요." eyebrow="WORKSPACE SETTINGS"/><form className="layout-panel layout-settings" noValidate onChange={()=>setSaved(false)} onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('워크스페이스 이름을 입력해주세요.');return;}onSave({name:name.trim(),description,timezone});setSaved(true);}}><div><h2>기본 정보</h2><p>이 정보는 사이드바와 탑바에 함께 표시됩니다.</p></div><TextField label="워크스페이스 이름" value={name} onChange={event=>{setName(event.target.value);setError('');}} required error={error||undefined}/><TextArea label="워크스페이스 소개" value={description} onChange={event=>setDescription(event.target.value)} rows={3}/><Select label="시간대" value={timezone} onValueChange={value=>{setTimezone(value);setSaved(false);}} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/><div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div></form></>;
+type SettingsProps={settings:WorkspaceSettings;onSave:(patch:Partial<WorkspaceSettings>)=>void};
+type NotificationSettingsProps={settings:WorkspaceSettings;onChange:(patch:Partial<WorkspaceSettings>)=>void};
+type SettingsDraft=Partial<Pick<WorkspaceSettings,'name'|'description'|'timezone'>>;
+
+function WorkspaceSettingsForm({settings,onSave}:SettingsProps){
+  const [draft,setDraft]=React.useState<SettingsDraft>({}),[error,setError]=React.useState(''),[saved,setSaved]=React.useState(false);
+  const name=draft.name??settings.name,description=draft.description??settings.description,timezone=draft.timezone??settings.timezone;
+  const change=(key:keyof SettingsDraft,value:string)=>{setDraft(current=>{const next={...current};if(value===settings[key])delete next[key];else next[key]=value;return next;});setSaved(false);};
+  return <form className="layout-panel layout-settings" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('워크스페이스 이름을 입력해주세요.');return;}onSave({...draft,...(draft.name!==undefined?{name:name.trim()}:{})});setDraft({});setSaved(true);}}><div><h2>기본 정보</h2><p>이 정보는 사이드바와 탑바에 함께 표시됩니다.</p></div><TextField label="워크스페이스 이름" value={name} onChange={event=>{change('name',event.target.value);setError('');}} required error={error||undefined}/><TextArea label="워크스페이스 소개" value={description} onChange={event=>change('description',event.target.value)} rows={3}/><Select label="시간대" value={timezone} onValueChange={value=>change('timezone',value)} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/><div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div></form>;
 }
 
-export function NotificationSettingsPage({settings,onChange}: {settings:WorkspaceSettings;onChange:(patch:Partial<WorkspaceSettings>)=>void}){
-  return <><WorkspacePageHeader title="알림 설정" description="필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다." eyebrow="NOTIFICATION PREFERENCES"/><section className="layout-panel layout-notification-settings"><h2>업무 알림</h2>{[
+function NotificationSettingsContent({settings,onChange}:NotificationSettingsProps){
+  return <section className="layout-panel layout-notification-settings"><h2>업무 알림</h2>{[
     ['projectNotifications','프로젝트 변경 알림','담당 프로젝트의 상태와 일정이 변경되면 알려줍니다.'],['mentionNotifications','멘션과 검토 요청','나를 언급하거나 검토를 요청한 소식을 알려줍니다.'],['weeklySummary','주간 활동 요약','팀의 프로젝트 진행 현황을 주간 요약으로 받습니다.'],
-  ].map(([key,label,description])=><div key={key}><div><h3>{label}</h3><p>{description}</p></div><Switch label={<span className="sr-only">{label}</span>} checked={settings[key as keyof WorkspaceSettings]===true} onChange={event=>onChange({[key]:event.target.checked})}/></div>)}</section></>;
+  ].map(([key,label,description])=><div key={key}><div><h3>{label}</h3><p>{description}</p></div><Switch label={<span className="sr-only">{label}</span>} checked={settings[key as keyof WorkspaceSettings]===true} onChange={event=>onChange({[key]:event.target.checked})}/></div>)}</section>;
+}
+
+export function SettingsPage(props:SettingsProps){
+  return <><WorkspacePageHeader title="워크스페이스 설정" description="워크스페이스의 기본 정보와 표시 기준을 설정하세요." eyebrow="WORKSPACE SETTINGS"/><WorkspaceSettingsForm {...props}/></>;
+}
+
+export function NotificationSettingsPage(props:NotificationSettingsProps){
+  return <><WorkspacePageHeader title="알림 설정" description="필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다." eyebrow="NOTIFICATION PREFERENCES"/><NotificationSettingsContent {...props}/></>;
+}
+
+export function VerticalSettingsPage({settings,onSave,onChange}:SettingsProps&NotificationSettingsProps){
+  return <><WorkspacePageHeader title="버티컬 탭 설정" description="워크스페이스의 기본 정보와 알림을 관리하세요." eyebrow="WORKSPACE SETTINGS"/><Tabs className="layout-settings-tabs" label="워크스페이스 설정 분류" orientation="vertical" items={[
+    {value:'general',label:'기본 정보',content:<WorkspaceSettingsForm settings={settings} onSave={onSave}/>},
+    {value:'notifications',label:'알림',content:<NotificationSettingsContent settings={settings} onChange={onChange}/>},
+  ]}/></>;
 }

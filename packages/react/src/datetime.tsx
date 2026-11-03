@@ -228,11 +228,14 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
       // positioning it outside that container's vertical clipping area.
       for (let parent = picker.parentElement; parent; parent = parent.parentElement) {
         const style = window.getComputedStyle(parent);
-        if (!/(auto|scroll|hidden|clip)/.test(`${style.overflowX} ${style.overflowY}`)) continue;
-        const rect = parent.getBoundingClientRect();
-        if (anchor.bottom <= rect.top || anchor.top >= rect.bottom || anchor.right <= rect.left || anchor.left >= rect.right) { setOpen(false); return; }
-        leftEdge = Math.max(leftEdge, rect.left + parent.clientLeft);
-        rightEdge = Math.min(rightEdge, rect.left + parent.clientLeft + parent.clientWidth);
+        if (/(auto|scroll|hidden|clip)/.test(`${style.overflowX} ${style.overflowY}`)) {
+          const rect = parent.getBoundingClientRect();
+          if (anchor.bottom <= rect.top || anchor.top >= rect.bottom || anchor.right <= rect.left || anchor.left >= rect.right) { setOpen(false); return; }
+          leftEdge = Math.max(leftEdge, rect.left + parent.clientLeft);
+          rightEdge = Math.min(rightEdge, rect.left + parent.clientLeft + parent.clientWidth);
+        }
+        // Native modal dialogs escape their ancestors' clipping, including a locked body.
+        if (parent.tagName === 'DIALOG' && parent.hasAttribute('open')) break;
       }
       if (anchor.bottom <= edge || anchor.top >= height - edge || anchor.right <= edge || anchor.left >= width - edge) { setOpen(false); return; }
       const below = Math.max(0, height - anchor.bottom - gap - edge), above = Math.max(0, anchor.top - gap - edge);

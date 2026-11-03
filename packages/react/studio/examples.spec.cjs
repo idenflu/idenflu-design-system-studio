@@ -201,6 +201,49 @@ test('project tabs skip unavailable categories during keyboard navigation', asyn
   await expect(active).toHaveAttribute('aria-selected', 'true');
 });
 
+test('vertical tabs keep their side by side layout and support keyboard navigation', async ({ page }) => {
+  await page.goto('/systems/idenflu-mono/index.html#/components/tabs');
+  const list = page.getByRole('tablist', {name:'워크스페이스 세로 설정', exact:true});
+  await expect(list).toHaveAttribute('aria-orientation', 'vertical');
+  const general = list.getByRole('tab', {name:'기본 정보', exact:true});
+  const notifications = list.getByRole('tab', {name:'알림', exact:true});
+  const members = list.getByRole('tab', {name:'멤버', exact:true});
+  const container = list.locator('..');
+  const panel = container.getByRole('tabpanel', {name:'기본 정보', exact:true});
+  const listBounds = await list.boundingBox();
+  const panelBounds = await panel.boundingBox();
+  const generalBounds = await general.boundingBox();
+  const notificationsBounds = await notifications.boundingBox();
+  expect(panelBounds.x).toBeGreaterThanOrEqual(listBounds.x + listBounds.width);
+  expect(Math.abs(listBounds.y - panelBounds.y)).toBeLessThan(2);
+  expect(notificationsBounds.y).toBeGreaterThanOrEqual(generalBounds.y + generalBounds.height);
+  await expect(list.getByRole('tab', {name:'보안', exact:true})).toBeDisabled();
+  const name = panel.getByRole('textbox', {name:'워크스페이스 이름', exact:true});
+  await name.fill('작성 중인 워크스페이스');
+  await general.focus();
+  await general.press('ArrowDown');
+  await expect(notifications).toBeFocused();
+  await expect(container.getByRole('tabpanel', {name:'알림', exact:true})).toBeVisible();
+  await notifications.press('ArrowDown');
+  await expect(members).toBeFocused();
+  await expect(members).toHaveAttribute('aria-selected', 'true');
+  await members.press('ArrowDown');
+  await expect(general).toBeFocused();
+  await expect(name).toHaveValue('작성 중인 워크스페이스');
+  await general.press('End');
+  await expect(members).toBeFocused();
+  await members.press('Home');
+  await expect(general).toBeFocused();
+  await general.press('ArrowUp');
+  await expect(members).toBeFocused();
+  await members.press('Home');
+  await general.press('Tab');
+  await expect(panel).toBeFocused();
+  expect(await container.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+  await expect(page.locator('.react-studio-code code')).toContainText('orientation="vertical"');
+});
+
 test('file example rejects unsupported types and displays removable PDF selection', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/file-upload');
   const upload = page.getByLabel('첨부 파일', {exact:true});

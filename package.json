@@ -3,6 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "description": "idenflu mono React components and documentation",
+  "license": "MIT",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "check": "node scripts/check.mjs",

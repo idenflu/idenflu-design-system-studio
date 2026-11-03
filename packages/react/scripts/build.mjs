@@ -18,6 +18,7 @@ await build({
   outExtension: ({ format }) => ({ js: format === 'cjs' ? '.cjs' : '.js' }),
 });
 await mkdir(output, { recursive: true });
+await cp(resolve(root, '../../LICENSE'), resolve(output, 'LICENSE'));
 const styles = await Promise.all(componentStyles.map(async (name) =>
   `/* ${name} */\n${await readFile(resolve(source, name), 'utf8')}`));
 styles.push(`/* react.css */\n${await readFile(resolve(root, 'src/react.css'), 'utf8')}`);

@@ -2,7 +2,7 @@
   "name": "@idenflu/mono-react",
   "version": "0.3.0",
   "description": "React components for the idenflu mono design system",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "repository": {
     "type": "git",

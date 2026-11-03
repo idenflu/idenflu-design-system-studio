@@ -1,0 +1,125 @@
+const { test, expect } = require('@playwright/test');
+
+async function openExamples(page) {
+  await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
+  await page.clock.install();
+}
+
+test('spinner dialog completes without closing and returns focus after confirmation', async ({ page }) => {
+  await openExamples(page);
+  const trigger = page.getByRole('button', {name:'동기화 시작', exact:true});
+  await trigger.click();
+  const dialog = page.getByRole('dialog', {name:'데이터 동기화', exact:true});
+  const cancel = dialog.getByRole('button', {name:'작업 취소', exact:true});
+  await expect(dialog).toBeVisible();
+  await expect(cancel).toBeFocused();
+  await expect(dialog.locator('.nova-spinner')).toBeVisible();
+  await expect(dialog.getByRole('status')).toHaveCount(1);
+  await expect(dialog.getByRole('status')).toContainText('데이터를 동기화하고 있습니다');
+  await page.mouse.click(4, 4);
+  await expect(dialog).toBeVisible();
+  const before = await dialog.boundingBox();
+  expect(before.x).toBeGreaterThanOrEqual(0);
+  expect(before.x + before.width).toBeLessThanOrEqual(page.viewportSize().width);
+  await page.clock.runFor(4600);
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('status')).toContainText('처리를 완료했습니다');
+  await expect(dialog.locator('.nova-spinner')).toHaveCount(0);
+  const confirm = dialog.getByRole('button', {name:'확인', exact:true});
+  await expect(confirm).toBeFocused();
+  await confirm.click();
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await expect(page.getByText('데이터 동기화를 완료했습니다.', {exact:true})).toBeVisible();
+});
+
+test('determinate dialog reports progress and cancels cleanly before a fresh run', async ({ page }) => {
+  await openExamples(page);
+  const trigger = page.getByRole('button', {name:'일괄 처리 시작', exact:true});
+  await trigger.click();
+  const dialog = page.getByRole('dialog', {name:'프로젝트 일괄 처리', exact:true});
+  const progress = dialog.getByRole('progressbar', {name:'프로젝트 처리 진행률', exact:true});
+  await expect(progress).toHaveAttribute('max', '120');
+  await expect(progress).toHaveJSProperty('value', 0);
+  await page.clock.runFor(1400);
+  expect(await progress.evaluate(element => element.value)).toBeGreaterThan(0);
+  expect(await progress.evaluate(element => element.value)).toBeLessThan(120);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await expect(page.getByText('프로젝트 일괄 처리를 취소했습니다.', {exact:true})).toBeVisible();
+  await page.clock.runFor(5000);
+  await expect(page.getByText('프로젝트 일괄 처리를 완료했습니다.', {exact:true})).toHaveCount(0);
+  await trigger.click();
+  await expect(progress).toHaveJSProperty('value', 0);
+  await page.clock.runFor(4600);
+  await expect(progress).toHaveJSProperty('value', 120);
+  await expect(progress).toHaveAttribute('aria-valuetext', '120개 중 120개 처리');
+  await expect(dialog.getByText('100%', {exact:true})).toBeVisible();
+  await dialog.getByRole('button', {name:'확인', exact:true}).click();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await expect(progress).toHaveJSProperty('value', 0);
+  await dialog.getByRole('button', {name:'작업 취소', exact:true}).click();
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+});
+
+test('buttonless processing ignores dismissal, traps focus and closes automatically on completion', async ({ page }) => {
+  await openExamples(page);
+  const trigger = page.getByRole('button', {name:'버튼 없는 처리 시작', exact:true});
+  const originalOverflow = await page.evaluate(() => getComputedStyle(document.documentElement).overflow);
+  await trigger.click();
+  const dialog = page.getByRole('dialog', {name:'변경사항 적용', exact:true});
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('button')).toHaveCount(0);
+  await expect(dialog.locator('.nova-spinner')).toBeVisible();
+  await expect(dialog.getByRole('status')).toHaveCount(1);
+  await expect(dialog.getByRole('status')).toContainText('변경사항을 적용하고 있습니다');
+  await expect(dialog).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(dialog).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(dialog).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeVisible();
+  const accepted = await dialog.evaluate(element => element.dispatchEvent(new Event('cancel', {cancelable:true})));
+  expect(accepted).toBe(false);
+  await expect(dialog).toBeVisible();
+  await page.mouse.click(4,4);
+  await expect(dialog).toBeVisible();
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
+  const bounds = await dialog.boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(page.viewportSize().width);
+  await page.clock.runFor(4600);
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText('변경사항을 적용했습니다.', {exact:true})).toBeVisible();
+  await expect(trigger).toBeFocused();
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe(originalOverflow);
+  await trigger.click();
+  await expect(dialog.getByRole('status')).toContainText('변경사항을 적용하고 있습니다');
+  await page.clock.runFor(1000);
+  await expect(dialog).toBeVisible();
+  await page.clock.runFor(3600);
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test('leaving the example clears its in-flight processing state', async ({ page }) => {
+  await openExamples(page);
+  await page.getByRole('button', {name:'동기화 시작', exact:true}).click();
+  await page.clock.runFor(1000);
+  await page.evaluate(() => { location.hash = '#/components/buttons'; });
+  await expect(page.getByRole('heading', {level:1, name:'Buttons', exact:true})).toBeVisible();
+  await page.clock.runFor(5000);
+  await page.evaluate(() => { location.hash = '#/components/overlays'; });
+  await expect(page.getByRole('heading', {level:1, name:'Dialog & toast', exact:true})).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByRole('button', {name:'동기화 시작', exact:true}).click();
+  const dialog = page.getByRole('dialog', {name:'데이터 동기화', exact:true});
+  await expect(dialog.getByRole('button', {name:'작업 취소', exact:true})).toBeFocused();
+  await expect(dialog.getByRole('status')).toContainText('데이터를 동기화하고 있습니다');
+  await page.keyboard.press('Escape');
+});

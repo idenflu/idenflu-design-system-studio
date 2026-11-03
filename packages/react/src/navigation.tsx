@@ -214,6 +214,8 @@ export function Tabs({items, label, value, defaultValue, onValueChange, onTabClo
   const list = React.useRef<HTMLDivElement>(null);
   const pendingClose = React.useRef<string | null>(null);
   const pendingKeyboardFocus = React.useRef<string | null>(null);
+  // Content updates alone should not undo a user's manual tab-list scroll.
+  const itemStructure = JSON.stringify(items.map(item => [item.value, Boolean(item.disabled)]));
   const selected = items.some(item => item.value === current && !item.disabled) ? current : first;
   useClientLayoutEffect(() => {
     if (!pendingKeyboardFocus.current) return;
@@ -236,22 +238,28 @@ export function Tabs({items, label, value, defaultValue, onValueChange, onTabClo
       pendingClose.current = null;
     }
     const container = list.current;
-    if (!container || orientation !== 'horizontal') return;
+    if (!container) return;
     const reveal = () => {
       const element = refs.current[items.findIndex(item => item.value === selected)];
       if (!element) return;
       const tab = element.getBoundingClientRect(), bounds = container.getBoundingClientRect();
-      if (tab.left < bounds.left) container.scrollLeft -= bounds.left - tab.left;
-      else if (tab.right > bounds.right) container.scrollLeft += tab.right - bounds.right;
+      if (orientation === 'vertical') {
+        if (tab.top < bounds.top) container.scrollTop -= bounds.top - tab.top;
+        else if (tab.bottom > bounds.bottom) container.scrollTop += tab.bottom - bounds.bottom;
+      } else {
+        if (tab.left < bounds.left) container.scrollLeft -= bounds.left - tab.left;
+        else if (tab.right > bounds.right) container.scrollLeft += tab.right - bounds.right;
+      }
     };
     reveal();
     const win = container.ownerDocument.defaultView;
     const Observer = (win as Window & {ResizeObserver?: typeof ResizeObserver} | null)?.ResizeObserver;
     const observer = Observer ? new Observer(reveal) : null;
     observer?.observe(container);
+    refs.current.forEach(element => { if (element) observer?.observe(element); });
     win?.addEventListener('resize', reveal);
     return () => { observer?.disconnect(); win?.removeEventListener('resize', reveal); };
-  }, [items, selected, orientation]);
+  }, [itemStructure, selected, orientation]);
   const onKeyDown = (event: React.KeyboardEvent, index: number) => {
     if (event.key === 'Delete' && items[index].closable && onTabClose) { event.preventDefault(); closeTab(index); return; }
     const nextKey = orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown';
@@ -266,7 +274,7 @@ export function Tabs({items, label, value, defaultValue, onValueChange, onTabClo
     pendingKeyboardFocus.current = items[target].value;
     setCurrent(items[target].value);
   };
-  return <div className={`tabs${className ? ` ${className}` : ''}`}><div ref={list} className="tab-list" role="tablist" aria-label={label} aria-orientation={orientation}>
+  return <div className={`tabs${className ? ` ${className}` : ''}`} data-orientation={orientation}><div ref={list} className="tab-list" role="tablist" aria-label={label} aria-orientation={orientation}>
     {items.map((item, index) => {
       const closable = item.closable && !!onTabClose;
       const tab = <button ref={node => { refs.current[index] = node; }} type="button" role="tab" className="tab" id={`${id}-tab-${index}`} aria-controls={`${id}-panel-${index}`} aria-selected={item.value === selected} aria-keyshortcuts={closable ? 'Delete' : undefined} tabIndex={item.value === selected ? 0 : -1} disabled={item.disabled} onClick={() => setCurrent(item.value)} onKeyDown={event => onKeyDown(event, index)}>{item.label}</button>;

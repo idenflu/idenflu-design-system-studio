@@ -35,6 +35,10 @@ export function TabsExample() {
   const [tab, setTab] = useState('general');
   return <Tabs label="설정 분류" items={items}
                value={tab} onValueChange={setTab} />;
+}
+
+export function VerticalTabsExample() {
+  return <Tabs label="세로 설정 분류" orientation="vertical" items={items} />;
 }`,
   'components/dropdown-menu': `import { useState } from 'react';
 import { DropdownMenu, Icon, type MenuItem } from '@idenflu/mono-react';
