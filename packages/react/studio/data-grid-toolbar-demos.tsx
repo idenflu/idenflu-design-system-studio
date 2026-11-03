@@ -32,7 +32,7 @@ export function DataGridToolbarDemos() {
   const [toolbarSize,setToolbarSize] = React.useState<'sm'|'md'|'lg'>('sm');
   const [toolbarOrder,setToolbarOrder] = React.useState<ToolbarOrderPreset>('default');
   return <><Section id="data-grid-toolbar-demo" title="상단 기능 버튼 구성" description="검색·컬럼 필터·행 밀도·표시 열·CSV 등 내장 도구의 크기와 순서를 바꿔보세요. 필터와 행 선택에 따라 추가 도구가 나타납니다.">
-    <div role="group" aria-label="상단 도구 구성" className="react-studio-row">
+    <div role="group" aria-label="상단 도구 구성" className="react-studio-row studio-grid-toolbar-controls">
       <Select label="상단 도구 크기" size="sm" value={toolbarSize}
         onValueChange={value=>setToolbarSize(value==='md'||value==='lg'?value:'sm')}
         options={[{value:'sm',label:'SM (기본)'},{value:'md',label:'MD'},{value:'lg',label:'LG'}]} />

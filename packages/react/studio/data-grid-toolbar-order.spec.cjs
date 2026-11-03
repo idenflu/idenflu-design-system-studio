@@ -175,3 +175,52 @@ test('column filters and selection controls can be revealed and cleared from the
   await expectOrder(page,tools,orders[0].idle);
   await expectNoOverflow(page,tools);
 });
+
+test('toolbar configuration keeps stable control widths and complete single-line option labels', async ({page}) => {
+  await page.goto(route);
+  const example = exampleFor(page);
+  const settings = example.getByRole('group', {name:'상단 도구 구성',exact:true});
+  const controls = settings.getByRole('combobox');
+  await expect(controls).toHaveCount(2);
+  const widths = await controls.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().width));
+  const expectStableWidths = async () => {
+    const current = await controls.evaluateAll(elements => elements.map(element => element.getBoundingClientRect().width));
+    for (const [index,width] of current.entries()) expect(width).toBeCloseTo(widths[index],1);
+    for (const text of await controls.locator('.select-value-text').evaluateAll(elements => elements.map(element => ({fits:element.scrollWidth <= element.clientWidth})))) {
+      expect(text.fits).toBe(true);
+    }
+  };
+  const expectOptionsFit = async (name,labels) => {
+    const trigger = settings.getByRole('combobox', {name:new RegExp(`^${name}:`)});
+    await trigger.click();
+    const optionLabels = settings.getByRole('listbox', {name,exact:true}).locator('.option-label');
+    await expect(optionLabels).toHaveText(labels);
+    const metrics = await optionLabels.evaluateAll(elements => elements.map(element => {
+      const range = element.ownerDocument.createRange();
+      range.selectNodeContents(element);
+      const lines = new Set([...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0).map(rect => rect.top));
+      const copy = element.closest('.select-option-copy');
+      return {
+        text:element.textContent,
+        lines:lines.size,
+        labelFits:element.scrollWidth <= element.clientWidth,
+        copyFits:copy !== null && copy.scrollWidth <= copy.clientWidth,
+      };
+    }));
+    expect(metrics).toEqual(labels.map(text => ({text,lines:1,labelFits:true,copyFits:true})));
+    await expectStableWidths();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    await trigger.press('Escape');
+    await expect(trigger).toBeFocused();
+  };
+  await choose(example,'상단 도구 크기','LG');
+  await expectStableWidths();
+  await expectOptionsFit('상단 도구 크기',['SM (기본)','MD','LG']);
+  const orderLabels = orders.map(order => order.label);
+  for (const label of orderLabels) {
+    await choose(example,'도구 순서',label);
+    await expectStableWidths();
+    await expectOptionsFit('도구 순서',orderLabels);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});

@@ -238,6 +238,8 @@
 .studio-grid-reference-table :is(th,td) { vertical-align:top; overflow-wrap:anywhere; }
 .studio-grid-reference-table code { white-space:normal; font-size:var(--font-size-caption); }
 .studio-grid-reference-code { max-width:100%; }
+.studio-grid-toolbar-controls > div { flex:0 1 12em; width:12em; max-width:100%; min-width:0; }
+.studio-grid-toolbar-controls .option-label { white-space:nowrap; }
 .studio-grid-reference-notes { display:grid; gap:var(--space-2); color:var(--text-secondary); }
 .studio-grid-reference-notes dt { color:var(--text); font-weight:var(--font-weight-semibold); }
 .studio-grid-reference-notes dd { margin-top:var(--space-1); }
