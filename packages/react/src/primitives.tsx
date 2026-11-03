@@ -197,7 +197,7 @@ export type IconName =
   | 'home-fill' | 'image' | 'image-fill' | 'info' | 'info-fill' | 'keyboard-arrow-down'
   | 'keyboard-arrow-left' | 'keyboard-arrow-right' | 'keyboard-arrow-up' | 'link' | 'list' | 'location'
   | 'location-fill' | 'lock' | 'lock-fill' | 'logout' | 'mail' | 'mail-fill'
-  | 'menu' | 'more-horizontal' | 'person' | 'person-fill' | 'play' | 'play-fill'
+  | 'menu' | 'microsoft-excel' | 'more-horizontal' | 'person' | 'person-fill' | 'play' | 'play-fill'
   | 'plus' | 'receipt' | 'receipt-fill' | 'redo' | 'refresh' | 'remove'
   | 'save' | 'search' | 'send' | 'send-fill' | 'settings' | 'shield-check'
   | 'shield-check-fill' | 'sort' | 'star' | 'star-fill' | 'tag' | 'tag-fill'

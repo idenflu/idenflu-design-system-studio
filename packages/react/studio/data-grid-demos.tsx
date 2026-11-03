@@ -102,10 +102,10 @@ export function DataGridDemos() {
         selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
         searchLabel="프로젝트 검색" defaultPageSize={5} pageSizeOptions={[5,10,20,50,100]}
         sortModel={sortModel} onSortModelChange={setSortModel}
-        exportable exportFileName="idenflu-projects.csv" maxHeight={480} />
+        exportable exportFormats={['csv','xlsx']} exportFileName="idenflu-projects.csv" maxHeight={480} />
       <p className="react-studio-caption">상단의 행 간격 아이콘으로 밀도를 전환합니다. Shift+클릭으로 정렬 조건을 추가하고, 열 경계는 드래그하거나 방향키로 조절합니다.</p>
       <p role="status" className="component-helper">정렬: {sortModel.length ? sortModel.map((sort,index)=>`${index+1}. ${projectColumns.find(column=>column.id===sort.columnId)?.header} ${sort.direction === 'asc' ? '오름차순' : '내림차순'}`).join(' · ') : '원래 순서'}</p>
-      <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV는 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다.</p>
+      <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV와 Excel(.xlsx)은 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다. Excel 버튼에는 엑셀 아이콘을 사용합니다.</p>
     </Section>
     <DataGridMultiFilterDemo />
     <Section title="셀 편집과 값 바인딩" description="텍스트·숫자 편집, 입력 검증과 읽기 전용 행을 비교합니다. 저장한 값은 React 상태에 반영되어 다시 검색·정렬할 수 있습니다.">
@@ -125,13 +125,13 @@ export function DataGridDemos() {
         getRowId={row=>row.id} getRowLabel={row=>row.name}
         virtualized={{estimateRowHeight:virtualDensity === 'compact' ? 61 : 73,overscan:8}} maxHeight={420} density={virtualDensity} onDensityChange={setVirtualDensity}
         selectable selectedRowIds={virtualSelected} onSelectedRowIdsChange={setVirtualSelected}
-        searchLabel="대용량 데이터 검색" exportable exportFileName="idenflu-virtual-projects.csv"
+        searchLabel="대용량 데이터 검색" exportable exportFormats={['csv','xlsx']} exportFileName="idenflu-virtual-projects.csv"
         onCellEdit={({rowId,value})=>{
           setVirtualRows(current=>current.map(row=>row.id === rowId ? {...row,name:value.trim()} : row));
           setVirtualNotice(`${rowId}의 프로젝트 이름을 변경했습니다.`);
         }} />
       <p role="status" className="component-helper">{virtualNotice}</p>
-      <p className="react-studio-caption">가상 스크롤의 전체 선택은 검색 결과 전체에 적용합니다. CSV도 화면 밖의 결과를 포함합니다. 행의 높이는 실제 콘텐츠에 맞춰 측정하며 검색·정렬은 전달한 데이터 전체를 브라우저에서 처리합니다.</p>
+      <p className="react-studio-caption">가상 스크롤의 전체 선택은 검색 결과 전체에 적용합니다. CSV와 Excel(.xlsx)도 화면 밖의 결과를 포함합니다. 행의 높이는 실제 콘텐츠에 맞춰 측정하며 검색·정렬은 전달한 데이터 전체를 브라우저에서 처리합니다.</p>
     </Section>
     <Section title="로딩·빈 데이터·오류" description="조회 상태에 맞는 안내를 그리드 안에 표시합니다. 오류에서 다시 시도하면 샘플 데이터를 표시합니다.">
       <div className="react-studio-row"><Segmented label="데이터그리드 조회 상태" value={state} onValueChange={setState} options={[{value:'loading',label:'로딩'},{value:'empty',label:'빈 데이터'},{value:'error',label:'오류'},{value:'success',label:'조회 완료'}]} /></div>
@@ -192,7 +192,7 @@ export function ProjectGrid() {
     selectable selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
     sortModel={sortModel} onSortModelChange={setSortModel}
     defaultPageSize={5} pageSizeOptions={[5, 10, 20]} maxHeight={400}
-    exportable exportFileName="projects.csv"
+    exportable exportFormats={['csv', 'xlsx']} exportFileName="projects.csv"
     onCellEdit={({ rowId, columnId, value }) => {
       setRows(current => current.map(row => row.id === rowId
         ? { ...row, [columnId]: columnId === 'hours' ? Number(value) : value.trim() }

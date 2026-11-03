@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, Icon, Segmented, Slider, Tooltip } from '../src';
+import { Button, Icon, Segmented, Slider, Tooltip } from '../src';
+import { useEscapeLayer } from '../src/escape-layer';
 
 type PreferenceKey = 'fontSize' | 'lineHeight' | 'spacing' | 'controlHeight' | 'radius';
 type Theme = 'light' | 'dark';
@@ -67,8 +68,20 @@ export function StudioSettings() {
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState(() => window.IdenfluPreferences.get());
   const [message, setMessage] = React.useState('');
+  const trigger = React.useRef<HTMLButtonElement>(null);
+  const panel = React.useRef<HTMLDialogElement>(null);
   const body = React.useRef<HTMLDivElement>(null);
+  const close = () => {
+    setOpen(false);
+    trigger.current?.focus({preventScroll:true});
+  };
+  useEscapeLayer(open, panel, close);
   const palette = usePalette();
+  React.useLayoutEffect(() => {
+    if (!open) return;
+    document.documentElement.setAttribute('data-studio-settings-open','');
+    return () => document.documentElement.removeAttribute('data-studio-settings-open');
+  }, [open]);
   React.useEffect(() => {
     const update = (event:Event) => {
       const detail = (event as CustomEvent<{values:PreferenceValues; saved:boolean; reason:string}>).detail;
@@ -85,9 +98,9 @@ export function StudioSettings() {
   }, [open]);
   const fields: [PreferenceKey, string][] = [['fontSize','글자 크기'],['lineHeight','행간'],['spacing','여백'],['controlHeight','컨트롤 높이'],['radius','모서리']];
   return <>
-    <Tooltip content="화면 조정"><button type="button" className="icon-button studio-settings-open" aria-label="화면 조정" aria-haspopup="dialog" aria-controls="studio-settings-dialog" onClick={() => setOpen(true)}><Icon name="settings" /></button></Tooltip>
-    {createPortal(<Dialog id="studio-settings-dialog" closeOnBackdrop open={open} onOpenChange={setOpen} aria-labelledby="react-settings-title" aria-describedby="react-settings-description">
-      <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={() => setOpen(false)}><Icon name="close" /></button></header>
+    <Tooltip content="화면 조정"><button ref={trigger} type="button" className="icon-button studio-settings-open" aria-label="화면 조정" aria-haspopup="dialog" aria-expanded={open} aria-controls="studio-settings-dialog" onClick={() => open ? close() : setOpen(true)}><Icon name="settings" /></button></Tooltip>
+    {createPortal(<dialog ref={panel} id="studio-settings-dialog" open={open} aria-modal="false" aria-labelledby="react-settings-title" aria-describedby="react-settings-description">
+      <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={close}><Icon name="close" /></button></header>
       <div className="studio-preferences-body" ref={body}>
         <section aria-labelledby="studio-layout-title">
           <h3 id="studio-layout-title" className="studio-preferences-section-title">크기·간격</h3>
@@ -115,9 +128,9 @@ export function StudioSettings() {
       <footer className="studio-preferences-footer"><div className="studio-preferences-actions">
         <Button variant="outline" onClick={() => window.IdenfluPreferences.reset()}>초기화</Button>
         <Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(window.IdenfluPreferences.cssText()); setMessage('CSS를 복사했습니다.'); } catch { setMessage('CSS를 복사하지 못했습니다.'); } }}>CSS 복사</Button>
-        <Button onClick={() => setOpen(false)}>닫기</Button>
+        <Button onClick={close}>닫기</Button>
       </div><p id="studio-preferences-status" role="status" aria-live="polite">{message}</p></footer>
-    </Dialog>, document.body)}
+    </dialog>, document.body)}
   </>;
 }
 export function ThemeControl() {

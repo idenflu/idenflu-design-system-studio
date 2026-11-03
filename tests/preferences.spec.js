@@ -219,7 +219,7 @@ test('reset restores defaults without losing theme, form edits or validation sta
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(theme.current);
 });
 
-test('settings support keyboard adjustment, modal focus and Escape return', async ({ page }) => {
+test('settings support keyboard adjustment, nonmodal focus and Escape return', async ({ page }) => {
   await openApp(page);
   const opener = page.getByRole('button', {name:'화면 조정',exact:true});
   await opener.focus();
@@ -235,10 +235,11 @@ test('settings support keyboard adjustment, modal focus and Escape return', asyn
   await expect(font).toHaveValue('12');
   await font.press('End');
   await expect(font).toHaveValue('18');
-  for (let i = 0; i < 12; i += 1) {
-    await page.keyboard.press('Tab');
-    expect(await page.evaluate(() => document.querySelector('#studio-settings-dialog').contains(document.activeElement))).toBe(true);
-  }
+  await expect(page.locator('#studio-settings-dialog')).toHaveAttribute('aria-modal','false');
+  await page.locator('#studio-settings-dialog').getByRole('button',{name:'닫기',exact:true}).focus();
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.querySelector('#studio-settings-dialog').contains(document.activeElement))).toBe(false);
+  await font.focus();
   await page.keyboard.press('Escape');
   await expect(page.locator('#studio-settings-dialog')).toBeHidden();
   await expect(opener).toBeFocused();

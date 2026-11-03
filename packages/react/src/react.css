@@ -227,7 +227,9 @@
 .data-grid-virtual-spacer { pointer-events:none; }
 @media (max-width:600px) {
   .data-grid-toolbar { align-items:flex-start; }
-  .data-grid-tools { width:100%; }
+  .data-grid-tools { width:100%; column-gap:var(--space-1); }
+  .data-grid-selection { padding-inline-end:0; border-inline-end:0; }
+  .data-grid-selection-actions { column-gap:var(--space-1); }
   .data-grid-search { flex:1 1 100%; width:100%; min-width:0; }
   .data-grid-tools .popover-wrap { flex:none; }
   .data-grid-footer { align-items:flex-start; }

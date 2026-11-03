@@ -1,6 +1,7 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { inflateRawSync } from 'node:zlib';
 import { JSDOM } from 'jsdom';
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url:'http://localhost/', pretendToBeVisual:true });
@@ -77,6 +78,41 @@ const rows = [
   { id:'d', name:'Delta', amount:2, team:'개발' },
 ];
 const props = {label:'프로젝트 목록', rows, columns, getRowId:row => row.id, getRowLabel:row => row.name};
+
+function xlsxRows(bytes) {
+  const zip=Buffer.from(bytes),files=new Map();
+  let end=zip.length-22;
+  while(end>=0&&zip.readUInt32LE(end)!==0x06054b50)end--;
+  assert.ok(end>=0,'XLSX must contain a complete ZIP directory');
+  let position=zip.readUInt32LE(end+16);
+  for(let i=0;i<zip.readUInt16LE(end+10);i++){
+    assert.equal(zip.readUInt32LE(position),0x02014b50);
+    const method=zip.readUInt16LE(position+10),size=zip.readUInt32LE(position+20);
+    const nameLength=zip.readUInt16LE(position+28),extraLength=zip.readUInt16LE(position+30),commentLength=zip.readUInt16LE(position+32);
+    const name=zip.toString('utf8',position+46,position+46+nameLength),local=zip.readUInt32LE(position+42);
+    const start=local+30+zip.readUInt16LE(local+26)+zip.readUInt16LE(local+28),content=zip.subarray(start,start+size);
+    assert.ok(method===0||method===8,'standard stored or deflated XLSX member');
+    files.set(name,(method===8?inflateRawSync(content):content).toString('utf8'));
+    position+=46+nameLength+extraLength+commentLength;
+  }
+  const parse=text=>new dom.window.DOMParser().parseFromString(text,'application/xml');
+  const shared=files.has('xl/sharedStrings.xml')?[...parse(files.get('xl/sharedStrings.xml')).getElementsByTagName('si')].map(item=>item.textContent):[];
+  assert.ok(files.has('xl/worksheets/sheet1.xml'),'workbook contains a worksheet');
+  const worksheet=parse(files.get('xl/worksheets/sheet1.xml'));
+  assert.equal(worksheet.getElementsByTagName('parsererror').length,0,'worksheet is valid XML');
+  const result=[...worksheet.getElementsByTagName('row')].map(row=>{
+    const values=[];
+    for(const cell of row.getElementsByTagName('c')){
+      const letters=cell.getAttribute('r').match(/^[A-Z]+/)[0];
+      let index=0;for(const letter of letters)index=index*26+letter.charCodeAt(0)-64;
+      const type=cell.getAttribute('t'),value=cell.getElementsByTagName('v')[0]?.textContent;
+      values[index-1]=type==='s'?shared[Number(value)]:type==='inlineStr'?[...cell.getElementsByTagName('t')].map(item=>item.textContent).join(''):value==null?'':type==='str'?value:Number(value);
+    }
+    return values;
+  });
+  const width=result[0]?.length??0;
+  return result.map(row=>Array.from({length:width},(_,index)=>row[index]??''));
+}
 
 test('DataGrid sorts numbers stably, keeps missing values last and restores source order', async () => {
   const f = fixture();
@@ -233,6 +269,71 @@ test('DataGrid disables duplicate exports, treats cancellation quietly, and reco
     await click(button(f.node,'CSV 내보내기'));
     assert.equal(f.node.querySelector('[role="alert"]'),null);
   } finally { window.showSaveFilePicker=originalPicker; await f.dispose(); }
+});
+
+test('DataGrid export formats preserve CSV defaults and expose Excel icons only when requested',async()=>{
+  const f=fixture();
+  try{
+    await f.render(h(DataGrid,{...props,exportable:true,selectable:true,defaultSelectedRowIds:['a']}));
+    assert.ok(button(f.node,'CSV 내보내기'));
+    assert.equal(button(f.node,'Excel 내보내기'),undefined);
+    await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['xlsx'],selectable:true,defaultSelectedRowIds:['a']}));
+    assert.equal(button(f.node,'CSV 내보내기'),undefined);
+    assert.equal(button(f.node,'선택한 행 내보내기'),undefined);
+    assert.ok(button(f.node,'Excel 내보내기').querySelector('.icon-microsoft-excel'));
+    assert.ok(button(f.node,'선택한 행 Excel 내보내기').querySelector('.icon-microsoft-excel'));
+    await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['csv','xlsx','xlsx'],selectable:true,defaultSelectedRowIds:['a']}));
+    assert.equal(f.node.querySelectorAll('button[aria-label="Excel 내보내기"]').length,1);
+    assert.ok(button(f.node,'CSV 내보내기'));
+    await f.render(h(DataGrid,{...props,exportable:false,exportFormats:['csv','xlsx']}));
+    assert.equal(button(f.node,'CSV 내보내기'),undefined);
+    assert.equal(button(f.node,'Excel 내보내기'),undefined);
+  }finally{await f.dispose();}
+});
+
+test('Excel exports filtered sorted results across pages and selected original rows using visible columns',async()=>{
+  const f=fixture(),originalPicker=window.showSaveFilePicker,saved=[];
+  try{
+    window.showSaveFilePicker=async options=>{
+      const file={name:options.suggestedName};saved.push(file);
+      return{createWritable:async()=>({write:async blob=>{file.type=blob.type;file.bytes=await blob.arrayBuffer();},close:async()=>{}})};
+    };
+    await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['csv','xlsx'],exportFileName:'projects.csv',selectable:true,defaultSelectedRowIds:['b'],defaultQuery:'디자인',defaultSort:{columnId:'name',direction:'desc'},defaultPageSize:1,defaultHiddenColumnIds:['team']}));
+    await click(button(f.node,'Excel 내보내기'));
+    assert.equal(saved[0].name,'projects.xlsx');
+    assert.equal(saved[0].type,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    assert.deepEqual(xlsxRows(saved[0].bytes),[['이름','금액'],['Gamma',''],['Alpha',10]]);
+    await click(button(f.node,'선택한 행 Excel 내보내기'));
+    assert.equal(saved[1].name,'projects-selected.xlsx');
+    assert.deepEqual(xlsxRows(saved[1].bytes),[['이름','금액'],['Beta',2]]);
+    await click(button(f.node,'CSV 내보내기'));
+    assert.equal(saved[2].name,'projects.csv');
+    assert.equal(new TextDecoder().decode(saved[2].bytes),'이름,금액\r\nGamma,\r\nAlpha,10\r\n');
+  }finally{window.showSaveFilePicker=originalPicker;await f.dispose();}
+});
+
+test('Excel export shares the busy guard, cancels quietly, and recovers after a saving error',async()=>{
+  const f=fixture(),originalPicker=window.showSaveFilePicker;
+  let cancel;
+  const labels=['CSV 내보내기','Excel 내보내기','선택한 행 내보내기','선택한 행 Excel 내보내기'];
+  try{
+    window.showSaveFilePicker=()=>new Promise((resolve,reject)=>{cancel=reject;});
+    await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['csv','xlsx'],selectable:true,defaultSelectedRowIds:['a']}));
+    await click(button(f.node,'Excel 내보내기'));
+    for(const label of labels)assert.equal(button(f.node,label).disabled,true,label);
+    await act(async()=>cancel(new dom.window.DOMException('Cancelled','AbortError')));
+    assert.equal(f.node.querySelector('[role="alert"]'),null);
+    for(const label of labels)assert.equal(button(f.node,label).disabled,false,label);
+    window.showSaveFilePicker=async()=>{throw new Error('Save failed');};
+    await click(button(f.node,'Excel 내보내기'));
+    assert.match(f.node.querySelector('[role="alert"]').textContent,/Excel|엑셀|XLSX/i);
+    assert.equal(button(f.node,'Excel 내보내기').disabled,false);
+    window.showSaveFilePicker=async()=>({createWritable:async()=>({write:async()=>{},close:async()=>{}})});
+    await click(button(f.node,'Excel 내보내기'));
+    assert.equal(f.node.querySelector('[role="alert"]'),null);
+    await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['xlsx'],rows:[]}));
+    assert.equal(button(f.node,'Excel 내보내기').disabled,true);
+  }finally{window.showSaveFilePicker=originalPicker;await f.dispose();}
 });
 
 test('DataGrid clamps its page when rows shrink and resets on sort and page size changes', async () => {

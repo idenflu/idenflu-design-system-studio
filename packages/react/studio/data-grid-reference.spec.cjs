@@ -19,16 +19,18 @@ test('toolbar settings and selection expose only built-in data-grid controls', a
   const grid=example.getByRole('group',{name:'상단 도구 모음 데이터그리드',exact:true});
   const clear=grid.getByRole('button',{name:'선택 해제',exact:true});
   const selectedExport=grid.getByRole('button',{name:'선택한 행 내보내기',exact:true});
+  const selectedExcelExport=grid.getByRole('button',{name:'선택한 행 Excel 내보내기',exact:true});
   const density=grid.getByRole('button',{name:'촘촘한 행 간격',exact:true});
   for(const name of ['예제 데이터 새로고침','프로젝트 추가','선택 삭제']) {
     await expect(grid.getByRole('button',{name,exact:true})).toHaveCount(0);
   }
   await expect(clear).toHaveCount(0);
   await expect(selectedExport).toHaveCount(0);
+  await expect(selectedExcelExport).toHaveCount(0);
   await expect(density).toHaveAttribute('aria-pressed','true');
   await density.click();
   await expect(density).toHaveAttribute('aria-pressed','false');
-  for(const [checkbox,button] of [['행 밀도 버튼 표시','촘촘한 행 간격'],['표시 열 버튼 표시','표시 열'],['CSV 버튼 표시','CSV 내보내기']]) {
+  for(const [checkbox,button] of [['행 밀도 버튼 표시','촘촘한 행 간격'],['표시 열 버튼 표시','표시 열'],['CSV 버튼 표시','CSV 내보내기'],['Excel 버튼 표시','Excel 내보내기']]) {
     await example.getByRole('checkbox',{name:checkbox,exact:true}).uncheck();
     await expect(grid.getByRole('button',{name:button,exact:true})).toHaveCount(0);
   }
@@ -36,18 +38,21 @@ test('toolbar settings and selection expose only built-in data-grid controls', a
   await grid.locator('tbody tr[data-grid-row-id]').first().getByRole('checkbox').check();
   await expect(clear).toBeVisible();
   await expect(selectedExport).toHaveCount(0);
+  await expect(selectedExcelExport).toHaveCount(0);
   for(const name of ['예제 데이터 새로고침','프로젝트 추가','선택 삭제']) {
     await expect(grid.getByRole('button',{name,exact:true})).toHaveCount(0);
   }
-  for(const [checkbox,button] of [['행 밀도 버튼 표시','촘촘한 행 간격'],['표시 열 버튼 표시','표시 열'],['CSV 버튼 표시','CSV 내보내기']]) {
+  for(const [checkbox,button] of [['행 밀도 버튼 표시','촘촘한 행 간격'],['표시 열 버튼 표시','표시 열'],['CSV 버튼 표시','CSV 내보내기'],['Excel 버튼 표시','Excel 내보내기']]) {
     await example.getByRole('checkbox',{name:checkbox,exact:true}).check();
     await expect(grid.getByRole('button',{name:button,exact:true})).toBeVisible();
   }
   await expect(selectedExport).toBeVisible();
+  await expect(selectedExcelExport).toBeVisible();
   await clear.click();
   await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(3);
   await expect(clear).toHaveCount(0);
   await expect(selectedExport).toHaveCount(0);
+  await expect(selectedExcelExport).toHaveCount(0);
   await expect(grid.locator('thead').getByRole('checkbox')).toBeFocused();
   await expect(grid.locator('tbody')).toContainText('디자인 시스템');
   await expect(grid.locator('tbody')).not.toContainText('새 프로젝트');

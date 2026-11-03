@@ -76,6 +76,7 @@ import '@idenflu/mono-react/styles.css';
 export function IconExample() {
   return <>
     <Button><Icon name="save" />저장</Button>
+    <Button variant="outline"><Icon name="microsoft-excel" />Excel 내보내기</Button>
     <IconButton label="알림"><Icon name="bell" /></IconButton>
     <Button variant="outline" aria-pressed="true"><Icon name="bookmark-fill" />북마크됨</Button>
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />

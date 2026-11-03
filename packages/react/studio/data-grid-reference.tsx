@@ -44,7 +44,7 @@ const dataProps: readonly PropertyRow[] = [
   ['columns', 'readonly DataGridColumn<T>[]', '필수', '열의 값, 표시, 정렬, 필터, 너비와 편집 규칙을 정의합니다.'],
   ['getRowId', '(row: T) => string', '필수', '고유하고 안정적인 행 ID입니다. 선택·편집·가상 행 추적에 사용하므로 배열 인덱스 대신 데이터의 ID를 반환하세요.'],
   ['getRowLabel', '(row: T) => string', 'undefined', '행 선택과 편집 버튼에 읽어 줄 이름입니다. 생략하면 getRowId의 값을 사용합니다.'],
-  ['loading', 'boolean', 'false', '로딩 안내를 표시합니다. 데이터 행과 페이지 버튼을 숨기고 정렬·기본 CSV·밀도 변경 등을 비활성화합니다.'],
+  ['loading', 'boolean', 'false', '로딩 안내를 표시합니다. 데이터 행과 페이지 버튼을 숨기고 정렬·내보내기·밀도 변경 등을 비활성화합니다.'],
   ['error', 'ReactNode', 'undefined', '오류 안내 내용입니다. undefined·null·false는 오류가 없는 상태이며, loading과 함께 지정하면 로딩이 먼저 표시됩니다.'],
   ['emptyMessage', 'ReactNode', "'등록된 데이터가 없습니다.'", '데이터가 비었을 때의 내용입니다. 검색·필터 결과가 없을 때는 별도의 결과 없음 안내와 조건 초기화 버튼이 표시됩니다.'],
 ];
@@ -302,7 +302,7 @@ export function DataGridReferenceLinks() {
     ['data-grid-multi-filter-demo', '복수 필터'], ['data-grid-extensions', '확장 예제'], ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
     ['data-grid-columns', '열·타입'],
     ['data-grid-events', '이벤트·상태 연결'], ['data-grid-styles', '스타일'],
-    ['data-grid-behavior', '동작·CSV'],
+    ['data-grid-behavior', '동작·내보내기'],
   ] as const;
   return <nav className="studio-grid-reference-links" aria-label="데이터그리드 문서 바로가기">
     {links.map(([id, label]) => <a key={id} href={`#${id}`} onClick={event => {
@@ -328,10 +328,10 @@ export function DataGridReference() {
       <DetailTable title="내장 도구의 역할" rows={[
         ['컬럼 필터 토글', 'showColumnFilterToggle=true이고 필터 가능한 열이 있으면 표시합니다. 초기에는 꺼져 있으며 켜면 열별 필터 행을 표시하고 조건을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다.'],
         ['밀도 전환', '기본 행 간격과 compact를 전환합니다. 로딩·오류 상태에서는 비활성화합니다.'],
-        ['표시 열', '열이 둘 이상일 때 표시 열 메뉴를 제공합니다. 최소 한 개의 열은 유지하며, 숨긴 열은 기본 CSV에서도 제외합니다.'],
+        ['표시 열', '열이 둘 이상일 때 표시 열 메뉴를 제공합니다. 최소 한 개의 열은 유지하며, 숨긴 열은 CSV·XLSX에서도 제외합니다.'],
         ['검색', '전체 rows에서 accessor 값을 검색합니다. 검색어를 제어하려면 query와 onQueryChange를 함께 연결합니다.'],
-        ['CSV 내보내기', '검색·필터·정렬 결과 전체를 현재 보이는 열 순서로 저장합니다. 페이지나 가상화로 화면에 보이는 행 수와 무관합니다. 로딩·오류·결과 없음·저장 중에는 비활성화합니다.'],
-        ['선택 도구', 'selectable이며 선택 가능한 행을 선택하면 selection 묶음을 표시합니다. 선택 해제와 exportable일 때의 선택 행 CSV가 포함됩니다. 선택 행 CSV에는 검색 결과 밖의 선택도 포함합니다. selectionActions로 직접 구현한 선택 작업을 추가할 수 있습니다.'],
+        ['CSV·Excel 내보내기', 'exportFormats에 지정한 형식별 버튼을 표시합니다. 검색·필터·정렬 결과 전체를 현재 보이는 열 순서로 저장하며 페이지나 가상화로 화면에 보이는 행 수와 무관합니다. 로딩·오류·결과 없음·저장 중에는 비활성화합니다.'],
+        ['선택 도구', 'selectable이며 선택 가능한 행을 선택하면 selection 묶음을 표시합니다. 선택 해제와 exportable일 때의 형식별 선택 행 내보내기가 포함됩니다. CSV·Excel 모두 검색 결과 밖의 선택도 포함합니다. selectionActions로 직접 구현한 선택 작업을 추가할 수 있습니다.'],
         ['필터 초기화', '적용 중인 열별 필터 값이 있을 때 resetFilters 위치에 표시합니다. 클릭하면 필터를 비우고 onFiltersChange({})를 호출합니다.'],
       ]} />
       <PropertyTable title="상단 도구의 표시와 제어" rows={[
@@ -344,32 +344,34 @@ export function DataGridReference() {
         ['showColumnVisibility', 'boolean', 'true', '표시 열 메뉴를 숨기려면 false로 지정합니다.'],
         ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 이후 열 표시 상태는 그리드가 관리합니다.'],
         ['searchable / searchLabel', 'boolean / string', "true / '검색'", '검색 입력의 표시 여부와 접근 가능한 이름을 지정합니다. searchable=false이면 전체 검색도 적용하지 않습니다.'],
-        ['exportable / exportFileName', 'boolean / string', "false / 'data-grid.csv'", '전체·선택 CSV 버튼 표시와 제안 파일명을 지정합니다. 선택 행 파일명에는 -selected.csv를 붙입니다.'],
+        ['exportable / exportFormats', 'boolean / readonly DataGridExportFormat[]', "false / ['csv']", "전체·선택 내보내기를 켜고 csv·xlsx 형식을 지정합니다. exportFormats={['csv', 'xlsx']}이면 두 형식의 버튼을 표시합니다."],
+        ['exportFileName', 'string', "'data-grid.csv'", '형식에 맞는 제안 파일명을 지정합니다. 선택 행 파일명에는 -selected.csv 또는 -selected.xlsx를 붙입니다.'],
         ['toolbarActions', 'ReactNode', 'undefined', '직접 구현한 상시 작업의 UI를 전달하는 확장 슬롯입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음 전체를 이동합니다. 묶음 안의 버튼 순서는 전달한 JSX로 정합니다.'],
         ['selectionActions', 'ReactNode', 'undefined', '직접 구현한 선택 작업의 UI를 전달하는 확장 슬롯입니다. selectable이며 유효한 선택이 있을 때 표시하고 toolbarOrder의 selection으로 선택 내보내기·해제와 함께 이동합니다. 부모에서 선택 상태를 연결합니다.'],
       ]} />
       <DetailTable title="DataGridToolbarItem 순서 키" rows={[
         ['기본 순서', 'search → selection → columnFilters → density → columns → export → resetFilters → actions'],
         ['search', 'searchable일 때 표시하는 전체 검색 입력입니다.'],
-        ['selection', '행 선택 후 표시하는 선택 행 CSV·선택 해제·selectionActions 묶음입니다.'],
+        ['selection', '행 선택 후 표시하는 형식별 선택 행 내보내기·선택 해제·selectionActions 묶음입니다.'],
         ['columnFilters', 'showColumnFilterToggle이고 필터 가능한 열이 있을 때 표시하는 컬럼 필터 토글입니다.'],
         ['density', 'showDensityToggle로 표시하는 행 밀도 토글입니다. density만 제어하고 onDensityChange가 없으면 숨깁니다.'],
         ['columns', 'showColumnVisibility이고 열이 둘 이상일 때 표시하는 표시 열 메뉴입니다.'],
-        ['export', 'exportable일 때 표시하는 전체 CSV 내보내기입니다.'],
+        ['export', 'exportable일 때 exportFormats 순서대로 표시하는 전체 CSV·Excel 내보내기 묶음입니다.'],
         ['resetFilters', '적용 중인 열별 필터 값이 있을 때 표시하는 필터 초기화입니다.'],
         ['actions', '선택 여부와 무관하게 표시하는 toolbarActions 묶음입니다.'],
       ]} />
-      <p className="studio-grid-reference-notes">DataGridToolbarItem은 위 8개 문자열의 유니언 타입이며 패키지에서 내보냅니다. 예제에서 컬럼 필터를 켜고 값을 입력하면 필터 초기화가 나타나고, 행을 선택하면 선택 행 CSV·선택 해제가 나타납니다.</p>
+      <p className="studio-grid-reference-notes">DataGridToolbarItem은 위 8개 문자열의 유니언 타입이며 패키지에서 내보냅니다. 예제에서 컬럼 필터를 켜고 값을 입력하면 필터 초기화가 나타나고, 행을 선택하면 선택 행 CSV·선택 행 Excel·선택 해제가 나타납니다.</p>
       <p className="studio-grid-reference-notes">toolbarSize는 상단 도구와 컬럼 필터의 공통 크기를 조정하며 본문 행 밀도와 푸터 크기에 영향을 주지 않습니다. 표시 열 팝업 안의 도구는 md를 유지합니다. toolbarOrder는 selection과 actions 묶음 전체를 이동하며, 추가 버튼 각각의 순서는 JSX 순서로 지정합니다.</p>
-      <p className="studio-grid-reference-notes">추가한 버튼은 loading·error에서도 자동으로 비활성화되지 않습니다. 각 버튼의 disabled와 오류 처리를 직접 연결하세요. 내장 CSV 내보내기 완료 전용 콜백과 열 표시 변경 콜백은 제공하지 않습니다. CSV 저장을 직접 처리하려면 아래 독립 CSV API를 사용하세요.</p>
+      <p className="studio-grid-reference-notes">추가한 버튼은 loading·error에서도 자동으로 비활성화되지 않습니다. 각 버튼의 disabled와 오류 처리를 직접 연결하세요. 내장 내보내기 완료 전용 콜백과 열 표시 변경 콜백은 제공하지 않습니다. CSV·Excel 저장을 직접 처리하려면 아래 독립 API를 사용하세요.</p>
       <p className="studio-grid-reference-notes">상단 도구 확장 섹션에서 toolbarActions·selectionActions의 동작 예제와 상태 연결 코드를 확인하세요. 업무 동작은 호출 측에서 직접 구현합니다.</p>
     </Section>
 
-    <Section id="data-grid-columns" title="열과 관련 타입" className="studio-grid-reference" description="화면의 표현은 cell로, 검색·정렬·필터·편집·CSV의 원시 값은 accessor로 구분합니다.">
+    <Section id="data-grid-columns" title="열과 관련 타입" className="studio-grid-reference" description="화면의 표현은 cell로, 검색·정렬·필터·편집·파일 내보내기의 원시 값은 accessor로 구분합니다.">
       <PropertyTable title="DataGridColumn<T>" rows={columnProps} />
       <CodeExample title="상태·편집 타입">{`type DataGridSort = { columnId: string; direction: 'asc' | 'desc' };
 type DataGridSortModel = readonly DataGridSort[];
 type DataGridFilters = Record<string, string | string[] | { min?: string; max?: string }>;
+type DataGridExportFormat = 'csv' | 'xlsx';
 type DataGridCellEdit<T> = {
   row: T; rowId: string; columnId: string; value: string;
 };
@@ -436,7 +438,7 @@ const filters: DataGridFilters = {
       <CodeExample title="className으로 한 그리드에만 적용하기">{stylingExample}</CodeExample>
     </Section>
 
-    <Section id="data-grid-behavior" title="동작 기준과 CSV 헬퍼" className="studio-grid-reference" description="데이터 처리 범위, 선택·편집·가상화의 차이와 파일 저장 방식을 확인하세요.">
+    <Section id="data-grid-behavior" title="동작 기준과 파일 내보내기 API" className="studio-grid-reference" description="데이터 처리 범위, 선택·편집·가상화의 차이와 CSV·Excel 저장 방식을 확인하세요.">
       <dl className="studio-grid-reference-notes">
         <div><dt>검색과 필터</dt><dd>전체 검색은 모든 열의 accessor 값과 검색어의 앞뒤 공백을 제거하고 소문자로 바꿔 부분 일치로 찾습니다. 검색과 각 열 필터는 AND로 적용하며 숨긴 열도 처리에 포함합니다. 숫자 필터의 빈 경계는 제한하지 않고, 숫자로 해석되지 않는 경계도 적용하지 않습니다.</dd></div>
         <div><dt>정렬</dt><dd>일반 클릭은 단일 정렬, Shift+클릭은 조건 추가·변경입니다. 각 열은 오름차순 → 내림차순 → 해제 순환입니다. 숫자는 수치로, 나머지는 한국어 기반 문자열로 비교하며 null·undefined는 방향과 무관하게 뒤로 보냅니다. 동률이면 원래 행 순서를 유지합니다.</dd></div>
@@ -444,7 +446,9 @@ const filters: DataGridFilters = {
         <div><dt>선택 범위</dt><dd>헤더 체크박스는 페이지 이동이 켜져 있으면 현재 페이지의 선택 가능한 행, 꺼져 있으면 검색 결과 전체에 적용합니다. 선택은 안정적인 ID로 페이지와 검색 조건 사이에서 유지합니다. 링크·버튼·입력 조작과 텍스트 드래그는 행 클릭 선택을 바꾸지 않습니다. 사용자 요소에는 data-grid-ignore-row-click을 넣어 행 클릭 선택에서 제외할 수 있습니다.</dd></div>
         <div><dt>편집</dt><dd>onCellEdit와 열의 editable이 함께 있어야 편집할 수 있습니다. Enter·저장으로 확정하고 Escape·취소로 닫습니다. blur만으로는 저장하거나 취소하지 않습니다. 그리드는 rows를 수정하지 않으므로 부모가 저장 결과를 반영해야 합니다. 편집 중인 행이 현재 결과에서 사라지거나 열이 숨겨지거나 로딩·오류 상태가 되면 편집을 닫습니다.</dd></div>
         <div><dt>너비 조절</dt><dd>핸들 드래그 또는 ←·→로 10px씩, Shift와 함께 누르면 1px씩 조절합니다. Home·End는 최소·최대 너비로 이동합니다. 조절한 너비는 내부 px 값으로 유지하며 Enter·더블클릭으로 원래 width·flex를 복구합니다. 열 표시가 바뀌거나 뷰포트가 변하면 고정되지 않은 비율·flex 열은 다시 계산합니다.</dd></div>
-        <div><dt>기본 CSV 범위</dt><dd>전체 내보내기는 검색·필터·정렬 결과 전체를 현재 보이는 열 순서로 저장합니다. 선택 행 내보내기는 현재 rows에서 선택된 행을 원래 입력 순서로 저장하므로 검색 결과 밖의 선택도 포함합니다. 두 방식 모두 cell의 JSX 대신 accessor 값과 header를 사용합니다.</dd></div>
+        <div><dt>파일 내보내기 범위</dt><dd>CSV·XLSX의 전체 내보내기는 검색·필터·정렬 결과 전체를 현재 보이는 열 순서로 저장합니다. 선택 행 내보내기는 현재 rows에서 선택된 행을 원래 입력 순서로 저장하므로 검색 결과 밖의 선택도 포함합니다. 두 형식 모두 cell의 JSX 대신 accessor 값과 header를 사용합니다.</dd></div>
+        <div><dt>CSV와 Excel</dt><dd>CSV는 BOM을 포함한 텍스트이며 수식처럼 시작하는 문자열에 작은따옴표를 붙입니다. XLSX는 워크시트 한 개를 가진 실제 Excel 파일이며 number는 숫자 셀, string은 텍스트 셀, null·undefined는 빈 셀로 저장합니다. 수식처럼 시작하는 문자열도 텍스트로 보존하며 수식·차트·셀 JSX를 실행하거나 내보내지 않습니다. 기본 시트명은 데이터입니다.</dd></div>
+        <div><dt>Excel 지원 범위</dt><dd>첫 행은 제목으로 강조하고 스크롤 중 고정합니다. 시트명은 1~31자이며 Excel에서 금지하는 문자를 포함할 수 없습니다. 헤더를 포함해 최대 1,048,576행·16,384열, 셀 텍스트는 32,767자까지 지원하며 초과하면 오류를 반환합니다. NaN·Infinity는 텍스트로 저장합니다.</dd></div>
         <div><dt>저장 위치 선택</dt><dd>showSaveFilePicker를 지원하면 파일명과 저장 위치를 선택하는 기본 저장 대화상자를 엽니다. 미지원 환경은 파일명 입력 prompt를 표시한 뒤 브라우저 다운로드 설정에 따라 저장합니다. 취소는 오류 없이 종료합니다. 저장 위치를 지정하는 prop은 없으며, 실패하면 그리드 툴바에 오류를 표시합니다.</dd></div>
       </dl>
       <div className="studio-grid-reference-group"><h3>독립 CSV API</h3>
@@ -457,6 +461,17 @@ const filters: DataGridFilters = {
         ]} />
       </div>
       <CodeExample title="CSV 문자열 생성과 저장">{csvExample}</CodeExample>
+      <div className="studio-grid-reference-group"><h3>독립 Excel API</h3>
+        <DetailTable title="데이터그리드 XLSX 함수와 타입" rows={[
+          ['DataGridExportFormat', "'csv' | 'xlsx' 유니언 타입입니다. DataGrid의 exportFormats에서 제공할 버튼 형식을 지정합니다."],
+          ['DataGridXlsxColumn<T>', 'header: string과 accessor: (row: T) => string | number | null | undefined로 구성합니다. DataGridColumn<T>도 그대로 전달할 수 있습니다.'],
+          ['DataGridXlsxOptions<T>', 'rows: readonly T[], columns: readonly DataGridXlsxColumn<T>[], sheetName?: string입니다. sheetName 기본값은 데이터이며 호출자가 검색·정렬·선택 범위를 준비합니다.'],
+          ['createDataGridXlsx<T>(options): Uint8Array', '브라우저·서버에서 실제 .xlsx 파일 바이트를 반환합니다. 한국어와 문자열을 텍스트 셀로 보존하고 number는 숫자 셀로 저장합니다. = 등으로 시작하는 문자열도 수식으로 실행하지 않습니다.'],
+          ['DownloadDataGridXlsxOptions<T>', 'DataGridXlsxOptions<T>에 fileName?: string을 추가합니다. 기본 파일명은 data-grid.xlsx이며 사용할 수 없는 파일명 문자는 _로 바꾸고 .xlsx 확장자를 보완합니다.'],
+          ['downloadDataGridXlsx<T>(options): Promise<void>', '브라우저에서 저장 대화상자 또는 파일명 prompt와 다운로드를 실행합니다. 취소 시 resolve하고 실제 저장 오류는 reject합니다. 서버에서는 createDataGridXlsx로 바이트를 생성하세요.'],
+        ]} />
+      </div>
+      <CodeExample title="Excel 파일 생성과 저장">{xlsxExample}</CodeExample>
     </Section>
   </>;
 }

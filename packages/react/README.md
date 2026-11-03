@@ -52,7 +52,7 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 
 ## 아이콘
 
-`Icon`은 현재 글자색을 따르는 SVG 마스크를 사용하며 전체 99종을 SVG 파일명 그대로 지원합니다. `name`의 타입은 `IconName`으로 내보냅니다. 기존 `plus`, `trash`, `list`, `email`, `eye`, `eye-slash`, `caret` 별칭도 유지합니다. 크기는 `--icon-size`로 조정합니다.
+`Icon`은 현재 글자색을 따르는 SVG 마스크를 사용하며 전체 100종을 SVG 파일명 그대로 지원합니다. `name`의 타입은 `IconName`으로 내보냅니다. 기존 `plus`, `trash`, `list`, `email`, `eye`, `eye-slash`, `caret` 별칭도 유지합니다. 크기는 `--icon-size`로 조정합니다.
 
 이번 추가는 탐색·편집·협업·차트·커머스에 쓰는 Outline 32종과 Filled 20종입니다. Outline은 기존의 24×24 기준, 1.5px 선과 각진 선 끝을 유지합니다. Filled는 `-fill` 접미사로 선택하며 모든 아이콘에 Filled가 있는 것은 아닙니다.
 
@@ -275,9 +275,10 @@ export function ProjectGrid() {
 | 편집 | 열의 `editable`은 boolean 또는 행별 판별 함수입니다. `editor="text | number"`, `validate(value,row)`로 검증합니다. `onCellEdit({row,rowId,columnId,value})`에서 부모 `rows`를 갱신해야 합니다. 전달하는 값은 문자열입니다. |
 | 확정·취소 | 셀의 편집 버튼으로 진입하고 Enter/저장으로 확정, Escape/취소로 원본을 유지합니다. 오류는 셀 안에 표시하며 종료 후 편집 버튼으로 포커스를 복원합니다. blur로 저장하지 않습니다. |
 | 상태 | `loading`·`error`·`onRetry`·`emptyMessage`를 지정합니다. 로딩·오류에서는 이전 행을 정상 데이터처럼 노출하지 않습니다. 데이터 없음과 검색 결과 없음을 구분합니다. |
-| 내보내기 | `exportable`·`exportFileName`으로 CSV 다운로드를 켭니다. 표시 중인 열만 출력합니다. 전체 다운로드는 검색·필터·정렬된 **모든 페이지**, 선택 다운로드는 원본 rows 중 **선택한 행**이 대상입니다. |
+| 내보내기 | `exportable`로 다운로드를 켜고 `exportFormats`로 형식을 지정합니다. 기본은 `['csv']`이며 `['csv', 'xlsx']`이면 CSV·Excel 버튼을 함께 표시합니다. `exportFileName`은 형식별 확장자로 제안 파일명을 만듭니다. 표시 중인 열만 출력합니다. 전체 다운로드는 검색·필터·정렬된 **모든 페이지**, 선택 다운로드는 원본 rows 중 **선택한 행**이 대상입니다. |
 | 저장 위치 | 내보내기를 누르면 지원 브라우저에서 파일명과 저장 위치를 지정하는 시스템 저장 창을 엽니다. 취소하면 저장하지 않습니다. 미지원 브라우저에서는 파일명을 확인한 뒤 브라우저 다운로드 설정에 따라 저장합니다. |
 | CSV 형식 | 한글 BOM, 쉼표·따옴표·개행 이스케이프와 문자열 수식 보호를 적용합니다. `createDataGridCsv`·`downloadDataGridCsv`로 동일한 규칙을 직접 사용할 수 있습니다. `downloadDataGridCsv`는 사용자 클릭에서 호출하고 반환하는 Promise의 저장 오류를 처리하세요. |
+| Excel 형식 | `createDataGridXlsx`는 실제 XLSX 바이트를 만들고 `downloadDataGridXlsx`는 저장 창 또는 다운로드로 저장합니다. 숫자는 숫자 셀, 문자열은 텍스트 셀로 내보내며 수식으로 실행하지 않습니다. `sheetName`으로 시트명을 지정합니다. |
 | 밀도 | `density="default | compact"`로 기존 테이블과 동일한 행 간격을 사용합니다. |
 | 가상 스크롤 | `virtualized` 또는 `virtualized={{estimateRowHeight:56,overscan:6}}`으로 켭니다. 화면 근처 행과 편집·포커스 유지에 필요한 행만 렌더링합니다. `estimateRowHeight`는 초기 추정 높이(px)이며 실제 높이는 자동 측정합니다. 실제 콘텐츠에 가까운 값이면 위치 보정이 줄어듭니다. `overscan`은 앞뒤 버퍼를 만들 행 수이며, 화면이 버퍼 경계에 가까워지면 렌더링 범위를 갱신합니다. 스크롤 중에는 행 hover 강조를 잠시 멈춥니다. 세로 스크롤바는 헤더 아래 본문 영역에 배치하며 브라우저 기본 형태를 사용합니다. 드래그할 때 목적지 행을 먼저 렌더링한 뒤 이동합니다. 방향키·PageUp·PageDown·Home·End로도 조작할 수 있습니다. |
 | 페이지와 가상화 | `pagination` 기본값은 일반 모드에서 `true`, 가상 모드에서 `false`입니다. `virtualized pagination defaultPageSize={100}`은 현재 페이지 내부를 가상화합니다. `pagination={false}`에서는 검색 결과 전체가 선택·스크롤 대상입니다. |
@@ -315,7 +316,7 @@ const columns: DataGridColumn<Project>[] = [
   maxHeight={420} selectable exportable />
 ```
 
-가상 모드에서 `maxHeight`를 생략하면 480px로 제한합니다. `none` 같은 무제한 높이 키워드나 0 이하의 숫자는 기본값으로 되돌립니다. CSS 문자열을 지정할 때도 실제로 높이를 제한하는 유효한 값을 사용해야 가상화가 적용됩니다. 기본 가상 모드는 전체 검색 결과를 스크롤하며 페이지 크기 선택 UI를 표시하지 않습니다. 전체 선택은 현재 검색 결과 전체에 적용하고 CSV는 기존처럼 필터·정렬 결과 또는 선택한 행 전체를 내보냅니다. 일반 모드의 기본 페이지 이동 동작은 유지됩니다.
+가상 모드에서 `maxHeight`를 생략하면 480px로 제한합니다. `none` 같은 무제한 높이 키워드나 0 이하의 숫자는 기본값으로 되돌립니다. CSS 문자열을 지정할 때도 실제로 높이를 제한하는 유효한 값을 사용해야 가상화가 적용됩니다. 기본 가상 모드는 전체 검색 결과를 스크롤하며 페이지 크기 선택 UI를 표시하지 않습니다. 전체 선택은 현재 검색 결과 전체에 적용하고 CSV·Excel은 기존처럼 필터·정렬 결과 또는 선택한 행 전체를 내보냅니다. 일반 모드의 기본 페이지 이동 동작은 유지됩니다.
 
 줄바꿈·열 너비·밀도·편집 오류로 달라지는 실제 행 높이를 측정하고 반영합니다. 데이터 조건이나 페이지를 바꾸면 세로 위치를 복구하며 가로 스크롤 위치는 유지합니다. 편집 중이거나 포커스를 가진 행은 화면 밖에서도 유지합니다. 이를 위해 떨어진 행 사이에 별도의 빈 공간을 두므로 중간의 모든 행을 렌더링하지 않습니다.
 

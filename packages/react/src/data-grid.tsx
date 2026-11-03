@@ -3,12 +3,15 @@ import { Button, Checkbox, Icon, Pagination, Spinner, Table, TextField } from '.
 import { Popover, Tooltip } from './interactive';
 import { MultiSelect, Select } from './navigation';
 import { DataGridCellEditor, downloadDataGridCsv } from './data-grid-tools';
+import { downloadDataGridXlsx } from './data-grid-xlsx-download';
+import { dataGridFileName, type DataGridExportFormat } from './data-grid-file';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
 import { DataGridScrollbar } from './data-grid-scrollbar';
 import { getDataGridColumnWidthBounds as widthBounds, resolveDataGridColumnWidths } from './data-grid-sizing';
 import { resolveDataGridToolbarOrder, type DataGridToolbarItem } from './data-grid-toolbar';
 export type { DataGridVirtualizationOptions } from './data-grid-virtual';
 export type { DataGridToolbarItem } from './data-grid-toolbar';
+export type { DataGridExportFormat } from './data-grid-file';
 
 export interface DataGridColumn<T> {
   id: string;
@@ -94,6 +97,8 @@ export interface DataGridProps<T> {
   className?: string;
   exportable?: boolean;
   exportFileName?: string;
+  /** Available file formats. CSV remains the default for existing callers. */
+  exportFormats?: readonly DataGridExportFormat[];
   onCellEdit?: (change: DataGridCellEdit<T>) => void;
   /** Render a measured window of rows instead of the complete result. */
   virtualized?: boolean | DataGridVirtualizationOptions;
@@ -129,7 +134,7 @@ export function DataGrid<T>({
   pageSize: controlledPageSize, defaultPageSize = 10, onPageSizeChange, pageSizeOptions = [5, 10, 20, 50],
   density: controlledDensity, defaultDensity = 'default', onDensityChange, showDensityToggle = true, showColumnFilterToggle = false, showColumnVisibility = true, defaultHiddenColumnIds = [],
   loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, className,
-  exportable = false, exportFileName = 'data-grid.csv', onCellEdit,
+  exportable = false, exportFileName = 'data-grid.csv', exportFormats = ['csv'], onCellEdit,
   virtualized = false, pagination,
 }: DataGridProps<T>) {
   const id = React.useId();
@@ -311,13 +316,15 @@ export function DataGrid<T>({
     setPage(1);
   };
   const changeQuery = (next: string) => { setQuery(next); resetPageFor(next); };
-  const exportCsv = async (exportRows: readonly T[], fileName: string) => {
+  const enabledExportFormats=exportable?[...new Set(exportFormats.filter(format=>format==='csv'||format==='xlsx'))]:[];
+  const exportFile = async (format:DataGridExportFormat, exportRows: readonly T[], fileName: string) => {
     setExportError('');
     setExporting(true);
     try {
-      await downloadDataGridCsv({rows: exportRows, columns: visibleColumns, fileName});
+      const download=format==='xlsx'?downloadDataGridXlsx:downloadDataGridCsv;
+      await download({rows: exportRows, columns: visibleColumns, fileName});
     } catch {
-      setExportError('CSV 파일을 저장하지 못했습니다. 다시 시도해주세요.');
+      setExportError(`${format==='xlsx'?'Excel':'CSV'} 파일을 저장하지 못했습니다. 다시 시도해주세요.`);
     } finally {
       setExporting(false);
     }
@@ -386,7 +393,7 @@ export function DataGrid<T>({
     selection: selectable && selectedSet.size > 0 && <div className="data-grid-selection">
       <div className="data-grid-selection-actions">
         {selectionActions}
-        {exportable && <Tooltip content="선택한 행 CSV 내보내기"><Button variant="ghost" iconOnly aria-label="선택한 행 내보내기" disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}><Icon name="download" /></Button></Tooltip>}
+        {enabledExportFormats.map(format=><Tooltip key={format} content={`선택한 행 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="ghost" iconOnly aria-label={format==='xlsx'?'선택한 행 Excel 내보내기':'선택한 행 내보내기'} disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,rows.filter(row => selectedSet.has(getRowId(row))),dataGridFileName(exportFileName,format).replace(/\.(csv|xlsx)$/i,`-selected.${format}`))}><Icon name={format==='xlsx'?'microsoft-excel':'download'} /></Button></Tooltip>)}
         <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="close" /></Button></Tooltip>
       </div>
     </div>,
@@ -407,7 +414,7 @@ export function DataGrid<T>({
         return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;
       })}</div>
     </Popover>,
-    export: exportable && <Tooltip content="검색 결과 전체 CSV 내보내기"><Button variant="outline" iconOnly aria-label="CSV 내보내기" disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" /></Button></Tooltip>,
+    export: <>{enabledExportFormats.map(format=><Tooltip key={format} content={`검색 결과 전체 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="outline" iconOnly aria-label={format==='xlsx'?'Excel 내보내기':'CSV 내보내기'} disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,filtered,dataGridFileName(exportFileName,format))}><Icon name={format==='xlsx'?'microsoft-excel':'download'} /></Button></Tooltip>)}</>,
     resetFilters: activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>,
     actions: toolbarActions != null && <div className="data-grid-toolbar-actions">{toolbarActions}</div>,
   };

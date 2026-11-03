@@ -37,5 +37,12 @@ Twenty original filled counterparts were drawn separately, using the existing
 
 Each filename is also its React `Icon` name and CSS `icon-<name>` suffix.
 The original 47 assets and their source/license records above are preserved.
-Together with these 52 additions, the canonical catalog contains 99 SVG files.
+Together with these 52 additions and the application icon below, the canonical
+catalog contains 100 SVG files.
 Research sources and selection rationale: [icon-research.md](../../../../../docs/icon-research.md).
+
+## Application icons
+
+`microsoft-excel` is an original monochrome drawing of an X tile and worksheet
+grid, identifying Microsoft Excel while following the studio's existing
+24 × 24 / 1.5px / butt / miter rules. It uses currentColor like the other icons.

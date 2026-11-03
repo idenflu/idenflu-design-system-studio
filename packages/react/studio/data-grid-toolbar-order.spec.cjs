@@ -4,12 +4,13 @@ const route = '/systems/idenflu-mono/index.html#/components/data-grid';
 const exampleFor = page => page.locator('#data-grid-toolbar-demo');
 const gridFor = page => exampleFor(page).getByRole('group', {name:'상단 도구 모음 데이터그리드',exact:true});
 const search = '상단 도구 예제 검색';
-const builtins = ['컬럼 필터','촘촘한 행 간격','표시 열','CSV 내보내기'];
-const selection = ['선택한 행 내보내기','선택 해제'];
+const exportButtons = ['CSV 내보내기','Excel 내보내기'];
+const builtins = ['컬럼 필터','촘촘한 행 간격','표시 열',...exportButtons];
+const selection = ['선택한 행 내보내기','선택한 행 Excel 내보내기','선택 해제'];
 const orders = [
   {label:'기본',idle:[search,...builtins],selected:[search,...selection,...builtins]},
   {label:'컬럼 필터 먼저',idle:['컬럼 필터',search,...builtins.slice(1)],selected:['컬럼 필터',search,...selection,...builtins.slice(1)]},
-  {label:'내보내기 먼저',idle:['CSV 내보내기',search,...builtins.slice(0,-1)],selected:['CSV 내보내기',search,...selection,...builtins.slice(0,-1)]},
+  {label:'내보내기 먼저',idle:[...exportButtons,search,...builtins.slice(0,3)],selected:[...exportButtons,search,...selection,...builtins.slice(0,3)]},
 ];
 const toolbarControls = tools => tools.getByRole('searchbox').or(tools.getByRole('button'));
 const controlFor = (tools,name) => tools.getByRole(name === search ? 'searchbox' : 'button', {name,exact:true});
@@ -43,7 +44,7 @@ async function expectControlSize(tools, size) {
     const bounds = (control.closest('.input-group') || control).getBoundingClientRect();
     return {name:control.getAttribute('aria-label') || (control.labels?.[0]?.textContent || control.textContent).trim(),height:bounds.height,width:bounds.width,iconOnly:control.classList.contains('button--icon')};
   }));
-  expect(controls.length).toBeGreaterThanOrEqual(5);
+  expect(controls.length).toBeGreaterThanOrEqual(6);
   for (const control of controls) {
     expect(control.height,`${control.name} ${size} height`).toBeCloseTo(expected,0);
     if (control.iconOnly) expect(control.width,`${control.name} stays square`).toBeCloseTo(control.height,0);
@@ -118,8 +119,8 @@ test('hidden built-in controls stay absent after reordering and large tools fit 
   const example = exampleFor(page), grid = gridFor(page), tools = grid.locator('.data-grid-tools');
   await choose(example,'상단 도구 크기','LG');
   await grid.locator('tbody tr[data-grid-row-id]').first().getByRole('checkbox').check();
-  const visibilitySettings = ['검색 입력 표시','컬럼 필터 토글 사용','행 밀도 버튼 표시','표시 열 버튼 표시','CSV 버튼 표시'];
-  const hiddenControls = [search,...builtins,'선택한 행 내보내기'];
+  const visibilitySettings = ['검색 입력 표시','컬럼 필터 토글 사용','행 밀도 버튼 표시','표시 열 버튼 표시','CSV 버튼 표시','Excel 버튼 표시'];
+  const hiddenControls = [search,...builtins,...selection.slice(0,-1)];
   for (const name of visibilitySettings) {
     await example.getByRole('checkbox', {name,exact:true}).uncheck();
   }
@@ -137,6 +138,48 @@ test('hidden built-in controls stay absent after reordering and large tools fit 
   await expectOrder(page,tools,orders[2].selected);
   await expectControlSize(tools,'lg');
   await expectNoOverflow(page,tools);
+});
+
+test('CSV and Excel visibility independently controls their full and selected-row export buttons', async ({page}) => {
+  await page.goto(route);
+  const example = exampleFor(page), grid = gridFor(page), tools = grid.locator('.data-grid-tools');
+  const row = grid.locator('tbody tr[data-grid-row-id]').first();
+  const formats = [
+    {checkbox:'CSV 버튼 표시',button:'CSV 내보내기',selected:'선택한 행 내보내기'},
+    {checkbox:'Excel 버튼 표시',button:'Excel 내보내기',selected:'선택한 행 Excel 내보내기'},
+  ];
+  await choose(example,'도구 순서','내보내기 먼저');
+  await choose(example,'상단 도구 크기','LG');
+  for (const format of formats) {
+    await expect(controlFor(tools,format.button)).toBeVisible();
+    await expect(controlFor(tools,format.selected)).toHaveCount(0);
+  }
+  await expectOrder(page,tools,orders[2].idle);
+  await row.getByRole('checkbox').check();
+  await expectControlSize(tools,'lg');
+  for (const enabled of [[false,true],[true,false],[false,false],[true,true]]) {
+    const hidden = [];
+    for (const [index,format] of formats.entries()) {
+      await example.getByRole('checkbox', {name:format.checkbox,exact:true}).setChecked(enabled[index]);
+      if (!enabled[index]) hidden.push(format.button,format.selected);
+    }
+    for (const [index,format] of formats.entries()) {
+      for (const name of [format.button,format.selected]) {
+        if (enabled[index]) await expect(controlFor(tools,name)).toBeVisible();
+        else await expect(controlFor(tools,name)).toHaveCount(0);
+      }
+    }
+    await expect(row.getByRole('checkbox')).toBeChecked();
+    await expect(grid.locator('.data-grid-selection-count')).toHaveText('1개 선택됨');
+    await expectOrder(page,tools,orders[2].selected.filter(name => !hidden.includes(name)));
+    await expectNoOverflow(page,tools);
+  }
+  await expectControlSize(tools,'lg');
+  await tools.getByRole('button', {name:'선택 해제',exact:true}).click();
+  for (const format of formats) await expect(controlFor(tools,format.selected)).toHaveCount(0);
+  await expect(row.getByRole('checkbox')).not.toBeChecked();
+  await expect(grid.locator('thead').getByRole('checkbox')).toBeFocused();
+  await expectOrder(page,tools,orders[2].idle);
 });
 
 test('column filters and selection controls can be revealed and cleared from the toolbar', async ({page}) => {

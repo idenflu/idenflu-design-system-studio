@@ -57,8 +57,8 @@ export function SidebarLayoutSample() {
   const [createOpen,setCreateOpen]=React.useState(false),[inviteOpen,setInviteOpen]=React.useState(false),[accountOpen,setAccountOpen]=React.useState(false);
   const [detailProjectId,setDetailProjectId]=React.useState<string|null>(null);
   const [deleteProjectIds,setDeleteProjectIds]=React.useState<string[]|null>(null);
-  const [notificationOpen,setNotificationOpen]=React.useState(false),[unread,setUnread]=React.useState(['reviews','project:PRJ-001']),[notice,setNotice]=React.useState('변경 사항은 현재 샘플에서만 유지됩니다.');
-  const [notificationTimes]=React.useState(()=>{const now=Date.now();return {reviews:now-5*60_000,project:now-60*60_000};});
+  const [notificationOpen,setNotificationOpen]=React.useState(false),[unread,setUnread]=React.useState(['reviews','project:PRJ-001','design-guide']),[notice,setNotice]=React.useState('');
+  const [notificationTimes]=React.useState(()=>{const now=Date.now();return {reviews:now-5*60_000,project:now-60*60_000,guide:now-2*60*60_000};});
   const [notificationNow,setNotificationNow]=React.useState(Date.now);
   const createFormId=React.useId(),inviteFormId=React.useId(),profileFormId=React.useId();
   const searchInput=React.useRef<HTMLInputElement>(null);
@@ -107,7 +107,7 @@ export function SidebarLayoutSample() {
     if(tab.page==='settings')return <SettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}}/>;
     if(tab.page==='notifications')return <NotificationSettingsPage settings={settings} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
     if(tab.page==='vertical-settings')return <VerticalSettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
-    return <ProjectsPage page={tab.page} projects={projects} onOpen={setDetailProjectId} onCreate={()=>setCreateOpen(true)} onDelete={setDeleteProjectIds} onComplete={ids=>{setProjects(values=>values.map(project=>ids.includes(project.id)?{...project,status:'완료',progress:100}:project));setNotice(`${ids.length}개 프로젝트를 완료했습니다.`);}}/>;
+    return <ProjectsPage page={tab.page} projects={projects} onOpen={setDetailProjectId} onCreate={()=>setCreateOpen(true)} onDelete={setDeleteProjectIds}/>;
   };
   const tree=filterWorkspaceTree(workspaceTree(),menuQuery);
   const sidebarProps={items:tree,query:menuQuery,onQuery:(value:string)=>{setMenuQuery(value);setSearchExpanded(defaultExpanded);},selected,expanded:menuQuery?searchExpanded:expanded,onExpanded:menuQuery?setSearchExpanded:setExpanded,onPage:openPage};
@@ -121,14 +121,42 @@ export function SidebarLayoutSample() {
     <aside className="layout-workspace-sidebar" aria-label="사이드바"><SidebarNavigation {...sidebarProps}/></aside>
     <header className="layout-workspace-topbar" aria-label="탑바"><div className="layout-topbar-location"><Button variant="ghost" className="layout-mobile-menu" aria-label="메뉴 열기" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><Icon name="menu"/></Button><nav aria-label="현재 위치"><span>{settings.name}</span><Icon name="keyboard-arrow-right"/><span>{pageInfo[selected].group}</span><Icon name="keyboard-arrow-right"/><strong aria-current="page">{tabTitle(activeTab)}</strong></nav></div>
       <div className="layout-topbar-tools"><Button variant="outline" className="layout-quick-search" onClick={()=>{setSearch('');setSearchOpen(true);}} aria-label="빠른 검색"><Icon name="search"/><span>메뉴 및 프로젝트 검색</span><kbd>⌘ K</kbd></Button><ThemeControl/>
-        <div className="layout-notification-popover"><Popover align="end" iconOnly triggerLabel={`업무 알림${unread.length?` ${unread.length}개`:""}`} open={notificationOpen} onOpenChange={setNotificationOpen} label="업무 알림" trigger={<span className="layout-notification-trigger"><Icon name="bell"/>{unread.length>0&&<i/>}</span>}><header><h2>알림</h2><Button size="sm" variant="ghost" disabled={!unread.length} onClick={()=>setUnread([])}>모두 읽음</Button></header><button type="button" className={unread.includes('reviews')?'is-unread':undefined} onClick={()=>setUnread(values=>values.filter(value=>value!=='reviews'))}><Icon name="check-circle"/><span className="layout-notification-copy"><strong>프로젝트 검토 요청</strong><small>팀의 검토 대기 프로젝트를 확인해주세요.</small><time dateTime={new Date(notificationTimes.reviews).toISOString()}>{notificationAge(notificationTimes.reviews,notificationNow)}</time></span>{unread.includes('reviews')&&<span className="layout-notification-unread"><span className="sr-only">안 읽음</span></span>}</button><button type="button" className={unread.includes('project:PRJ-001')?'is-unread':undefined} onClick={()=>setUnread(values=>values.filter(value=>value!=='project:PRJ-001'))}><Icon name="folder"/><span className="layout-notification-copy"><strong>디자인 시스템 v2</strong><small>프로젝트 진행 현황을 확인하세요.</small><time dateTime={new Date(notificationTimes.project).toISOString()}>{notificationAge(notificationTimes.project,notificationNow)}</time></span>{unread.includes('project:PRJ-001')&&<span className="layout-notification-unread"><span className="sr-only">안 읽음</span></span>}</button></Popover></div>
+        <div className="layout-notification-popover">
+          <Popover align="end" iconOnly triggerLabel={`업무 알림${unread.length?` ${unread.length}개`:""}`} open={notificationOpen} onOpenChange={setNotificationOpen} label="업무 알림" trigger={<span className="layout-notification-trigger"><Icon name="bell"/>{unread.length>0&&<i/>}</span>}>
+            <header><h2>알림</h2><Button size="sm" variant="ghost" disabled={!unread.length} onClick={()=>setUnread([])}>모두 읽음</Button></header>
+            <button type="button" className={unread.includes('reviews')?'is-unread':undefined} onClick={()=>setUnread(values=>values.filter(value=>value!=='reviews'))}>
+              <Icon name="check-circle"/>
+              <span className="layout-notification-copy">
+                <span className="layout-notification-title"><strong>프로젝트 검토 요청</strong>{unread.includes('reviews')&&<span className="layout-notification-unread"><span className="sr-only">안 읽음</span></span>}</span>
+                <time dateTime={new Date(notificationTimes.reviews).toISOString()}>{notificationAge(notificationTimes.reviews,notificationNow)}</time>
+                <small>팀의 검토 대기 프로젝트를 확인해주세요.</small>
+              </span>
+            </button>
+            <button type="button" className={unread.includes('project:PRJ-001')?'is-unread':undefined} onClick={()=>setUnread(values=>values.filter(value=>value!=='project:PRJ-001'))}>
+              <Icon name="folder"/>
+              <span className="layout-notification-copy">
+                <span className="layout-notification-title"><strong>디자인 시스템 v2</strong>{unread.includes('project:PRJ-001')&&<span className="layout-notification-unread"><span className="sr-only">안 읽음</span></span>}</span>
+                <time dateTime={new Date(notificationTimes.project).toISOString()}>{notificationAge(notificationTimes.project,notificationNow)}</time>
+                <small>프로젝트 진행 현황을 확인하세요.</small>
+              </span>
+            </button>
+            <button type="button" className={unread.includes('design-guide')?'is-unread':undefined} onClick={()=>setUnread(values=>values.filter(value=>value!=='design-guide'))}>
+              <Icon name="bell"/>
+              <span className="layout-notification-copy">
+                <span className="layout-notification-title"><strong>디자인 가이드 업데이트</strong>{unread.includes('design-guide')&&<span className="layout-notification-unread"><span className="sr-only">안 읽음</span></span>}</span>
+                <time dateTime={new Date(notificationTimes.guide).toISOString()}>{notificationAge(notificationTimes.guide,notificationNow)}</time>
+                <small>새 디자인 가이드가 등록되었습니다. 변경된 컴포넌트 사용법을 확인해주세요.</small>
+              </span>
+            </button>
+          </Popover>
+        </div>
         <div className="layout-account-menu"><DropdownMenu align="end" label="사용자 메뉴" trigger={<><Avatar size="sm" shape="circle" variant="neutral" aria-hidden="true">{Array.from(currentMember.name)[0]}</Avatar><span className="layout-account-name">{currentMember.name}</span><span className="sr-only"> 사용자 메뉴</span><Icon name="caret"/></>} items={[{value:'account',label:'내 프로필',icon:<Icon name="person"/>},{value:'settings',label:'워크스페이스 설정',icon:<Icon name="settings"/>},{value:'notifications',label:'알림 설정',icon:<Icon name="bell"/>}]} onSelect={value=>{if(value==='account')setAccountOpen(true);else openPage(value as WorkspacePage);}}/></div>
       </div>
     </header>
     <main ref={workspaceRef} className="layout-workspace-content" id="workspace-content" aria-label="콘텐츠 영역"><WorkspaceTabsToolbar workspaceRef={workspaceRef} items={tabMenuItems} onSelect={value=>{if(value.startsWith('tab:')){activate(value.slice(4));return;}if(value==='all'){setTabs([{key:'home',page:'home'}]);setActive('home');}else setTabs(values=>values.filter(tab=>tab.page==='home'||tab.key===active));}}/>
       <Tabs className="layout-workspace-tabs" label="열린 업무 화면" value={active} onValueChange={activate} onTabClose={closeTab} items={workspaceTabItems}/>
-      <footer className="layout-statusbar"><span role="status">{notice}</span><span><i/>샘플 환경</span></footer>
     </main>
+    <span className="sr-only" role="status">{notice}</span>
     <div className="layout-floating-settings"><StudioSettings/></div>
     <Drawer open={mobileOpen} onOpenChange={setMobileOpen} className="layout-mobile-sidebar" aria-label="워크스페이스 메뉴"><SidebarNavigation {...sidebarProps} mobile onClose={()=>setMobileOpen(false)}/></Drawer>
     <Dialog open={deleteProjectIds!==null} onOpenChange={open=>{if(!open)setDeleteProjectIds(null);}} variant="divided" aria-labelledby="workspace-delete-title" aria-describedby="workspace-delete-description"><DialogHeader><h2 id="workspace-delete-title">프로젝트 삭제</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setDeleteProjectIds(null)}><Icon name="close"/></Button></DialogHeader><DialogBody><p id="workspace-delete-description">선택한 {deleteProjects.length}개 프로젝트를 삭제할까요?</p><ul className="layout-delete-project-list">{deleteProjects.slice(0,3).map(project=><li key={project.id}><strong>{project.name}</strong><span>{project.id}</span></li>)}{deleteProjects.length>3&&<li className="layout-delete-project-summary">외 {deleteProjects.length-3}개 프로젝트</li>}</ul><p className="component-helper">열려 있는 해당 프로젝트의 상세 탭도 함께 닫힙니다.</p></DialogBody><DialogFooter><Button ref={deleteCancel} variant="outline" onClick={()=>setDeleteProjectIds(null)}>취소</Button><Button variant="danger" disabled={!deleteProjects.length} onClick={confirmDelete}><Icon name="trash"/>삭제</Button></DialogFooter></Dialog>

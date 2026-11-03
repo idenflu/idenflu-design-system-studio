@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Checkbox, DataGrid, Select, type DataGridColumn, type DataGridToolbarItem } from '../src';
+import { Checkbox, DataGrid, Select, type DataGridColumn, type DataGridExportFormat, type DataGridToolbarItem } from '../src';
 import { Section } from './demo-layout';
 import { DataGridExtensionsDemo } from './data-grid-extensions-demo';
 
@@ -29,9 +29,11 @@ export function DataGridToolbarDemos() {
   const [showDensity,setShowDensity] = React.useState(true);
   const [showColumns,setShowColumns] = React.useState(true);
   const [showCsv,setShowCsv] = React.useState(true);
+  const [showExcel,setShowExcel] = React.useState(true);
   const [toolbarSize,setToolbarSize] = React.useState<'sm'|'md'|'lg'>('sm');
   const [toolbarOrder,setToolbarOrder] = React.useState<ToolbarOrderPreset>('default');
-  return <><Section id="data-grid-toolbar-demo" title="상단 기능 버튼 구성" description="검색·컬럼 필터·행 밀도·표시 열·CSV 등 내장 도구의 크기와 순서를 바꿔보세요. 필터와 행 선택에 따라 추가 도구가 나타납니다.">
+  const exportFormats:DataGridExportFormat[] = [...(showCsv ? ['csv' as const] : []), ...(showExcel ? ['xlsx' as const] : [])];
+  return <><Section id="data-grid-toolbar-demo" title="상단 기능 버튼 구성" description="검색·컬럼 필터·행 밀도·표시 열·CSV·Excel 등 내장 도구의 크기와 순서를 바꿔보세요. 필터와 행 선택에 따라 추가 도구가 나타납니다.">
     <div role="group" aria-label="상단 도구 구성" className="react-studio-row studio-grid-toolbar-controls">
       <Select label="상단 도구 크기" size="sm" value={toolbarSize}
         onValueChange={value=>setToolbarSize(value==='md'||value==='lg'?value:'sm')}
@@ -46,6 +48,7 @@ export function DataGridToolbarDemos() {
       <Checkbox label="행 밀도 버튼 표시" checked={showDensity} onChange={event=>setShowDensity(event.target.checked)} />
       <Checkbox label="표시 열 버튼 표시" checked={showColumns} onChange={event=>setShowColumns(event.target.checked)} />
       <Checkbox label="CSV 버튼 표시" checked={showCsv} onChange={event=>setShowCsv(event.target.checked)} />
+      <Checkbox label="Excel 버튼 표시" checked={showExcel} onChange={event=>setShowExcel(event.target.checked)} />
     </div>
     <DataGrid label="상단 도구 모음 데이터그리드" rows={initialRows} columns={columns}
       getRowId={row=>row.id} getRowLabel={row=>row.name} searchable={showSearch} searchLabel="상단 도구 예제 검색"
@@ -53,9 +56,9 @@ export function DataGridToolbarDemos() {
       selectable selectedRowIds={selected} onSelectedRowIdsChange={setSelected}
       density={density} onDensityChange={setDensity} showDensityToggle={showDensity}
       toolbarSize={toolbarSize} toolbarOrder={toolbarOrders[toolbarOrder]}
-      showColumnVisibility={showColumns} exportable={showCsv} exportFileName="toolbar-projects.csv"
+      showColumnVisibility={showColumns} exportable={exportFormats.length > 0} exportFormats={exportFormats} exportFileName="toolbar-projects.csv"
       pagination={false} maxHeight={320} />
     <p className="component-helper">현재 밀도: {density === 'compact' ? 'Compact' : 'Default'}</p>
-    <p className="react-studio-caption">이 예제는 DataGrid 내장 도구만 표시합니다. 컬럼 필터를 켜고 값을 입력하면 필터 초기화가, 행을 선택하면 선택 CSV·선택 해제가 나타납니다. 토글을 사용하지 않으면 필터 행을 항상 표시합니다. 업무 버튼을 직접 추가하는 방법은 바로 다음 상단 도구 확장 예제를 확인하세요.</p>
+    <p className="react-studio-caption">이 예제는 DataGrid 내장 도구만 표시합니다. 검색어를 입력하면 검색 초기화, 컬럼 필터에 값을 입력하면 필터 초기화, 행을 선택하면 선택 CSV·선택 Excel·선택 해제가 나타납니다. CSV·Excel 표시 옵션은 전체와 선택 행 버튼에 함께 적용합니다. 컬럼 필터 토글을 사용하지 않으면 필터 행을 항상 표시합니다. 업무 버튼 추가는 다음 상단 도구 확장 예제를 확인하세요.</p>
   </Section><DataGridExtensionsDemo /></>;
 }

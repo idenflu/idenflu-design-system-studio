@@ -12,3 +12,5 @@ export * from './divider';
 export * from './nova-spinner';
 export * from './data-grid';
 export * from './data-grid-tools';
+export * from './data-grid-xlsx';
+export * from './data-grid-xlsx-download';
