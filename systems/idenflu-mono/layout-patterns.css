@@ -46,6 +46,10 @@
 .layout-tree-navigation .tree-children > .tree-item:not(.is-selected),
 .layout-tree-navigation .tree-children > details > summary { border-left-width:1px; padding-left:calc(var(--space-2) + var(--layout-tree-line-offset) + 1px); }
 .layout-tree-navigation .tree-item.is-selected { background:var(--info-surface); color:var(--primary); }
+.layout-tree-navigation .tree-category-label { padding-inline:calc(var(--space-2) + 2px); }
+.layout-tree-navigation .tree-category-label .ui-icon { display:none; }
+.layout-tree-navigation .tree-category > details > summary { border-inline-start:2px solid transparent; padding-inline:var(--space-2); }
+.layout-tree-navigation .tree-category > details > .tree-children { margin-left:calc(var(--space-2) + 2px + var(--icon-size) / 2); }
 .layout-tree-label { display:flex; align-items:center; gap:var(--space-2); width:100%; min-width:0; }
 .layout-tree-label > .ui-icon { flex:none; width:16px; height:16px; }
 .layout-tree-label > span:last-child { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }

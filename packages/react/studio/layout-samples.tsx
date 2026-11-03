@@ -3,7 +3,7 @@ import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer,
 import { StudioSettings, ThemeControl } from './controls';
 import { initialWorkspaceRoles } from './layout-role-data';
 import { RoleManagementPage } from './layout-role-management';
-import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceTab } from './layout-workspace-data';
+import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspacePagePath, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings, type WorkspaceTab } from './layout-workspace-data';
 import { HomePage, InviteMemberForm, MasterDetailPage, MembersPage, NotificationSettingsPage, ProfileForm, ProjectDetailContent, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage, VerticalSettingsPage } from './layout-workspace-pages';
 
 function notificationAge(timestamp:number,now:number){
@@ -14,11 +14,11 @@ function notificationAge(timestamp:number,now:number){
   return hours<24?`${hours}시간 전`:`${Math.floor(hours/24)}일 전`;
 }
 
-function SidebarNavigation({items,query,onQuery,selected,expanded,onExpanded,onPage,mobile,onClose}: {items:TreeNode[];query:string;onQuery:(value:string)=>void;selected:string;expanded:string[];onExpanded:(values:string[])=>void;onPage:(page:WorkspacePage)=>void;mobile?:boolean;onClose?:()=>void}) {
+function SidebarNavigation({items,query,onQuery,selected,expanded,onExpanded,onPage,sideMenuStyle,mobile,onClose}: {items:TreeNode[];query:string;onQuery:(value:string)=>void;selected:string;expanded:string[];onExpanded:(values:string[])=>void;onPage:(page:WorkspacePage)=>void;sideMenuStyle:WorkspaceSettings['sideMenuStyle'];mobile?:boolean;onClose?:()=>void}) {
   return <div className="layout-sidebar-inner">
     <div className="layout-sidebar-brand"><img className="layout-brand-mark" src="./assets/nova-workspace.svg" alt=""/><strong>NOVA Workspace</strong>{mobile&&<Button variant="ghost" size="sm" aria-label="메뉴 닫기" onClick={onClose}><Icon name="close"/></Button>}</div>
     <div className="layout-menu-search"><TextField hideLabel label="메뉴 검색" type="search" value={query} onChange={event=>onQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="메뉴 검색"/></div>
-    <nav className="layout-tree-navigation" aria-label="워크스페이스 메뉴"><Tree label="워크스페이스 트리 메뉴" items={items} value={selected} onValueChange={value=>onPage(value as WorkspacePage)} expanded={expanded} onExpandedChange={onExpanded}/>{!items.length&&<p className="layout-empty">검색 결과가 없습니다.</p>}</nav>
+    <nav className="layout-tree-navigation" aria-label="워크스페이스 메뉴"><Tree label="워크스페이스 트리 메뉴" rootStyle={sideMenuStyle} items={items} value={selected} onValueChange={value=>onPage(value as WorkspacePage)} expanded={expanded} onExpandedChange={onExpanded}/>{!items.length&&<p className="layout-empty">검색 결과가 없습니다.</p>}</nav>
   </div>;
 }
 
@@ -71,6 +71,8 @@ export function SidebarLayoutSample() {
   const deleteProjects=projects.filter(project=>deleteProjectIds?.includes(project.id));
   const selected=activeTab.page==='project-detail'?'projects':activeTab.page;
   const tabTitle=(tab:WorkspaceTab)=>tab.page==='project-detail'?projects.find(project=>project.id===tab.projectId)?.name??'프로젝트 상세':pageInfo[tab.page].title;
+  const breadcrumbs=workspacePagePath(selected);
+  if(activeTab.page==='project-detail')breadcrumbs.push(tabTitle(activeTab));
   const activate=(key:string)=>{setActive(key);const tab=tabs.find(item=>item.key===key);const page=tab?.page==='project-detail'?'projects':tab?.page;if(page)setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));};
   const openTab=(tab:WorkspaceTab)=>{setTabs(values=>values.some(item=>item.key===tab.key)?values:[...values,tab]);setActive(tab.key);const page=tab.page==='project-detail'?'projects':tab.page;setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));setMobileOpen(false);setSearchOpen(false);setMenuQuery('');};
   const openPage=(page:WorkspacePage)=>openTab({key:page,page});
@@ -109,8 +111,8 @@ export function SidebarLayoutSample() {
     if(tab.page==='vertical-settings')return <VerticalSettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
     return <ProjectsPage page={tab.page} projects={projects} onOpen={setDetailProjectId} onCreate={()=>setCreateOpen(true)} onDelete={setDeleteProjectIds}/>;
   };
-  const tree=filterWorkspaceTree(workspaceTree(),menuQuery);
-  const sidebarProps={items:tree,query:menuQuery,onQuery:(value:string)=>{setMenuQuery(value);setSearchExpanded(defaultExpanded);},selected,expanded:menuQuery?searchExpanded:expanded,onExpanded:menuQuery?setSearchExpanded:setExpanded,onPage:openPage};
+  const tree=filterWorkspaceTree(workspaceTree(settings.sideMenuStyle),menuQuery);
+  const sidebarProps={items:tree,query:menuQuery,onQuery:(value:string)=>{setMenuQuery(value);setSearchExpanded(defaultExpanded);},selected,expanded:menuQuery?searchExpanded:expanded,onExpanded:menuQuery?setSearchExpanded:setExpanded,onPage:openPage,sideMenuStyle:settings.sideMenuStyle};
   const needle=search.trim().toLocaleLowerCase();
   const menuResults=(Object.keys(pageInfo) as WorkspacePage[]).filter(page=>`${pageInfo[page].title} ${pageInfo[page].group}`.toLocaleLowerCase().includes(needle));
   const projectResults=projects.filter(project=>`${project.name} ${project.id}`.toLocaleLowerCase().includes(needle)).slice(0,5);
@@ -119,7 +121,7 @@ export function SidebarLayoutSample() {
   return <div className="layout-sample-app">
     <a className="layout-sample-skip" href="#workspace-content" onClick={event=>{event.preventDefault();document.querySelector<HTMLElement>('.layout-workspace-tabs .tab-panel:not([hidden])')?.focus();}}>콘텐츠로 바로가기</a>
     <aside className="layout-workspace-sidebar" aria-label="사이드바"><SidebarNavigation {...sidebarProps}/></aside>
-    <header className="layout-workspace-topbar" aria-label="탑바"><div className="layout-topbar-location"><Button variant="ghost" className="layout-mobile-menu" aria-label="메뉴 열기" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><Icon name="menu"/></Button><nav aria-label="현재 위치"><span>{settings.name}</span><Icon name="keyboard-arrow-right"/><span>{pageInfo[selected].group}</span><Icon name="keyboard-arrow-right"/><strong aria-current="page">{tabTitle(activeTab)}</strong></nav></div>
+    <header className="layout-workspace-topbar" aria-label="탑바"><div className="layout-topbar-location"><Button variant="ghost" className="layout-mobile-menu" aria-label="메뉴 열기" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><Icon name="menu"/></Button><nav aria-label="현재 위치">{breadcrumbs.map((title,index)=><React.Fragment key={`${index}-${title}`}>{index>0&&<Icon name="keyboard-arrow-right"/>}{index===breadcrumbs.length-1?<strong aria-current="page">{title}</strong>:<span>{title}</span>}</React.Fragment>)}</nav></div>
       <div className="layout-topbar-tools"><Button variant="outline" className="layout-quick-search" onClick={()=>{setSearch('');setSearchOpen(true);}} aria-label="빠른 검색"><Icon name="search"/><span>메뉴 및 프로젝트 검색</span><kbd>⌘ K</kbd></Button><ThemeControl/>
         <div className="layout-notification-popover">
           <Popover align="end" iconOnly triggerLabel={`업무 알림${unread.length?` ${unread.length}개`:""}`} open={notificationOpen} onOpenChange={setNotificationOpen} label="업무 알림" trigger={<span className="layout-notification-trigger"><Icon name="bell"/>{unread.length>0&&<i/>}</span>}>

@@ -14,8 +14,8 @@ test('screen settings stay open while the visible workspace remains usable',asyn
   const surface=await page.locator('.layout-sample-app').boundingBox();
   const side=await settings(page).boundingBox();
   expect(surface.x+surface.width).toBeLessThanOrEqual(side.x+1);
-  await page.locator('.layout-workspace-sidebar').getByRole('button',{name:'팀 홈',exact:true}).click();
-  await expect(page.locator('.layout-workspace-tabs > .tab-panel:not([hidden])').getByRole('heading',{name:'팀 홈',exact:true})).toBeVisible();
+  await page.locator('.layout-workspace-sidebar').getByRole('button',{name:'대시보드',exact:true}).click();
+  await expect(page.locator('.layout-workspace-tabs > .tab-panel:not([hidden])').getByRole('heading',{name:'대시보드',exact:true})).toBeVisible();
   await expect(settings(page)).toBeVisible();
   await settings(page).getByRole('button',{name:'화면 조정 닫기',exact:true}).click();
   await expect(trigger(page)).toBeFocused();

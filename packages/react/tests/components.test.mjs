@@ -472,6 +472,39 @@ test('Tree expands branches, selects a leaf and resets the initial state', async
   } finally { await f.dispose(); }
 });
 
+test('Tree category roots share selection and expansion with the default tree style', async () => {
+  const f = fixture(), changes = [], expansion = [];
+  const items = [{ value: 'root', label: '업무 공간', children: [
+    { value: 'branch', label: '프로젝트 관리', children: [{ value: 'first', label: '전체 프로젝트' }, { value: 'second', label: '진행 중 프로젝트' }] },
+    { value: 'disabled', label: '준비 중', disabled: true },
+  ] }];
+  const render = rootStyle => h('form', null, h(Tree, { items, rootStyle, label: '업무 메뉴', name: 'page', defaultValue: 'first', defaultExpanded: ['root', 'branch'], onValueChange: value => changes.push(value), onExpandedChange: values => expansion.push(values) }));
+  try {
+    await f.render(render('category'));
+    const group = f.container.querySelector('.demo-tree');
+    assert.equal(f.container.querySelectorAll('.demo-tree').length, 1);
+    assert.equal(group.querySelectorAll('details').length, 1);
+    const category = group.querySelector('.tree-category'), heading = category.querySelector('h3');
+    assert.equal(heading.textContent, '업무 공간');
+    assert.equal(category.getAttribute('aria-labelledby'), heading.id);
+    assert.equal(group.querySelector('button:disabled').textContent, '준비 중');
+    await click([...group.querySelectorAll('button')].find(button => button.textContent === '진행 중 프로젝트'));
+    assert.deepEqual(changes, ['second']);
+    await click(group.querySelector('summary'));
+    assert.deepEqual(expansion, [['root']]);
+    await f.render(render('tree'));
+    const rootBranch = group.querySelector('details');
+    assert.equal(group.querySelector('.tree-category'), null);
+    assert.equal(rootBranch.open, true);
+    assert.equal(rootBranch.querySelector('details').open, false);
+    assert.equal(group.querySelector('[aria-current=true]').textContent, '진행 중 프로젝트');
+    await f.render(render('category'));
+    await act(async () => f.container.querySelector('form').reset());
+    assert.equal(group.querySelector('details').open, true);
+    assert.equal(new dom.window.FormData(f.container.querySelector('form')).get('page'), 'first');
+  } finally { await f.dispose(); }
+});
+
 test('Table enables row hover only when interactive and keeps selected rows marked', async () => {
   const f = fixture(), ref = React.createRef();
   const body = h('tbody', null, h('tr', { 'data-selected': true }, h('td', null, '디자인 시스템')));

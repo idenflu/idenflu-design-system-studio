@@ -98,7 +98,7 @@ export function MasterDetailPage({projects,members,onUpdate,onOpen}: {projects:P
 
 export function HomePage({projects,members,onOpen,onPage}: {projects:Project[];members:Member[];onOpen:(id:string)=>void;onPage:(page:WorkspacePage)=>void}){
   const reviewing=projects.filter(project=>project.status==='검토 중');
-  return <><WorkspacePageHeader title="팀 홈" description="팀의 주요 업무와 최근 활동을 한눈에 확인하세요." eyebrow="WORKSPACE OVERVIEW" action={<Button variant="outline" onClick={()=>onPage('projects')}>프로젝트 전체 보기<Icon name="arrow-right"/></Button>}/>
+  return <><WorkspacePageHeader title={pageInfo.home.title} description="팀의 주요 업무와 최근 활동을 한눈에 확인하세요." eyebrow="WORKSPACE OVERVIEW" action={<Button variant="outline" onClick={()=>onPage('projects')}>프로젝트 전체 보기<Icon name="arrow-right"/></Button>}/>
     <div className="layout-home-metrics">{[['전체 프로젝트',projects.length,'projects'],['진행 중',projects.filter(project=>project.status==='진행 중').length,'active-projects'],['검토 대기',reviewing.length,'reviews'],['팀 멤버',members.length,'members']].map(([label,value,page])=><button type="button" className="layout-panel layout-metric" key={label} onClick={()=>onPage(page as WorkspacePage)}><span>{label}</span><strong>{value}</strong><small>상세 보기 <Icon name="arrow-right"/></small></button>)}</div>
     <div className="layout-home-columns"><section className="layout-panel layout-recent"><header><div><h2>검토가 필요한 프로젝트</h2><p>작업을 확인하고 다음 단계를 진행해주세요.</p></div><Badge variant="warning">{reviewing.length}개</Badge></header>{reviewing.length?reviewing.slice(0,5).map(project=><button type="button" key={project.id} onClick={()=>onOpen(project.id)}><span><strong>{project.name}</strong><small>{project.owner} · {project.due}</small></span><Badge variant="warning">검토 중</Badge><Icon name="arrow-right"/></button>):<p className="layout-empty">모든 검토를 마쳤습니다.</p>}</section>
       <section className="layout-panel layout-team-card"><h2>함께하는 팀</h2><p>각자의 역할로 더 나은 제품을 만듭니다.</p><div>{members.slice(0,5).map(member=><Avatar key={member.id} shape="circle" variant="neutral" aria-label={member.name}>{member.name.slice(0,1)}</Avatar>)}</div><Button variant="outline" onClick={()=>onPage('members')}>멤버 관리<Icon name="arrow-right"/></Button></section></div>
@@ -129,13 +129,24 @@ export function MembersPage({members,onInvite,onRole}: {members:Member[];onInvit
 
 type SettingsProps={settings:WorkspaceSettings;onSave:(patch:Partial<WorkspaceSettings>)=>void};
 type NotificationSettingsProps={settings:WorkspaceSettings;onChange:(patch:Partial<WorkspaceSettings>)=>void};
-type SettingsDraft=Partial<Pick<WorkspaceSettings,'name'|'description'|'timezone'>>;
+type SettingsDraft=Partial<Pick<WorkspaceSettings,'name'|'description'|'timezone'|'sideMenuStyle'>>;
 
 function WorkspaceSettingsForm({settings,onSave}:SettingsProps){
   const [draft,setDraft]=React.useState<SettingsDraft>({}),[error,setError]=React.useState(''),[saved,setSaved]=React.useState(false);
-  const name=draft.name??settings.name,description=draft.description??settings.description,timezone=draft.timezone??settings.timezone;
-  const change=(key:keyof SettingsDraft,value:string)=>{setDraft(current=>{const next={...current};if(value===settings[key])delete next[key];else next[key]=value;return next;});setSaved(false);};
-  return <form className="layout-panel layout-settings" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('워크스페이스 이름을 입력해주세요.');return;}onSave({...draft,...(draft.name!==undefined?{name:name.trim()}:{})});setDraft({});setSaved(true);}}><div><h2>기본 정보</h2><p>이 정보는 사이드바와 탑바에 함께 표시됩니다.</p></div><TextField label="워크스페이스 이름" value={name} onChange={event=>{change('name',event.target.value);setError('');}} required error={error||undefined}/><TextArea label="워크스페이스 소개" value={description} onChange={event=>change('description',event.target.value)} rows={3}/><Select label="시간대" value={timezone} onValueChange={value=>change('timezone',value)} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/><div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div></form>;
+  const menuStyleDescriptionId=React.useId();
+  const name=draft.name??settings.name,description=draft.description??settings.description,timezone=draft.timezone??settings.timezone,sideMenuStyle=draft.sideMenuStyle??settings.sideMenuStyle;
+  const change=<K extends keyof SettingsDraft,>(key:K,value:WorkspaceSettings[K])=>{setDraft(current=>{const next={...current};if(value===settings[key])delete next[key];else next[key]=value;return next;});setSaved(false);};
+  return <form className="layout-panel layout-settings" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('워크스페이스 이름을 입력해주세요.');return;}onSave({...draft,...(draft.name!==undefined?{name:name.trim()}:{})});setDraft({});setSaved(true);}}>
+    <div><h2>기본 정보</h2><p>이 정보는 사이드바와 탑바에 함께 표시됩니다.</p></div>
+    <TextField label="워크스페이스 이름" value={name} onChange={event=>{change('name',event.target.value);setError('');}} required error={error||undefined}/>
+    <TextArea label="워크스페이스 소개" value={description} onChange={event=>change('description',event.target.value)} rows={3}/>
+    <Select label="시간대" value={timezone} onValueChange={value=>change('timezone',value)} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/>
+    <div>
+      <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'tree',label:'트리형 (기본)'},{value:'category',label:'카테고리형'}]} aria-describedby={menuStyleDescriptionId}/>
+      <p id={menuStyleDescriptionId} className="component-helper">카테고리형은 업무 공간·조직 관리·환경 설정을 제목으로 구분합니다.</p>
+    </div>
+    <div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div>
+  </form>;
 }
 
 function NotificationSettingsContent({settings,onChange}:NotificationSettingsProps){

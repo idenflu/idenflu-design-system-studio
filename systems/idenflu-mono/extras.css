@@ -1,5 +1,7 @@
 /* Shared React component rules from extras.css. */
 .demo-tree { max-width:560px; }
+.tree-category + .tree-category { margin-block-start:var(--space-4); }
+.tree-category-label { margin:0; padding:var(--space-2) var(--space-3); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); font-weight:var(--font-weight-semibold); }
 .demo-tree details { margin:0; }
 .demo-tree summary, .tree-item { display:flex; align-items:center; width:100%; min-height:var(--control-height); padding:var(--space-2) var(--space-3); border:0; background:transparent; color:var(--text-secondary); font:inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); text-align:left; cursor:pointer; list-style:none; }
 .demo-tree summary { justify-content:space-between; gap:var(--space-3); }

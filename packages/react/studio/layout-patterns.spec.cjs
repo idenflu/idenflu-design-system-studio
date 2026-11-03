@@ -60,7 +60,7 @@ test('tree navigation opens unique tabs, preserves state, and closes to the adja
   await page.getByRole('button',{name:'워크스페이스 설정 탭 닫기',exact:true}).click();
   await expect(page.getByRole('tab',{name:'전체 프로젝트',exact:true})).toBeFocused();
   await expect(page.getByRole('tab',{name:'전체 프로젝트',exact:true})).toHaveAttribute('aria-selected','true');
-  await expect(page.getByRole('button',{name:'팀 홈 탭 닫기',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'대시보드 탭 닫기',exact:true})).toHaveCount(0);
 });
 
 test('tree groups can be collapsed while searching without changing the saved navigation state',async({page,isMobile})=>{
@@ -279,7 +279,7 @@ test('quick search opens a matching menu and tab management preserves pinned hom
   await page.locator('.layout-tabs-toolbar').getByRole('button').click();
   await page.getByRole('menuitem',{name:'작업 탭 모두 닫기',exact:true}).click();
   await expect(page.getByRole('tab')).toHaveCount(1);
-  await expect(panel(page).getByRole('heading',{name:'팀 홈',exact:true})).toBeVisible();
+  await expect(panel(page).getByRole('heading',{name:'대시보드',exact:true})).toBeVisible();
 });
 
 test('mobile tabs show the selected screen and allow switching from the open tabs menu',async({page})=>{
