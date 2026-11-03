@@ -45,9 +45,11 @@ const state = page => page.evaluate(() => {
 
 test('modal locks wheel scrolling without moving the page or its horizontal alignment', async ({page}) => {
   const opener = await mount(page);
+  // Focus before measuring so activation does not scroll the opener into view.
+  await opener.focus();
   await page.evaluate(() => scrollTo(0, 150));
   const before = await state(page);
-  await opener.click();
+  await page.keyboard.press('Enter');
   const during = await state(page);
   expect(during.overflow).toBe('hidden');
   expect(during.bodyOverflow).toBe('hidden');

@@ -60,16 +60,17 @@ test('built React documentation works without the legacy HTML runtime', async ({
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/dist/systems/idenflu-mono/index.html#/components/select');
-  await expect(page.getByRole('combobox', {name:'담당 팀: 디자인', exact:true})).toBeVisible();
+  const basicSelect = page.locator('.react-studio-section').filter({has:page.getByRole('heading', {level:2, name:'기본 선택', exact:true})});
+  await expect(basicSelect.getByRole('combobox', {name:'담당 팀: 디자인', exact:true})).toBeVisible();
   expect(await page.evaluate(() => typeof window.IdenfluMono)).toBe('undefined');
   await expect(page.locator('script[type="module"]')).toHaveCount(1);
   const response = await page.request.get('/dist/systems/idenflu-mono/manifest.json');
   const manifest = await response.json();
   expect(manifest.files.runtime).toBeUndefined();
   expect(manifest.files.styles).toBeUndefined();
-  await page.getByRole('combobox', {name:'담당 팀: 디자인', exact:true}).click();
-  await page.getByRole('option', {name:'개발', exact:true}).click();
-  await expect(page.getByRole('combobox', {name:'담당 팀: 개발', exact:true})).toBeVisible();
+  await basicSelect.getByRole('combobox', {name:'담당 팀: 디자인', exact:true}).click();
+  await basicSelect.getByRole('option', {name:'개발', exact:true}).click();
+  await expect(basicSelect.getByRole('combobox', {name:'담당 팀: 개발', exact:true})).toBeVisible();
   for (const file of ['runtime.js', 'components.js', 'script.js']) {
     expect((await page.request.get(`/systems/idenflu-mono/${file}`)).status()).toBe(404);
   }

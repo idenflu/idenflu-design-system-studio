@@ -34,14 +34,15 @@ test('React text field examples support search clearing and password visibility'
 
 test('inline multi-select removes and clears selected values', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/select');
-  await page.getByRole('button', { name: '디자인 제거' }).click();
-  await expect(page.getByRole('button', { name: '디자인 제거' })).toHaveCount(0);
-  const trigger = page.getByRole('combobox', { name: /참여 팀/ });
+  const section = page.locator('.react-studio-section').filter({ has: page.getByRole('heading', { level: 2, name: '태그형 복수 선택', exact: true }) });
+  await section.getByRole('button', { name: '디자인 제거' }).click();
+  await expect(section.getByRole('button', { name: '디자인 제거' })).toHaveCount(0);
+  const trigger = section.getByRole('combobox', { name: /참여 팀/ });
   await trigger.click();
-  await page.getByRole('option', { name: '개발' }).click();
-  await expect(page.getByRole('button', { name: '개발 제거' })).toBeVisible();
-  await page.getByRole('button', { name: '참여 팀 모두 지우기' }).click();
-  await expect(page.getByRole('button', { name: '개발 제거' })).toHaveCount(0);
+  await section.getByRole('option', { name: '개발' }).click();
+  await expect(section.getByRole('button', { name: '개발 제거' })).toBeVisible();
+  await section.getByRole('button', { name: '참여 팀 모두 지우기' }).click();
+  await expect(section.getByRole('button', { name: '개발 제거' })).toHaveCount(0);
 });
 
 test('screen settings change and reset the document tokens', async ({ page }) => {
@@ -235,15 +236,17 @@ test('table rows highlight only in interactive tables and selection marks the ch
 
 test('menu and popover apply actions report their result', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/dropdown-menu');
-  await page.getByRole('button', { name: '더보기' }).click();
-  await page.getByRole('menuitem', { name: '수정' }).click();
-  await expect(page.locator('.react-studio-demo').getByRole('status')).toHaveText('수정 동작을 선택했습니다.');
+  const menu = page.locator('.react-studio-section').filter({ has: page.getByRole('heading', { level: 2, name: '작업 메뉴', exact: true }) });
+  await menu.getByRole('button', { name: '더보기' }).click();
+  await menu.getByRole('menuitem', { name: '수정' }).click();
+  await expect(menu.getByRole('status')).toHaveText('수정 동작을 선택했습니다.');
   await page.goto('/systems/idenflu-mono/index.html#/components/popover');
-  const trigger = page.getByRole('button', { name: '표시 설정' });
+  const popover = page.locator('.react-studio-section').filter({ has: page.getByRole('heading', { level: 2, name: '설정 팝오버', exact: true }) });
+  const trigger = popover.getByRole('button', { name: '표시 설정', exact: true });
   await trigger.click();
-  await page.getByRole('checkbox', { name: '상태' }).uncheck();
-  await page.getByRole('button', { name: '적용' }).click();
-  await expect(page.locator('.react-studio-demo').getByRole('status')).toHaveText('설명 표시 중');
+  await popover.getByRole('checkbox', { name: '상태' }).uncheck();
+  await popover.getByRole('button', { name: '적용' }).click();
+  await expect(popover.getByRole('status')).toHaveText('설명 표시 중');
   await expect(trigger).toBeFocused();
 });
 
