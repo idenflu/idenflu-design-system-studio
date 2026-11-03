@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AIAssistantCustomInstructionsStorage">
+    <option name="instructions">
+      <map>
+        <entry key="AIAssistant.VCS.GenerateCommitMessage">
+          <value>
+            <AIAssistantStoredInstruction>
+              <option name="actionId" value="AIAssistant.VCS.GenerateCommitMessage" />
+              <option name="content" value="Write a Git commit message for the following code changes using the Conventional Commits format (`type(scope): message`).&#10;&#10;Requirements:&#10;- type: feat, fix, docs, style, refactor, test, chore&#10;- Automatically determine the scope from the changed file paths or module names&#10;- Title: written in Korean using present tense verbs, max 50 characters, no period at the end&#10;- Body: written in Korean&#10;- First, explain the reason for the change in 1–2 short sentences&#10;- Then, list the specific changes as bullet points (hyphen + space)&#10;- Keep method, class, and library names in English, but translate all other parts into Korean&#10;- Wrap body lines at 72 characters&#10;- Output only the plain commit message text without any code fences, quotes, or extra formatting&#10;&#10;Here are the changes:&#10;" />
+            </AIAssistantStoredInstruction>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="57cad08a-4359-4a5b-9627-8eeca2c01aee" name="변경" comment="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)">
+      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-patterns.spec.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-patterns.spec.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-samples.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-samples.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-workspace-data.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-workspace-data.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/react/studio/layout-workspace-pages.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/react/studio/layout-workspace-pages.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/systems/idenflu-mono/layout-patterns.css" beforeDir="false" afterPath="$PROJECT_DIR$/systems/idenflu-mono/layout-patterns.css" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="277" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;wonzopein&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/idenflu/idenflu-design-system-studio.git&quot;,
+    &quot;accountId&quot;: &quot;80bc5642-f9ba-4504-8fb7-86c17af9be47&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3LX5pjjwAHMFt7AScrptfNPVSsw" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript 디버그.index.html (1).executor": "Run",
+    "JavaScript 디버그.index.html.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "dev",
+    "javascript.preferred.runtime.type.id": "node",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.build.executor": "Run",
+    "npm.example:build.executor": "Run",
+    "npm.studio:build.executor": "Run",
+    "ts.external.directory.path": "/Users/wonzopein/WebstormProjects/idenflu-design-system-studio/packages/react/node_modules/typescript/lib"
+  }
+}]]></component>
+  <component name="RunManager" selected="npm.build">
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/react/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="example:build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/react/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="example:build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="studio:build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/packages/react/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="studio:build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.build" />
+        <item itemvalue="npm.example:build" />
+        <item itemvalue="npm.studio:build" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-WS-262.10968.77" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="57cad08a-4359-4a5b-9627-8eeca2c01aee" name="변경" comment="" />
+      <created>1793587756739</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1793587756739</updated>
+      <workItem from="1793587757753" duration="8590000" />
+      <workItem from="1793672810338" duration="87000" />
+      <workItem from="1793672903802" duration="1633000" />
+    </task>
+    <task id="LOCAL-00001" summary="feat(styles): 디자인 시스템의 사용자 경험을 개선한다&#10;&#10;레이아웃 정렬, 테두리 반지름, 여백과 같은 스타일 요소를&#10;조정해 접근성과 일관성을 강화한다.&#10;&#10;- segmented-control 컴포넌트의 간격과 높이 설정 개선&#10;- 버튼 및 선택 팝업에 테두리 반지름 추가&#10;- field-horizontal 레이아웃 및 input-group 구조 최적화&#10;- 모바일 대응을 위한 미디어 쿼리 개선 및 간격 조정&#10;- data-preference-summary 속성을 추가해 사용자 설정 반영&#10;- 테이블과 스타일 기본값 내 알림 메시지 추가&#10;- HTML 및 CSS 리소스 버전 업데이트 (v0.2.0 → v0.3.0)">
+      <option name="closed" value="true" />
+      <created>1793599424047</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1793599424047</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat(react): React 패키지에 문서화 및 테스트 환경 추가&#10;&#10;React 기반 패키지 개발과 컴포넌트 시연 및 동작 검증을 위해 문서화와 테스트 환경을 확장했습니다.&#10;&#10;- `examples` 폴더에 React 컴포넌트 데모 페이지 추가&#10;- `studio` 폴더에 문서화 및 시연을 위한 스크립트와 컴포넌트 구성&#10;- 기존 디자인 시스템의 데이터와 아이콘을 활용하도록 세팅&#10;- 컴포넌트 동작 검증을 위한 테스트 케이스 작성 (`node:test`, `assert`)&#10;- 스타일 시트 및 정적 자산을 빌드하는 스크립트(`build.mjs`, `build-studio.mjs`) 작성&#10;- React 패키지 일부 스타일 코드와 타입 정의 추가">
+      <option name="closed" value="true" />
+      <created>1793606925655</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1793606925655</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat(react): React 컴포넌트 데모 문서화 구조 리팩토링&#10;&#10;컴포넌트 데모의 유지관리성과 가독성을 개선하기 위해 파일 구조를 리팩토링하고 색상 및 콘텐츠 관련 데모를 별도로 분리했습니다.&#10;&#10;- `studio/demos.tsx` 파일을 제거하고 관련 데모를 개별 파일로 분리&#10;- 색상 데모(`color-demos.tsx`)를 생성하여 테마별 색상 미리보기 및 사용 예시 추가&#10;- 콘텐츠 데모(`content-demos.tsx`)를 작성하여 탭, 알림, 카드 등 주요 컴포넌트의 시연 구조화&#10;- 공통 레이아웃 컴포넌트 `Section` 및 예제 구조 통합 수정&#10;- 상태 메시지 및 색상 사용 설명 추가, 코드 정리 및 주석 보완">
+      <option name="closed" value="true" />
+      <created>1793609022068</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1793609022068</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat(react): React 라이브러리에 Divider 및 NovaSpinner 컴포넌트 추가&#10;&#10;사용자 인터페이스를 개선하고 컴포넌트의 유연성을 높이기 위해&#10;새로운 Divider 및 NovaSpinner 컴포넌트를 추가하고 관련 문서와&#10;데모를 작성했습니다.&#10;&#10;- Divider 컴포넌트 추가: 영역 구분, 텍스트 정렬 옵션 및 다양한 스타일 지원&#10;- NovaSpinner 컴포넌트 추가: 로딩 상태 시각화, 크기 및 색상 옵션 제공&#10;- DividerDemos 및 NovaSpinnerDemos 파일 추가로 컴포넌트 동작 예제 작성&#10;- Studio 경로에 Divider 및 NovaSpinner 데모 라우트 추가&#10;- NovaSpinner 동작 검증을 위한 Playwright 기반 테스트 작성&#10;- 다양한 입력 패턴 및 상태를 다룰 수 있는 패턴 데모 및 폼 예제 추가">
+      <option name="closed" value="true" />
+      <created>1793612485094</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1793612485094</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)">
+      <option name="closed" value="true" />
+      <created>1793614919651</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1793614919651</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="feat(preferences): add customizable user preferences with defaults, storage, and API&#10;&#10;Introduce a user preference engine for typography and spacing, supporting live updates, default resets, and persistence via localStorage. Includes an interactive settings UI and associated tests to ensure accessibility, validation, and cross-route usage robustness." />
+    <MESSAGE value="**feat(idenflu-mono): refine component styles and structure**  &#10;&#10;- Enhance corner rounding for various component groups.  &#10;- Improve spacing, padding, and alignment calculations.  &#10;- Introduce support for theme-based preferences in typography, radius, and control height.  &#10;- Update asset versions to `v0.3.0`.  &#10;- Revise documentation and guides to reflect new style updates." />
+    <MESSAGE value="**feat(idenflu-mono): refine component styles and structure**  &#10;&#10;- Enhance corner rounding for various component groups.  &#10;- Improve spacing, padding, and alignment calculations.  &#10;- Introduce support for theme-based preferences in typography, radius, and control height.  &#10;- Update asset versions to `v0.3.0`.  &#10;- Revise documentation and guides to reflect new style updates.  " />
+    <MESSAGE value="**feat(idenflu-mono): refine and update design system styles**&#10;&#10;- Introduced consistent border-radius tokens for enhanced visual harmony.  &#10;- Improved segmented controls with configurable padding and gap values.  &#10;- Enhanced input groups, multi-selects, and dropdowns with better focus styles and disabled states.  &#10;- Added support for customizable screen adjustments in documentation.  &#10;- Updated asset and script versions to `v0.3.0`." />
+    <MESSAGE value="feat(styles): 디자인 시스템의 사용자 경험을 개선한다&#10;&#10;레이아웃 정렬, 테두리 반지름, 여백과 같은 스타일 요소를&#10;조정해 접근성과 일관성을 강화한다.&#10;&#10;- segmented-control 컴포넌트의 간격과 높이 설정 개선&#10;- 버튼 및 선택 팝업에 테두리 반지름 추가&#10;- field-horizontal 레이아웃 및 input-group 구조 최적화&#10;- 모바일 대응을 위한 미디어 쿼리 개선 및 간격 조정&#10;- data-preference-summary 속성을 추가해 사용자 설정 반영&#10;- 테이블과 스타일 기본값 내 알림 메시지 추가&#10;- HTML 및 CSS 리소스 버전 업데이트 (v0.2.0 → v0.3.0)" />
+    <MESSAGE value="feat(react): React 패키지에 문서화 및 테스트 환경 추가&#10;&#10;React 기반 패키지 개발과 컴포넌트 시연 및 동작 검증을 위해 문서화와 테스트 환경을 확장했습니다.&#10;&#10;- `examples` 폴더에 React 컴포넌트 데모 페이지 추가&#10;- `studio` 폴더에 문서화 및 시연을 위한 스크립트와 컴포넌트 구성&#10;- 기존 디자인 시스템의 데이터와 아이콘을 활용하도록 세팅&#10;- 컴포넌트 동작 검증을 위한 테스트 케이스 작성 (`node:test`, `assert`)&#10;- 스타일 시트 및 정적 자산을 빌드하는 스크립트(`build.mjs`, `build-studio.mjs`) 작성&#10;- React 패키지 일부 스타일 코드와 타입 정의 추가" />
+    <MESSAGE value="feat(react): React 컴포넌트 데모 문서화 구조 리팩토링&#10;&#10;컴포넌트 데모의 유지관리성과 가독성을 개선하기 위해 파일 구조를 리팩토링하고 색상 및 콘텐츠 관련 데모를 별도로 분리했습니다.&#10;&#10;- `studio/demos.tsx` 파일을 제거하고 관련 데모를 개별 파일로 분리&#10;- 색상 데모(`color-demos.tsx`)를 생성하여 테마별 색상 미리보기 및 사용 예시 추가&#10;- 콘텐츠 데모(`content-demos.tsx`)를 작성하여 탭, 알림, 카드 등 주요 컴포넌트의 시연 구조화&#10;- 공통 레이아웃 컴포넌트 `Section` 및 예제 구조 통합 수정&#10;- 상태 메시지 및 색상 사용 설명 추가, 코드 정리 및 주석 보완" />
+    <MESSAGE value="feat(react): React 라이브러리에 Divider 및 NovaSpinner 컴포넌트 추가&#10;&#10;사용자 인터페이스를 개선하고 컴포넌트의 유연성을 높이기 위해&#10;새로운 Divider 및 NovaSpinner 컴포넌트를 추가하고 관련 문서와&#10;데모를 작성했습니다.&#10;&#10;- Divider 컴포넌트 추가: 영역 구분, 텍스트 정렬 옵션 및 다양한 스타일 지원&#10;- NovaSpinner 컴포넌트 추가: 로딩 상태 시각화, 크기 및 색상 옵션 제공&#10;- DividerDemos 및 NovaSpinnerDemos 파일 추가로 컴포넌트 동작 예제 작성&#10;- Studio 경로에 Divider 및 NovaSpinner 데모 라우트 추가&#10;- NovaSpinner 동작 검증을 위한 Playwright 기반 테스트 작성&#10;- 다양한 입력 패턴 및 상태를 다룰 수 있는 패턴 데모 및 폼 예제 추가" />
+    <MESSAGE value="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(idenflu-mono): idenflu-mono 시스템 비사용 코드 정리&#10;&#10;코드베이스의 유지관리성과 가독성을 개선하기 위해 사용되지 않는 예제 및 문서용 코드를 제거했습니다.&#10;&#10;- interactive prototype 관련 요소 제거 (e.g., 메뉴, 팝오버, 드로어 UI)&#10;- idenflu-mono 전체에서 사용되지 않는 dnd/demos/input-field 등의 코드 삭제&#10;- 불필요한 컴포넌트 동작 관련 핸들러 제거 (e.g., drawer, file-upload에서 초기화 및 비사용 알림)" />
+    <option name="NON_MODAL_COMMIT_POSTPONE_SLOW_CHECKS" value="false" />
+  </component>
+</project>

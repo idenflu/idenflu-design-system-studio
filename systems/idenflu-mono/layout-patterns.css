@@ -35,12 +35,7 @@
 .layout-sidebar-brand strong { font-size:15px; font-weight:var(--font-weight-semibold); white-space:nowrap; letter-spacing:-.4px; }
 .layout-brand-mark { display:grid; place-items:center; flex:none; width:28px; height:28px; background:var(--primary); color:var(--text-on-primary); }
 .layout-brand-mark .ui-icon { width:18px; height:18px; }
-.layout-workspace-identity { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-5) var(--space-4); }
-.layout-workspace-identity > div { display:grid; flex:1; min-width:0; gap:2px; }
-.layout-workspace-identity strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:var(--font-weight-semibold); }
-.layout-workspace-identity small { color:var(--text-secondary); font-size:var(--font-size-caption); }
-.layout-workspace-identity > .badge { font-size:10px; }
-.layout-menu-search { padding:0 var(--space-4) var(--space-4); }
+.layout-menu-search { padding:var(--space-4); }
 .layout-menu-search .field-label, .layout-inline-select .field-label { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 .layout-tree-navigation { flex:1; min-height:0; overflow:auto; padding:0 var(--space-3) var(--space-4); }
 .layout-tree-navigation .demo-tree { padding:0; border:0; background:transparent; }
@@ -53,14 +48,7 @@
 .layout-tree-label { display:flex; align-items:center; gap:var(--space-2); width:100%; min-width:0; }
 .layout-tree-label > .ui-icon { flex:none; width:16px; height:16px; }
 .layout-tree-label > span:last-child { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.layout-sidebar-footer { display:grid; gap:var(--space-4); flex:none; padding:var(--space-4); border-top:1px solid var(--border); }
-.layout-sidebar-footer > a { display:flex; align-items:center; gap:var(--space-2); color:var(--text-secondary); font-size:12px; }
-.layout-sidebar-footer > a:hover { color:var(--primary); }
-.layout-sidebar-footer > a .ui-icon { width:14px; height:14px; }
-.layout-sidebar-footer > div { display:flex; align-items:center; gap:var(--space-3); }
-.layout-sidebar-footer > div > span:nth-child(2) { display:grid; flex:1; gap:2px; }
-.layout-sidebar-footer small { color:var(--text-secondary); font-size:11px; }
-.layout-online-dot, .layout-statusbar i { display:inline-block; width:6px; height:6px; flex:none; background:var(--success); border-radius:50%; }
+.layout-statusbar i { display:inline-block; width:6px; height:6px; flex:none; background:var(--success); border-radius:50%; }
 .layout-workspace-topbar { grid-area:topbar; display:flex; align-items:center; justify-content:space-between; min-width:0; gap:var(--space-4); padding:0 var(--space-6); border-bottom:1px solid var(--border); background:var(--field-background); z-index:10; }
 .layout-topbar-location { display:flex; align-items:center; gap:var(--space-2); flex:1; min-width:0; }
 .layout-topbar-location nav { display:flex; align-items:center; gap:var(--space-2); min-width:0; font-size:12px; color:var(--text-secondary); }

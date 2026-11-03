@@ -21,6 +21,23 @@ export const defaultExpanded=['work','project-menu','team-menu','settings-menu']
 export const statuses=['준비 중','진행 중','검토 중','완료'].map(value=>({value,label:value}));
 export const teams=['프로덕트 디자인','플랫폼 개발','브랜드 디자인'].map(value=>({value,label:value}));
 export const roles=['관리자','편집자','뷰어'].map(value=>({value,label:value}));
+const extraProjectAreas=[
+  '계정 관리','결제 흐름','상품 탐색','주문 내역','고객 상담','알림 센터','문서 공유',
+  '검색 경험','운영 대시보드','사용자 권한','파트너 정산','콘텐츠 관리','모바일 내비게이션','예약 관리',
+  '데이터 분석','접근성 가이드','컴포넌트 문서','온보딩 여정','운영 리포트','캠페인 성과','브랜드 자산',
+  'API 콘솔','파일 업로드','활동 피드','협업 보드','관리자 설정','보안 알림','성능 모니터링',
+];
+const extraProjectWork=['사용성 개선','기능 확장','운영 정비','품질 점검'];
+const extraProjects:Project[]=Array.from({length:extraProjectAreas.length*extraProjectWork.length},(_,index)=>{
+  const area=extraProjectAreas[index%extraProjectAreas.length];
+  const work=extraProjectWork[Math.floor(index/extraProjectAreas.length)];
+  const team=teams[index%teams.length].value;
+  const status=statuses[index%statuses.length].value;
+  const cycle=Math.floor(index/statuses.length);
+  const progress=status==='완료'?100:status==='검토 중'?75+(cycle*7)%25:status==='진행 중'?25+(cycle*11)%60:(cycle*3)%25;
+  const owner=team==='프로덕트 디자인'?(index%2===0?'김민수':'이서연'):team==='플랫폼 개발'?'박지훈':'정수빈';
+  return {id:`PRJ-${String(index+9).padStart(3,'0')}`,name:`${area} ${work}`,team,owner,status,progress,due:new Date(Date.UTC(2026,10,10+index)).toISOString().slice(0,10),description:`${area} 영역의 ${work}을 진행하고 관련 화면과 운영 흐름을 정리합니다.`};
+});
 export const initialProjects:Project[]=[
   {id:'PRJ-001',name:'디자인 시스템 v2',team:'프로덕트 디자인',owner:'김민수',status:'진행 중',progress:72,due:'2026-11-12',description:'공통 컴포넌트의 사용 규칙을 정리하고 제품 화면에 일관된 경험을 적용합니다.'},
   {id:'PRJ-002',name:'모바일 앱 온보딩',team:'프로덕트 디자인',owner:'이서연',status:'검토 중',progress:90,due:'2026-11-16',description:'새 사용자가 주요 기능을 이해하고 첫 작업을 완료할 수 있도록 진입 과정을 개선합니다.'},
@@ -30,6 +47,7 @@ export const initialProjects:Project[]=[
   {id:'PRJ-006',name:'파일 공유 개선',team:'플랫폼 개발',owner:'박지훈',status:'진행 중',progress:36,due:'2026-11-25',description:'파일을 공유하고 변경 이력을 쉽게 확인할 수 있도록 개선합니다.'},
   {id:'PRJ-007',name:'접근성 점검',team:'프로덕트 디자인',owner:'김민수',status:'검토 중',progress:84,due:'2026-11-18',description:'키보드 탐색과 읽기 순서, 대비를 점검하고 공통 개선 사항을 반영합니다.'},
   {id:'PRJ-008',name:'연간 캠페인 준비',team:'브랜드 디자인',owner:'정수빈',status:'준비 중',progress:12,due:'2026-12-02',description:'제품의 주요 가치를 전달할 콘텐츠와 캠페인 일정을 준비합니다.'},
+  ...extraProjects,
 ];
 export const initialMembers:Member[]=[
   {id:'member-1',name:'김민수',email:'minsu@example.com',team:'프로덕트 디자인',role:'관리자'},

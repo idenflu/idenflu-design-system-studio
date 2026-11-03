@@ -4,13 +4,11 @@ import { ThemeControl } from './controls';
 import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceTab } from './layout-workspace-data';
 import { HomePage, InviteMemberForm, MembersPage, NotificationSettingsPage, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage } from './layout-workspace-pages';
 
-function SidebarNavigation({name,items,query,onQuery,selected,expanded,onExpanded,onPage,mobile,onClose}: {name:string;items:TreeNode[];query:string;onQuery:(value:string)=>void;selected:string;expanded:string[];onExpanded:(values:string[])=>void;onPage:(page:WorkspacePage)=>void;mobile?:boolean;onClose?:()=>void}) {
+function SidebarNavigation({items,query,onQuery,selected,expanded,onExpanded,onPage,mobile,onClose}: {items:TreeNode[];query:string;onQuery:(value:string)=>void;selected:string;expanded:string[];onExpanded:(values:string[])=>void;onPage:(page:WorkspacePage)=>void;mobile?:boolean;onClose?:()=>void}) {
   return <div className="layout-sidebar-inner">
     <div className="layout-sidebar-brand"><span className="layout-brand-mark"><Icon name="grid"/></span><strong>idenflu workspace</strong>{mobile&&<Button variant="ghost" size="sm" aria-label="메뉴 닫기" onClick={onClose}><Icon name="close"/></Button>}</div>
-    <div className="layout-workspace-identity"><Avatar variant="neutral" shape="square">{name.slice(0,1)}</Avatar><div><strong>{name}</strong><small>팀 워크스페이스</small></div><Badge variant="neutral">PRO</Badge></div>
     <div className="layout-menu-search"><TextField label="메뉴 검색" type="search" size="sm" value={query} onChange={event=>onQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="메뉴 검색"/></div>
     <nav className="layout-tree-navigation" aria-label="워크스페이스 메뉴"><Tree label="워크스페이스 트리 메뉴" items={items} value={selected} onValueChange={value=>onPage(value as WorkspacePage)} expanded={expanded} onExpandedChange={onExpanded}/>{!items.length&&<p className="layout-empty">검색 결과가 없습니다.</p>}</nav>
-    <footer className="layout-sidebar-footer"><a href="./index.html#/patterns/layout"><Icon name="arrow-left"/>Layout 개요</a><div><Avatar shape="circle" size="sm" variant="neutral">김</Avatar><span><strong>김민수</strong><small>워크스페이스 관리자</small></span><span className="layout-online-dot"><span className="sr-only">접속 중</span></span></div></footer>
   </div>;
 }
 
@@ -46,7 +44,7 @@ export function SidebarLayoutSample() {
     return <ProjectsPage page={tab.page} projects={projects} onOpen={openProject} onCreate={()=>setCreateOpen(true)} onComplete={ids=>{setProjects(values=>values.map(project=>ids.includes(project.id)?{...project,status:'완료',progress:100}:project));setNotice(`${ids.length}개 프로젝트를 완료했습니다.`);}}/>;
   };
   const tree=filterWorkspaceTree(workspaceTree(),menuQuery);
-  const sidebarProps={name:settings.name,items:tree,query:menuQuery,onQuery:(value:string)=>{setMenuQuery(value);setSearchExpanded(defaultExpanded);},selected,expanded:menuQuery?searchExpanded:expanded,onExpanded:menuQuery?setSearchExpanded:setExpanded,onPage:openPage};
+  const sidebarProps={items:tree,query:menuQuery,onQuery:(value:string)=>{setMenuQuery(value);setSearchExpanded(defaultExpanded);},selected,expanded:menuQuery?searchExpanded:expanded,onExpanded:menuQuery?setSearchExpanded:setExpanded,onPage:openPage};
   const needle=search.trim().toLocaleLowerCase();
   const menuResults=(Object.keys(pageInfo) as WorkspacePage[]).filter(page=>`${pageInfo[page].title} ${pageInfo[page].group}`.toLocaleLowerCase().includes(needle));
   const projectResults=projects.filter(project=>`${project.name} ${project.id}`.toLocaleLowerCase().includes(needle)).slice(0,5);

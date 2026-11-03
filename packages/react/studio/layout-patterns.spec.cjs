@@ -63,7 +63,7 @@ test('project details open in a tab and update other open screens',async({page,i
   await expect(page.getByRole('tab',{name:'디자인 시스템 v2',exact:true})).toHaveCount(0);
   await expect(panel(page).locator('tbody tr').first()).toContainText('완료');
   await navigate(page,'완료된 프로젝트',isMobile);
-  await expect(panel(page).locator('tbody tr')).toHaveCount(2);
+  await expect(panel(page).getByRole('button',{name:/디자인 시스템 v2/})).toBeVisible();
 });
 
 test('bulk selection clears when a project leaves the current list',async({page,isMobile})=>{
