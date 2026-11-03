@@ -50,11 +50,11 @@ const dataProps: readonly PropertyRow[] = [
 ];
 
 const stateProps: readonly PropertyRow[] = [
-  ['searchable', 'boolean', 'true', '검색 입력을 표시하고 전체 검색을 적용합니다. false이면 query를 보관하더라도 검색에는 적용하지 않으며 열별 필터는 계속 적용합니다.'],
+  ['searchable', 'boolean', 'true', '검색 입력을 표시하고 전체 검색을 적용합니다. false이면 query를 보관하더라도 검색에는 적용하지 않으며 열별 필터와는 별개입니다. showColumnFilterToggle로 컬럼 필터를 끄면 열별 조건도 적용하지 않습니다.'],
   ['searchLabel', 'string', "'검색'", '검색 입력의 접근 가능한 이름입니다.'],
   ['query', 'string', 'undefined', '부모가 제어하는 검색어입니다. 입력을 반영하려면 onQueryChange에서 갱신하세요.'],
   ['defaultQuery', 'string', "''", '비제어 검색어의 최초 값입니다. query가 있으면 사용하지 않습니다.'],
-  ['filters', 'DataGridFilters', 'undefined', '부모가 제어하는 열별 필터입니다. 열 ID를 키로 사용하며 해당 열에 filter가 설정되어야 적용됩니다.'],
+  ['filters', 'DataGridFilters', 'undefined', '부모가 제어하는 열별 필터입니다. 열 ID를 키로 사용하며 해당 열에 filter가 설정되어야 적용됩니다. 컬럼 필터를 끈 동안은 적용하지 않고, 다시 켜면 현재 filters를 적용합니다.'],
   ['defaultFilters', 'DataGridFilters', '{}', '비제어 필터의 최초 값입니다.'],
   ['sort', 'DataGridSort | null', 'undefined', '단일 정렬을 제어하는 기존 API입니다. null은 정렬 해제이며 sortModel이 있으면 sortModel을 우선합니다.'],
   ['defaultSort', 'DataGridSort | null', 'null', '최초 단일 정렬입니다. defaultSortModel이 없을 때만 초기 정렬에 사용합니다.'],
@@ -65,7 +65,7 @@ const stateProps: readonly PropertyRow[] = [
   ['isRowSelectable', '(row: T) => boolean', 'undefined', 'false를 반환한 행은 선택할 수 없으며 선택 개수·전체 선택에서도 제외합니다. 생략하면 모든 행을 선택할 수 있습니다.'],
   ['selectedRowIds', 'readonly string[]', 'undefined', '부모가 제어하는 선택 ID입니다. 현재 rows에 존재하고 선택 가능한 ID만 그리드의 유효 선택으로 계산합니다.'],
   ['defaultSelectedRowIds', 'readonly string[]', '[]', '비제어 선택의 최초 값입니다. 페이지나 검색 조건이 바뀌어도 유효한 ID의 선택을 유지합니다.'],
-  ['selectionActions', 'ReactNode', 'undefined', 'selectable이며 유효한 선택이 있을 때 툴바에 표시할 추가 액션입니다. 선택 ID는 전달되지 않으므로 부모의 selectedRowIds 상태를 사용하세요.'],
+  ['selectionActions', 'ReactNode', 'undefined', '호출 측에서 직접 구현한 선택 작업의 UI입니다. selectable이며 유효한 선택이 있을 때 툴바에 표시합니다. 선택 ID는 전달되지 않으므로 부모의 selectedRowIds 상태를 사용하세요.'],
 ];
 
 const displayProps: readonly PropertyRow[] = [
@@ -77,9 +77,12 @@ const displayProps: readonly PropertyRow[] = [
   ['density', "'default' | 'compact'", 'undefined', '부모가 제어하는 행 밀도입니다. 변경 콜백이 없으면 이 값을 유지하며 내장 밀도 토글도 숨깁니다.'],
   ['defaultDensity', "'default' | 'compact'", "'default'", '비제어 밀도의 최초 값입니다. density가 있으면 사용하지 않습니다.'],
   ['showDensityToggle', 'boolean', 'true', '밀도 전환 아이콘의 표시 여부입니다. true여도 density만 제어하고 onDensityChange가 없으면 표시하지 않습니다.'],
+  ['showColumnFilterToggle', 'boolean', 'false', 'true이고 filter가 설정된 열이 있으면 툴바에 컬럼 필터 토글을 표시합니다. 토글은 초기에는 꺼져 있으며, 켜면 필터 행과 현재 필터 값을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. 비제어 필터는 비워지고, 제어 필터는 부모가 유지한 값이 있다면 다시 켤 때 적용됩니다. false이면 토글 없이 기존처럼 필터 행과 필터 조건을 항상 적용합니다.'],
   ['showColumnVisibility', 'boolean', 'true', '열이 둘 이상이면 표시 열 메뉴를 제공합니다. 마지막으로 보이는 열은 숨길 수 없습니다.'],
   ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 모든 열을 숨기도록 설정해도 첫 열 하나는 표시합니다. 이후 표시 상태는 내부에서 관리합니다.'],
-  ['toolbarActions', 'ReactNode', 'undefined', '상단 툴바 오른쪽의 내장 도구 뒤에 항상 표시할 추가 액션입니다. 선택 여부와 무관하며 loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
+  ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '상단 검색·내장 도구·추가 도구의 기본 크기입니다. 기본 토큰에서 sm은 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식의 명시적인 size가 우선하고 행 밀도·푸터와 열 선택 팝업의 크기는 바꾸지 않습니다.'],
+  ['toolbarOrder', 'readonly DataGridToolbarItem[]', '기본 순서', '지정한 도구를 먼저 배치하고 누락한 도구는 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 표시 조건은 각 도구의 속성을 따르며 DOM과 Tab 순서도 함께 바뀝니다.'],
+  ['toolbarActions', 'ReactNode', 'undefined', '호출 측에서 직접 구현한 상시 작업의 UI입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음을 이동합니다. loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
   ['maxHeight', 'number | string', 'undefined', '툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
   ['virtualized', 'boolean | DataGridVirtualizationOptions', 'false', 'true 또는 옵션 객체로 세로 행 가상화를 켭니다. 화면 근처 행을 렌더링하고 실제 행 높이를 측정합니다.'],
   ['pagination', 'boolean', '!virtualized', '일반 표는 기본 true, 가상화는 기본 false입니다. 가상화와 함께 true를 지정하면 현재 페이지 안에서 가상화합니다.'],
@@ -87,14 +90,15 @@ const displayProps: readonly PropertyRow[] = [
 ];
 
 const exportProps: readonly PropertyRow[] = [
-  ['exportable', 'boolean', 'false', '검색·필터·정렬 결과 전체 CSV 버튼을 표시합니다. 선택이 있으면 선택 행 CSV 버튼도 표시합니다. 현재 페이지나 렌더링된 가상 행만 내보내는 기능이 아닙니다.'],
-  ['exportFileName', 'string', "'data-grid.csv'", 'CSV 저장 시 제안할 파일명입니다. 선택 행은 -selected.csv를 붙입니다. 최종 파일명과 저장 위치는 저장 대화상자 또는 브라우저 설정을 따릅니다.'],
+  ['exportable', 'boolean', 'false', 'exportFormats에 지정한 형식의 전체 내보내기 버튼을 표시합니다. 선택이 있으면 같은 형식의 선택 행 내보내기도 표시합니다. 현재 페이지나 렌더링된 가상 행만 내보내는 기능이 아닙니다.'],
+  ['exportFormats', 'readonly DataGridExportFormat[]', "['csv']", 'csv와 xlsx 중 제공할 형식을 지정합니다. 두 형식을 지정하면 CSV와 Excel 버튼을 함께 표시하며, Excel 버튼에는 microsoft-excel 아이콘을 사용합니다. exportable이 true여야 표시됩니다.'],
+  ['exportFileName', 'string', "'data-grid.csv'", '저장 시 제안할 파일명입니다. CSV·XLSX에 맞게 확장자를 바꾸며 선택 행은 -selected.csv 또는 -selected.xlsx를 붙입니다. 최종 파일명과 저장 위치는 저장 대화상자 또는 브라우저 설정을 따릅니다.'],
 ];
 
 const columnProps: readonly PropertyRow[] = [
   ['id', 'string', '필수', '열의 고유 ID입니다. 정렬·필터·숨김·편집·사용자 너비를 연결하는 키입니다.'],
-  ['header', 'string', '필수', '헤더, 필터·편집 컨트롤의 이름과 CSV 제목으로 사용합니다.'],
-  ['accessor', '(row: T) => string | number | null | undefined', '필수', '검색·필터·정렬·편집 초깃값·CSV에 사용하는 원시 값입니다. 숫자 정렬에는 number를 반환하세요.'],
+  ['header', 'string', '필수', '헤더, 필터·편집 컨트롤의 이름과 CSV·XLSX 제목으로 사용합니다.'],
+  ['accessor', '(row: T) => string | number | null | undefined', '필수', '검색·필터·정렬·편집 초깃값·CSV·XLSX에 사용하는 원시 값입니다. 숫자 정렬과 XLSX 숫자 셀에는 number를 반환하세요.'],
   ['cell', '(row: T) => ReactNode', 'undefined', '화면에 표시할 셀만 바꿉니다. 생략하면 accessor의 값을 표시하고 null·undefined는 대시로 표시합니다.'],
   ['sortable', 'boolean', 'true', 'false이면 정렬 버튼을 표시하지 않고 이 열의 정렬 모델도 적용하지 않습니다.'],
   ['align', "'start' | 'center' | 'end'", "'start'", '헤더와 셀의 텍스트 정렬입니다. 금액·수량에는 end를 사용합니다.'],
@@ -113,7 +117,7 @@ const columnProps: readonly PropertyRow[] = [
 
 const events: readonly EventRow[] = [
   ['onQueryChange(query: string): void', '검색 입력·검색 초기화·결과 없음의 조건 초기화 때 호출합니다.', 'query를 제어한다면 받은 문자열로 부모 상태를 갱신합니다.'],
-  ['onFiltersChange(filters: DataGridFilters): void', '열별 필터 변경, 필터 초기화, 조건 초기화 때 다음 필터 객체를 전달합니다.', 'filters 상태를 받은 객체로 교체합니다. 초기화 시 {}를 받습니다.'],
+  ['onFiltersChange(filters: DataGridFilters): void', '열별 필터 변경, 필터 초기화, 조건 초기화, 컬럼 필터 토글을 끌 때 다음 필터 객체를 전달합니다.', 'filters 상태를 받은 객체로 교체합니다. 초기화와 토글 끄기 시 {}를 받습니다.'],
   ['onSortModelChange(sortModel: DataGridSort[]): void', '헤더 클릭·Shift+클릭으로 정렬 조건을 바꿀 때 다음 전체 배열을 전달합니다.', 'sortModel 상태를 배열 전체로 교체합니다. 배열 순서가 정렬 우선순위입니다.'],
   ['onSortChange(sort: DataGridSort | null): void', '헤더 조작으로 첫 번째 정렬 조건이 바뀔 때만 호출합니다. 보조 조건만 바뀌면 호출하지 않습니다.', 'sort를 사용하는 경우 다음 첫 정렬을 반영합니다. 다중 정렬에는 onSortModelChange를 사용합니다.'],
   ['onSelectedRowIdsChange(ids: string[]): void', '행·체크박스·전체 선택·선택 해제 조작으로 선택을 바꿀 때 유효한 전체 ID 목록을 전달합니다.', 'selectedRowIds를 갱신합니다. rows 또는 isRowSelectable 변경만으로 선택 정리 콜백이 자동 발생하지는 않습니다.'],
@@ -240,9 +244,37 @@ const saveCsv = async () => {
 };
 // <button type="button" onClick={saveCsv}>CSV 저장</button>`;
 
+const xlsxExample = `import {
+  createDataGridXlsx, downloadDataGridXlsx,
+  type DataGridXlsxColumn,
+} from '@idenflu/mono-react';
+
+type Task = { name: string; hours: number };
+const rows: Task[] = [{ name: '문서 작성', hours: 8 }];
+const columns: DataGridXlsxColumn<Task>[] = [
+  { header: '작업', accessor: row => row.name },
+  { header: '시간', accessor: row => row.hours },
+];
+
+// 브라우저나 서버에서 실제 .xlsx 파일의 바이트를 생성합니다.
+const bytes = createDataGridXlsx({ rows, columns, sheetName: '업무' });
+// 서버에서는 Uint8Array를 파일 또는 HTTP 응답에 저장할 수 있습니다.
+
+// 브라우저 버튼의 클릭 핸들러에서 직접 호출합니다.
+const saveXlsx = async () => {
+  try {
+    await downloadDataGridXlsx({
+      rows, columns, sheetName: '업무', fileName: 'tasks.xlsx',
+    });
+  } catch {
+    window.alert('Excel 저장에 실패했습니다. 다시 시도해주세요.');
+  }
+};
+// <button type="button" onClick={saveXlsx}>Excel 저장</button>`;
+
 const toolbarExample = `import { useState } from 'react';
 import {
-  Button, DataGrid, Icon, IconButton, type DataGridColumn,
+  Button, DataGrid, Icon, IconButton, type DataGridColumn, type DataGridToolbarItem,
 } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
@@ -252,9 +284,12 @@ const initialRows: Task[] = [
 ];
 const columns: DataGridColumn<Task>[] = [
   { id: 'id', header: 'ID', accessor: row => row.id },
-  { id: 'name', header: '작업', accessor: row => row.name },
+  { id: 'name', header: '작업', accessor: row => row.name, filter: 'text' },
 ];
+// 일부만 지정해도 됩니다. 나머지는 기본 순서로 뒤에 붙습니다.
+const toolbarOrder: readonly DataGridToolbarItem[] = ['actions', 'export'];
 
+// 새로고침·작업 추가·선택 삭제는 호출 측에서 직접 구현하는 사용자 정의 작업입니다.
 export function ToolbarGrid({ loading = false }: { loading?: boolean }) {
   const [rows, setRows] = useState(initialRows);
   const [density, setDensity] = useState<'default' | 'compact'>('default');
@@ -269,12 +304,15 @@ export function ToolbarGrid({ loading = false }: { loading?: boolean }) {
     setSelectedRowIds([]);
   };
 
-  // 각 표시 속성을 false로 바꾸면 해당 내장 도구를 숨깁니다.
+  // 컬럼 필터를 켠 뒤 작업 필터를 입력하면 필터 초기화가 표시됩니다.
+  // 행을 선택하면 선택 삭제·선택 행 CSV/Excel·선택 해제가 표시됩니다.
   return <DataGrid label="작업 목록" rows={rows} columns={columns}
     getRowId={row => row.id} getRowLabel={row => row.name} loading={loading}
     density={density} onDensityChange={setDensity}
-    showDensityToggle showColumnVisibility searchable searchLabel="작업 검색"
-    exportable exportFileName="tasks.csv"
+    toolbarSize="sm" toolbarOrder={toolbarOrder}
+    showColumnFilterToggle showDensityToggle showColumnVisibility
+    searchable searchLabel="작업 검색"
+    exportable exportFormats={['csv', 'xlsx']} exportFileName="tasks.csv"
     toolbarActions={<>
       <IconButton label="새로고침" variant="outline" disabled={loading}
         onClick={reload}><Icon name="refresh" /></IconButton>
@@ -314,19 +352,23 @@ export function DataGridReference() {
       <PropertyTable title="데이터와 조회 상태" rows={dataProps} />
       <PropertyTable title="검색·정렬·선택 상태" rows={stateProps} />
       <PropertyTable title="페이지·밀도·가상화와 표시" rows={displayProps} />
-      <PropertyTable title="CSV 내보내기" rows={exportProps} />
+      <PropertyTable title="CSV·Excel 내보내기" rows={exportProps} />
     </Section>
 
-    <Section id="data-grid-toolbar" title="상단 도구 모음" className="studio-grid-reference" description="가로줄 아이콘은 행 밀도 전환, 다운로드 아이콘은 CSV 내보내기입니다. 내장 도구는 표시 속성으로 설정하고, 업무 버튼은 toolbarActions 또는 selectionActions로 추가합니다.">
+    <Section id="data-grid-toolbar" title="상단 도구 모음" className="studio-grid-reference" description="toolbarSize로 도구 크기를, toolbarOrder로 도구의 배치와 Tab 순서를 설정합니다. 내장 도구는 표시 속성으로 설정하고, 업무 버튼은 toolbarActions 또는 selectionActions로 추가합니다.">
       <DetailTable title="내장 도구의 역할" rows={[
+        ['컬럼 필터 토글', 'showColumnFilterToggle=true이고 필터 가능한 열이 있으면 표시합니다. 초기에는 꺼져 있으며 켜면 열별 필터 행을 표시하고 조건을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다.'],
         ['밀도 전환', '기본 행 간격과 compact를 전환합니다. 로딩·오류 상태에서는 비활성화합니다.'],
         ['표시 열', '열이 둘 이상일 때 표시 열 메뉴를 제공합니다. 최소 한 개의 열은 유지하며, 숨긴 열은 기본 CSV에서도 제외합니다.'],
         ['검색', '전체 rows에서 accessor 값을 검색합니다. 검색어를 제어하려면 query와 onQueryChange를 함께 연결합니다.'],
         ['CSV 내보내기', '검색·필터·정렬 결과 전체를 현재 보이는 열 순서로 저장합니다. 페이지나 가상화로 화면에 보이는 행 수와 무관합니다. 로딩·오류·결과 없음·저장 중에는 비활성화합니다.'],
-        ['선택 도구', 'selectable이며 현재 rows에 존재하는 선택 가능한 행이 선택되어 있으면 selectionActions와 선택 해제를 표시합니다. exportable이면 검색 결과 밖의 선택도 포함하는 선택 행 CSV 버튼을 함께 표시합니다.'],
-        ['필터 초기화', '열별 필터 조건이 있으면 표시하며, 클릭하면 필터를 비우고 onFiltersChange({})를 호출합니다.'],
+        ['선택 도구', 'selectable이며 선택 가능한 행을 선택하면 selection 묶음을 표시합니다. 선택 해제와 exportable일 때의 선택 행 CSV가 포함됩니다. 선택 행 CSV에는 검색 결과 밖의 선택도 포함합니다. selectionActions로 직접 구현한 선택 작업을 추가할 수 있습니다.'],
+        ['필터 초기화', '적용 중인 열별 필터 값이 있을 때 resetFilters 위치에 표시합니다. 클릭하면 필터를 비우고 onFiltersChange({})를 호출합니다.'],
       ]} />
       <PropertyTable title="상단 도구의 표시와 제어" rows={[
+        ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '검색 입력과 내장 도구, size를 생략한 자식 도구에 적용합니다. 기본 토큰의 높이는 sm 30px·md 36px·lg 42px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식에 명시한 size가 우선합니다.'],
+        ['toolbarOrder', 'readonly DataGridToolbarItem[]', '기본 순서', '배열에 지정한 키부터 배치하고, 누락한 키는 아래 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 각 도구의 표시 조건은 유지하며 화면·DOM·Tab 순서가 함께 바뀝니다.'],
+        ['showColumnFilterToggle', 'boolean', 'false', 'true이고 필터 가능한 열이 있으면 컬럼 필터 토글을 표시하고 필터 행을 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하고 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. false이면 토글 없이 필터 가능한 열의 필터 행과 조건을 항상 적용합니다.'],
         ['showDensityToggle', 'boolean', 'true', '밀도 버튼을 표시합니다. false로 숨겨도 지정한 밀도는 유지합니다.'],
         ['density / defaultDensity', "'default' | 'compact'", "undefined / 'default'", '현재 밀도를 제어하거나 최초 밀도를 지정합니다. density만 전달하면 읽기 전용이며 내장 토글을 숨깁니다.'],
         ['onDensityChange', "(density: 'default' | 'compact') => void", 'undefined', '내장 토글이 전달한 다음 밀도를 부모 상태에 반영합니다.'],
@@ -334,11 +376,25 @@ export function DataGridReference() {
         ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 이후 열 표시 상태는 그리드가 관리합니다.'],
         ['searchable / searchLabel', 'boolean / string', "true / '검색'", '검색 입력의 표시 여부와 접근 가능한 이름을 지정합니다. searchable=false이면 전체 검색도 적용하지 않습니다.'],
         ['exportable / exportFileName', 'boolean / string', "false / 'data-grid.csv'", '전체·선택 CSV 버튼 표시와 제안 파일명을 지정합니다. 선택 행 파일명에는 -selected.csv를 붙입니다.'],
-        ['toolbarActions', 'ReactNode', 'undefined', '선택 여부와 무관하게 내장 도구 뒤에 표시합니다. 새로고침·추가 등 항상 필요한 동작에 사용합니다.'],
-        ['selectionActions', 'ReactNode', 'undefined', 'selectable이며 유효한 선택이 있을 때만 표시합니다. 선택 ID를 인자로 받는 함수가 아니므로 selectedRowIds와 onSelectedRowIdsChange를 부모에서 연결합니다.'],
+        ['toolbarActions', 'ReactNode', 'undefined', '직접 구현한 상시 작업의 UI를 전달하는 확장 슬롯입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음 전체를 이동합니다. 묶음 안의 버튼 순서는 전달한 JSX로 정합니다.'],
+        ['selectionActions', 'ReactNode', 'undefined', '직접 구현한 선택 작업의 UI를 전달하는 확장 슬롯입니다. selectable이며 유효한 선택이 있을 때 표시하고 toolbarOrder의 selection으로 선택 내보내기·해제와 함께 이동합니다. 부모에서 선택 상태를 연결합니다.'],
       ]} />
+      <DetailTable title="DataGridToolbarItem 순서 키" rows={[
+        ['기본 순서', 'search → selection → columnFilters → density → columns → export → resetFilters → actions'],
+        ['search', 'searchable일 때 표시하는 전체 검색 입력입니다.'],
+        ['selection', '행 선택 후 표시하는 선택 행 CSV·선택 해제·selectionActions 묶음입니다.'],
+        ['columnFilters', 'showColumnFilterToggle이고 필터 가능한 열이 있을 때 표시하는 컬럼 필터 토글입니다.'],
+        ['density', 'showDensityToggle로 표시하는 행 밀도 토글입니다. density만 제어하고 onDensityChange가 없으면 숨깁니다.'],
+        ['columns', 'showColumnVisibility이고 열이 둘 이상일 때 표시하는 표시 열 메뉴입니다.'],
+        ['export', 'exportable일 때 표시하는 전체 CSV 내보내기입니다.'],
+        ['resetFilters', '적용 중인 열별 필터 값이 있을 때 표시하는 필터 초기화입니다.'],
+        ['actions', '선택 여부와 무관하게 표시하는 toolbarActions 묶음입니다.'],
+      ]} />
+      <p className="studio-grid-reference-notes">DataGridToolbarItem은 위 8개 문자열의 유니언 타입이며 패키지에서 내보냅니다. 예제에서 컬럼 필터를 켜고 값을 입력하면 필터 초기화가 나타나고, 행을 선택하면 선택 행 CSV·선택 해제가 나타납니다.</p>
+      <p className="studio-grid-reference-notes">toolbarSize는 행 밀도와 푸터 크기에 영향을 주지 않습니다. 표시 열 팝업 안의 도구는 md를 유지합니다. toolbarOrder는 selection과 actions 묶음 전체를 이동하며, 추가 버튼 각각의 순서는 JSX 순서로 지정합니다.</p>
       <p className="studio-grid-reference-notes">추가한 버튼은 loading·error에서도 자동으로 비활성화되지 않습니다. 각 버튼의 disabled와 오류 처리를 직접 연결하세요. 내장 CSV 내보내기 완료 전용 콜백과 열 표시 변경 콜백은 제공하지 않습니다. CSV 저장을 직접 처리하려면 아래 독립 CSV API를 사용하세요.</p>
-      <CodeExample title="밀도·기본 도구 설정과 업무 버튼 추가">{toolbarExample}</CodeExample>
+      <p className="studio-grid-reference-notes">다음 코드는 toolbarActions와 selectionActions 확장 슬롯의 사용 예입니다. 새로고침·작업 추가·선택 삭제의 처리 함수는 호출 측에서 직접 구현하며, DataGrid 내장 API로 제공하는 작업이 아닙니다.</p>
+      <CodeExample title="사용자 정의 도구 확장과 크기·순서 설정">{toolbarExample}</CodeExample>
     </Section>
 
     <Section id="data-grid-columns" title="열과 관련 타입" className="studio-grid-reference" description="화면의 표현은 cell로, 검색·정렬·필터·편집·CSV의 원시 값은 accessor로 구분합니다.">

@@ -546,6 +546,105 @@ test('DataGrid controlled column filters publish changes and follow external rep
   } finally { await f.dispose(); }
 });
 
+test('column filter toggles are opt-in, require filter columns, and follow blocked states', async () => {
+  const f=fixture();
+  const base={...props,columns:[{...columns[0],filter:'text'},...columns.slice(1)]};
+  try {
+    await f.render(h(DataGrid,base));
+    assert.equal(button(f.node,'컬럼 필터'),undefined);
+    assert.ok(control(f.node,'이름 필터'),'existing filter rows remain visible without the toggle option');
+    await f.render(h(DataGrid,{...base,showColumnFilterToggle:true}));
+    assert.equal(button(f.node,'컬럼 필터').getAttribute('aria-pressed'),'false','opt-in filter toggles start off');
+    assert.equal(f.node.querySelector('.data-grid-filter-row'),null);
+    assert.equal(button(f.node,'컬럼 필터').disabled,false);
+    await click(button(f.node,'컬럼 필터'));
+    assert.equal(button(f.node,'컬럼 필터').getAttribute('aria-pressed'),'true');
+    assert.ok(control(f.node,'이름 필터'));
+    await f.render(h(DataGrid,{...base,showColumnFilterToggle:true,loading:true}));
+    assert.equal(button(f.node,'컬럼 필터').disabled,true);
+    await f.render(h(DataGrid,{...base,showColumnFilterToggle:true,error:'조회 실패'}));
+    assert.equal(button(f.node,'컬럼 필터').disabled,true);
+    await f.render(h(DataGrid,{...props,showColumnFilterToggle:true}));
+    assert.equal(button(f.node,'컬럼 필터'),undefined,'columns without filters do not expose an empty toggle');
+  } finally {await f.dispose();}
+});
+
+test('turning column filters off clears uncontrolled criteria and restores the result set', async () => {
+  const f=fixture(),changes=[];
+  try {
+    await f.render(h(DataGrid,{...props,columns:[{...columns[0],filter:'text'},...columns.slice(1)],showColumnFilterToggle:true,onFiltersChange:value=>changes.push(value)}));
+    assert.equal(button(f.node,'컬럼 필터').getAttribute('aria-pressed'),'false');
+    assert.equal(control(f.node,'이름 필터'),null);
+    await click(button(f.node,'컬럼 필터'));
+    await input(control(f.node,'이름 필터'),'Alpha');
+    assert.deepEqual(names(f.node),['Alpha']);
+    await click(button(f.node,'컬럼 필터'));
+    assert.equal(button(f.node,'컬럼 필터').getAttribute('aria-pressed'),'false');
+    assert.equal(f.node.querySelector('.data-grid-filter-row'),null);
+    assert.equal(control(f.node,'이름 필터'),null);
+    assert.deepEqual(changes.at(-1),{});
+    assert.deepEqual(names(f.node),rows.map(row=>row.name));
+    assert.equal(button(f.node,'필터 초기화'),undefined);
+    await click(button(f.node,'컬럼 필터'));
+    assert.equal(button(f.node,'컬럼 필터').getAttribute('aria-pressed'),'true');
+    assert.equal(control(f.node,'이름 필터').value,'');
+    assert.deepEqual(names(f.node),rows.map(row=>row.name));
+  } finally {await f.dispose();}
+});
+
+test('disabled column filtering ignores controlled criteria until the filter row is enabled again', async () => {
+  const f=fixture(),changes=[];
+  const base={...props,columns:[{...columns[0],filter:'text'},...columns.slice(1)],showColumnFilterToggle:true,onFiltersChange:value=>changes.push(value)};
+  try {
+    await f.render(h(DataGrid,{...base,filters:{name:'Alpha'}}));
+    assert.equal(button(f.node,'컬럼 필터').getAttribute('aria-pressed'),'false');
+    assert.equal(control(f.node,'이름 필터'),null);
+    assert.deepEqual(names(f.node),rows.map(row=>row.name),'initially disabled filtering does not apply controlled criteria');
+    await click(button(f.node,'컬럼 필터'));
+    assert.deepEqual(names(f.node),['Alpha']);
+    await click(button(f.node,'컬럼 필터'));
+    assert.deepEqual(changes,[{}],'the owner is asked to clear its controlled filter model');
+    assert.deepEqual(names(f.node),rows.map(row=>row.name),'off must work even when the owner ignores the clear request');
+    await f.render(h(DataGrid,{...base,filters:{name:'Beta'}}));
+    assert.deepEqual(names(f.node),rows.map(row=>row.name),'external replacements do not reapply hidden filters');
+    await click(button(f.node,'컬럼 필터'));
+    assert.deepEqual(names(f.node),['Beta'],'the controlled owner remains authoritative when filtering is enabled');
+    assert.equal(control(f.node,'이름 필터').value,'Beta');
+  } finally {await f.dispose();}
+});
+
+test('toggling filter rows updates virtual table header counts and accessible row positions', async () => {
+  const f=fixture(),prototype=dom.window.HTMLElement.prototype,previousScrollTo=prototype.scrollTo;
+  const dimensions=['clientWidth','clientHeight'].map(property=>[property,Object.getOwnPropertyDescriptor(prototype,property)]);
+  // JSDOM has no layout; give the virtualizer a real-sized scrolling viewport.
+  // Row measurements still use the production estimate rather than a mocked row list.
+  for(const [property] of dimensions)Object.defineProperty(prototype,property,{configurable:true,get(){return this.classList.contains('data-grid-scroll')?(property==='clientWidth'?640:480):0;}});
+  prototype.scrollTo=function(options){if(typeof options==='object'&&options.top!==undefined)this.scrollTop=options.top;};
+  try {
+    await f.render(h(DataGrid,{...props,columns:[{...columns[0],filter:'text'},...columns.slice(1)],showColumnFilterToggle:true,virtualized:true}));
+    const table=f.node.querySelector('table');
+    const firstRow=()=>f.node.querySelector('tbody tr[data-grid-row-id]');
+    assert.equal(f.node.querySelectorAll('thead tr').length,1);
+    assert.equal(table.getAttribute('aria-rowcount'),'5');
+    assert.equal(firstRow().getAttribute('aria-rowindex'),'2');
+    await click(button(f.node,'컬럼 필터'));
+    assert.equal(table.getAttribute('aria-rowcount'),'6');
+    assert.equal(firstRow().getAttribute('aria-rowindex'),'3');
+    await click(button(f.node,'컬럼 필터'));
+    assert.equal(f.node.querySelectorAll('thead tr').length,1);
+    assert.equal(table.getAttribute('aria-rowcount'),'5');
+    assert.equal(firstRow().getAttribute('aria-rowindex'),'2');
+    await click(button(f.node,'컬럼 필터'));
+    assert.equal(f.node.querySelectorAll('thead tr').length,2);
+    assert.equal(table.getAttribute('aria-rowcount'),'6');
+    assert.equal(firstRow().getAttribute('aria-rowindex'),'3');
+  } finally {
+    await f.dispose();
+    prototype.scrollTo=previousScrollTo;
+    for(const [property,descriptor] of dimensions){if(descriptor)Object.defineProperty(prototype,property,descriptor);else delete prototype[property];}
+  }
+});
+
 test('DataGrid criteria resets respect controlled page ownership and notify once', async () => {
   const criteriaCases=[
     {name:'query',next:{query:'a'},expected:['Alpha'],controlledExpected:['Beta']},

@@ -256,12 +256,16 @@ export function ProjectGrid() {
 | 검색 | 기본 제공. `searchable={false}`로 숨기고 `searchLabel`로 이름을 지정합니다. `query`·`defaultQuery`·`onQueryChange`로 상태를 연결합니다. |
 | 필터 | 열에 `filter="text | number | select"`를 지정합니다. 텍스트 포함·숫자 최솟값/최댓값·선택값 일치를 지원합니다. select의 `filterOptions`는 `{value,label}[]`입니다. 검색과 각 열의 필터는 AND로 적용합니다. |
 | 필터 상태 | `filters`·`defaultFilters`·`onFiltersChange`를 사용합니다. `DataGridFilters`는 열 ID를 키로 텍스트/선택값 문자열 또는 `{min?:string,max?:string}`를 저장합니다. |
+| 컬럼 필터 토글 | `showColumnFilterToggle`은 기본 `false`이며 이때 필터 가능한 열의 필터 행과 조건을 항상 적용합니다. `true`이면 상단 `columnFilters` 토글을 표시하고 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하며, 끄면 숨기고 `onFiltersChange({})`로 초기화를 요청합니다. 비제어 필터는 비우고 제어 필터는 부모 상태에서 갱신합니다. |
 | 정렬 | 클릭은 단일 정렬, Shift+클릭은 기존 조건을 유지하는 다중 정렬입니다. 오름차순 → 내림차순 → 해제 순서이며 빈 값은 각 조건에서 마지막입니다. 열의 `sortable={false}`로 해제합니다. 화살표 옆 숫자는 정렬 우선순위입니다. |
 | 정렬 상태 | `sortModel`·`defaultSortModel`·`onSortModelChange`는 우선순위 순서의 `{columnId,direction:'asc'|'desc'}[]`를 사용합니다. 모든 조건이 같은 행은 원래 순서를 유지합니다. 기존 `sort`·`defaultSort`·`onSortChange`는 첫 정렬 조건과 호환되며, 제어형 다중 정렬은 `sortModel`로 연결하세요. 두 제어형 값을 함께 주면 `sortModel`이 우선합니다. |
 | 행 선택 | `selectable`로 켭니다. 행의 일반 영역 클릭으로 선택/해제하고 체크박스로 키보드 조작할 수 있습니다. `selectOnRowClick={false}`는 체크박스로만 선택합니다. 버튼·링크·입력·텍스트 드래그는 행 선택을 변경하지 않습니다. 사용자 정의 영역은 `data-grid-ignore-row-click`로 제외할 수 있습니다. `getRowId`는 중복되지 않는 안정적인 ID를 반환해야 합니다. `getRowLabel`은 체크박스 이름에 사용합니다. `isRowSelectable`로 행별 선택을 제한합니다. |
 | 선택 상태 | `selectedRowIds`·`defaultSelectedRowIds`·`onSelectedRowIdsChange`를 사용합니다. 검색·정렬·페이지 이동 후에도 선택을 유지합니다. 전체 선택은 **현재 페이지의 선택 가능한 행**에만 적용합니다. |
-| 선택 작업 | `selectionActions`에 버튼 등을 전달하면 행을 선택했을 때 상단 툴바의 선택 작업 영역에 표시합니다. 선택 상태와 작업 실행은 호출 측에서 관리합니다. |
-| 상시 도구 | `toolbarActions`에 `Button`·`IconButton` 등을 전달하면 선택 여부와 무관하게 상단 내장 도구 뒤에 표시합니다. 새로고침·추가 같은 업무 동작과 `disabled`·오류 처리는 호출 측에서 연결합니다. |
+| 선택 작업 | 선택 가능한 행을 선택하면 상단 `selection` 묶음에 내장 선택 해제가 표시됩니다. `exportable`이면 선택 행 CSV도 함께 표시합니다. `selectionActions`는 호출 측에서 직접 구현한 선택 작업의 UI를 추가하는 확장 슬롯입니다. 선택 삭제 등 업무 동작과 선택 상태는 호출 측에서 구현합니다. |
+| 상시 도구 | `toolbarActions`는 호출 측에서 직접 구현한 상시 작업의 UI를 추가하는 확장 슬롯입니다. `Button`·`IconButton` 등을 전달하면 선택 여부와 무관하게 표시합니다. 기본 위치는 내장 도구 뒤이며 `toolbarOrder`의 `actions`로 묶음을 이동합니다. 새로고침·추가 등 업무 동작과 `disabled`·오류 처리는 호출 측에서 구현합니다. |
+| 상단 도구 크기 | `toolbarSize`는 `'sm' \| 'md' \| 'lg'`이며 기본값은 `'sm'`입니다. 기본 토큰에서 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 검색·내장 도구·크기를 생략한 자식 도구에 적용하고, 자식에 명시한 `size`가 우선합니다. 행 밀도·푸터는 유지하고 표시 열 팝업 안의 도구는 md를 사용합니다. |
+| 상단 도구 순서 | `toolbarOrder?: readonly DataGridToolbarItem[]`로 배치와 Tab 순서를 함께 바꿉니다. 키와 기본 순서는 `search` → `selection` → `columnFilters` → `density` → `columns` → `export` → `resetFilters` → `actions`입니다. 지정한 키를 먼저 배치하고 누락한 키는 기본 순서로 뒤에 붙이며 중복·알 수 없는 키는 무시합니다. `toolbarOrder={['actions', 'export']}`처럼 일부만 지정할 수 있고 표시 조건은 각 속성을 따릅니다. `selection`·`actions`는 묶음 전체를 이동하며 추가 버튼 각각은 전달한 JSX 순서를 따릅니다. |
+| 필터 초기화 도구 | 적용 중인 열별 필터 값이 있으면 상단 `resetFilters` 위치에 필터 초기화를 표시합니다. 클릭하면 필터를 비우고 `onFiltersChange({})`를 호출합니다. |
 | 페이지 | `page`·`defaultPage`·`onPageChange`, `pageSize`·`defaultPageSize`·`onPageSizeChange`, `pageSizeOptions`를 지원합니다. 검색·필터·정렬·페이지 크기 변경 시 첫 페이지로 이동합니다. 외부 데이터가 줄면 표시 페이지를 유효 범위로 제한합니다. |
 | 열 조작 | 표시 열을 숨길 수 있으며 최소 1개는 유지합니다. `showColumnVisibility={false}`로 UI를 숨기고 `defaultHiddenColumnIds`로 초기 표시를 지정합니다. |
 | 열 너비 | `width`는 기본 160px이며 `180`, `"180px"`, `"25%"`를 지원합니다. 백분율은 선택 체크박스 열(52px)을 제외한 표 영역 너비를 기준으로 계산합니다. `minWidth`·`maxWidth`는 px 단위이며 기본 96·600입니다. |

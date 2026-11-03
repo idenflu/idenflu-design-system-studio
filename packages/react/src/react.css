@@ -119,6 +119,10 @@
 .data-grid-search { width:240px; max-width:100%; min-width:0; }
 .data-grid-search input::-webkit-search-cancel-button { display:none; }
 .data-grid-tools .popover-content { width:240px; max-width:calc(100vw - 48px); }
+/* Touch hover can linger across wrapped toolbar rows. Keep nearby actions tappable. */
+@media (hover:none) {
+  .data-grid-tools .tooltip-content { pointer-events:none; }
+}
 .data-grid-column-options { display:grid; gap:var(--space-2); }
 .data-grid-column-options > p { color:var(--text-secondary); font-size:var(--font-size-caption); }
 .data-grid-column-options .choice { margin:0; min-height:32px; }

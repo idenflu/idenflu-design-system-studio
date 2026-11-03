@@ -6,7 +6,9 @@ import { DataGridCellEditor, downloadDataGridCsv } from './data-grid-tools';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
 import { DataGridScrollbar } from './data-grid-scrollbar';
 import { getDataGridColumnWidthBounds as widthBounds, resolveDataGridColumnWidths } from './data-grid-sizing';
+import { resolveDataGridToolbarOrder, type DataGridToolbarItem } from './data-grid-toolbar';
 export type { DataGridVirtualizationOptions } from './data-grid-virtual';
+export type { DataGridToolbarItem } from './data-grid-toolbar';
 
 export interface DataGridColumn<T> {
   id: string;
@@ -49,6 +51,10 @@ export interface DataGridProps<T> {
   selectionActions?: React.ReactNode;
   /** Additional top-toolbar actions shown regardless of row selection. */
   toolbarActions?: React.ReactNode;
+  /** Size inherited by toolbar controls. Defaults to sm; row and footer sizes are unchanged. */
+  toolbarSize?: 'sm' | 'md' | 'lg';
+  /** Render these toolbar groups first, then append unspecified groups in default order. */
+  toolbarOrder?: readonly DataGridToolbarItem[];
   searchable?: boolean;
   searchLabel?: string;
   query?: string;
@@ -76,6 +82,8 @@ export interface DataGridProps<T> {
   onDensityChange?: (density: 'default' | 'compact') => void;
   /** A controlled density without onDensityChange remains read-only. */
   showDensityToggle?: boolean;
+  /** Show an initially off control for column filters. Turning off clears them. */
+  showColumnFilterToggle?: boolean;
   showColumnVisibility?: boolean;
   defaultHiddenColumnIds?: readonly string[];
   loading?: boolean;
@@ -112,13 +120,14 @@ const hasFilter = (value: DataGridFilters[string]) => typeof value === 'string' 
 export function DataGrid<T>({
   label, rows, columns, getRowId, getRowLabel,
   selectable = false, selectOnRowClick = true, isRowSelectable, selectedRowIds, defaultSelectedRowIds = [], onSelectedRowIdsChange, selectionActions, toolbarActions,
+  toolbarSize = 'sm', toolbarOrder,
   searchable = true, searchLabel = '검색', query: controlledQuery, defaultQuery = '', onQueryChange,
   filters: controlledFilters, defaultFilters = {}, onFiltersChange,
   sort: controlledSort, defaultSort = null, onSortChange,
   sortModel: controlledSortModel, defaultSortModel, onSortModelChange,
   page: controlledPage, defaultPage = 1, onPageChange,
   pageSize: controlledPageSize, defaultPageSize = 10, onPageSizeChange, pageSizeOptions = [5, 10, 20, 50],
-  density: controlledDensity, defaultDensity = 'default', onDensityChange, showDensityToggle = true, showColumnVisibility = true, defaultHiddenColumnIds = [],
+  density: controlledDensity, defaultDensity = 'default', onDensityChange, showDensityToggle = true, showColumnFilterToggle = false, showColumnVisibility = true, defaultHiddenColumnIds = [],
   loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, className,
   exportable = false, exportFileName = 'data-grid.csv', onCellEdit,
   virtualized = false, pagination,
@@ -138,6 +147,9 @@ export function DataGrid<T>({
   }, [requestedSortModel, columns]);
   const sort = sorting[0] ?? null;
   const [filters, setFilters] = useGridValue<DataGridFilters>(controlledFilters, defaultFilters, onFiltersChange);
+  const [columnFiltersEnabled, setColumnFiltersEnabled] = React.useState(false);
+  const filtersEnabled = !showColumnFilterToggle || columnFiltersEnabled;
+  const appliedFilters = React.useMemo(()=>filtersEnabled ? filters : {},[filtersEnabled,filters]);
   const [requestedPage, setPage] = useGridValue(controlledPage, defaultPage, onPageChange);
   const [requestedPageSize, setPageSize] = useGridValue(controlledPageSize, defaultPageSize, onPageSizeChange);
   const [selected, setSelected] = useGridValue<readonly string[]>(selectedRowIds, defaultSelectedRowIds, values => onSelectedRowIdsChange?.([...values]));
@@ -160,7 +172,7 @@ export function DataGrid<T>({
   const paginated = pagination ?? !virtualEnabled;
   const size = positiveInteger(requestedPageSize, 10);
   const needle = searchable ? searchableText(query) : '';
-  const criteria = JSON.stringify([needle, sorting, filters, size]);
+  const criteria = JSON.stringify([needle, sorting, appliedFilters, size]);
   const previousCriteria = React.useRef(criteria);
   const eventResetCriteria = React.useRef<string | null>(null);
   const criteriaChanged = previousCriteria.current !== criteria;
@@ -168,7 +180,7 @@ export function DataGrid<T>({
     const matching = rows.filter(row => {
       if (needle && !columns.some(column => searchableText(String(column.accessor(row) ?? '')).includes(needle))) return false;
       return columns.every(column => {
-        const filter = filters[column.id];
+        const filter = appliedFilters[column.id];
         if (!column.filter || !filter || !hasFilter(filter)) return true;
         const value = column.accessor(row);
         if (column.filter === 'number' && typeof filter === 'object') {
@@ -193,7 +205,7 @@ export function DataGrid<T>({
       }
       return a.index - b.index;
     }).map(item => item.row);
-  }, [rows, columns, needle, filters, sorting]);
+  }, [rows, columns, needle, appliedFilters, sorting]);
   const pageCount = paginated ? Math.max(1, Math.ceil(filtered.length / size)) : 1;
   const page = !paginated || (criteriaChanged && controlledPage === undefined) ? 1 : Math.min(pageCount, positiveInteger(requestedPage, 1));
   const shownRows = React.useMemo(() => paginated ? filtered.slice((page - 1) * size, page * size) : filtered, [paginated, filtered, page, size]);
@@ -213,8 +225,9 @@ export function DataGrid<T>({
   const count = blocked ? 0 : filtered.length;
   const sizes = [...new Set([...pageSizeOptions.filter(value => Number.isInteger(value) && value > 0), size])].sort((a, b) => a - b);
   const anyFilters = columns.some(column => column.filter);
-  const activeFilters = columns.some(column => column.filter && filters[column.id] && hasFilter(filters[column.id]));
-  const headerRows = anyFilters ? 2 : 1;
+  const activeFilters = columns.some(column => column.filter && appliedFilters[column.id] && hasFilter(appliedFilters[column.id]));
+  const filterRowVisible = anyFilters && filtersEnabled;
+  const headerRows = filterRowVisible ? 2 : 1;
   const keepRowIds = React.useMemo(() => [...new Set([editing?.rowId, focusedRowId].filter((value): value is string => value != null))], [editing?.rowId, focusedRowId]);
   const shownIds = React.useMemo(() => new Set(shownRows.map(getRowId)), [shownRows, getRowId]);
   const resolvedWidths = React.useMemo(() => resolveDataGridColumnWidths(visibleColumns, viewportWidth, widths, selectable ? 52 : 0), [visibleColumns, viewportWidth, widths, selectable]);
@@ -286,9 +299,9 @@ export function DataGrid<T>({
     setFocusedRowId(null);
   }, [focusedRowId, shownIds, blocked]);
 
-  const resetPageFor = (nextQuery = query, nextSort = sorting, nextFilters = filters, nextSize = size) => {
+  const resetPageFor = (nextQuery = query, nextSort = sorting, nextFilters = appliedFilters, nextSize = size) => {
     if (!paginated) return;
-    eventResetCriteria.current = JSON.stringify([searchable ? searchableText(nextQuery) : '', nextSort, nextFilters, nextSize]);
+    eventResetCriteria.current = JSON.stringify([searchable ? searchableText(nextQuery) : '', nextSort, filtersEnabled ? nextFilters : {}, nextSize]);
     setPage(1);
   };
   const changeQuery = (next: string) => { setQuery(next); resetPageFor(next); };
@@ -362,34 +375,44 @@ export function DataGrid<T>({
     target?.focus({preventScroll:true});
   };
 
+  const toolbarItems: Record<DataGridToolbarItem, React.ReactNode> = {
+    search: searchable && <TextField hideLabel containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="close" /></button> : undefined} />,
+    selection: selectable && selectedSet.size > 0 && <div className="data-grid-selection">
+      <div className="data-grid-selection-actions">
+        {selectionActions}
+        {exportable && <Tooltip content="선택한 행 CSV 내보내기"><Button variant="ghost" iconOnly aria-label="선택한 행 내보내기" disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}><Icon name="download" /></Button></Tooltip>}
+        <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="close" /></Button></Tooltip>
+      </div>
+    </div>,
+    columnFilters: showColumnFilterToggle && anyFilters && <Tooltip content={filtersEnabled ? '컬럼 필터 끄기' : '컬럼 필터 켜기'}>
+      <Button variant={filtersEnabled ? 'primary' : 'outline'} iconOnly aria-label="컬럼 필터" aria-pressed={filtersEnabled} aria-controls={filterRowVisible ? `${id}-filters` : undefined} disabled={blocked} onClick={() => {
+        setColumnFiltersEnabled(!filtersEnabled);
+        if (filtersEnabled) { setFilters({}); resetPageFor(query, sorting, {}); }
+      }}><Icon name="filter" /></Button>
+    </Tooltip>,
+    density: showDensityToggle && (controlledDensity === undefined || !!onDensityChange) && <Tooltip content={density === 'compact' ? '기본 행 간격으로 전환' : '촘촘한 행 간격으로 전환'}>
+      <Button variant={density === 'compact' ? 'primary' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
+        <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
+      </Button>
+    </Tooltip>,
+    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<Icon name="grid" />} triggerLabel="표시 열" iconOnly label={`${label} 표시 열`}>
+      <div className="data-grid-column-options" data-size="md"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
+        const checked = visibleColumns.some(item => item.id === column.id);
+        return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;
+      })}</div>
+    </Popover>,
+    export: exportable && <Tooltip content="검색 결과 전체 CSV 내보내기"><Button variant="outline" iconOnly aria-label="CSV 내보내기" disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" /></Button></Tooltip>,
+    resetFilters: activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>,
+    actions: toolbarActions != null && <div className="data-grid-toolbar-actions">{toolbarActions}</div>,
+  };
+
   return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} tabIndex={-1} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined}>
     <p className="sr-only" id={`${id}-sort-help`}>클릭하면 단일 정렬을 변경합니다. Shift 키를 누르고 클릭하면 정렬 조건을 추가하거나 변경합니다.</p>
     <p className="sr-only" id={`${id}-resize-help`}>방향키로 10px, Shift와 함께 1px 조절합니다. Home과 End로 최소·최대 너비를 선택하고 Enter 또는 더블클릭으로 원래 너비 설정을 복구합니다.</p>
     <div className="data-grid-toolbar">
       <div className="data-grid-heading"><strong>{label}</strong><span className={selectable && selectedSet.size > 0 ? 'data-grid-selection-count' : undefined}>{selectable && selectedSet.size > 0 ? `${selectedSet.size}개 선택됨` : `${rows.length}개 항목`}</span></div>
-      <div className="data-grid-tools">
-        {searchable && <TextField hideLabel containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="close" /></button> : undefined} />}
-        {selectable && selectedSet.size > 0 && <div className="data-grid-selection">
-          <div className="data-grid-selection-actions">
-            {selectionActions}
-            {exportable && <Tooltip content="선택한 행 CSV 내보내기"><Button variant="ghost" iconOnly aria-label="선택한 행 내보내기" disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(rows.filter(row => selectedSet.has(getRowId(row))), exportFileName.replace(/(\.csv)?$/i, '-selected.csv'))}><Icon name="download" /></Button></Tooltip>}
-            <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="close" /></Button></Tooltip>
-          </div>
-        </div>}
-        {showDensityToggle && (controlledDensity === undefined || !!onDensityChange) && <Tooltip content={density === 'compact' ? '기본 행 간격으로 전환' : '촘촘한 행 간격으로 전환'}>
-          <Button variant={density === 'compact' ? 'primary' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
-            <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
-          </Button>
-        </Tooltip>}
-        {showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<Icon name="grid" />} triggerLabel="표시 열" iconOnly label={`${label} 표시 열`}>
-          <div className="data-grid-column-options"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
-            const checked = visibleColumns.some(item => item.id === column.id);
-            return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;
-          })}</div>
-        </Popover>}
-        {exportable && <Tooltip content="검색 결과 전체 CSV 내보내기"><Button variant="outline" iconOnly aria-label="CSV 내보내기" disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" /></Button></Tooltip>}
-        {activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>}
-        {toolbarActions != null && <div className="data-grid-toolbar-actions">{toolbarActions}</div>}
+      <div className="data-grid-tools" data-size={toolbarSize}>
+        {resolveDataGridToolbarOrder(toolbarOrder).map(item => <React.Fragment key={item}>{toolbarItems[item]}</React.Fragment>)}
       </div>
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>
@@ -421,7 +444,7 @@ export function DataGrid<T>({
               drag.current = {id:column.id, startX:event.clientX, startWidth:columnWidth(column), direction:event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget).direction === 'rtl' ? -1 : 1};
             }} onPointerMove={event => { if (drag.current?.id === column.id) resize(column, drag.current.startWidth + (event.clientX - drag.current.startX) * drag.current.direction); }} onPointerUp={event => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }} />}
           </th>; })}
-        </tr>{anyFilters && <tr className="data-grid-filter-row" aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
+        </tr>{filterRowVisible && <tr id={`${id}-filters`} className="data-grid-filter-row" aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
           const filter = filters[column.id];
           return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select hideLabel label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={typeof filter === 'object' ? filter.min || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={typeof filter === 'object' ? filter.max || '' : ''} onChange={event => changeFilter(column.id, {...(typeof filter === 'object' ? filter : {}), max:event.target.value})} /></div> : null}</td>;
         })}</tr>}</thead>
@@ -429,8 +452,8 @@ export function DataGrid<T>({
           rows={shownRows} getRowId={getRowId} scrollRef={scroll} headerRef={header} prepareScrollRef={prepareScroll}
           keepRowIds={keepRowIds} options={typeof virtualized === 'object' ? virtualized : undefined}
           density={density} headerRows={headerRows} maxHeight={virtualMaxHeight}
-          resetKey={JSON.stringify([criteria, paginated ? page : 'all', blocked])}
-          measureKey={JSON.stringify([density, resolvedWidths, visibleColumns.map(column => column.id)])}
+          resetKey={JSON.stringify([criteria, paginated ? page : 'all', blocked, headerRows])}
+          measureKey={JSON.stringify([density, resolvedWidths, visibleColumns.map(column => column.id), headerRows])}
           columnCount={columnCount} renderRow={renderRow} onFocusCapture={event => {
           const row = (event.target as HTMLElement).closest<HTMLTableRowElement>('tr[data-grid-row-id]');
           if (row?.dataset.gridRowId) setFocusedRowId(row.dataset.gridRowId);
