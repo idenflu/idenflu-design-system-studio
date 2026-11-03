@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, type DataGridColumn, type DataGridSort } from '../src';
 import { Section } from './demo-layout';
 import { DataGridReference, DataGridReferenceLinks } from './data-grid-reference';
+import { DataGridToolbarDemos } from './data-grid-toolbar-demos';
 
 type Project = {
   id:string; name:string; team:string; owner:string | null;
@@ -158,6 +159,7 @@ export function DataGridDemos() {
         <div><dt>처리 범위</dt><dd>가상화는 세로 방향의 행 렌더링을 줄입니다. 전체 rows의 검색·정렬 계산과 데이터 메모리는 유지합니다. 서버 페이지 이동·열 가상화·행 그룹화는 포함하지 않습니다.</dd></div>
       </dl>
     </Section>
+    <DataGridToolbarDemos />
     <DataGridReference />
   </>;
 }

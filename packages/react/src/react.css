@@ -1,6 +1,7 @@
 /* React markup uses the same mask icons as the portable CSS bundle. */
 .field-label.sr-only { margin:-1px; }
 .icon-button-content { display:inline-flex; align-items:center; justify-content:center; }
+.data-grid-toolbar-actions { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-2); max-width:100%; }
 .choice-mark .ui-icon { display:none; width:calc(var(--choice-size) - 4px); height:calc(var(--choice-size) - 4px); flex:0 0 auto; color:var(--text-on-primary); }
 .choice-mark .minus-icon { --icon:url('./assets/icons/idenflu/remove.svg'); }
 .choice-input:checked + .choice-mark .check-icon,

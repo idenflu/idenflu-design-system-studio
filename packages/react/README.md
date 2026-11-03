@@ -261,6 +261,7 @@ export function ProjectGrid() {
 | 행 선택 | `selectable`로 켭니다. 행의 일반 영역 클릭으로 선택/해제하고 체크박스로 키보드 조작할 수 있습니다. `selectOnRowClick={false}`는 체크박스로만 선택합니다. 버튼·링크·입력·텍스트 드래그는 행 선택을 변경하지 않습니다. 사용자 정의 영역은 `data-grid-ignore-row-click`로 제외할 수 있습니다. `getRowId`는 중복되지 않는 안정적인 ID를 반환해야 합니다. `getRowLabel`은 체크박스 이름에 사용합니다. `isRowSelectable`로 행별 선택을 제한합니다. |
 | 선택 상태 | `selectedRowIds`·`defaultSelectedRowIds`·`onSelectedRowIdsChange`를 사용합니다. 검색·정렬·페이지 이동 후에도 선택을 유지합니다. 전체 선택은 **현재 페이지의 선택 가능한 행**에만 적용합니다. |
 | 선택 작업 | `selectionActions`에 버튼 등을 전달하면 행을 선택했을 때 상단 툴바의 선택 작업 영역에 표시합니다. 선택 상태와 작업 실행은 호출 측에서 관리합니다. |
+| 상시 도구 | `toolbarActions`에 `Button`·`IconButton` 등을 전달하면 선택 여부와 무관하게 상단 내장 도구 뒤에 표시합니다. 새로고침·추가 같은 업무 동작과 `disabled`·오류 처리는 호출 측에서 연결합니다. |
 | 페이지 | `page`·`defaultPage`·`onPageChange`, `pageSize`·`defaultPageSize`·`onPageSizeChange`, `pageSizeOptions`를 지원합니다. 검색·필터·정렬·페이지 크기 변경 시 첫 페이지로 이동합니다. 외부 데이터가 줄면 표시 페이지를 유효 범위로 제한합니다. |
 | 열 조작 | 표시 열을 숨길 수 있으며 최소 1개는 유지합니다. `showColumnVisibility={false}`로 UI를 숨기고 `defaultHiddenColumnIds`로 초기 표시를 지정합니다. |
 | 열 너비 | `width`는 기본 160px이며 `180`, `"180px"`, `"25%"`를 지원합니다. 백분율은 선택 체크박스 열(52px)을 제외한 표 영역 너비를 기준으로 계산합니다. `minWidth`·`maxWidth`는 px 단위이며 기본 96·600입니다. |

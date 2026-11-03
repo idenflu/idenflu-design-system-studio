@@ -47,6 +47,8 @@ export interface DataGridProps<T> {
   onSelectedRowIdsChange?: (ids: string[]) => void;
   /** Additional actions shown in the top toolbar while rows are selected. */
   selectionActions?: React.ReactNode;
+  /** Additional top-toolbar actions shown regardless of row selection. */
+  toolbarActions?: React.ReactNode;
   searchable?: boolean;
   searchLabel?: string;
   query?: string;
@@ -109,7 +111,7 @@ const hasFilter = (value: DataGridFilters[string]) => typeof value === 'string' 
 /** A client-side data table. Selection is keyed by stable row IDs across pages. */
 export function DataGrid<T>({
   label, rows, columns, getRowId, getRowLabel,
-  selectable = false, selectOnRowClick = true, isRowSelectable, selectedRowIds, defaultSelectedRowIds = [], onSelectedRowIdsChange, selectionActions,
+  selectable = false, selectOnRowClick = true, isRowSelectable, selectedRowIds, defaultSelectedRowIds = [], onSelectedRowIdsChange, selectionActions, toolbarActions,
   searchable = true, searchLabel = '검색', query: controlledQuery, defaultQuery = '', onQueryChange,
   filters: controlledFilters, defaultFilters = {}, onFiltersChange,
   sort: controlledSort, defaultSort = null, onSortChange,
@@ -387,6 +389,7 @@ export function DataGrid<T>({
         </Popover>}
         {exportable && <Tooltip content="검색 결과 전체 CSV 내보내기"><Button variant="outline" iconOnly aria-label="CSV 내보내기" disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportCsv(filtered, exportFileName)}><Icon name="download" /></Button></Tooltip>}
         {activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>}
+        {toolbarActions != null && <div className="data-grid-toolbar-actions">{toolbarActions}</div>}
       </div>
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>

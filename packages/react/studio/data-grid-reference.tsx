@@ -79,6 +79,7 @@ const displayProps: readonly PropertyRow[] = [
   ['showDensityToggle', 'boolean', 'true', '밀도 전환 아이콘의 표시 여부입니다. true여도 density만 제어하고 onDensityChange가 없으면 표시하지 않습니다.'],
   ['showColumnVisibility', 'boolean', 'true', '열이 둘 이상이면 표시 열 메뉴를 제공합니다. 마지막으로 보이는 열은 숨길 수 없습니다.'],
   ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 모든 열을 숨기도록 설정해도 첫 열 하나는 표시합니다. 이후 표시 상태는 내부에서 관리합니다.'],
+  ['toolbarActions', 'ReactNode', 'undefined', '상단 툴바 오른쪽의 내장 도구 뒤에 항상 표시할 추가 액션입니다. 선택 여부와 무관하며 loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
   ['maxHeight', 'number | string', 'undefined', '툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
   ['virtualized', 'boolean | DataGridVirtualizationOptions', 'false', 'true 또는 옵션 객체로 세로 행 가상화를 켭니다. 화면 근처 행을 렌더링하고 실제 행 높이를 측정합니다.'],
   ['pagination', 'boolean', '!virtualized', '일반 표는 기본 true, 가상화는 기본 false입니다. 가상화와 함께 true를 지정하면 현재 페이지 안에서 가상화합니다.'],
@@ -239,9 +240,60 @@ const saveCsv = async () => {
 };
 // <button type="button" onClick={saveCsv}>CSV 저장</button>`;
 
+const toolbarExample = `import { useState } from 'react';
+import {
+  Button, DataGrid, Icon, IconButton, type DataGridColumn,
+} from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+type Task = { id: string; name: string };
+const initialRows: Task[] = [
+  { id: 't1', name: '문서 작성' }, { id: 't2', name: '검토' },
+];
+const columns: DataGridColumn<Task>[] = [
+  { id: 'id', header: 'ID', accessor: row => row.id },
+  { id: 'name', header: '작업', accessor: row => row.name },
+];
+
+export function ToolbarGrid({ loading = false }: { loading?: boolean }) {
+  const [rows, setRows] = useState(initialRows);
+  const [density, setDensity] = useState<'default' | 'compact'>('default');
+  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+  const reload = () => {
+    // 예시는 초기 데이터를 복원합니다. 실제 앱에서는 조회 함수를 연결하세요.
+    setRows(initialRows);
+    setSelectedRowIds([]);
+  };
+  const removeSelected = () => {
+    setRows(current => current.filter(row => !selectedRowIds.includes(row.id)));
+    setSelectedRowIds([]);
+  };
+
+  // 각 표시 속성을 false로 바꾸면 해당 내장 도구를 숨깁니다.
+  return <DataGrid label="작업 목록" rows={rows} columns={columns}
+    getRowId={row => row.id} getRowLabel={row => row.name} loading={loading}
+    density={density} onDensityChange={setDensity}
+    showDensityToggle showColumnVisibility searchable searchLabel="작업 검색"
+    exportable exportFileName="tasks.csv"
+    toolbarActions={<>
+      <IconButton label="새로고침" variant="outline" disabled={loading}
+        onClick={reload}><Icon name="refresh" /></IconButton>
+      <Button disabled={loading} onClick={() => setRows(current => [
+        ...current, { id: crypto.randomUUID(), name: '새 작업' },
+      ])}><Icon name="plus" />작업 추가</Button>
+    </>}
+    selectable selectedRowIds={selectedRowIds}
+    onSelectedRowIdsChange={setSelectedRowIds}
+    selectionActions={<Button variant="danger" disabled={loading}
+      onClick={removeSelected}>선택 삭제</Button>} />;
+}
+
+// 비제어 밀도는 density/onDensityChange 대신 defaultDensity="compact"로 시작합니다.`;
+
 export function DataGridReferenceLinks() {
   const links = [
-    ['data-grid-props', '속성'], ['data-grid-columns', '열·타입'],
+    ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
+    ['data-grid-columns', '열·타입'],
     ['data-grid-events', '이벤트·상태 연결'], ['data-grid-styles', '스타일'],
     ['data-grid-behavior', '동작·CSV'],
   ] as const;
@@ -263,6 +315,30 @@ export function DataGridReference() {
       <PropertyTable title="검색·정렬·선택 상태" rows={stateProps} />
       <PropertyTable title="페이지·밀도·가상화와 표시" rows={displayProps} />
       <PropertyTable title="CSV 내보내기" rows={exportProps} />
+    </Section>
+
+    <Section id="data-grid-toolbar" title="상단 도구 모음" className="studio-grid-reference" description="가로줄 아이콘은 행 밀도 전환, 다운로드 아이콘은 CSV 내보내기입니다. 내장 도구는 표시 속성으로 설정하고, 업무 버튼은 toolbarActions 또는 selectionActions로 추가합니다.">
+      <DetailTable title="내장 도구의 역할" rows={[
+        ['밀도 전환', '기본 행 간격과 compact를 전환합니다. 로딩·오류 상태에서는 비활성화합니다.'],
+        ['표시 열', '열이 둘 이상일 때 표시 열 메뉴를 제공합니다. 최소 한 개의 열은 유지하며, 숨긴 열은 기본 CSV에서도 제외합니다.'],
+        ['검색', '전체 rows에서 accessor 값을 검색합니다. 검색어를 제어하려면 query와 onQueryChange를 함께 연결합니다.'],
+        ['CSV 내보내기', '검색·필터·정렬 결과 전체를 현재 보이는 열 순서로 저장합니다. 페이지나 가상화로 화면에 보이는 행 수와 무관합니다. 로딩·오류·결과 없음·저장 중에는 비활성화합니다.'],
+        ['선택 도구', 'selectable이며 현재 rows에 존재하는 선택 가능한 행이 선택되어 있으면 selectionActions와 선택 해제를 표시합니다. exportable이면 검색 결과 밖의 선택도 포함하는 선택 행 CSV 버튼을 함께 표시합니다.'],
+        ['필터 초기화', '열별 필터 조건이 있으면 표시하며, 클릭하면 필터를 비우고 onFiltersChange({})를 호출합니다.'],
+      ]} />
+      <PropertyTable title="상단 도구의 표시와 제어" rows={[
+        ['showDensityToggle', 'boolean', 'true', '밀도 버튼을 표시합니다. false로 숨겨도 지정한 밀도는 유지합니다.'],
+        ['density / defaultDensity', "'default' | 'compact'", "undefined / 'default'", '현재 밀도를 제어하거나 최초 밀도를 지정합니다. density만 전달하면 읽기 전용이며 내장 토글을 숨깁니다.'],
+        ['onDensityChange', "(density: 'default' | 'compact') => void", 'undefined', '내장 토글이 전달한 다음 밀도를 부모 상태에 반영합니다.'],
+        ['showColumnVisibility', 'boolean', 'true', '표시 열 메뉴를 숨기려면 false로 지정합니다.'],
+        ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 이후 열 표시 상태는 그리드가 관리합니다.'],
+        ['searchable / searchLabel', 'boolean / string', "true / '검색'", '검색 입력의 표시 여부와 접근 가능한 이름을 지정합니다. searchable=false이면 전체 검색도 적용하지 않습니다.'],
+        ['exportable / exportFileName', 'boolean / string', "false / 'data-grid.csv'", '전체·선택 CSV 버튼 표시와 제안 파일명을 지정합니다. 선택 행 파일명에는 -selected.csv를 붙입니다.'],
+        ['toolbarActions', 'ReactNode', 'undefined', '선택 여부와 무관하게 내장 도구 뒤에 표시합니다. 새로고침·추가 등 항상 필요한 동작에 사용합니다.'],
+        ['selectionActions', 'ReactNode', 'undefined', 'selectable이며 유효한 선택이 있을 때만 표시합니다. 선택 ID를 인자로 받는 함수가 아니므로 selectedRowIds와 onSelectedRowIdsChange를 부모에서 연결합니다.'],
+      ]} />
+      <p className="studio-grid-reference-notes">추가한 버튼은 loading·error에서도 자동으로 비활성화되지 않습니다. 각 버튼의 disabled와 오류 처리를 직접 연결하세요. 내장 CSV 내보내기 완료 전용 콜백과 열 표시 변경 콜백은 제공하지 않습니다. CSV 저장을 직접 처리하려면 아래 독립 CSV API를 사용하세요.</p>
+      <CodeExample title="밀도·기본 도구 설정과 업무 버튼 추가">{toolbarExample}</CodeExample>
     </Section>
 
     <Section id="data-grid-columns" title="열과 관련 타입" className="studio-grid-reference" description="화면의 표현은 cell로, 검색·정렬·필터·편집·CSV의 원시 값은 accessor로 구분합니다.">
