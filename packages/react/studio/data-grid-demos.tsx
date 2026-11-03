@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, type DataGridColumn, type DataGridSort } from '../src';
 import { Section } from './demo-layout';
+import { DataGridReference, DataGridReferenceLinks } from './data-grid-reference';
 
 type Project = {
   id:string; name:string; team:string; owner:string | null;
@@ -91,6 +92,7 @@ export function DataGridDemos() {
     setNotice(`${rowId}의 ${taskColumns.find(column=>column.id === columnId)?.header} 값을 변경했습니다.`);
   };
   return <>
+    <DataGridReferenceLinks />
     <Section title="프로젝트 데이터그리드" description={`${projects.length}개 프로젝트에서 검색·열별 필터·정렬·선택·페이지 이동을 함께 사용합니다. 프로젝트 이름은 가로 스크롤 중에도 고정됩니다.`}>
 
       <DataGrid label="프로젝트 데이터그리드" rows={projects} columns={projectColumns}
@@ -156,6 +158,7 @@ export function DataGridDemos() {
         <div><dt>처리 범위</dt><dd>가상화는 세로 방향의 행 렌더링을 줄입니다. 전체 rows의 검색·정렬 계산과 데이터 메모리는 유지합니다. 서버 페이지 이동·열 가상화·행 그룹화는 포함하지 않습니다.</dd></div>
       </dl>
     </Section>
+    <DataGridReference />
   </>;
 }
 

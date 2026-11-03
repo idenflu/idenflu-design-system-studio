@@ -221,6 +221,27 @@
 .studio-time-reference-table td:nth-child(2) { width:27%; }
 .studio-time-reference-table :is(th,td) { vertical-align:top; overflow-wrap:anywhere; }
 .studio-time-reference-table code { white-space:normal; font-size:var(--font-size-caption); }
+.studio-grid-reference-links { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-4); padding:var(--space-4); border:1px solid var(--divider); background:var(--surface); }
+.studio-grid-reference-links nav { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+.studio-grid-reference-links p { margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); }
+.studio-grid-reference-links a { white-space:nowrap; }
+.studio-grid-reference { scroll-margin-top:96px; }
+.studio-grid-reference .react-studio-demo { grid-template-columns:minmax(0,1fr); }
+.studio-grid-reference-group { display:grid; gap:var(--space-3); min-width:0; }
+.studio-grid-reference-group h3 { font-size:var(--font-size-body); font-weight:var(--font-weight-semibold); }
+.studio-grid-reference-table { min-width:0; max-width:100%; }
+.studio-grid-reference-table table { min-width:720px; }
+.studio-grid-reference-table th[scope="row"] { width:25%; font-weight:var(--font-weight-medium); }
+.studio-grid-reference-table td:nth-child(2):not(:last-child) { width:29%; }
+.studio-grid-reference-table .studio-grid-property-table { table-layout:fixed; }
+.studio-grid-property-table th[scope="row"], .studio-grid-property-table td:nth-child(2):not(:last-child) { width:auto; }
+.studio-grid-reference-table :is(th,td) { vertical-align:top; overflow-wrap:anywhere; }
+.studio-grid-reference-table code { white-space:normal; font-size:var(--font-size-caption); }
+.studio-grid-reference-code { max-width:100%; }
+.studio-grid-reference-notes { display:grid; gap:var(--space-2); color:var(--text-secondary); }
+.studio-grid-reference-notes dt { color:var(--text); font-weight:var(--font-weight-semibold); }
+.studio-grid-reference-notes dd { margin-top:var(--space-1); }
+.studio-grid-reference-notes > div { padding-block:var(--space-3); border-bottom:1px solid var(--divider); }
 .studio-grid-edit-example { width:100%; max-width:800px; }
 .studio-grid-state-example { width:100%; max-width:560px; }
 .studio-grid-virtual-toolbar { display:flex; align-items:flex-end; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap; }

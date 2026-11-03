@@ -179,7 +179,7 @@
     "title": "Data grid",
     "group": "Components",
     "description": "데이터를 검색·필터·정렬하고 열을 조정하거나 셀을 편집합니다.",
-    "searchTerms": "데이터그리드 데이터 그리드 datagrid grid 검색 필터 정렬 행 선택 컬럼 열 고정 리사이즈 편집 CSV 내보내기"
+    "searchTerms": "데이터그리드 데이터 그리드 datagrid grid 검색 필터 정렬 행 선택 컬럼 열 고정 리사이즈 편집 CSV 내보내기 속성 이벤트 스타일 props callback API flex 가상화"
   },
   {
     "route": "components/tooltip",
