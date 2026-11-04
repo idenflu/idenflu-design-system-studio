@@ -79,6 +79,87 @@ const rows = [
 ];
 const props = {label:'프로젝트 목록', rows, columns, getRowId:row => row.id, getRowLabel:row => row.name};
 
+test('footer context tracks all matching rows, page rows and valid selection across filters', async () => {
+  const f=fixture();let context;
+  const base={...props,selectable:true,isRowSelectable:row=>row.id!=='b',defaultSelectedRowIds:['a','b','removed'],
+    columns:columns.map(column=>column.id==='team'?{...column,filter:'select',filterOptions:[{value:'디자인',label:'디자인'},{value:'개발',label:'개발'}]}:column),
+    defaultFilters:{team:'디자인'},defaultSort:{columnId:'name',direction:'desc'},defaultPageSize:1,defaultPage:2,
+    footer:state=>{context=state;return h('span',null,`조회 ${state.filteredCount} · 선택 ${state.selectedCount}`);}};
+  try {
+    await f.render(h(DataGrid,base));
+    assert.equal(context.totalCount,4);assert.equal(context.filteredCount,2);
+    assert.deepEqual(context.filteredRows.map(row=>row.id),['c','a']);
+    assert.deepEqual(context.pageRows.map(row=>row.id),['a']);
+    assert.deepEqual(context.selectedRows.map(row=>row.id),['a']);
+    assert.equal(context.selectedCount,1);assert.equal(context.page,2);assert.equal(context.pageCount,2);
+    assert.equal(f.node.querySelector('.data-grid-footer .pagination'),null);
+    await input(control(f.node,'검색'),'Gamma');
+    assert.equal(context.filteredCount,1);assert.equal(context.page,1);
+    assert.deepEqual(context.filteredRows.map(row=>row.id),['c']);
+    assert.deepEqual(context.selectedRows.map(row=>row.id),['a']);
+    await input(control(f.node,'검색'),'');
+    await choose(f.node,'팀 필터','개발');
+    assert.deepEqual(context.filteredRows.map(row=>row.id),['d','b']);
+    await click(control(f.node,'Delta 선택'));
+    assert.equal(context.selectedCount,2);assert.deepEqual(context.selectedRows.map(row=>row.id),['a','d']);
+    await f.render(h(DataGrid,{...base,rows:rows.filter(row=>row.id!=='a')}));
+    assert.equal(context.totalCount,3);assert.equal(context.selectedCount,1);
+    assert.deepEqual(context.selectedRows.map(row=>row.id),['d']);
+  } finally {await f.dispose();}
+});
+
+test('footer context hides stale results while loading or errored and supports unpaginated results',async()=>{
+  const f=fixture();let context;
+  const base={...props,pagination:false,selectable:true,defaultSelectedRowIds:['a'],footer:state=>{context=state;return h('span',null,'요약');}};
+  try {
+    await f.render(h(DataGrid,base));
+    assert.equal(context.pagination,false);assert.equal(context.page,1);assert.equal(context.pageCount,1);
+    assert.equal(context.pageRows.length,4);assert.equal(context.filteredRows.length,4);
+    for(const state of [{loading:true},{error:'조회 실패'}]) {
+      await f.render(h(DataGrid,{...base,...state}));
+      assert.equal(context.filteredCount,0);assert.deepEqual(context.filteredRows,[]);assert.deepEqual(context.pageRows,[]);
+      assert.equal(context.selectedCount,1);assert.equal(context.totalCount,4);
+      assert.equal(context.loading,!!state.loading);assert.equal(context.hasError,!!state.error);
+    }
+    await f.render(h(DataGrid,{...base,selectable:false}));
+    assert.equal(context.filteredCount,4);assert.equal(context.selectedCount,0);assert.deepEqual(context.selectedRows,[]);
+  } finally {await f.dispose();}
+});
+
+test('footer accepts static content or hides the whole footer without losing live status',async()=>{
+  const f=fixture();let calls=0;
+  try {
+    await f.render(h(DataGrid,props));
+    assert.ok(f.node.querySelector('.data-grid-footer .data-grid-page-tools'));
+    const liveId=f.node.querySelector('.data-grid-footer [role="status"]').id;
+    await f.render(h(DataGrid,{...props,footer:h('button',{onClick:()=>calls++},'다시 조회')}));
+    await click(button(f.node,'다시 조회'));assert.equal(calls,1);
+    assert.ok(f.node.querySelector(`#${liveId}`).classList.contains('sr-only'));
+    for(const footer of [null,false,()=>null,()=>false]) {
+      await f.render(h(DataGrid,{...props,footer}));
+      assert.equal(f.node.querySelector('.data-grid-footer'),null);
+      assert.match(f.node.querySelector(`#${liveId}`).textContent,/4개 항목/);
+      assert.equal(f.node.querySelectorAll('[role="status"]').length,1);
+    }
+    await f.render(h(DataGrid,{...props,footer:0}));
+    assert.equal(f.node.querySelector('.data-grid-footer').textContent,'0');
+    await f.render(h(DataGrid,props));
+    assert.ok(f.node.querySelector('.data-grid-footer .data-grid-page-tools'));
+  } finally {await f.dispose();}
+});
+
+test('virtual footer receives full result and offscreen selection rather than rendered rows',async()=>{
+  const f=fixture();let context;
+  const data=Array.from({length:300},(_,index)=>({id:String(index),name:`프로젝트 ${index}`,amount:index,team:'개발'}));
+  try {
+    await f.render(h(DataGrid,{...props,rows:data,virtualized:true,selectable:true,defaultSelectedRowIds:['299'],
+      footer:state=>{context=state;return h('span',null,`${state.filteredCount}건`);}}));
+    assert.equal(context.pagination,false);assert.equal(context.filteredRows.length,300);assert.equal(context.pageRows.length,300);
+    assert.equal(context.selectedCount,1);assert.equal(context.selectedRows[0].id,'299');
+    assert.ok(f.node.querySelectorAll('tbody tr[data-grid-row-id]').length<300);
+  } finally {await f.dispose();}
+});
+
 function xlsxRows(bytes) {
   const zip=Buffer.from(bytes),files=new Map();
   let end=zip.length-22;
@@ -467,6 +548,28 @@ test('density is an internal toolbar toggle and supports controlled and read-onl
     assert.equal(button(f.node,'촘촘한 행 간격'),undefined);
     await f.render(h(DataGrid,{...props,showDensityToggle:false}));
     assert.equal(button(f.node,'촘촘한 행 간격'),undefined);
+  } finally {await f.dispose();}
+});
+
+test('scroll reset requests preserve density, sorting, selection and the mounted grid', async () => {
+  const f=fixture();
+  const base={...props,pagination:false,selectable:true,defaultSelectedRowIds:['a'],defaultDensity:'compact',defaultSort:{columnId:'name',direction:'desc'}};
+  try {
+    await f.render(h(DataGrid,{...base,scrollResetKey:0}));
+    await click(button(f.node,'촘촘한 행 간격'));
+    const viewport=f.node.querySelector('.data-grid-scroll');
+    viewport.scrollTop=240;viewport.scrollLeft=160;
+    await f.render(h(DataGrid,{...base,scrollResetKey:0}));
+    assert.equal(viewport.scrollTop,240);assert.equal(viewport.scrollLeft,160);
+    for(const scrollResetKey of [1,2]){
+      await f.render(h(DataGrid,{...base,scrollResetKey}));
+      assert.equal(f.node.querySelector('.data-grid-scroll'),viewport);
+      assert.equal(viewport.scrollTop,0);assert.equal(viewport.scrollLeft,0);
+      assert.equal(f.node.querySelector('.data-grid').dataset.density,'default');
+      assert.equal(control(f.node,'Alpha 선택').checked,true);
+      assert.equal(f.node.querySelector('th[aria-sort="descending"]').textContent.includes('이름'),true);
+      viewport.scrollTop=240;viewport.scrollLeft=160;
+    }
   } finally {await f.dispose();}
 });
 

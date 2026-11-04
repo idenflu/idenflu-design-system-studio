@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, MultiSelect, NumberField, Progress, Select, Switch, Table, TableContainer, Tabs, TextArea, TextField, type DataGridColumn, type DataGridFilters, type DateValue } from '../src';
-import { badgeVariant, pageInfo, roles, statuses, teams, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings } from './layout-workspace-data';
+import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, MultiSelect, NumberField, Progress, Select, Switch, Table, TableContainer, Tabs, TextArea, TextField, type DataGridColumn, type DataGridFilters, type DateValue, type SelectOption } from '../src';
+import { badgeVariant, pageInfo, statuses, teams, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings } from './layout-workspace-data';
 
 export function WorkspacePageHeader({title,description,eyebrow,action}: {title:string;description:string;eyebrow?:string;action?:React.ReactNode}){
   return <header className="layout-page-heading"><div>{eyebrow&&<p className="layout-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p>{description}</p></div>{action}</header>;
@@ -17,18 +17,21 @@ export function ProjectForm({id,onCreate}: {id:string;onCreate:(draft:ProjectDra
   </form>;
 }
 
-export function InviteMemberForm({id,onInvite,existingEmails}: {id:string;onInvite:(member:Omit<Member,'id'>)=>void;existingEmails:string[]}){
-  const [name,setName]=React.useState(''),[email,setEmail]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[role,setRole]=React.useState('편집자');
+export function InviteMemberForm({id,onInvite,existingEmails,roleOptions,defaultRole}: {id:string;onInvite:(member:Omit<Member,'id'>)=>void;existingEmails:string[];roleOptions:readonly SelectOption[];defaultRole:string}){
+  const initialRole=roleOptions.some(option=>option.value===defaultRole)?defaultRole:'';
+  const [name,setName]=React.useState(''),[email,setEmail]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[role,setRole]=React.useState(initialRole);
+  const selectedRole=roleOptions.some(option=>option.value===role)?role:initialRole;
   const [error,setError]=React.useState('');
-  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,roles:[role]});}}>
+  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(!selectedRole)return;if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,roles:[selectedRole]});}}>
     <TextField label="이름" prefix={<Icon name="person"/>} prefixDecorative value={name} onChange={event=>setName(event.target.value)} required pattern=".*\S.*" autoFocus/>
     <TextField label="이메일" type="email" prefix={<Icon name="mail"/>} prefixDecorative value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
-    <Select label="소속 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" prefixIcon={<Icon name="shield-check"/>} value={role} options={roles} onValueChange={setRole} popupStrategy="fixed"/>
+    <Select label="소속 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" prefixIcon={<Icon name="shield-check"/>} value={selectedRole} options={roleOptions} onValueChange={setRole} popupStrategy="fixed" required disabled={!roleOptions.length}/>
+    {!roleOptions.length&&<p className="component-helper">멤버를 초대하려면 역할을 먼저 추가하세요.</p>}
     <p className="component-helper">샘플 멤버 목록에 추가하며 실제 초대 메일은 전송하지 않습니다.</p>
   </form>;
 }
 
-export function ProfileForm({id,member,members,onSave}: {id:string;member:Member;members:Member[];onSave:(profile:Pick<Member,'name'|'email'>)=>void}){
+export function ProfileForm({id,member,members,onSave,roleOptions}: {id:string;member:Member;members:Member[];onSave:(profile:Pick<Member,'name'|'email'>)=>void;roleOptions:readonly SelectOption[]}){
   const [name,setName]=React.useState(member.name),[email,setEmail]=React.useState(member.email);
   const [nameError,setNameError]=React.useState(''),[emailError,setEmailError]=React.useState('');
   const nameInput=React.useRef<HTMLInputElement>(null),emailInput=React.useRef<HTMLInputElement>(null);
@@ -44,38 +47,68 @@ export function ProfileForm({id,member,members,onSave}: {id:string;member:Member
   }}>
     <TextField ref={nameInput} label="이름" value={name} onChange={event=>{setName(event.target.value);setNameError('');}} required maxLength={60} error={nameError||undefined} autoFocus/>
     <TextField ref={emailInput} label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setEmailError('');}} required maxLength={254} error={emailError||undefined}/>
-    <div><MultiSelect label="역할" value={member.roles} options={roles.map(role=>role.value==='관리자'?{...role,label:'워크스페이스 관리자'}:role)} presentation="inline" disabled aria-describedby={`${id}-role-help`} placeholder="지정된 역할이 없습니다"/><p id={`${id}-role-help`} className="component-helper" style={{marginTop:'var(--space-1)'}}>역할은 멤버 관리에서 변경할 수 있습니다.</p></div>
+    <div><MultiSelect label="역할" value={member.roles} options={roleOptions} presentation="inline" disabled aria-describedby={`${id}-role-help`} placeholder="지정된 역할이 없습니다"/><p id={`${id}-role-help`} className="component-helper" style={{marginTop:'var(--space-1)'}}>역할은 멤버 관리에서 변경할 수 있습니다.</p></div>
   </form>;
 }
 
+const projectQueryDateTime=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
+
 export function ProjectsPage({page,projects,onOpen,onCreate,onDelete}: {page:'projects'|'active-projects'|'reviews'|'completed';projects:Project[];onOpen:(id:string)=>void;onCreate:()=>void;onDelete:(ids:string[])=>void}){
+  const [keyword,setKeyword]=React.useState('');
   const [team,setTeam]=React.useState('all');
   const [selectedStatuses,setSelectedStatuses]=React.useState<string[]>([]);
-  const [filters,setFilters]=React.useState<{team:string;statuses:string[]}>({team:'all',statuses:[]});
+  const [filters,setFilters]=React.useState<{keyword:string;team:string;statuses:string[]}|null>({keyword:'',team:'all',statuses:[]});
   const [columnFilters,setColumnFilters]=React.useState<DataGridFilters>({});
   const [selected,setSelected]=React.useState<string[]>([]);
+  const [scrollResetKey,setScrollResetKey]=React.useState(0);
+  const [lastQueriedAt,setLastQueriedAt]=React.useState(()=>new Date());
+  const [loading,setLoading]=React.useState(false);
+  const queryTimer=React.useRef<number|null>(null);
+  React.useEffect(()=>()=>{if(queryTimer.current!==null)window.clearTimeout(queryTimer.current);},[]);
+  const searchProjects=()=>{
+    if(queryTimer.current!==null)return;
+    const nextFilters={keyword:keyword.trim().toLocaleLowerCase(),team,statuses:[...selectedStatuses]};
+    setLoading(true);
+    setSelected([]);
+    queryTimer.current=window.setTimeout(()=>{
+      queryTimer.current=null;
+      setFilters(nextFilters);
+      setScrollResetKey(current=>current+1);
+      setLastQueriedAt(new Date());
+      setLoading(false);
+    },1000+Math.floor(Math.random()*2001));
+  };
+  const resetProjects=()=>{
+    if(queryTimer.current!==null){window.clearTimeout(queryTimer.current);queryTimer.current=null;}
+    setLoading(false);
+    setKeyword('');setTeam('all');setSelectedStatuses([]);setFilters(null);setColumnFilters({});setSelected([]);setScrollResetKey(current=>current+1);
+  };
   const filterStatus=page==='active-projects'?'진행 중':page==='reviews'?'검토 중':page==='completed'?'완료':null;
-  const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(filters.team==='all'||project.team===filters.team)&&(!filters.statuses.length||filters.statuses.includes(project.status))),[projects,filterStatus,filters]);
+  const rows=React.useMemo(()=>filters?projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(!filters.keyword||`${project.name} ${project.id}`.toLocaleLowerCase().includes(filters.keyword))&&(filters.team==='all'||project.team===filters.team)&&(!filters.statuses.length||filters.statuses.includes(project.status))):[],[projects,filterStatus,filters]);
   const availableIds=React.useMemo(()=>new Set(rows.map(row=>row.id)),[rows]);
   const visibleSelected=selected.filter(id=>availableIds.has(id));
   React.useEffect(()=>{setSelected(current=>{const next=current.filter(id=>availableIds.has(id));return next.length===current.length?current:next;});},[availableIds]);
   const columns:DataGridColumn<Project>[]=[
-    {id:'name',header:'프로젝트',accessor:row=>row.name,width:290,minWidth:200,filter:'text',cell:row=><button type="button" className="layout-project-link" onClick={()=>onOpen(row.id)}><span className="layout-project-link-title"><strong>{row.name}</strong><Icon name="arrow-up"/></span><small>{row.id}</small></button>},
+    {id:'name',header:'프로젝트',accessor:row=>row.name,width:290,minWidth:200,filter:'text',cell:row=><button type="button" className="layout-project-link" onClick={()=>onOpen(row.id)}><span className="layout-project-link-title"><span>{row.name}</span><Icon name="arrow-up"/></span><small>{row.id}</small></button>},
     {id:'status',header:'상태',accessor:row=>row.status,width:120,filter:'select',filterOptions:statuses,cell:row=><Badge variant={badgeVariant(row.status)}>{row.status}</Badge>},
     {id:'team',header:'담당 팀',accessor:row=>row.team,width:165,filter:'select',filterOptions:teams},
     {id:'owner',header:'담당자',accessor:row=>row.owner,width:130,filter:'text',cell:row=><span className="layout-person"><Avatar size="sm" shape="circle" variant="neutral">{row.owner.slice(0,1)}</Avatar>{row.owner}</span>},
     {id:'progress',header:'진행률',accessor:row=>row.progress,width:160,filter:'number',cell:row=><span className="layout-progress-cell"><Progress value={row.progress} max={100} aria-label={`${row.name} 진행률`}/><span>{row.progress}%</span></span>},
     {id:'due',header:'마감일',accessor:row=>row.due,width:135,filter:'text'},
   ];
-  return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
-    <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();setFilters({team,statuses:selectedStatuses});}}>
-      <Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/>
-      <MultiSelect className="layout-inline-select layout-project-status-filter" label="프로젝트 상태 필터" value={selectedStatuses} onValueChange={setSelectedStatuses} options={statuses} placeholder="전체 상태" presentation="inline" clearable popupStrategy="fixed"/>
-      <Button variant="ghost" onClick={()=>{setTeam('all');setSelectedStatuses([]);setFilters({team:'all',statuses:[]});setColumnFilters({});setSelected([]);}}><Icon name="refresh"/>필터 초기화</Button>
-      <Button type="submit"><Icon name="search"/>검색</Button>
-      <Button className="layout-filter-delete" variant="danger" disabled={!visibleSelected.length} onClick={()=>onDelete(visibleSelected)}><Icon name="trash"/>삭제</Button>
+  return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description}/>
+    <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();searchProjects();}}>
+      <TextField className="layout-project-keyword" label="프로젝트명 / ID" type="search" value={keyword} onChange={event=>setKeyword(event.target.value)} placeholder="프로젝트명 또는 ID 입력" prefix={<Icon name="search"/>} prefixDecorative autoComplete="off"/>
+      <Select label="담당 팀" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/>
+      <MultiSelect className="layout-inline-select layout-project-status-filter" label="프로젝트 상태" value={selectedStatuses} onValueChange={setSelectedStatuses} options={statuses} placeholder="전체 상태" presentation="inline" clearable={selectedStatuses.length>0} popupStrategy="fixed"/>
+      <Button variant="outline" onClick={resetProjects}><Icon name="refresh"/>초기화</Button>
+      <Button type="submit" disabled={loading} aria-busy={loading||undefined}><Icon name="search"/>검색</Button>
     </form>
-    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns} getRowId={row=>row.id} getRowLabel={row=>row.name} searchable={false} showColumnFilterToggle filters={columnFilters} onFiltersChange={next=>{setColumnFilters(next);setSelected([]);}} pagination={false} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} exportable exportFormats={['csv','xlsx']} exportFileName="workspace-projects.csv"/>
+    <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns} getRowId={row=>row.id} getRowLabel={row=>row.name} searchable={false} showColumnFilterToggle filters={columnFilters} onFiltersChange={next=>{setColumnFilters(next);setSelected([]);}} scrollResetKey={scrollResetKey} pagination={false} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected}
+      toolbarOrder={['selection','actions']} toolbarActions={<Button onClick={onCreate} disabled={loading}><Icon name="add"/>새 프로젝트</Button>} loading={loading}
+      selectionActions={<><Button variant="outline" disabled={visibleSelected.length!==1} onClick={()=>{if(visibleSelected.length===1)onOpen(visibleSelected[0]);}}><Icon name="edit"/>수정</Button><Button variant="danger" onClick={()=>onDelete(visibleSelected)}><Icon name="trash"/>선택 삭제</Button></>} exportable exportFormats={['csv','xlsx']} exportFileName="workspace-projects.csv"
+      emptyMessage={filters?(filters.keyword||filters.team!=='all'||filters.statuses.length?'검색 조건에 맞는 프로젝트가 없습니다.':'등록된 데이터가 없습니다.'):'검색 버튼을 눌러 프로젝트 목록을 조회하세요.'}
+      footer={({filteredCount,selectedCount,loading})=><div className="layout-grid-footer"><p className="component-helper">{loading?'조회 중…':`${filteredCount}개 항목${selectedCount>0?` · ${selectedCount}개 선택됨`:''}`}</p><p className="component-helper layout-grid-last-query">마지막 조회 <time dateTime={lastQueriedAt.toISOString()} title="한국 표준시 (KST)">{projectQueryDateTime.format(lastQueriedAt)}</time></p></div>}/>
   </>;
 }
 
@@ -126,11 +159,11 @@ export function ProjectDetailContent({project,members,onUpdate}: {project:Projec
   </>;
 }
 
-export function MembersPage({members,onInvite,onRole}: {members:Member[];onInvite:()=>void;onRole:(id:string,roles:string[])=>void}){
+export function MembersPage({members,onInvite,onRole,roleOptions}: {members:Member[];onInvite:()=>void;onRole:(id:string,roles:string[])=>void;roleOptions:readonly SelectOption[]}){
   const [query,setQuery]=React.useState(''),[team,setTeam]=React.useState('all');
   const visible=members.filter(member=>`${member.name} ${member.email}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())&&(team==='all'||member.team===team));
-  return <><WorkspacePageHeader title="멤버 관리" description="함께 일하는 팀원을 찾고 역할을 관리하세요." eyebrow="TEAM MEMBERS" action={<Button onClick={onInvite}><Icon name="add"/>멤버 초대</Button>}/><div className="layout-member-filters"><TextField label="멤버 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="이름 또는 이메일 검색"/><Select label="소속 팀 필터" value={team} options={[{value:'all',label:'전체 팀'},...teams]} onValueChange={setTeam}/></div>
-    <TableContainer label="워크스페이스 멤버 목록" className="layout-members-table"><Table><thead><tr><th scope="col">멤버</th><th scope="col">소속 팀</th><th scope="col">역할</th><th scope="col">상태</th></tr></thead><tbody>{visible.map(member=><tr key={member.id}><td><span className="layout-person"><Avatar shape="circle" variant="neutral">{member.name.slice(0,1)}</Avatar><span><strong>{member.name}</strong><small>{member.email}</small></span></span></td><td>{member.team}</td><td><div className="layout-inline-select"><MultiSelect hideLabel label={`${member.name} 역할`} value={member.roles} options={roles} presentation="inline" popupStrategy="fixed" placeholder="역할 선택" onValueChange={selected=>onRole(member.id,selected)}/></div></td><td><Badge variant="success">활성</Badge></td></tr>)}</tbody></Table></TableContainer>{!visible.length&&<p role="status" className="layout-empty">검색 결과가 없습니다.</p>}<p className="layout-content-caption">전체 {members.length}명 중 {visible.length}명을 표시합니다.</p>
+  return <><WorkspacePageHeader title="멤버 관리" description="함께 일하는 팀원을 찾고 역할을 관리하세요." eyebrow="TEAM MEMBERS" action={<Button onClick={onInvite} disabled={!roleOptions.length}><Icon name="add"/>멤버 초대</Button>}/>{!roleOptions.length&&<p className="component-helper">멤버를 초대하려면 역할을 먼저 추가하세요.</p>}<div className="layout-member-filters"><TextField label="멤버 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="이름 또는 이메일 검색"/><Select label="소속 팀 필터" value={team} options={[{value:'all',label:'전체 팀'},...teams]} onValueChange={setTeam}/></div>
+    <TableContainer label="워크스페이스 멤버 목록" className="layout-members-table"><Table><thead><tr><th scope="col">멤버</th><th scope="col">소속 팀</th><th scope="col">역할</th><th scope="col">상태</th></tr></thead><tbody>{visible.map(member=><tr key={member.id}><td><span className="layout-person"><Avatar shape="circle" variant="neutral">{member.name.slice(0,1)}</Avatar><span><strong>{member.name}</strong><small>{member.email}</small></span></span></td><td>{member.team}</td><td><div className="layout-inline-select"><MultiSelect hideLabel label={`${member.name} 역할`} value={member.roles} options={roleOptions} presentation="inline" popupStrategy="fixed" placeholder="역할 선택" onValueChange={selected=>onRole(member.id,selected)}/></div></td><td><Badge variant="success">활성</Badge></td></tr>)}</tbody></Table></TableContainer>{!visible.length&&<p role="status" className="layout-empty">검색 결과가 없습니다.</p>}<p className="layout-content-caption">전체 {members.length}명 중 {visible.length}명을 표시합니다.</p>
   </>;
 }
 
@@ -149,7 +182,7 @@ function WorkspaceSettingsForm({settings,onSave}:SettingsProps){
     <TextArea label="워크스페이스 소개" value={description} onChange={event=>change('description',event.target.value)} rows={3}/>
     <Select label="시간대" value={timezone} onValueChange={value=>change('timezone',value)} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/>
     <div>
-      <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'tree',label:'트리형 (기본)'},{value:'category',label:'카테고리형'}]} aria-describedby={menuStyleDescriptionId}/>
+      <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'category',label:'카테고리형 (기본)'},{value:'tree',label:'트리형'}]} aria-describedby={menuStyleDescriptionId}/>
       <p id={menuStyleDescriptionId} className="component-helper">카테고리형은 업무 공간·조직 관리·환경 설정을 제목으로 구분합니다.</p>
     </div>
     <div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div>

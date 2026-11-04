@@ -1,0 +1,74 @@
+const {test,expect}=require('@playwright/test');
+const route='/systems/idenflu-mono/index.html#/components/data-grid';
+const gridFor=page=>page.getByRole('group',{name:'하단 요약 데이터그리드',exact:true});
+const metric=(footer,label)=>footer.locator('dt').filter({hasText:new RegExp(`^${label}$`)}).locator('..').locator('dd');
+
+test('custom footer follows search, filters and selection including hidden selected rows',async({page})=>{
+  await page.goto(route);
+  const grid=gridFor(page),footer=grid.locator('.data-grid-footer');
+  const queriedAt=await footer.locator('time').getAttribute('datetime');
+  await expect(metric(footer,'조회')).toHaveText('6 / 6건');
+  await expect(metric(footer,'조회 예산 합계')).toHaveText('7,400,000원');
+  await expect(metric(footer,'선택')).toHaveText('0건');
+  await grid.getByRole('checkbox',{name:'디자인 시스템 선택',exact:true}).check();
+  await expect(metric(footer,'선택')).toHaveText('1건');
+  await expect(metric(footer,'선택 예산 합계')).toHaveText('1,500,000원');
+  await grid.getByRole('combobox',{name:/^담당 팀 필터:/}).click();
+  await page.getByRole('option',{name:'개발',exact:true}).click();
+  await expect(metric(footer,'조회')).toHaveText('3 / 6건');
+  await expect(metric(footer,'조회 예산 합계')).toHaveText('4,500,000원');
+  await expect(metric(footer,'선택 예산 합계')).toHaveText('1,500,000원');
+  const search=grid.getByRole('searchbox',{name:'하단 요약 검색',exact:true});
+  await search.fill('알림');
+  await expect(metric(footer,'조회 예산 합계')).toHaveText('900,000원');
+  await grid.getByRole('button',{name:'선택 해제',exact:true}).click();
+  await expect(metric(footer,'선택')).toHaveText('0건');
+  await grid.getByRole('checkbox',{name:'검색 결과 전체 선택',exact:true}).check();
+  await expect(metric(footer,'선택 예산 합계')).toHaveText('900,000원');
+  await search.fill('결과없는검색');
+  await expect(metric(footer,'조회')).toHaveText('0 / 6건');
+  await expect(metric(footer,'조회 예산 합계')).toHaveText('0원');
+  await expect(metric(footer,'선택')).toHaveText('1건');
+  await expect(footer.locator('time')).toHaveAttribute('datetime',queriedAt);
+  await expect(grid.getByRole('status')).toContainText('검색 결과가 없습니다.');
+  await expect(grid.getByRole('status')).toContainText('1개 선택됨');
+  await expect(footer.locator('.pagination,.data-grid-page-size')).toHaveCount(0);
+});
+
+test('last query timestamp changes on successful refresh and stays fixed during loading or local interaction',async({page})=>{
+  await page.clock.install({time:new Date('2026-11-04T00:00:00Z')});
+  await page.goto(route);
+  await page.clock.pauseAt(new Date('2026-11-04T00:05:00Z'));
+  const grid=gridFor(page),footer=grid.locator('.data-grid-footer');
+  const time=footer.locator('time'),initial=await time.getAttribute('datetime');
+  await page.clock.runFor(1000);
+  await grid.getByRole('checkbox',{name:'디자인 시스템 선택',exact:true}).check();
+  await grid.getByRole('button',{name:'다시 조회',exact:true}).click();
+  await expect(grid.getByRole('button',{name:'조회 중',exact:true})).toBeDisabled();
+  await expect(footer).toContainText('데이터를 조회하는 중입니다.');
+  await expect(footer.locator('dl')).toHaveCount(0);
+  await expect(time).toHaveAttribute('datetime',initial);
+  await page.clock.runFor(600);
+  await expect(time).toHaveAttribute('datetime',initial);
+  await page.clock.runFor(200);
+  await expect(grid.getByRole('button',{name:'다시 조회',exact:true})).toBeEnabled();
+  const refreshed=await time.getAttribute('datetime');
+  expect(Date.parse(refreshed)).toBeGreaterThan(Date.parse(initial));
+  await expect(metric(footer,'조회 예산 합계')).toHaveText('7,400,000원');
+  await expect(metric(footer,'선택')).toHaveText('1건');
+  await grid.getByRole('searchbox',{name:'하단 요약 검색',exact:true}).fill('브랜드');
+  await expect(time).toHaveAttribute('datetime',refreshed);
+});
+
+test('custom footer metrics and last query timestamp fit narrow and themed pages',{tag:['@mobile','@theme']},async({page})=>{
+  await page.goto(route);
+  const grid=gridFor(page),footer=grid.locator('.data-grid-footer');
+  await footer.scrollIntoViewIfNeeded();
+  await expect(footer.locator('time')).toBeVisible();
+  await expect(footer.locator('dt')).toHaveCount(4);
+  expect(await footer.evaluate(element=>element.scrollWidth<=element.clientWidth)).toBe(true);
+  const bounds=await footer.boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x+bounds.width).toBeLessThanOrEqual(page.viewportSize().width);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
+});

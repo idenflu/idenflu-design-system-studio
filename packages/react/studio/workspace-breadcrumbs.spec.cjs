@@ -15,10 +15,10 @@ test('workspace breadcrumbs follow the menu hierarchy in both styles and project
     ['역할 관리',['조직 관리','역할 관리']],
     ['워크스페이스 설정',['환경 설정','워크스페이스 설정']],
   ];
-  for(const style of ['tree','category']){
-    if(style==='category'){
-      await panel(page).getByRole('combobox',{name:'사이드 메뉴 스타일: 트리형 (기본)',exact:true}).click();
-      await page.getByRole('option',{name:'카테고리형',exact:true}).click();
+  for(const style of ['category','tree']){
+    if(style==='tree'){
+      await panel(page).getByRole('combobox',{name:'사이드 메뉴 스타일: 카테고리형 (기본)',exact:true}).click();
+      await page.getByRole('option',{name:'트리형',exact:true}).click();
       await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
     }
     for(const [title,path] of paths){

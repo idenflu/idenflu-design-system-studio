@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DropdownMenu, Icon, IconButton, Popover, Tabs, TextField, Tree, type TreeNode } from '../src';
 import { StudioSettings, ThemeControl } from './controls';
-import { initialWorkspaceRoles } from './layout-role-data';
+import { initialWorkspaceRoles, type WorkspaceRole } from './layout-role-data';
 import { RoleManagementPage } from './layout-role-management';
 import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspacePagePath, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings, type WorkspaceTab } from './layout-workspace-data';
 import { HomePage, InviteMemberForm, MasterDetailPage, MembersPage, NotificationSettingsPage, ProfileForm, ProjectDetailContent, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage, VerticalSettingsPage } from './layout-workspace-pages';
@@ -51,6 +51,9 @@ function WorkspaceTabsToolbar({workspaceRef,items,onSelect}: {workspaceRef:React
 export function SidebarLayoutSample() {
   const [projects,setProjects]=React.useState(initialProjects),[members,setMembers]=React.useState(initialMembers),[settings,setSettings]=React.useState(initialSettings);
   const [workspaceRoles,setWorkspaceRoles]=React.useState(initialWorkspaceRoles);
+  const roleOptions=workspaceRoles.map(role=>({value:role.name,label:role.name}));
+  const defaultInviteRole=workspaceRoles.find(role=>role.id==='role-editor')?.name??workspaceRoles.find(role=>role.id==='role-viewer')?.name??'';
+  const profileRoleOptions=workspaceRoles.map(role=>({value:role.name,label:role.id==='role-admin'&&role.name==='관리자'?'워크스페이스 관리자':role.name}));
   const [tabs,setTabs]=React.useState<WorkspaceTab[]>([{key:'home',page:'home'},{key:'projects',page:'projects'}]);
   const [active,setActive]=React.useState('projects'),[expanded,setExpanded]=React.useState(defaultExpanded),[searchExpanded,setSearchExpanded]=React.useState(defaultExpanded),[menuQuery,setMenuQuery]=React.useState('');
   const [mobileOpen,setMobileOpen]=React.useState(false),[searchOpen,setSearchOpen]=React.useState(false),[search,setSearch]=React.useState('');
@@ -65,6 +68,7 @@ export function SidebarLayoutSample() {
   const deleteCancel=React.useRef<HTMLButtonElement>(null);
   const deleteConfirmed=React.useRef(false);
   const workspaceRef=React.useRef<HTMLElement>(null);
+  const roleSequence=React.useRef(0);
   const activeTab=tabs.find(tab=>tab.key===active)??tabs[0];
   const currentMember=members.find(member=>member.id==='member-1')??initialMembers[0];
   const detailProject=projects.find(project=>project.id===detailProjectId);
@@ -99,13 +103,39 @@ export function SidebarLayoutSample() {
   React.useEffect(()=>{const media=window.matchMedia('(min-width: 901px)');const change=()=>{if(media.matches)setMobileOpen(false);};media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
   const createProject=(draft:ProjectDraft)=>{const id=`PRJ-${String(Math.max(0,...projects.map(project=>Number(project.id.split('-')[1])))+1).padStart(3,'0')}`;setProjects(values=>[{...draft,id,owner:currentMember.name,status:'준비 중',progress:0},...values]);setCreateOpen(false);openProject(id);setNotice(`“${draft.name}” 프로젝트를 만들었습니다.`);};
   const saveProfile=(profile:Pick<Member,'name'|'email'>)=>{setMembers(values=>values.map(member=>member.id===currentMember.id?{...member,...profile}:member));if(profile.name!==currentMember.name)setProjects(values=>values.map(project=>project.owner===currentMember.name?{...project,owner:profile.name}:project));setAccountOpen(false);setNotice('프로필을 저장했습니다.');};
-  const inviteMember=(member:Omit<Member,'id'>)=>{if(members.some(item=>item.email.toLowerCase()===member.email.toLowerCase())){setNotice('이미 등록된 이메일입니다.');return;}setMembers(values=>[...values,{...member,id:`member-${Date.now()}`}]);setInviteOpen(false);setNotice(`${member.name}님을 샘플 멤버 목록에 추가했습니다.`);};
+  const inviteMember=(member:Omit<Member,'id'>)=>{if(members.some(item=>item.email.toLowerCase()===member.email.toLowerCase())){setNotice('이미 등록된 이메일입니다.');return;}if(!member.roles.length||member.roles.some(name=>!workspaceRoles.some(role=>role.name===name))){setNotice('현재 사용할 수 있는 역할을 선택해주세요.');return;}setMembers(values=>[...values,{...member,roles:[...new Set(member.roles)],id:`member-${Date.now()}`}]);setInviteOpen(false);setNotice(`${member.name}님을 샘플 멤버 목록에 추가했습니다.`);};
+  const createWorkspaceRole=(details:Pick<WorkspaceRole,'name'|'description'>)=>{
+    const name=details.name.trim().normalize('NFC');
+    if(!name||workspaceRoles.some(role=>role.name.normalize('NFC').toLocaleLowerCase()===name.toLocaleLowerCase())){setNotice('중복되지 않는 역할 이름을 입력해주세요.');return '';}
+    const id=`role-${Date.now()}-${++roleSequence.current}`;
+    setWorkspaceRoles(values=>[...values,{id,name,description:details.description.trim(),permissions:[],notifications:{}}]);
+    setNotice(`“${name}” 역할을 추가했습니다. 권한과 알림을 설정해주세요.`);
+    return id;
+  };
+  const updateWorkspaceRole=(id:string,details:Pick<WorkspaceRole,'name'|'description'>)=>{
+    const current=workspaceRoles.find(role=>role.id===id),name=details.name.trim().normalize('NFC');
+    if(!current)return;
+    if(!name||workspaceRoles.some(role=>role.id!==id&&role.name.normalize('NFC').toLocaleLowerCase()===name.toLocaleLowerCase())){setNotice('중복되지 않는 역할 이름을 입력해주세요.');return;}
+    setWorkspaceRoles(values=>values.map(role=>role.id===id?{...role,name,description:details.description.trim()}:role));
+    if(name!==current.name)setMembers(values=>values.map(member=>member.roles.includes(current.name)?{...member,roles:[...new Set(member.roles.map(value=>value===current.name?name:value))]}:member));
+    setNotice('역할 정보를 수정했습니다.');
+  };
+  const deleteWorkspaceRole=(id:string,replacementId?:string)=>{
+    const current=workspaceRoles.find(role=>role.id===id);
+    if(!current)return;
+    const used=members.some(member=>member.roles.includes(current.name));
+    const replacement=workspaceRoles.find(role=>role.id!==id&&role.id===replacementId);
+    if(used&&!replacement){setNotice('사용 중인 역할은 대체 역할을 선택해야 삭제할 수 있습니다.');return;}
+    if(used&&replacement)setMembers(values=>values.map(member=>member.roles.includes(current.name)?{...member,roles:[...new Set([...member.roles.filter(name=>name!==current.name),replacement.name])]}:member));
+    setWorkspaceRoles(values=>values.filter(role=>role.id!==id));
+    setNotice(`“${current.name}” 역할을 삭제했습니다.`);
+  };
   const renderPage=(tab:WorkspaceTab)=>{
     if(tab.page==='project-detail'){const project=projects.find(item=>item.id===tab.projectId);return project?<ProjectDetailPage project={project} members={members} onUpdate={updateProject} onPage={openPage}/>:null;}
     if(tab.page==='home')return <HomePage projects={projects} members={members} onOpen={openProject} onPage={openPage}/>;
     if(tab.page==='master-detail')return <MasterDetailPage projects={projects} members={members} onUpdate={updateProject} onOpen={openProject}/>;
-    if(tab.page==='members')return <MembersPage members={members} onInvite={()=>setInviteOpen(true)} onRole={(id,roles)=>{setMembers(values=>values.map(member=>member.id===id?{...member,roles}:member));setNotice('멤버 역할을 변경했습니다.');}}/>;
-    if(tab.page==='role-management')return <RoleManagementPage roles={workspaceRoles} members={members} onSave={(id,connections)=>{setWorkspaceRoles(values=>values.map(role=>role.id===id?{...role,...connections}:role));setNotice('역할의 권한과 알림 설정을 저장했습니다.');}}/>;
+    if(tab.page==='members')return <MembersPage members={members} roleOptions={roleOptions} onInvite={()=>setInviteOpen(true)} onRole={(id,roles)=>{const assigned=[...new Set(roles.filter(name=>workspaceRoles.some(role=>role.name===name)))];setMembers(values=>values.map(member=>member.id===id?{...member,roles:assigned}:member));setNotice('멤버 역할을 변경했습니다.');}}/>;
+    if(tab.page==='role-management')return <RoleManagementPage roles={workspaceRoles} members={members} onCreate={createWorkspaceRole} onUpdate={updateWorkspaceRole} onDelete={deleteWorkspaceRole} onSave={(id,connections)=>{setWorkspaceRoles(values=>values.map(role=>role.id===id?{...role,...connections}:role));setNotice('역할의 권한과 알림 설정을 저장했습니다.');}}/>;
     if(tab.page==='settings')return <SettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}}/>;
     if(tab.page==='notifications')return <NotificationSettingsPage settings={settings} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
     if(tab.page==='vertical-settings')return <VerticalSettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
@@ -165,7 +195,7 @@ export function SidebarLayoutSample() {
     <Dialog open={searchOpen} onOpenChange={setSearchOpen} variant="divided" className="layout-command-dialog" aria-labelledby="workspace-search-title" aria-describedby="workspace-search-description" closeOnBackdrop><DialogHeader><div><h2 id="workspace-search-title">빠른 검색</h2><p id="workspace-search-description">메뉴나 프로젝트를 검색해 빠르게 이동하세요.</p></div><Button size="sm" variant="ghost" aria-label="검색 닫기" onClick={()=>setSearchOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody><TextField hideLabel ref={searchInput} label="메뉴 및 프로젝트 검색" type="search" value={search} onChange={event=>setSearch(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="어떤 화면을 찾으세요?"/><div className="layout-command-results">{menuResults.length>0&&<section><h3>메뉴</h3>{menuResults.map(page=><button type="button" key={page} onClick={()=>openPage(page)}><Icon name={pageInfo[page].icon}/><span>{pageInfo[page].title}<small>{pageInfo[page].group}</small></span><Icon name="arrow-right"/></button>)}</section>}{projectResults.length>0&&<section><h3>프로젝트</h3>{projectResults.map(project=><button type="button" key={project.id} onClick={()=>openProject(project.id)}><Icon name="folder"/><span>{project.name}<small>{project.id}</small></span><Icon name="arrow-right"/></button>)}</section>}{!menuResults.length&&!projectResults.length&&<p className="layout-empty" role="status">검색 결과가 없습니다.</p>}</div></DialogBody></Dialog>
     <Dialog open={!!detailProject} onOpenChange={open=>{if(!open)setDetailProjectId(null);}} variant="divided" className="layout-project-detail-dialog" aria-labelledby="workspace-project-detail-title" closeOnBackdrop><DialogHeader><div><h2 id="workspace-project-detail-title">프로젝트 상세</h2>{detailProject&&<p>{detailProject.name} · {detailProject.id}</p>}</div><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setDetailProjectId(null)}><Icon name="close"/></Button></DialogHeader><DialogBody>{detailProject&&<ProjectDetailContent project={detailProject} members={members} onUpdate={updateProject}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setDetailProjectId(null)}>닫기</Button><Button onClick={()=>{if(detailProject){setDetailProjectId(null);openProject(detailProject.id);}}}>새 탭으로 열기<Icon name="arrow-right"/></Button></DialogFooter></Dialog>
     <Dialog open={createOpen} onOpenChange={setCreateOpen} variant="divided" className="layout-project-create-dialog" aria-labelledby="workspace-create-title" closeOnBackdrop><DialogHeader><h2 id="workspace-create-title">새 프로젝트</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setCreateOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{createOpen&&<ProjectForm id={createFormId} onCreate={createProject}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setCreateOpen(false)}>취소</Button><Button type="submit" form={createFormId}>프로젝트 만들기</Button></DialogFooter></Dialog>
-    <Dialog open={inviteOpen} onOpenChange={setInviteOpen} variant="divided" aria-labelledby="workspace-invite-title" closeOnBackdrop><DialogHeader><h2 id="workspace-invite-title">멤버 초대</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setInviteOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{inviteOpen&&<InviteMemberForm id={inviteFormId} onInvite={inviteMember} existingEmails={members.map(member=>member.email)}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setInviteOpen(false)}>취소</Button><Button type="submit" form={inviteFormId}>멤버 추가</Button></DialogFooter></Dialog>
-    <Dialog open={accountOpen} onOpenChange={setAccountOpen} variant="divided" aria-labelledby="workspace-account-title" aria-describedby="workspace-account-description" closeOnBackdrop><DialogHeader><div><h2 id="workspace-account-title">내 프로필</h2><p id="workspace-account-description">이름과 이메일을 수정할 수 있습니다.</p></div><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setAccountOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{accountOpen&&<><div className="layout-profile"><Avatar size="lg" shape="circle" variant="neutral">{Array.from(currentMember.name)[0]}</Avatar></div><ProfileForm id={profileFormId} member={currentMember} members={members} onSave={saveProfile}/><Button className="layout-profile-settings" variant="outline" onClick={()=>{setAccountOpen(false);openPage('settings');}}>워크스페이스 설정</Button></>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setAccountOpen(false)}>취소</Button><Button type="submit" form={profileFormId}>저장</Button></DialogFooter></Dialog>
+    <Dialog open={inviteOpen} onOpenChange={setInviteOpen} variant="divided" aria-labelledby="workspace-invite-title" closeOnBackdrop><DialogHeader><h2 id="workspace-invite-title">멤버 초대</h2><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setInviteOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{inviteOpen&&<InviteMemberForm id={inviteFormId} onInvite={inviteMember} existingEmails={members.map(member=>member.email)} roleOptions={roleOptions} defaultRole={defaultInviteRole}/>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setInviteOpen(false)}>취소</Button><Button type="submit" form={inviteFormId} disabled={!roleOptions.length}>멤버 추가</Button></DialogFooter></Dialog>
+    <Dialog open={accountOpen} onOpenChange={setAccountOpen} variant="divided" aria-labelledby="workspace-account-title" aria-describedby="workspace-account-description" closeOnBackdrop><DialogHeader><div><h2 id="workspace-account-title">내 프로필</h2><p id="workspace-account-description">이름과 이메일을 수정할 수 있습니다.</p></div><Button size="sm" variant="ghost" aria-label="닫기" onClick={()=>setAccountOpen(false)}><Icon name="close"/></Button></DialogHeader><DialogBody>{accountOpen&&<><div className="layout-profile"><Avatar size="lg" shape="circle" variant="neutral">{Array.from(currentMember.name)[0]}</Avatar></div><ProfileForm id={profileFormId} member={currentMember} members={members} onSave={saveProfile} roleOptions={profileRoleOptions}/><Button className="layout-profile-settings" variant="outline" onClick={()=>{setAccountOpen(false);openPage('settings');}}>워크스페이스 설정</Button></>}</DialogBody><DialogFooter><Button variant="outline" onClick={()=>setAccountOpen(false)}>취소</Button><Button type="submit" form={profileFormId}>저장</Button></DialogFooter></Dialog>
   </div>;
 }

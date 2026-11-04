@@ -18,9 +18,12 @@ async function chooseStyle(page,current,next){
 test('saved side menu styles keep one tree, category search and branch state',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   const desktopTree=page.locator('.layout-workspace-sidebar .demo-tree');
-  await expect(desktopTree.locator(':scope > details')).toHaveCount(3);
+  await expect(desktopTree.locator('.tree-category-label')).toHaveText(['업무 공간','조직 관리','환경 설정']);
   await navigate(page,'워크스페이스 설정',isMobile);
-  await chooseStyle(page,'트리형 (기본)','카테고리형');
+  await chooseStyle(page,'카테고리형 (기본)','트리형');
+  await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
+  await expect(desktopTree.locator(':scope > details')).toHaveCount(3);
+  await chooseStyle(page,'트리형','카테고리형 (기본)');
   await expect(desktopTree.locator('.tree-category')).toHaveCount(0);
   await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
   await openMenu(page,isMobile);
@@ -40,7 +43,7 @@ test('saved side menu styles keep one tree, category search and branch state',{t
   await tree.getByRole('button',{name:'대시보드',exact:true}).click();
   await expect(panel(page).getByRole('heading',{level:1,name:'대시보드',exact:true})).toBeVisible();
   await navigate(page,'워크스페이스 설정',isMobile);
-  await chooseStyle(page,'카테고리형','트리형 (기본)');
+  await chooseStyle(page,'카테고리형 (기본)','트리형');
   await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
   await openMenu(page,isMobile);
   await expect(tree.locator('.tree-category-label')).toHaveCount(0);

@@ -176,6 +176,7 @@
 .data-grid .data-grid-select-cell { padding-inline:var(--space-4); }
 .data-grid-select-cell .choice { gap:0; width:18px; min-height:18px; }
 .data-grid .data-grid-state-cell { padding:0; text-align:center; }
+.data-grid .data-grid-table tbody tr:has(> .data-grid-state-cell) { background:transparent; }
 .data-grid-state { position:sticky; inset-inline-start:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--space-3); min-height:220px; max-width:100%; padding:var(--space-8); color:var(--text-secondary); }
 .data-grid .data-grid-table:has(.data-grid-state-cell) { height:100%; }
 .data-grid .data-grid-state-cell, .data-grid-state { height:100%; }
@@ -184,6 +185,8 @@
 .data-grid-state p { margin:0; }
 .data-grid-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3) var(--space-4); padding:var(--space-3) var(--space-4); }
 .data-grid-footer > .component-helper { margin:0; font-variant-numeric:tabular-nums; }
+.data-grid-footer--custom { min-width:0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.data-grid-footer--custom > * { min-width:0; max-width:100%; }
 .data-grid-page-tools { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:var(--space-4); margin-inline-start:auto; max-width:100%; }
 .data-grid-page-size { display:flex; align-items:center; gap:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); }
 .data-grid-page-size > span { white-space:nowrap; }

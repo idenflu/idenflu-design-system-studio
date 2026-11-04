@@ -6,6 +6,7 @@ import { DataGridToolbarDemos } from './data-grid-toolbar-demos';
 import { DataGridMultiFilterDemo } from './data-grid-multi-filter-demo';
 import {ProjectStatusBadge} from './status-definitions';
 import {DataGridStatusDemos} from './status-demos';
+import { DataGridFooterDemo } from './data-grid-footer-demo';
 
 type Project = {
   id:string; name:string; team:string; owner:string | null;
@@ -111,6 +112,7 @@ export function DataGridDemos() {
     </Section>
     <DataGridStatusDemos />
     <DataGridMultiFilterDemo />
+    <DataGridFooterDemo />
     <Section title="셀 편집과 값 바인딩" description="텍스트·숫자 편집, 입력 검증과 읽기 전용 행을 비교합니다. 저장한 값은 React 상태에 반영되어 다시 검색·정렬할 수 있습니다.">
       <DataGrid label="작업 편집 데이터그리드" rows={tasks} columns={taskColumns}
         className="studio-grid-edit-example"
@@ -221,4 +223,20 @@ export function VirtualProjectGrid({ rows }: { rows: Project[] }) {
 }
 // pagination을 명시하면 현재 페이지 안에서만 가상화합니다.
 // <DataGrid ... virtualized pagination defaultPageSize={100} />
+
+// lastQueriedAt은 애플리케이션에서 조회 성공 시 저장한 시각입니다.
+export function FooterProjectGrid({ rows, lastQueriedAt }: { rows: Project[]; lastQueriedAt: Date }) {
+  return <DataGrid label="프로젝트 요약" rows={rows} columns={columns}
+    getRowId={row => row.id} selectable pagination={false} maxHeight={360}
+    footer={({ filteredRows, filteredCount, totalCount, selectedCount }) => (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, width: '100%' }}>
+        <span>조회 {filteredCount} / {totalCount}건</span>
+        <span>예상 시간 합계 {filteredRows.reduce((sum, row) => sum + row.hours, 0)}시간</span>
+        <span>선택 {selectedCount}건</span>
+        <span>마지막 조회 <time dateTime={lastQueriedAt.toISOString()}>
+          {lastQueriedAt.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
+        </time></span>
+      </div>
+    )} />;
+}
 `;

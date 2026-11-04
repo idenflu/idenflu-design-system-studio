@@ -13,6 +13,8 @@ export type { DataGridVirtualizationOptions } from './data-grid-virtual';
 export type { DataGridToolbarItem } from './data-grid-toolbar';
 export type { DataGridExportFormat } from './data-grid-file';
 
+const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
 export interface DataGridColumn<T> {
   id: string;
   header: string;
@@ -37,6 +39,23 @@ export interface DataGridSort { columnId: string; direction: 'asc' | 'desc' }
 export type DataGridSortModel = readonly DataGridSort[];
 export type DataGridFilters = Record<string, string | string[] | {min?: string; max?: string}>;
 export interface DataGridCellEdit<T> { row: T; rowId: string; columnId: string; value: string }
+export interface DataGridFooterContext<T> {
+  totalCount: number;
+  filteredCount: number;
+  selectedCount: number;
+  /** Sorted matching rows across all pages; empty while loading or errored. */
+  filteredRows: readonly T[];
+  /** All rows on the current page, including those outside a virtual window. */
+  pageRows: readonly T[];
+  /** Valid selected rows from the original data, including filtered-out rows. */
+  selectedRows: readonly T[];
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  pagination: boolean;
+  loading: boolean;
+  hasError: boolean;
+}
 export interface DataGridProps<T> {
   label: string;
   rows: readonly T[];
@@ -94,6 +113,8 @@ export interface DataGridProps<T> {
   onRetry?: () => void;
   emptyMessage?: React.ReactNode;
   maxHeight?: number | string;
+  /** Changing this value resets both scroll axes without changing grid state. */
+  scrollResetKey?: string | number;
   className?: string;
   exportable?: boolean;
   exportFileName?: string;
@@ -104,6 +125,8 @@ export interface DataGridProps<T> {
   virtualized?: boolean | DataGridVirtualizationOptions;
   /** Defaults to false with virtualization and true for ordinary tables. */
   pagination?: boolean;
+  /** Replace the complete footer. Undefined keeps the default; null/false hides it. */
+  footer?: React.ReactNode | ((context: DataGridFooterContext<T>) => React.ReactNode);
 }
 
 function useGridValue<T>(controlled: T | undefined, initial: T, onChange?: (value: T) => void) {
@@ -133,9 +156,9 @@ export function DataGrid<T>({
   page: controlledPage, defaultPage = 1, onPageChange,
   pageSize: controlledPageSize, defaultPageSize = 10, onPageSizeChange, pageSizeOptions = [5, 10, 20, 50],
   density: controlledDensity, defaultDensity = 'default', onDensityChange, showDensityToggle = true, showColumnFilterToggle = false, showColumnVisibility = true, defaultHiddenColumnIds = [],
-  loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, className,
+  loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, scrollResetKey, className,
   exportable = false, exportFileName = 'data-grid.csv', exportFormats = ['csv'], onCellEdit,
-  virtualized = false, pagination,
+  virtualized = false, pagination, footer,
 }: DataGridProps<T>) {
   const id = React.useId();
   const [density, setDensity] = useGridValue(controlledDensity, defaultDensity, onDensityChange);
@@ -234,6 +257,8 @@ export function DataGrid<T>({
   const hasError = error !== undefined && error !== null && error !== false;
   const blocked = loading || hasError;
   const count = blocked ? 0 : filtered.length;
+  const footerSelectedRows = React.useMemo(() => typeof footer === 'function' && selectable && selectedSet.size
+    ? rows.filter(row => selectedSet.has(getRowId(row))) : [], [footer, selectable, selectedSet, rows, getRowId]);
   const sizes = [...new Set([...pageSizeOptions.filter(value => Number.isInteger(value) && value > 0), size])].sort((a, b) => a - b);
   const anyFilters = columns.some(column => column.filter);
   const activeFilters = columns.some(column => column.filter && appliedFilters[column.id] && hasFilter(appliedFilters[column.id]));
@@ -262,18 +287,33 @@ export function DataGrid<T>({
     });
   };
 
-  React.useEffect(() => {
+  const measureViewport = React.useCallback(() => {
+    const width = scroll.current?.clientWidth;
+    if (width && width > 0) setViewportWidth(width);
+  }, []);
+  // Also measure React commits: a previously hidden tab can be revealed at a
+  // different width before ResizeObserver delivers its next notification.
+  useClientLayoutEffect(measureViewport);
+  useClientLayoutEffect(() => {
     const element = scroll.current;
     const win = element?.ownerDocument.defaultView;
     if (!element || !win) return;
-    const measure = () => setViewportWidth(element.clientWidth || undefined);
-    measure();
     const Observer = (win as Window & {ResizeObserver?: typeof ResizeObserver}).ResizeObserver;
-    const observer = Observer ? new Observer(measure) : null;
+    const observer = Observer ? new Observer(measureViewport) : null;
     observer?.observe(element);
-    win.addEventListener('resize', measure);
-    return () => { observer?.disconnect(); win.removeEventListener('resize', measure); };
-  }, []);
+    win.addEventListener('resize', measureViewport);
+    return () => { observer?.disconnect(); win.removeEventListener('resize', measureViewport); };
+  }, [measureViewport]);
+
+  const previousScrollResetKey = React.useRef(scrollResetKey);
+  React.useEffect(() => {
+    if (Object.is(previousScrollResetKey.current, scrollResetKey)) return;
+    previousScrollResetKey.current = scrollResetKey;
+    const element = scroll.current;
+    if (!element) return;
+    element.scrollTop = 0;
+    element.scrollLeft = 0;
+  }, [scrollResetKey]);
 
   // Reflect page clamping in the uncontrolled state and notify controlled owners once.
   const clampRequest = React.useRef('');
@@ -380,6 +420,13 @@ export function DataGrid<T>({
   };
   const columnCount = Math.max(1, visibleColumns.length + (selectable ? 1 : 0));
   const status = loading ? '데이터를 불러오는 중입니다.' : hasError ? '데이터를 불러오지 못했습니다.' : !rows.length ? '등록된 데이터가 없습니다.' : !count ? '검색 결과가 없습니다.' : paginated ? `${(page - 1) * size + 1}–${Math.min(page * size, count)} / ${count}개 항목` : `${count}개 항목`;
+  const footerStatus = <p className={footer === undefined ? 'component-helper' : 'sr-only'} id={`${id}-status`} role="status" aria-live="polite" aria-atomic="true">{status}{selectable && selectedSet.size > 0 ? ` · ${selectedSet.size}개 선택됨` : ''}</p>;
+  const footerContent = typeof footer === 'function' ? footer({
+    totalCount: rows.length, filteredCount: count, selectedCount: selectable ? selectedSet.size : 0,
+    filteredRows: blocked ? [] : filtered, pageRows: blocked ? [] : shownRows, selectedRows: footerSelectedRows,
+    page, pageCount, pageSize: size, pagination: paginated, loading, hasError,
+  }) : footer;
+  const showFooter = footer === undefined || (footerContent != null && typeof footerContent !== 'boolean');
 
   const clearSelection = () => {
     setSelected([]);
@@ -466,7 +513,7 @@ export function DataGrid<T>({
           rows={shownRows} getRowId={getRowId} scrollRef={scroll} headerRef={header} prepareScrollRef={prepareScroll}
           keepRowIds={keepRowIds} options={typeof virtualized === 'object' ? virtualized : undefined}
           density={density} headerRows={headerRows} maxHeight={virtualMaxHeight}
-          resetKey={JSON.stringify([criteria, paginated ? page : 'all', blocked, headerRows])}
+          resetKey={JSON.stringify([criteria, paginated ? page : 'all', blocked, headerRows, scrollResetKey])}
           measureKey={JSON.stringify([density, resolvedWidths, visibleColumns.map(column => column.id), headerRows])}
           columnCount={columnCount} renderRow={renderRow} onFocusCapture={event => {
           const row = (event.target as HTMLElement).closest<HTMLTableRowElement>('tr[data-grid-row-id]');
@@ -480,11 +527,12 @@ export function DataGrid<T>({
     </div>
     <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} viewportWidth={viewportWidth} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
     </div>
-    <div className="data-grid-footer">
-      <p className="component-helper" id={`${id}-status`} role="status" aria-live="polite" aria-atomic="true">{status}{selectable && selectedSet.size > 0 ? ` · ${selectedSet.size}개 선택됨` : ''}</p>
+    {footer !== undefined && footerStatus}
+    {showFooter && <div className={`data-grid-footer${footer === undefined ? '' : ' data-grid-footer--custom'}`}>
+      {footer === undefined ? <>{footerStatus}
       {paginated && <div className="data-grid-page-tools"><div className="data-grid-page-size"><Select label="페이지당 행 수" value={String(size)} disabled={blocked} popupStrategy="fixed" onValueChange={value => { setPageSize(Number(value)); resetPageFor(query, sorting, filters, Number(value)); }} options={sizes.map(value => ({value:String(value),label:`${value}개`}))} /></div>
         {!blocked && <Pagination page={page} pageCount={pageCount} onPageChange={setPage} aria-label={`${label} 페이지 탐색`} />}
-      </div>}
-    </div>
+      </div>}</> : footerContent}
+    </div>}
   </div>;
 }

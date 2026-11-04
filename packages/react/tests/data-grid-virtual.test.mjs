@@ -141,6 +141,26 @@ test('switching virtualization on and off preserves selection and restores each 
   } finally {await f.dispose();}
 });
 
+test('external scroll reset restores the virtual window without clearing its selection',async()=>{
+  const f=fixture();
+  const base={...props,virtualized:true,selectable:true,defaultSelectedRowIds:['id-1']};
+  const prototype=dom.window.HTMLElement.prototype;
+  // JSDOM has no layout, so give the virtualizer a visible scroll viewport.
+  Object.defineProperty(prototype,'clientHeight',{configurable:true,get(){return this.classList.contains('data-grid-scroll')?480:0;}});
+  Object.defineProperty(prototype,'clientWidth',{configurable:true,get(){return this.classList.contains('data-grid-scroll')?640:0;}});
+  try {
+    await f.render(h(DataGrid,{...base,scrollResetKey:0}));
+    const viewport=f.node.querySelector('.data-grid-scroll');
+    await act(async()=>{viewport.scrollTop=800;viewport.scrollLeft=160;viewport.dispatchEvent(new Event('scroll'));});
+    await f.render(h(DataGrid,{...base,scrollResetKey:1}));
+    assert.equal(f.node.querySelector('.data-grid-scroll'),viewport);
+    assert.equal(viewport.scrollTop,0);assert.equal(viewport.scrollLeft,0);
+    await act(async()=>{viewport.dispatchEvent(new Event('scroll'));});
+    assert.ok(f.node.querySelector('tr[data-grid-row-id="id-1"]'));
+    assert.equal(checkbox(f.node,'항목 1 선택').checked,true);
+  } finally {await f.dispose();delete prototype.clientHeight;delete prototype.clientWidth;}
+});
+
 test('invalid virtual estimates and overscan fall back to a usable bounded server window',()=>{
   const many=Array.from({length:1000},(_,index)=>({id:String(index),name:`항목 ${index}`,amount:index}));
   for (const virtualized of [{estimateRowHeight:0,overscan:-5},{estimateRowHeight:Number.NaN,overscan:Number.NaN}]) {

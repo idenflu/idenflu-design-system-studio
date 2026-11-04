@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+
 export type DataGridPrepareScrollRef = React.RefObject<((offset:number) => void) | null>;
 interface Props {
   enabled: boolean;
@@ -42,26 +44,32 @@ export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollR
       synced.current.left = horizontal.current.scrollLeft;
     }
   },[scrollRef]);
-  React.useEffect(() => {
+  const updateMetrics = React.useCallback(() => {
     const element = scrollRef.current, win = element?.ownerDocument.defaultView;
-    if (!element || !win || !enabled || !win.ResizeObserver) return;
-    const update = () => {
-      // A gutter can change the viewport before responsive columns have adopted
-      // that width. Measuring this intermediate table would create a false X
-      // scrollbar, reduce the height and repeatedly toggle the Y gutter.
-      if (viewportWidth !== undefined && element.clientWidth !== viewportWidth) return;
-      if (!element.hasAttribute('data-native-scrollbars')) {
-        const style = win.getComputedStyle(element);
-        const gutter = Math.max(element.offsetWidth - element.clientWidth - (parseFloat(style.borderLeftWidth)||0) - (parseFloat(style.borderRightWidth)||0), element.offsetHeight - element.clientHeight - (parseFloat(style.borderTopWidth)||0) - (parseFloat(style.borderBottomWidth)||0));
-        if (gutter > 0) size.current = gutter;
-      }
-      const header = headerRef.current;
-      const next = {width:element.clientWidth,height:element.clientHeight,extent:element.scrollHeight,breadth:element.scrollWidth,top:element.scrollTop,left:element.scrollLeft,header:header?.getBoundingClientRect().height ?? 0,split:header && header.rows.length > 1 ? header.rows[0].getBoundingClientRect().height : 0,size:size.current};
-      refreshExtent();
-      syncControls();
-      setMetrics(previous => Object.keys(next).every(key => next[key as keyof typeof next] === previous[key as keyof typeof next]) ? previous : next);
-    };
-    update();element.addEventListener('scroll',update,{passive:true});
+    if (!element || !win || !enabled) return;
+    // Hidden tabs have no geometry. Keep their last measured gutters so
+    // showing the same results does not tear down and recreate scrollbars.
+    if (!element.clientWidth || !element.clientHeight) return;
+    // A gutter can change the viewport before responsive columns have adopted
+    // that width. Measuring this intermediate table would create a false X
+    // scrollbar, reduce the height and repeatedly toggle the Y gutter.
+    if (viewportWidth !== undefined && element.clientWidth !== viewportWidth) return;
+    if (!element.hasAttribute('data-native-scrollbars')) {
+      const style = win.getComputedStyle(element);
+      const gutter = Math.max(element.offsetWidth - element.clientWidth - (parseFloat(style.borderLeftWidth)||0) - (parseFloat(style.borderRightWidth)||0), element.offsetHeight - element.clientHeight - (parseFloat(style.borderTopWidth)||0) - (parseFloat(style.borderBottomWidth)||0));
+      if (gutter > 0) size.current = gutter;
+    }
+    const header = headerRef.current;
+    const next = {width:element.clientWidth,height:element.clientHeight,extent:element.scrollHeight,breadth:element.scrollWidth,top:element.scrollTop,left:element.scrollLeft,header:header?.getBoundingClientRect().height ?? 0,split:header && header.rows.length > 1 ? header.rows[0].getBoundingClientRect().height : 0,size:size.current};
+    refreshExtent();
+    syncControls();
+    setMetrics(previous => Object.keys(next).every(key => next[key as keyof typeof next] === previous[key as keyof typeof next]) ? previous : next);
+  },[enabled,scrollRef,headerRef,syncControls,refreshExtent,viewportWidth]);
+  useClientLayoutEffect(updateMetrics);
+  useClientLayoutEffect(() => {
+    const element = scrollRef.current, win = element?.ownerDocument.defaultView;
+    if (!element || !win || !enabled) return;
+    element.addEventListener('scroll',updateMetrics,{passive:true});
     const cancel = () => {
       active.current = {top:false,left:false};
       dragging.current = null;
@@ -71,16 +79,16 @@ export function DataGridScrollbar({enabled, scrollRef, headerRef, prepareScrollR
     element.addEventListener('wheel',cancel,{passive:true});
     element.addEventListener('touchstart',cancel,{passive:true});
     element.addEventListener('keydown',cancel);
-    const observer = new win.ResizeObserver(update);
-    observer.observe(element);
-    if (element.firstElementChild) observer.observe(element.firstElementChild);
-    if (headerRef.current) observer.observe(headerRef.current);
-    return () => {observer.disconnect();element.removeEventListener('scroll',update);element.removeEventListener('wheel',cancel);element.removeEventListener('touchstart',cancel);element.removeEventListener('keydown',cancel);active.current = {top:false,left:false};win.clearTimeout(settle.current.top);win.clearTimeout(settle.current.left);};
-  },[enabled,scrollRef,headerRef,syncControls,refreshExtent,viewportWidth]);
+    const observer = win.ResizeObserver ? new win.ResizeObserver(updateMetrics) : null;
+    observer?.observe(element);
+    if (element.firstElementChild) observer?.observe(element.firstElementChild);
+    if (headerRef.current) observer?.observe(headerRef.current);
+    return () => {observer?.disconnect();element.removeEventListener('scroll',updateMetrics);element.removeEventListener('wheel',cancel);element.removeEventListener('touchstart',cancel);element.removeEventListener('keydown',cancel);active.current = {top:false,left:false};win.clearTimeout(settle.current.top);win.clearTimeout(settle.current.left);};
+  },[enabled,scrollRef,headerRef,refreshExtent,updateMetrics]);
   const showVertical = enabled && metrics.extent > metrics.height && metrics.height > metrics.header;
   const showHorizontal = enabled && metrics.breadth > metrics.width && metrics.width > 0;
-  React.useEffect(syncControls,[extent.height,extent.width,metrics.height,metrics.width,showVertical,showHorizontal,syncControls]);
-  React.useEffect(() => {
+  useClientLayoutEffect(syncControls,[extent.height,extent.width,metrics.height,metrics.width,showVertical,showHorizontal,syncControls]);
+  useClientLayoutEffect(() => {
     const element = scrollRef.current;
     element?.toggleAttribute('data-native-scrollbars',showVertical || showHorizontal);
     return () => element?.removeAttribute('data-native-scrollbars');

@@ -229,6 +229,11 @@
 .studio-grid-progress { display:grid; gap:var(--space-2); font-variant-numeric:tabular-nums; }
 .studio-grid-progress .progress-bar { width:100%; }
 .studio-grid-guidelines dd { min-width:0; }
+.studio-grid-footer-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3) var(--space-5); width:100%; color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.studio-grid-footer-metrics { display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-4); margin:0; padding:0; }
+.studio-grid-footer-metrics > div { display:flex; flex-wrap:wrap; gap:var(--space-1); }
+.studio-grid-footer-metrics dd { margin:0; color:var(--text); font-weight:var(--font-weight-medium); }
+.studio-grid-footer-updated { min-width:0; }
 .studio-time-reference-table { min-width:0; max-width:100%; }
 .studio-time-reference-table table { min-width:720px; }
 .studio-time-reference-table th[scope="row"] { width:27%; font-weight:var(--font-weight-medium); }

@@ -69,6 +69,7 @@ const stateProps: readonly PropertyRow[] = [
 ];
 
 const displayProps: readonly PropertyRow[] = [
+  ['scrollResetKey', 'string | number', 'undefined', '값을 변경하면 가로·세로 스크롤을 처음으로 돌립니다. 최초 렌더와 동일 값의 재렌더에서는 이동하지 않으며 밀도·열 너비·필터 등 상태를 유지합니다.'],
   ['page', 'number', 'undefined', '부모가 제어하는 1부터 시작하는 페이지입니다. 표시 범위를 벗어나면 유효 범위로 표시하고 onPageChange로 보정을 요청합니다.'],
   ['defaultPage', 'number', '1', '비제어 페이지의 최초 값입니다. 유효하지 않은 값은 1로 처리합니다.'],
   ['pageSize', 'number', 'undefined', '부모가 제어하는 페이지당 행 수입니다. 1 이상의 유한한 수를 내림하며 유효하지 않으면 10을 사용합니다.'],
@@ -86,6 +87,7 @@ const displayProps: readonly PropertyRow[] = [
   ['maxHeight', 'number | string', 'undefined', '툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
   ['virtualized', 'boolean | DataGridVirtualizationOptions', 'false', 'true 또는 옵션 객체로 세로 행 가상화를 켭니다. 화면 근처 행을 렌더링하고 실제 행 높이를 측정합니다.'],
   ['pagination', 'boolean', '!virtualized', '일반 표는 기본 true, 가상화는 기본 false입니다. 가상화와 함께 true를 지정하면 현재 페이지 안에서 가상화합니다.'],
+  ['footer', 'ReactNode | ((context: DataGridFooterContext<T>) => ReactNode)', 'undefined', '기본 하단 전체(페이지 이동 포함)를 교체합니다. null·false 또는 이를 반환하는 콜백은 하단을 숨깁니다. 생략하면 기존 하단을 유지하며 조회·선택 상태의 스크린 리더 안내는 항상 제공합니다.'],
   ['className', 'string', 'undefined', '최상위 .data-grid에 추가할 클래스입니다. 스타일 범위를 이 클래스 아래로 제한할 수 있습니다.'],
 ];
 
@@ -299,7 +301,7 @@ export function FilterGrid() {
 
 export function DataGridReferenceLinks() {
   const links = [
-    ['data-grid-multi-filter-demo', '복수 필터'], ['data-grid-extensions', '확장 예제'], ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
+    ['data-grid-multi-filter-demo', '복수 필터'], ['data-grid-footer-demo', '사용자 지정 하단'], ['data-grid-extensions', '확장 예제'], ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
     ['data-grid-columns', '열·타입'],
     ['data-grid-events', '이벤트·상태 연결'], ['data-grid-styles', '스타일'],
     ['data-grid-behavior', '동작·내보내기'],
@@ -383,6 +385,14 @@ const filters: DataGridFilters = {
       <PropertyTable title="DataGridVirtualizationOptions" rows={[
         ['estimateRowHeight', 'number', '56 / compact: 40', '최초 행 높이 추정치(px)입니다. 유한한 양수는 16~1000으로 제한하며 실제로 렌더링된 행은 측정한 높이를 사용합니다.'],
         ['overscan', 'number', '8', '뷰포트 앞뒤에 여유로 렌더링할 행 수입니다. 유한한 0 이상의 수를 내림해 0~100으로 제한합니다. 편집·포커스 유지용 행은 별도로 남을 수 있습니다.'],
+      ]} />
+      <PropertyTable title="DataGridFooterContext<T>" rows={[
+        ['totalCount', 'number', 'rows.length', '원본 전체 건수입니다. 검색·필터·페이지 이동으로 바뀌지 않습니다.'],
+        ['filteredCount / filteredRows', 'number / readonly T[]', '조회 결과', '검색·필터·정렬 후 모든 페이지의 결과입니다. 로딩·오류에서는 0과 빈 배열입니다.'],
+        ['selectedCount / selectedRows', 'number / readonly T[]', '유효한 선택', '검색·페이지 밖의 선택도 포함하며 원본 순서로 제공합니다. 삭제되거나 선택 불가능한 행은 제외하고 selectable=false에서는 비웁니다.'],
+        ['pageRows', 'readonly T[]', '현재 페이지', '가상 렌더링 범위와 무관하게 현재 페이지 전체를 제공합니다. pagination=false이면 filteredRows와 같고 로딩·오류에서는 빈 배열입니다.'],
+        ['page / pageCount / pageSize / pagination', 'number / number / number / boolean', '현재 페이지 상태', '페이지네이션을 끄면 page·pageCount는 1이며 pageSize는 설정값을 유지합니다.'],
+        ['loading / hasError', 'boolean / boolean', '조회 상태', '합계 대신 조회 중·실패 안내를 표시할 때 사용합니다.'],
       ]} />
       <CodeExample title="복수 선택 필터와 상태 연결">{multiFilterExample}</CodeExample>
       <p className="studio-grid-reference-notes">복수 필터는 팝업 검색을 제공하며 선택값을 첫 항목과 나머지 개수로 요약합니다. 검색은 선택값을 바꾸지 않고, 마지막 항목을 해제하면 빈 배열을 전달해 전체 조회로 돌아갑니다. 필터 초기화·조건 초기화·컬럼 필터 끄기도 배열 조건을 함께 비웁니다.</p>

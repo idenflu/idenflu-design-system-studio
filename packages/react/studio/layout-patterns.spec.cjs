@@ -120,20 +120,49 @@ test('bulk selection clears when a project leaves the current list',async({page,
   await expect(panel(page).locator('.data-grid-selection')).toHaveCount(0);
 });
 
-test('project filters own deletion while the selection toolbar keeps exports and clearing',async({page,isMobile})=>{
+test('project toolbar groups creation with selection actions and utilities',async({page,isMobile})=>{
   await page.goto(sample);
   for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
     if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
     const filters=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
-    const remove=filters.getByRole('button',{name:'삭제',exact:true});
     const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
-    await expect(remove).toBeDisabled();
-    await expect(grid.getByRole('button',{name:'삭제',exact:true})).toHaveCount(0);
+    const create=grid.locator('.data-grid-toolbar').getByRole('button',{name:'새 프로젝트',exact:true});
+    await expect(panel(page).locator('.layout-page-heading').getByRole('button',{name:'새 프로젝트',exact:true})).toHaveCount(0);
+    await expect(panel(page).getByRole('button',{name:'새 프로젝트',exact:true})).toHaveCount(1);
+    await expect(create).toBeVisible();
+    const tools=await grid.locator('.data-grid-tools button').evaluateAll(buttons=>buttons.map(button=>button.getAttribute('aria-label')||button.textContent.trim()));
+    expect(tools.slice(0,5)).toEqual(['새 프로젝트','컬럼 필터','촘촘한 행 간격','CSV 내보내기','Excel 내보내기']);
+    await create.click();
+    const creation=page.getByRole('dialog',{name:'새 프로젝트',exact:true});
+    await expect(creation).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(creation).not.toBeVisible();
+    await expect(create).toBeFocused();
+    const remove=grid.locator('.data-grid-selection').getByRole('button',{name:'선택 삭제',exact:true});
+    const edit=grid.locator('.data-grid-selection').getByRole('button',{name:'수정',exact:true});
+    await expect(filters.getByRole('button',{name:/삭제/})).toHaveCount(0);
+    await expect(remove).toHaveCount(0);
+    await expect(edit).toHaveCount(0);
     await expect(panel(page).getByRole('button',{name:'선택 항목 완료',exact:true})).toHaveCount(0);
     const first=grid.locator('tbody tr[data-grid-row-id]').first();
     const checkbox=first.getByRole('checkbox');
     await checkbox.check();
+    await expect(create).toBeEnabled();
     await expect(remove).toBeEnabled();
+    await expect(edit).toBeEnabled();
+    await edit.click();
+    const detail=page.getByRole('dialog',{name:'프로젝트 상세',exact:true});
+    await expect(detail).toBeVisible();
+    await expect(detail).toContainText(await first.getAttribute('data-grid-row-id'));
+    await page.keyboard.press('Escape');
+    await expect(detail).not.toBeVisible();
+    await expect(checkbox).toBeChecked();
+    const second=grid.locator('tbody tr[data-grid-row-id]').nth(1).getByRole('checkbox');
+    await second.check();
+    await expect(edit).toBeDisabled();
+    await expect(remove).toBeEnabled();
+    await second.uncheck();
+    await expect(edit).toBeEnabled();
     const selection=grid.locator('.data-grid-selection');
     await expect(grid.locator('.data-grid-selection-count')).toContainText('1개 선택됨');
     await expect(selection.getByRole('button',{name:'선택한 행 내보내기',exact:true})).toBeEnabled();
@@ -143,7 +172,8 @@ test('project filters own deletion while the selection toolbar keeps exports and
     await selection.getByRole('button',{name:'선택 해제',exact:true}).click();
     await expect(checkbox).not.toBeChecked();
     await expect(selection).toHaveCount(0);
-    await expect(remove).toBeDisabled();
+    await expect(remove).toHaveCount(0);
+    await expect(edit).toHaveCount(0);
     await expect(grid.getByRole('button',{name:'CSV 내보내기',exact:true})).toBeEnabled();
     await expect(grid.getByRole('button',{name:'Excel 내보내기',exact:true})).toBeEnabled();
   }
@@ -168,7 +198,7 @@ test('project deletion can be cancelled and removes only confirmed projects and 
   const second=grid.locator('tr[data-grid-row-id="PRJ-002"]');
   await first.getByRole('checkbox').check();
   await second.getByRole('checkbox').check();
-  const remove=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true}).getByRole('button',{name:'삭제',exact:true});
+  const remove=grid.locator('.data-grid-selection').getByRole('button',{name:'선택 삭제',exact:true});
   const confirmation=page.getByRole('dialog',{name:'프로젝트 삭제',exact:true});
   await remove.click();
   await expect(confirmation).toBeVisible();
@@ -189,7 +219,7 @@ test('project deletion can be cancelled and removes only confirmed projects and 
   await expect(second).toHaveCount(0);
   await expect(grid.locator('tbody tr[data-grid-row-id]')).toHaveCount(118);
   await expect(grid.locator('.data-grid-selection')).toHaveCount(0);
-  await expect(remove).toBeDisabled();
+  await expect(remove).toHaveCount(0);
   await expect(grid.locator('.data-grid-scroll')).toBeFocused();
   await expect(deletedTab).toHaveCount(0);
   await expect(retainedTab).toHaveCount(1);
@@ -204,7 +234,7 @@ test('project deletion previews three items and deletes the full selection',asyn
   await page.goto(sample);
   const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
   await grid.getByRole('checkbox',{name:'검색 결과 전체 선택',exact:true}).check();
-  await panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true}).getByRole('button',{name:'삭제',exact:true}).click();
+  await grid.locator('.data-grid-selection').getByRole('button',{name:'선택 삭제',exact:true}).click();
   const confirmation=page.getByRole('dialog',{name:'프로젝트 삭제',exact:true});
   await expect(confirmation.getByRole('button',{name:'취소',exact:true})).toBeFocused();
   await expect(confirmation).toContainText('선택한 120개 프로젝트를 삭제할까요?');
@@ -218,7 +248,8 @@ test('project deletion previews three items and deletes the full selection',asyn
   await expect(grid.locator('.data-grid-selection')).toHaveCount(0);
   await expect(grid.locator('.data-grid-state')).toContainText('등록된 데이터가 없습니다.');
   await expect(grid.locator('.data-grid-scroll')).toBeFocused();
-  await expect(panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true}).getByRole('button',{name:'삭제',exact:true})).toBeDisabled();
+  await expect(grid.getByRole('button',{name:'선택 삭제',exact:true})).toHaveCount(0);
+  await expect(panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true}).getByRole('button',{name:/삭제/})).toHaveCount(0);
 });
 
 test('project creation validates input and opens the newly created detail tab',{tag:'@mobile'},async({page,isMobile})=>{
@@ -394,7 +425,7 @@ test('project filter popups escape clipping and stay within the viewport',{tag:'
     })).toEqual({insideViewport:true,optionUnclipped:true});
     return popup;
   };
-  for(const name of ['담당 팀 필터: 전체 팀','프로젝트 상태 필터: 전체 상태']){
+  for(const name of ['담당 팀: 전체 팀','프로젝트 상태: 전체 상태']){
     const trigger=panel(page).getByRole('combobox',{name,exact:true});
     await assertFixedPopup(trigger);
     await trigger.press('Escape');
@@ -403,7 +434,56 @@ test('project filter popups escape clipping and stay within the viewport',{tag:'
   await expect(panel(page).locator('.select-popup:visible')).toHaveCount(0);
 });
 
-test('project management lists apply draft filters on search and reset immediately',{tag:'@mobile'},async({page,isMobile})=>{
+test('project search finds names and IDs on submit with compact headers and consistent defaults',async({page,isMobile})=>{
+  await page.goto(sample);
+  for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
+    if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
+    const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
+    const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
+    const keyword=search.getByRole('searchbox',{name:'프로젝트명 / ID',exact:true});
+    const results=grid.locator('tr[data-grid-row-id]');
+    const originalCount=await results.count();
+    const id=await results.first().getAttribute('data-grid-row-id');
+    const name=await results.first().locator('.layout-project-link-title > span:not(.ui-icon)').innerText();
+    const team=await results.first().locator('td').nth(3).innerText();
+    const status=await results.first().locator('td').nth(2).innerText();
+    const clear=search.getByRole('button',{name:'프로젝트 상태 모두 지우기',exact:true});
+    await expect(panel(page).locator('.layout-page-heading .layout-eyebrow')).toHaveCount(0);
+    await expect(search.locator('.field-label')).toHaveText(['프로젝트명 / ID','담당 팀','프로젝트 상태']);
+    await expect(clear).toHaveCount(0);
+    const textColor=await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).evaluate(element=>getComputedStyle(element).color);
+    await expect(search.locator('.multi-inline-placeholder')).toHaveCSS('color',textColor);
+    await keyword.fill(`  ${id.toLowerCase()}  `);
+    await expect(results).toHaveCount(originalCount);
+    await keyword.press('Enter');
+    await expect(results).toHaveCount(1);
+    await expect(results.first()).toHaveAttribute('data-grid-row-id',id);
+    await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();
+    await search.getByRole('option',{name:team==='플랫폼 개발'?'브랜드 디자인':'플랫폼 개발',exact:true}).click();
+    await expect(results).toHaveCount(1);
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await expect(results).toHaveCount(0);
+    await expect(grid.locator('.data-grid-state')).toContainText('검색 조건에 맞는 프로젝트가 없습니다.');
+    await search.getByRole('button',{name:'초기화',exact:true}).click();
+    await expect(keyword).toHaveValue('');
+    await expect(results).toHaveCount(0);
+    await keyword.fill(name);
+    await expect(results).toHaveCount(0);
+    await search.getByRole('combobox',{name:'프로젝트 상태: 전체 상태',exact:true}).click();
+    await search.getByRole('option',{name:status,exact:true}).click();
+    await search.getByRole('combobox',{name:`프로젝트 상태: ${status}`,exact:true}).press('Escape');
+    await expect(clear).toBeVisible();
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await expect(results).toHaveCount(1);
+    await expect(results.first()).toHaveAttribute('data-grid-row-id',id);
+    await clear.click();
+    await expect(clear).toHaveCount(0);
+    await expect(search.getByRole('combobox',{name:'프로젝트 상태: 전체 상태',exact:true})).toBeVisible();
+    await expect(search.locator('.multi-inline-placeholder')).toHaveCSS('color',textColor);
+  }
+});
+
+test('project management lists bind draft filters on search and clear bound results on reset',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
     if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
@@ -413,38 +493,42 @@ test('project management lists apply draft filters on search and reset immediate
     const firstRow=grid.locator('tbody tr').first();
     const originalId=await firstRow.getAttribute('data-grid-row-id');
     await expect(search.getByRole('button',{name:'검색',exact:true})).toBeVisible();
-    await search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true}).click();
+    await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();
     await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
     await expect(firstRow).toHaveAttribute('data-grid-row-id',originalId);
     await search.getByRole('button',{name:'검색',exact:true}).click();
     await expect.poll(()=>grid.locator('tbody tr').evaluateAll(rows=>rows.length>0&&rows.every(row=>row.children[3]?.textContent==='플랫폼 개발'))).toBe(true);
     if(title==='전체 프로젝트'){
       const appliedId=await firstRow.getAttribute('data-grid-row-id');
-      await search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true}).click();
+      await search.getByRole('combobox',{name:'프로젝트 상태: 전체 상태',exact:true}).click();
       await search.getByRole('option',{name:'완료',exact:true}).click();
       await search.getByRole('option',{name:'진행 중',exact:true}).click();
-      await search.getByRole('combobox',{name:'프로젝트 상태 필터: 진행 중, 완료',exact:true}).press('Escape');
-      await expect(search.getByRole('button',{name:'완료 제거',exact:true})).toBeVisible();
-      await expect(search.getByRole('button',{name:'진행 중 제거',exact:true})).toBeVisible();
+      await search.getByRole('combobox',{name:'프로젝트 상태: 진행 중, 완료',exact:true}).press('Escape');
+      await expect(search.getByRole('combobox',{name:'프로젝트 상태: 진행 중, 완료',exact:true})).toBeVisible();
       await expect(firstRow).toHaveAttribute('data-grid-row-id',appliedId);
       await search.getByRole('button',{name:'검색',exact:true}).press('Enter');
       await expect.poll(()=>grid.locator('tbody tr[data-grid-row-id]').evaluateAll(rows=>rows.length>0&&rows.every(row=>['진행 중','완료'].includes(row.children[2]?.textContent)&&row.children[3]?.textContent==='플랫폼 개발')&&new Set(rows.map(row=>row.children[2]?.textContent)).size===2)).toBe(true);
-      await search.getByRole('button',{name:'완료 제거',exact:true}).click();
+      await search.getByRole('combobox',{name:'프로젝트 상태: 진행 중, 완료',exact:true}).click();
+      await search.getByRole('option',{name:'완료',exact:true}).click();
+      await search.getByRole('combobox',{name:'프로젝트 상태: 진행 중',exact:true}).press('Escape');
       await expect.poll(()=>grid.locator('tbody tr[data-grid-row-id]').evaluateAll(rows=>rows.some(row=>row.children[2]?.textContent==='완료'))).toBe(true);
       await search.getByRole('button',{name:'검색',exact:true}).click();
       await expect.poll(()=>grid.locator('tbody tr[data-grid-row-id]').evaluateAll(rows=>rows.length>0&&rows.every(row=>row.children[2]?.textContent==='진행 중'))).toBe(true);
-      await search.getByRole('button',{name:'프로젝트 상태 필터 모두 지우기',exact:true}).click();
-      await expect(search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true})).toBeVisible();
+      await search.getByRole('button',{name:'프로젝트 상태 모두 지우기',exact:true}).click();
+      await expect(search.getByRole('combobox',{name:'프로젝트 상태: 전체 상태',exact:true})).toBeVisible();
       await search.getByRole('button',{name:'검색',exact:true}).click();
       await expect.poll(()=>grid.locator('tbody tr[data-grid-row-id]').evaluateAll(rows=>new Set(rows.map(row=>row.children[2]?.textContent)).size)).toBeGreaterThan(1);
     }
     await enableColumnFilters(grid);
     await grid.getByRole('textbox',{name:'프로젝트 필터',exact:true}).fill('일치하지않는프로젝트xyz');
     await expect(grid.locator('.data-grid-state').getByText('검색 결과가 없습니다.',{exact:true})).toBeVisible();
-    await search.getByRole('button',{name:'필터 초기화',exact:true}).click();
-    await expect(search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true})).toBeVisible();
-    await expect(search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true})).toBeVisible();
+    await search.getByRole('button',{name:'초기화',exact:true}).click();
+    await expect(search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true})).toBeVisible();
+    await expect(search.getByRole('combobox',{name:'프로젝트 상태: 전체 상태',exact:true})).toBeVisible();
     await expect(grid.getByRole('textbox',{name:'프로젝트 필터',exact:true})).toHaveValue('');
+    await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
+    await expect(grid.locator('.data-grid-state')).toContainText('검색 버튼을 눌러 프로젝트 목록을 조회하세요.');
+    await search.getByRole('button',{name:'검색',exact:true}).click();
     await expect(firstRow).toHaveAttribute('data-grid-row-id',originalId);
   }
 });
@@ -486,7 +570,7 @@ test('project column filters combine criteria, clear selections, and reset withi
   await expect(grid.getByRole('combobox',{name:'상태 필터: 전체',exact:true})).toBeVisible();
   await expect(grid.getByRole('combobox',{name:'담당 팀 필터: 전체',exact:true})).toBeVisible();
 
-  await search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true}).click();
+  await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();
   await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
   await search.getByRole('button',{name:'검색',exact:true}).click();
   await name.fill('포털');
@@ -497,10 +581,12 @@ test('project column filters combine criteria, clear selections, and reset withi
   await expect(rows).toHaveCount(0);
   await grid.getByRole('button',{name:'조건 초기화',exact:true}).click();
   await expect.poll(()=>rows.evaluateAll(items=>items.length>0&&items.every(row=>row.children[3]?.textContent==='플랫폼 개발'))).toBe(true);
-  await expect(search.getByRole('combobox',{name:'담당 팀 필터: 플랫폼 개발',exact:true})).toBeVisible();
+  await expect(search.getByRole('combobox',{name:'담당 팀: 플랫폼 개발',exact:true})).toBeVisible();
   await name.fill('포털');
-  await search.getByRole('button',{name:'필터 초기화',exact:true}).click();
+  await search.getByRole('button',{name:'초기화',exact:true}).click();
   await expect(name).toHaveValue('');
+  await expect(rows).toHaveCount(0);
+  await search.getByRole('button',{name:'검색',exact:true}).click();
   await expect(rows).toHaveCount(120);
 });
 
@@ -566,25 +652,174 @@ test('master detail filters immediately without a search button',async({page,isM
   await expect(list.getByRole('button')).toHaveCount(originalCount);
 });
 
-test('project filter actions place the reset icon before search and keep reset behaviour',async({page,isMobile})=>{
+test('project reset clears bound data until search while preserving density and column widths',async({page,isMobile})=>{
   await page.goto(sample);
   for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
     if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
     const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
-    const reset=search.getByRole('button',{name:'필터 초기화',exact:true});
-    await expect(search.locator(':scope > button')).toHaveText(['필터 초기화','검색','삭제']);
+    const reset=search.getByRole('button',{name:'초기화',exact:true});
+    await expect(search.locator(':scope > button')).toHaveText(['초기화','검색']);
     await expect(reset.locator('.icon-refresh')).toHaveAttribute('aria-hidden','true');
     const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
-    await search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true}).click();
+    const originalIds=await grid.locator('tr[data-grid-row-id]').evaluateAll(rows=>rows.map(row=>row.dataset.gridRowId));
+    await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();
     await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
     await search.getByRole('button',{name:'검색',exact:true}).click();
     await enableColumnFilters(grid);
     await grid.getByRole('textbox',{name:'프로젝트 필터',exact:true}).fill('일치하지않는프로젝트xyz');
     await expect(grid.locator('.data-grid-state').getByText('검색 결과가 없습니다.',{exact:true})).toBeVisible();
     await reset.click();
-    await expect(search.getByRole('combobox',{name:'담당 팀 필터: 전체 팀',exact:true})).toBeVisible();
-    await expect(search.getByRole('combobox',{name:'프로젝트 상태 필터: 전체 상태',exact:true})).toBeVisible();
+    await expect(search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true})).toBeVisible();
+    await expect(search.getByRole('combobox',{name:'프로젝트 상태: 전체 상태',exact:true})).toBeVisible();
     await expect(grid.getByRole('textbox',{name:'프로젝트 필터',exact:true})).toHaveValue('');
-    await expect.poll(()=>grid.locator('tr[data-grid-row-id]').count()).toBeGreaterThan(0);
+    await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
+    await expect(grid.locator('.data-grid-state')).toContainText('검색 버튼을 눌러 프로젝트 목록을 조회하세요.');
+    const density=grid.getByRole('button',{name:'촘촘한 행 간격',exact:true});
+    await density.click();
+    await expect(grid).toHaveAttribute('data-density','default');
+    const width=grid.getByRole('separator',{name:'프로젝트 열 너비',exact:true});
+    await width.press('ArrowRight');
+    const resizedWidth=await width.getAttribute('aria-valuenow');
+    const scrollbar=grid.getByRole('scrollbar',{name:`${title} 목록 세로 스크롤`,exact:true});
+    const viewport=grid.locator('.data-grid-scroll');
+    for(let attempt=0;attempt<2;attempt++){
+      await search.getByRole('button',{name:'검색',exact:true}).click();
+      await expect.poll(()=>grid.locator('tr[data-grid-row-id]').evaluateAll(rows=>rows.map(row=>row.dataset.gridRowId))).toEqual(originalIds);
+      await grid.locator('tr[data-grid-row-id]').first().getByRole('checkbox').check();
+      await scrollbar.focus();
+      await scrollbar.press('End');
+      await expect.poll(()=>viewport.evaluate(element=>element.scrollTop)).toBeGreaterThan(0);
+      await reset.click();
+      await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
+      await expect.poll(()=>viewport.evaluate(element=>element.scrollTop)).toBe(0);
+      await expect(grid.locator('.data-grid-selection')).toHaveCount(0);
+      await expect(grid.locator('tbody input:checked')).toHaveCount(0);
+      await expect(density).toHaveAttribute('aria-pressed','false');
+      await expect(width).toHaveAttribute('aria-valuenow',resizedWidth);
+      await reset.click();
+      await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
+    }
+    await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();
+    await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
+    await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await expect.poll(()=>grid.locator('tr[data-grid-row-id]').evaluateAll(rows=>rows.length>0&&rows.every(row=>row.children[3]?.textContent==='플랫폼 개발'))).toBe(true);
   }
+});
+
+test('project footers update the last query time on search and preserve it when bound results are reset',async({page,isMobile})=>{
+  await page.clock.install({time:new Date('2026-11-04T00:00:00Z')});
+  await page.goto(sample);
+  await page.clock.pauseAt(new Date('2026-11-04T00:05:00Z'));
+  for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
+    if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
+    const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
+    const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
+    const footer=grid.locator('.data-grid-footer');
+    const time=footer.locator('time');
+    const count=footer.locator('.layout-grid-footer > p').first();
+    const originalCount=await grid.locator('tr[data-grid-row-id]').count();
+    const initial=await time.getAttribute('datetime');
+    expect(Number.isFinite(Date.parse(initial))).toBe(true);
+    await expect(time).toBeVisible();
+    await expect(count).toHaveText(`${originalCount}개 항목`);
+    await grid.locator('tr[data-grid-row-id]').first().getByRole('checkbox').check();
+    await expect(count).toHaveText(`${originalCount}개 항목 · 1개 선택됨`);
+    await grid.getByRole('button',{name:'촘촘한 행 간격',exact:true}).click();
+    await grid.getByRole('button',{name:'프로젝트',exact:true}).click();
+    await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();
+    await search.getByRole('option',{name:'플랫폼 개발',exact:true}).click();
+    await expect(time).toHaveAttribute('datetime',initial);
+    await page.clock.runFor(1000);
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await expect(grid.getByRole('region',{name:`${title} 목록 표`,exact:true})).toHaveAttribute('aria-busy','true');
+    await expect(time).toHaveAttribute('datetime',initial);
+    await page.clock.runFor(3000);
+    const queried=await time.getAttribute('datetime');
+    expect(Date.parse(queried)).toBeGreaterThan(Date.parse(initial));
+    await expect(time).toHaveText(`2026. 11. 04. 09:${queried.slice(14,19)}`);
+    await expect.poll(()=>grid.locator('tr[data-grid-row-id]').count()).toBeLessThan(originalCount);
+    await expect(count).toContainText(`${await grid.locator('tr[data-grid-row-id]').count()}개 항목`);
+    await enableColumnFilters(grid);
+    await grid.getByRole('textbox',{name:'프로젝트 필터',exact:true}).fill('일치하지않는프로젝트xyz');
+    await expect(count).toHaveText('0개 항목');
+    await expect(time).toHaveAttribute('datetime',queried);
+    await page.clock.runFor(1000);
+    await search.getByRole('button',{name:'초기화',exact:true}).click();
+    await expect(time).toHaveAttribute('datetime',queried);
+    await expect(count).toHaveText('0개 항목');
+    await page.clock.runFor(1000);
+    await search.getByRole('button',{name:'검색',exact:true}).click();
+    await page.clock.runFor(3000);
+    const rebound=await time.getAttribute('datetime');
+    expect(Date.parse(rebound)).toBeGreaterThan(Date.parse(queried));
+    await expect(count).toHaveText(`${originalCount}개 항목`);
+    await expect(time).toHaveText(`2026. 11. 04. 09:${rebound.slice(14,19)}`);
+    expect(await footer.evaluate(element=>element.scrollWidth<=element.clientWidth)).toBe(true);
+    const stamp=await footer.locator('.layout-grid-last-query').boundingBox();
+    const floating=await page.getByRole('button',{name:'화면 조정',exact:true}).boundingBox();
+    expect(stamp.x+stamp.width).toBeLessThanOrEqual(floating.x);
+  }
+});
+
+for(const [random,delay] of [[0,1000],[0.5,2000],[0.9999,3000]]){
+  test(`project search shows grid loading for the sampled ${delay}ms delay`,async({page,isMobile})=>{
+    await page.addInitScript(value=>{Math.random=()=>value;},random);
+    await page.clock.install({time:new Date('2026-11-04T00:00:00Z')});
+    await page.goto(sample);
+    await page.clock.pauseAt(new Date('2026-11-04T00:05:00Z'));
+    for(const title of ['전체 프로젝트','진행 중 프로젝트','검토 요청','완료된 프로젝트']){
+      if(title!=='전체 프로젝트')await navigate(page,title,isMobile);
+      const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
+      const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
+      const viewport=grid.getByRole('region',{name:`${title} 목록 표`,exact:true});
+      const rows=grid.locator('tr[data-grid-row-id]');
+      const id=await rows.first().getAttribute('data-grid-row-id');
+      const time=grid.locator('time'),before=await time.getAttribute('datetime');
+      const submit=search.getByRole('button',{name:'검색',exact:true});
+      await search.getByRole('searchbox',{name:'프로젝트명 / ID',exact:true}).fill(id);
+      await submit.click();
+      await expect(viewport).toHaveAttribute('aria-busy','true');
+      await expect(submit).toBeDisabled();
+      await expect(grid.getByRole('button',{name:'새 프로젝트',exact:true})).toBeDisabled();
+      await expect(grid.locator('.data-grid-state')).toContainText('데이터를 불러오는 중입니다.');
+      await expect(grid.locator('.data-grid-footer')).toContainText('조회 중…');
+      await expect(rows).toHaveCount(0);
+      await expect(time).toHaveAttribute('datetime',before);
+      await search.getByRole('searchbox',{name:'프로젝트명 / ID',exact:true}).fill('다음 검색 조건');
+      await page.clock.runFor(delay-1);
+      await expect(viewport).toHaveAttribute('aria-busy','true');
+      await expect(time).toHaveAttribute('datetime',before);
+      await page.clock.runFor(1);
+      await expect(viewport).toHaveAttribute('aria-busy','false');
+      await expect(submit).toBeEnabled();
+      await expect(rows).toHaveCount(1);
+      await expect(rows.first()).toHaveAttribute('data-grid-row-id',id);
+      expect(Date.parse(await time.getAttribute('datetime'))).toBeGreaterThan(Date.parse(before));
+    }
+  });
+}
+
+test('reset cancels a pending project query and prevents stale results from rebinding',async({page})=>{
+  await page.addInitScript(()=>{Math.random=()=>0.9999;});
+  await page.clock.install({time:new Date('2026-11-04T00:00:00Z')});
+  await page.goto(sample);
+  await page.clock.pauseAt(new Date('2026-11-04T00:05:00Z'));
+  const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
+  const grid=panel(page).getByRole('group',{name:'전체 프로젝트 목록',exact:true});
+  const viewport=grid.getByRole('region',{name:'전체 프로젝트 목록 표',exact:true});
+  const time=grid.locator('time'),before=await time.getAttribute('datetime');
+  const submit=search.getByRole('button',{name:'검색',exact:true});
+  await submit.click();
+  await page.clock.runFor(1000);
+  await search.getByRole('button',{name:'초기화',exact:true}).click();
+  await expect(viewport).toHaveAttribute('aria-busy','false');
+  await expect(submit).toBeEnabled();
+  await page.clock.runFor(3000);
+  await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(0);
+  await expect(grid.locator('.data-grid-state')).toContainText('검색 버튼을 눌러 프로젝트 목록을 조회하세요.');
+  await expect(time).toHaveAttribute('datetime',before);
+  await submit.click();
+  await page.clock.runFor(3000);
+  await expect(grid.locator('tr[data-grid-row-id]')).toHaveCount(120);
 });

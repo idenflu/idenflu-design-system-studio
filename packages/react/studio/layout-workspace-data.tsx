@@ -73,10 +73,10 @@ export const initialMembers:Member[]=[
   {id:'member-3',name:'박지훈',email:'jihoon@example.com',team:'플랫폼 개발',roles:['편집자']},
   {id:'member-4',name:'정수빈',email:'subin@example.com',team:'브랜드 디자인',roles:['뷰어']},
 ];
-export const initialSettings:WorkspaceSettings={name:'제품팀',description:'함께 더 나은 제품 경험을 만드는 공간입니다.',timezone:'seoul',sideMenuStyle:'tree',projectNotifications:true,weeklySummary:true,mentionNotifications:true};
+export const initialSettings:WorkspaceSettings={name:'제품팀',description:'함께 더 나은 제품 경험을 만드는 공간입니다.',timezone:'seoul',sideMenuStyle:'category',projectNotifications:true,weeklySummary:true,mentionNotifications:true};
 export const badgeVariant=(status:string)=>status==='완료'?'success' as const:status==='검토 중'?'warning' as const:status==='진행 중'?'primary' as const:'neutral' as const;
 
-export function workspaceTree(style:WorkspaceSettings['sideMenuStyle']='tree'):TreeNode[]{
+export function workspaceTree(style:WorkspaceSettings['sideMenuStyle']=initialSettings.sideMenuStyle):TreeNode[]{
   const category=style==='category';
   const label=(title:string,icon?:IconName)=><span className="layout-tree-label">{icon&&<Icon name={icon}/>}<span>{title}</span></span>;
   const leaf=(value:WorkspacePage,firstLevel=false):TreeNode=>({value,label:label(pageInfo[value].title,category&&firstLevel?pageInfo[value].icon:undefined)});
