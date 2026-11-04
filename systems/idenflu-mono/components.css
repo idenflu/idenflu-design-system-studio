@@ -237,7 +237,6 @@
 .choice-mark, .radio-mark { flex-basis: var(--choice-size); width: var(--choice-size); height: var(--choice-size); }
 .choice-mark img { width: calc(var(--choice-size) - 4px); height: calc(var(--choice-size) - 4px); }
 .radio-mark::after { width: calc(var(--choice-size) - 10px); height: calc(var(--choice-size) - 10px); }
-.badge { height: var(--badge-height); min-height: var(--badge-height); padding-block: 0; }
 .icon-button { padding: 0; }
 .icon-button img { width: var(--icon-size); height: var(--icon-size); }
 .page-button { padding-block: 0; padding-inline: var(--control-px); }

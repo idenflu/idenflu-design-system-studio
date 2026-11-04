@@ -251,6 +251,22 @@
   --size-sm-icon: 14px;
   --size-md-icon: 16px;
   --size-lg-icon: 18px;
+  --badge-sm-font-size: var(--font-size-caption);
+  --badge-md-font-size: max(12px, calc(var(--font-size-base) - 1px));
+  --badge-lg-font-size: var(--font-size-body);
+  --badge-sm-line-height: max(calc(var(--badge-sm-font-size) + 4px), calc(var(--line-height-base) - 6px));
+  --badge-md-line-height: max(calc(var(--badge-md-font-size) + 5px), calc(var(--line-height-base) - 4px));
+  --badge-lg-line-height: max(calc(var(--badge-lg-font-size) + 6px), calc(var(--line-height-base) - 2px));
+  --badge-sm-height: max(20px, calc(var(--badge-sm-line-height) + 4px));
+  --badge-md-height: max(24px, calc(var(--badge-md-line-height) + 4px));
+  --badge-lg-height: max(28px, calc(var(--badge-lg-line-height) + 4px));
+  --badge-sm-icon-size: 12px;
+  --badge-md-icon-size: 14px;
+  --badge-lg-icon-size: 16px;
+  --badge-sm-padding-inline: calc(var(--space-unit) * 1.5);
+  --badge-md-padding-inline: var(--space-2);
+  --badge-lg-padding-inline: calc(var(--space-unit) * 2.5);
+  --badge-gap: var(--space-1);
   --control-height: var(--size-md-height);
   --control-px: var(--size-md-padding);
   --control-gap: var(--space-2);
@@ -262,7 +278,11 @@
   --switch-height: 20px;
   --switch-thumb: 16px;
   --switch-inset: 2px;
-  --badge-height: max(24px, var(--line-height-caption));
+  --badge-height: var(--badge-md-height);
+  --badge-font-size: var(--badge-md-font-size);
+  --badge-line-height: var(--badge-md-line-height);
+  --badge-icon-size: var(--badge-md-icon-size);
+  --badge-padding-inline: var(--badge-md-padding-inline);
   --multi-chip-height: max(24px, calc(var(--font-size-base) + 10px));
   --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
 }
@@ -277,7 +297,11 @@
   --switch-width: 28px;
   --switch-height: 16px;
   --switch-thumb: 12px;
-  --badge-height: max(20px, var(--line-height-caption));
+  --badge-height: var(--badge-sm-height);
+  --badge-font-size: var(--badge-sm-font-size);
+  --badge-line-height: var(--badge-sm-line-height);
+  --badge-icon-size: var(--badge-sm-icon-size);
+  --badge-padding-inline: var(--badge-sm-padding-inline);
   --multi-chip-height: max(24px, calc(var(--font-size-base) + 10px));
   --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
 }
@@ -292,7 +316,11 @@
   --switch-width: 36px;
   --switch-height: 20px;
   --switch-thumb: 16px;
-  --badge-height: max(24px, var(--line-height-caption));
+  --badge-height: var(--badge-md-height);
+  --badge-font-size: var(--badge-md-font-size);
+  --badge-line-height: var(--badge-md-line-height);
+  --badge-icon-size: var(--badge-md-icon-size);
+  --badge-padding-inline: var(--badge-md-padding-inline);
   --multi-chip-height: max(24px, calc(var(--font-size-base) + 10px));
   --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
 }
@@ -307,7 +335,11 @@
   --switch-width: 44px;
   --switch-height: 24px;
   --switch-thumb: 20px;
-  --badge-height: max(28px, var(--line-height-caption));
+  --badge-height: var(--badge-lg-height);
+  --badge-font-size: var(--badge-lg-font-size);
+  --badge-line-height: var(--badge-lg-line-height);
+  --badge-icon-size: var(--badge-lg-icon-size);
+  --badge-padding-inline: var(--badge-lg-padding-inline);
   --multi-chip-height: max(28px, calc(var(--font-size-base) + 10px));
   --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
 }

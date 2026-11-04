@@ -81,7 +81,6 @@
 .react-studio-icon-label > .ui-icon, .react-studio-icon-alert > .ui-icon { flex:0 0 16px; width:16px; height:16px; color:var(--text-secondary); }
 .react-studio-icon-alert { display:flex; align-items:flex-start; gap:var(--space-3); }
 .react-studio-icon-alert > .ui-icon { margin-top:3px; }
-.react-studio-section .badge .ui-icon { flex-basis:12px; width:12px; height:12px; }
 .react-studio-size-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--space-6); align-items:start; }
 .react-studio-field-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--space-6) var(--space-8); align-items:start; }
 .react-studio-field-grid > *, .react-studio-size-grid > *, .react-studio-demo > * { min-width:0; }

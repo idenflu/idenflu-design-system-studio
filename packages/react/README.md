@@ -117,6 +117,48 @@ export function IconActions() {
 
 입력과 선택 컴포넌트는 React의 `value`/`onValueChange` 또는 `defaultValue`를 사용합니다. `TextField` 등 네이티브 입력 래퍼는 일반적인 `onChange`를 사용합니다. 날짜와 숫자의 `onValueChange`는 값을 확정하거나 증감할 때 호출하며 숫자는 정밀도를 유지하는 문자열을 전달합니다. `DateRangePicker`의 값은 `[시작일, 종료일]`이며 값은 `YYYY-MM-DD` 또는 `null`입니다.
 
+### Badge
+
+`Badge`는 상태를 짧은 문구로 표시하는 `span`입니다. 선택하거나 필터링하는 분류에는 `Chip`을 사용합니다. `variant`로 상태색, `appearance="solid"`로 상태색 배경과 반전 텍스트를 지정합니다. 기본 `appearance="default"`는 연한 배경을 사용합니다.
+
+| 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | 상위 크기 또는 `md` | 상위 `data-size`를 따르며 명시하면 해당 배지의 크기를 우선합니다. |
+| `variant` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'danger'` | `'neutral'` | 상태의 의미에 맞는 색상입니다. |
+| `appearance` | `'default' \| 'solid'` | `'default'` | 연한 배경 또는 상태색 배경입니다. |
+| `children` | `ReactNode` | — | 상태 문구와 선택적인 장식 아이콘입니다. |
+| `className` | `string` | — | 배지에 추가할 CSS 클래스입니다. |
+
+`id`, `title`, `aria-*`, `data-*`, 이벤트 등 `span`의 일반 HTML 속성도 전달합니다. 크기를 생략하면 상위 `data-size`를 따르고 상위 설정이 없으면 `md`가 됩니다. Compact 표 안에서는 `sm`을 상속하며, `size="md"`나 `size="lg"`로 개별 크기를 지정할 수 있습니다.
+
+문서와 설치한 패키지는 같은 크기 규칙을 사용합니다. 다음 수치는 기본 설정 기준이며 사용자 글자 크기·행간 설정에 따라 글자와 높이가 커질 수 있습니다. 높이는 내용이 잘리지 않도록 필요한 여유를 유지합니다.
+
+| 크기 | 높이 | 글자 | 행간 | 아이콘 | 좌우 여백 |
+| --- | --- | --- | --- | --- | --- |
+| `sm` | 20px | 12px | 16px | 12px | 6px |
+| `md` | 24px | 13px | 18px | 14px | 8px |
+| `lg` | 28px | 14px | 20px | 16px | 10px |
+
+크기는 `size`로 선택하고, 세부 조정은 `className` 범위에서 CSS 변수를 재정의합니다. `--badge-font-size`(글자), `--badge-line-height`(행간), `--badge-height`(높이), `--badge-icon-size`(아이콘), `--badge-padding-inline`(좌우 여백), `--badge-gap`(아이콘과 문구 간격)을 사용합니다. 글자나 행간을 직접 바꾸면 높이도 함께 조정하세요.
+
+```tsx
+import { Badge, Icon } from '@idenflu/mono-react';
+
+export function StatusBadges() {
+  return <>
+    <Badge size="sm" variant="success">완료</Badge>
+    <Badge size="md" variant="success"><Icon name="check-circle" />완료</Badge>
+    <Badge size="lg" variant="success" appearance="solid">
+      <Icon name="check-circle-fill" />완료
+    </Badge>
+    <div data-size="sm">
+      <Badge>SM 상속</Badge>
+      <Badge size="md">MD 지정</Badge>
+    </div>
+  </>;
+}
+```
+
 ### 숨김 라벨
 
 `TextField type="search"`는 값이 있을 때 공통 `.input-action` 스타일의

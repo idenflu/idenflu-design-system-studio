@@ -3,6 +3,7 @@ import { Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBod
 import { Section } from './demo-layout';
 import {StatusBadge} from './status-definitions';
 import { ProcessingDialogDemo } from './processing-dialog-demo';
+import { BadgeSizeDemos } from './badge-size-demos';
 
 function DetailRows({items, style}: {items:readonly (readonly [string, string])[]; style?:React.CSSProperties}) {
   return <dl className="detail-list" style={style}>{items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>;
@@ -59,6 +60,7 @@ export function FeedbackDemos() {
       <div className="react-studio-row" role="group" aria-label="아이콘 반전 배지"><StatusBadge status="success" appearance="solid" /><StatusBadge status="error" appearance="solid">점검 필요</StatusBadge></div>
       <p className="react-studio-caption"><code>appearance="solid"</code>로 반전 스타일을 사용합니다. 기본값인 <code>appearance="default"</code>는 연한 배경을 표시합니다. 색상은 <code>variant</code>로 지정합니다.</p>
     </Section>
+    <BadgeSizeDemos />
     <Section id="workflow-status-badges" title="업무 상태 배지" description="진행 상태와 주의·오류를 구분합니다. 검토 중은 진행 상태로, 검토가 필요한 조건은 주의 상태로 표시합니다. 같은 기준을 데이터그리드 셀에도 적용합니다.">
       <div className="react-studio-row" role="group" aria-label="업무 상태별 배지"><StatusBadge status="review" /><StatusBadge status="paused" /><StatusBadge status="inactive" /><StatusBadge status="blocked" /><StatusBadge status="blocked" appearance="solid" /></div>
       <p className="react-studio-caption">기본은 Outline을 사용합니다. 반전 스타일의 완료·안내·주의·오류·차단은 같은 의미의 Filled로 강조하며, 대기·진행·보류·비활성은 기본 도형을 유지합니다.</p>

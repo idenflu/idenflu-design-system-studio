@@ -21,6 +21,14 @@ export function ButtonDemos() {
     <Section title="기본 버튼" description="행동의 중요도에 따라 스타일을 선택합니다. 위험한 행동은 별도 색상으로 구분합니다.">
       <div className="react-studio-row">{(['primary','secondary','outline','ghost','danger'] as const).map(variant => <Button key={variant} variant={variant} onClick={() => setFeedback(`${variant} 버튼을 눌렀습니다.`)}>{variant}</Button>)}</div>
     </Section>
+    <Section id="button-outline-appearance" title="색상을 유지하는 아웃라인" description="버튼의 색상은 유지하고 배경 대신 테두리로 강조합니다.">
+      <div className="react-studio-row" role="group" aria-label="색상별 아웃라인 버튼">
+        <Button appearance="outline" onClick={() => setFeedback('Primary 아웃라인 버튼을 눌렀습니다.')}>Primary 아웃라인</Button>
+        <Button variant="danger" appearance="outline" onClick={() => setFeedback('Danger 아웃라인 버튼을 눌렀습니다.')}><Icon name="trash" />Danger 아웃라인</Button>
+        <Button variant="danger" appearance="outline" disabled><Icon name="trash" />Danger 아웃라인 비활성</Button>
+      </div>
+      <p className="react-studio-caption"><code>variant="danger"</code>에 <code>appearance="outline"</code>을 함께 지정하면 빨간 글자·아이콘·테두리를 사용합니다. 기본값 <code>appearance="default"</code>는 기존 variant 스타일을 유지합니다.</p>
+    </Section>
     <ButtonDisabledDemos />
     <Section title="아이콘과 버튼" description="아이콘은 문구의 의미를 보조하며, 아이콘만 사용할 때도 접근 가능한 이름을 제공합니다.">
       <div className="react-studio-row"><Button onClick={() => setFeedback('새로 만들기를 선택했습니다.')}><Icon name="plus" />새로 만들기</Button><Button variant="outline" onClick={() => setFeedback('다운로드를 선택했습니다.')}><Icon name="download" />다운로드</Button></div>

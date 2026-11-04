@@ -7,14 +7,16 @@ type Alignment = 'start' | 'center' | 'end';
 
 export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  /** Keep the variant color while drawing an outline instead of a filled background. */
+  appearance?: 'default' | 'outline';
   size?: Size;
   fullWidth?: boolean;
   iconOnly?: boolean;
 }
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = 'primary', size, fullWidth = false, iconOnly = false, className, type = 'button', ...props }, ref,
+  { variant = 'primary', appearance = 'default', size, fullWidth = false, iconOnly = false, className, type = 'button', ...props }, ref,
 ) {
-  return <button {...props} ref={ref} type={type} data-size={size} className={classes('button', variant !== 'primary' && `button--${variant}`, !fullWidth && 'button-inline', iconOnly && 'button--icon', className)} />;
+  return <button {...props} ref={ref} type={type} data-size={size} className={classes('button', variant !== 'primary' && `button--${variant}`, appearance === 'outline' && 'button--appearance-outline', !fullWidth && 'button-inline', iconOnly && 'button--icon', className)} />;
 });
 
 export interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix'> {
@@ -143,11 +145,13 @@ export const Switch = React.forwardRef<HTMLInputElement, ChoiceProps>(function S
 });
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** Inherit the surrounding size when omitted; otherwise use sm, md or lg. */
+  size?: Size;
   variant?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger';
   /** Fill the background with the status color and use contrasting text. */
   appearance?: 'default' | 'solid';
 }
-export function Badge({ variant = 'neutral', appearance = 'default', className, ...props }: BadgeProps) { return <span {...props} className={classes('badge', variant !== 'neutral' && `badge--${variant}`, appearance === 'solid' && 'badge--solid', className)} />; }
+export function Badge({ size, variant = 'neutral', appearance = 'default', className, ...props }: BadgeProps) { return <span {...props} {...(size ? {'data-size':size} : {})} className={classes('badge', variant !== 'neutral' && `badge--${variant}`, appearance === 'solid' && 'badge--solid', className)} />; }
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> { variant?: 'info' | 'success' | 'warning' | 'danger' }
 export function Alert({ variant = 'info', className, ...props }: AlertProps) { return <div {...props} className={classes('inline-alert', variant !== 'info' && `inline-alert--${variant}`, className)} />; }
 export { Chip } from './chip';

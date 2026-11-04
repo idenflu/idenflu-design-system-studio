@@ -102,6 +102,7 @@ export function IconExample() {
   'components/buttons':`import { Button, Icon, IconButton, Segmented } from '@idenflu/mono-react';
 
 <Button variant="outline">저장</Button>
+<Button variant="danger" appearance="outline"><Icon name="trash" />선택 삭제</Button>
 <IconButton label="설정 열기"><Icon name="settings" /></IconButton>
 <Segmented label="보기 방식" size="md" defaultValue="list"
   options={[
