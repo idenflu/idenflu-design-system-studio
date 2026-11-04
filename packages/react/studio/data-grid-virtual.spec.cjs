@@ -231,8 +231,11 @@ test.describe('vertical scrollbar dragging',()=>{
       await expect(rowFor(grid,`ROW-${String(count).padStart(5,'0')}`)).toHaveCount(1);
       await scrollbar.press('Home');
       await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBeLessThan(2);
+      const beforeArrow=await scroller.evaluate(element=>element.scrollTop);
       await scrollbar.press('ArrowDown');
-      await expect.poll(()=>scroller.evaluate(element=>element.scrollTop)).toBe(40);
+      // Home permits a native rounding residual; ArrowDown moves 40px from
+      // the actual offset rather than from an assumed absolute zero.
+      await expect.poll(async()=>Math.abs(await scroller.evaluate(element=>element.scrollTop)-beforeArrow-40)).toBeLessThan(2);
     }
   });
 });
