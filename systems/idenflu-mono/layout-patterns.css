@@ -36,6 +36,7 @@
 .layout-brand-mark { display:block; flex:none; width:28px; height:28px; object-fit:contain; }
 .layout-menu-search { padding:var(--space-4); }
 .layout-tree-navigation { flex:1; min-height:0; overflow:auto; padding:0 var(--space-3) var(--space-4); }
+.layout-sidebar-footer { display:flex; flex:none; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-3) var(--space-5); border-top:1px solid var(--border-subtle); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); font-variant-numeric:tabular-nums; }
 .layout-tree-navigation .demo-tree { padding:0; border:0; background:transparent; }
 .layout-tree-navigation .tree-children { --layout-tree-line-offset:9px; margin-left:9px; padding-left:calc(var(--layout-tree-line-offset) - 1px); }
 .layout-tree-navigation .demo-tree summary { min-height:max(40px,var(--control-height)); padding:var(--space-2) var(--space-1); color:var(--text-secondary); font-weight:var(--font-weight-medium); }
@@ -247,6 +248,9 @@
 .layout-role-section-heading { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-bottom:var(--space-5); }
 .layout-role-section-heading h3, .layout-role-permission-group h4 { font-weight:var(--font-weight-semibold); }
 .layout-role-section-heading p { margin-top:var(--space-2); font-size:var(--font-size-caption); color:var(--text-secondary); }
+.layout-role-permission-search { display:grid; gap:var(--space-2); }
+.layout-role-permission-search > p { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.layout-role-permission-empty { display:grid; justify-items:center; gap:var(--space-3); }
 .layout-role-permission-group { margin-top:var(--space-4); border:1px solid var(--border); }
 .layout-role-permission-group > header { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-1) var(--space-4); border-bottom:1px solid var(--divider); background:var(--surface); }
 .layout-role-group-title, .layout-role-group-actions { display:flex; align-items:center; gap:var(--space-3); min-width:0; }

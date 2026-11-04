@@ -21,6 +21,7 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
   onDelete:(id:string,replacementId?:string)=>void;
 }) {
   const [query,setQuery] = React.useState('');
+  const [permissionQuery,setPermissionQuery] = React.useState('');
   const [selectedId,setSelectedId] = React.useState(roles[0]?.id??'');
   const [drafts,setDrafts] = React.useState<Record<string,RoleConnections>>({});
   const [feedback,setFeedback] = React.useState('');
@@ -30,11 +31,15 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
   const [replacementId,setReplacementId] = React.useState('');
   const dialogId = React.useId(), formId = `${dialogId}-form`;
   const nameInput = React.useRef<HTMLInputElement>(null), deleteCancel = React.useRef<HTMLButtonElement>(null);
+  const permissionInput = React.useRef<HTMLInputElement>(null);
   const addButton = React.useRef<HTMLButtonElement>(null), roleList = React.useRef<HTMLDivElement>(null);
   const focusAfterDelete = React.useRef(false);
   const visible = roles.filter(role=>`${role.name} ${role.description}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   const selected = visible.find(role=>role.id===selectedId)??visible[0];
   const draft = selected ? drafts[selected.id]??selected : null;
+  const normalizedPermissionQuery = permissionQuery.trim().toLocaleLowerCase();
+  const visiblePermissions = rolePermissions.filter(item=>`${item.name} ${item.description} ${item.group}`.toLocaleLowerCase().includes(normalizedPermissionQuery));
+  const visiblePermissionGroups = permissionGroups.map(group=>({group,items:visiblePermissions.filter(item=>item.group===group)})).filter(({items})=>items.length);
   const dirty = !!selected && !!draft && !sameConnections(draft,selected);
   const changedPermissions = selected&&draft?rolePermissions.filter(({id})=>draft.permissions.includes(id)!==selected.permissions.includes(id)).length:0;
   const changedNotifications = selected&&draft?roleNotifications.filter(({id})=>roleNotificationChannels.some(channel=>!!draft.notifications[id]?.includes(channel)!==!!selected.notifications[id]?.includes(channel))).length:0;
@@ -132,16 +137,20 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
           <header className="layout-role-header">
             <Avatar variant="neutral"><Icon name="shield-check"/></Avatar>
             <div><div className="layout-role-title"><h2>{selected.name}</h2><Badge variant="warning" style={{visibility:dirty?'visible':'hidden'}} aria-hidden={!dirty}>변경 중</Badge></div><p>{selected.description||'역할 설명이 없습니다.'}</p><span className="layout-role-members"><Icon name="users"/>이 역할을 사용하는 멤버 {memberCount(selected)}명</span></div>
-            <div className="layout-role-header-actions"><Button variant="outline" size="sm" onClick={()=>openEditor(selected)}><Icon name="edit"/>역할 수정</Button><Button variant="ghost" size="sm" className="layout-role-delete" onClick={()=>{setReplacementId('');setDeleteId(selected.id);}}><Icon name="trash"/>역할 삭제</Button></div>
+            <div className="layout-role-header-actions"><Button variant="outline" size="sm" onClick={()=>openEditor(selected)}><Icon name="edit"/>역할 수정</Button><Button variant="danger" appearance="outline" size="sm" className="layout-role-delete" onClick={()=>{setReplacementId('');setDeleteId(selected.id);}}><Icon name="trash"/>역할 삭제</Button></div>
           </header>
           <Tabs className="layout-role-tabs" label="역할 연결 정보" items={[
             {value:'permissions',label:`권한 ${draft.permissions.length}`,content:<>
               <div className="layout-role-section-heading"><div><h3>사용 권한</h3><p>이 역할에 허용할 작업을 선택하세요.</p></div><Badge variant="neutral">{draft.permissions.length} / {rolePermissions.length}</Badge></div>
-              {permissionGroups.map(group=>{
-                const items=rolePermissions.filter(item=>item.group===group);
+              <div className="layout-role-permission-search">
+                <TextField ref={permissionInput} label="사용 권한 검색" type="search" value={permissionQuery} onChange={event=>setPermissionQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="권한 이름, 설명 또는 그룹 검색" aria-describedby={`${dialogId}-permission-results`}/>
+                <p id={`${dialogId}-permission-results`} role="status">{normalizedPermissionQuery?`검색 결과 ${visiblePermissions.length}개`:`전체 ${rolePermissions.length}개`}</p>
+              </div>
+              {visiblePermissionGroups.map(({group,items})=>{
                 const count=items.filter(item=>draft.permissions.includes(item.id)).length;
+                const selectAllLabel=normalizedPermissionQuery?'검색 결과 전체 선택':'전체 선택';
                 return <section className="layout-role-permission-group" key={group} aria-label={`${group} 권한`}>
-                  <header><div className="layout-role-group-title"><h4>{group}</h4><span className="layout-role-group-count">{count} / {items.length} 허용</span></div><div className="layout-role-group-actions"><span aria-hidden="true">전체 선택</span><Checkbox containerClassName="layout-role-permission-check" label={<span className="sr-only">{group} 전체 선택</span>} checked={count===items.length} indeterminate={count>0&&count<items.length} onChange={event=>updatePermissions(event.target.checked?[...new Set([...draft.permissions,...items.map(item=>item.id)])]:draft.permissions.filter(id=>!items.some(item=>item.id===id)))}/></div></header>
+                  <header><div className="layout-role-group-title"><h4>{group}</h4><span className="layout-role-group-count">{count} / {items.length} 허용</span></div><div className="layout-role-group-actions"><span aria-hidden="true">{selectAllLabel}</span><Checkbox containerClassName="layout-role-permission-check" label={<span className="sr-only">{group} {selectAllLabel}</span>} checked={count===items.length} indeterminate={count>0&&count<items.length} onChange={event=>updatePermissions(event.target.checked?[...new Set([...draft.permissions,...items.map(item=>item.id)])]:draft.permissions.filter(id=>!items.some(item=>item.id===id)))}/></div></header>
                   <div className="layout-role-options">{items.map(item=>{
                     const changed=draft.permissions.includes(item.id)!==selected.permissions.includes(item.id);
                     return <div className="layout-role-option" key={item.id} data-changed={changed||undefined}>
@@ -151,6 +160,7 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
                   })}</div>
                 </section>;
               })}
+              {!visiblePermissions.length&&<div className="layout-empty layout-role-permission-empty"><p>검색 결과가 없습니다.</p><Button variant="outline" size="sm" onClick={()=>{setPermissionQuery('');permissionInput.current?.focus();}}>검색 초기화</Button></div>}
             </>},
             {value:'notifications',label:`알림 ${notificationCount(draft)}`,content:<>
               <div className="layout-role-section-heading"><div><h3>수신 알림</h3><p>이 역할을 가진 멤버에게 전달할 알림과 수신 방법을 선택하세요.</p></div><Badge variant="neutral">{notificationCount(draft)} / {roleNotifications.length}</Badge></div>
