@@ -71,14 +71,30 @@ export function ColorExample() {
     </div>
   </>;
 }`,
-  'foundations/icons': `import { Button, Icon, IconButton, TextField } from '@idenflu/mono-react';
+  'foundations/icons': `import { useState, type CSSProperties } from 'react';
+import { Badge, Button, Icon, IconButton, TextField } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function IconExample() {
+  const [pinned, setPinned] = useState(false);
   return <>
     <Button><Icon name="save" />저장</Button>
     <Button variant="outline"><Icon name="microsoft-excel" />Excel 내보내기</Button>
     <IconButton label="알림"><Icon name="bell" /></IconButton>
+    <IconButton label={pinned ? '고정 해제' : '상단에 고정'}
+      aria-pressed={pinned} onClick={() => setPinned(value => !value)}>
+      <Icon name={pinned ? 'pin-off' : 'pin'} />
+    </IconButton>
+    <Button variant="outline"><Icon name="user-plus" />멤버 초대</Button>
+    <Badge><Icon name="crown" />소유자</Badge>
+    <Badge variant="success"><Icon name="shield-check" />접근 허용</Badge>
+    <Badge variant="danger"><Icon name="shield-off" />접근 거부</Badge>
+    <Badge variant="primary"><Icon name="circle-dot" />진행 중</Badge>
+    <Badge variant="danger" appearance="solid"><Icon name="error-circle-fill" />오류</Badge>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <Icon name="columns" style={{ '--icon-size': '20px' } as CSSProperties} />
+      <span>표시 열</span>
+    </div>
     <Button variant="outline" aria-pressed="true"><Icon name="bookmark-fill" />북마크됨</Button>
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
   </>;

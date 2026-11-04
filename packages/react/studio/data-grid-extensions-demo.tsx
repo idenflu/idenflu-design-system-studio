@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Badge, Button, DataGrid, Icon, IconButton, type DataGridColumn } from '../src';
+import { Button, DataGrid, Icon, IconButton, type DataGridColumn } from '../src';
 import { Section } from './demo-layout';
+import {ProjectStatusBadge} from './status-definitions';
 
 type Project = {id:string; name:string; owner:string; status:'진행 중'|'검토 중'|'준비 중'|'완료'};
 const initialRows:Project[] = [
@@ -12,7 +13,7 @@ const columns:DataGridColumn<Project>[] = [
   {id:'name',header:'프로젝트',accessor:row=>row.name,flex:1,minWidth:200,maxWidth:1200},
   {id:'owner',header:'담당자',accessor:row=>row.owner,width:120},
   {id:'status',header:'상태',accessor:row=>row.status,width:120,
-    cell:row=><Badge variant={row.status==='완료'?'success':'neutral'}>{row.status}</Badge>},
+    cell:row=><ProjectStatusBadge value={row.status} />},
 ];
 
 // loading은 실제 앱의 조회·저장 상태를 연결합니다.
@@ -94,11 +95,17 @@ const initialRows:Project[] = [
   {id:'extension-2',name:'컴포넌트 가이드',owner:'이서연',status:'검토 중'},
   {id:'extension-3',name:'접근성 점검',owner:'박지훈',status:'준비 중'},
 ];
+const statusAppearance = {
+  '준비 중':{variant:'neutral',icon:'circle-dashed'},
+  '진행 중':{variant:'primary',icon:'circle-dot'},
+  '검토 중':{variant:'primary',icon:'circle-dot'},
+  '완료':{variant:'success',icon:'check-circle'},
+} as const;
 const columns:DataGridColumn<Project>[] = [
   {id:'name',header:'프로젝트',accessor:row=>row.name,flex:1,minWidth:200,maxWidth:1200},
   {id:'owner',header:'담당자',accessor:row=>row.owner,width:120},
   {id:'status',header:'상태',accessor:row=>row.status,width:120,
-    cell:row=><Badge variant={row.status==='완료'?'success':'neutral'}>{row.status}</Badge>},
+    cell:row=><Badge variant={statusAppearance[row.status].variant}><Icon name={statusAppearance[row.status].icon} />{row.status}</Badge>},
 ];
 
 // loading은 실제 앱의 조회·저장 상태를 연결합니다.

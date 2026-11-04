@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
   <mask id="nova-icon-image-fill-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
     <rect x="3" y="3" width="18" height="18" rx="1" fill="white" />
-    <circle cx="8" cy="8" r="2" fill="black" />
-    <path d="m3 18 5-5 4 4 4-6 5 7" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" />
+    <circle cx="8" cy="8" r="2.25" fill="black" />
+    <path d="m3 18 5-5 4 4 4-6 5 7" fill="none" stroke="black" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" />
   </mask>
   <rect width="24" height="24" mask="url(#nova-icon-image-fill-mask)" />
 </svg>

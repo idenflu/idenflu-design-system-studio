@@ -4,6 +4,8 @@ import { Section } from './demo-layout';
 import { DataGridReference, DataGridReferenceLinks } from './data-grid-reference';
 import { DataGridToolbarDemos } from './data-grid-toolbar-demos';
 import { DataGridMultiFilterDemo } from './data-grid-multi-filter-demo';
+import {ProjectStatusBadge} from './status-definitions';
+import {DataGridStatusDemos} from './status-demos';
 
 type Project = {
   id:string; name:string; team:string; owner:string | null;
@@ -37,7 +39,7 @@ const projectColumns:DataGridColumn<Project>[] = [
   {id:'name',header:'프로젝트',accessor:row=>row.name,width:260,minWidth:160,pinned:'start',filter:'text',cell:row=><div className="studio-grid-project"><strong>{row.name}</strong><small>{row.id}</small></div>},
   {id:'team',header:'담당 팀',accessor:row=>row.team,width:170,filter:'select',filterOptions:teams.map(value=>({value,label:value}))},
   {id:'owner',header:'담당자',accessor:row=>row.owner,width:130,filter:'text',cell:row=>row.owner ?? <span className="table-muted">미지정</span>},
-  {id:'status',header:'상태',accessor:row=>row.status,width:130,filter:'select',filterOptions:statuses.map(value=>({value,label:value})),cell:row=><Badge variant={row.status === '완료' ? 'success' : row.status === '검토 중' ? 'warning' : row.status === '진행 중' ? 'primary' : 'neutral'}>{row.status}</Badge>},
+  {id:'status',header:'상태',accessor:row=>row.status,width:130,filter:'select',filterOptions:statuses.map(value=>({value,label:value})),cell:row=><ProjectStatusBadge value={row.status} />},
   {id:'progress',header:'진행률',accessor:row=>row.progress,width:150,align:'end',filter:'number',cell:row=><div className="studio-grid-progress"><span>{row.progress}%</span><Progress value={row.progress} max={100} aria-label={`${row.name} 진행률`} /></div>},
   {id:'budget',header:'예산',accessor:row=>row.budget,width:170,align:'end',filter:'number',cell:row=>`${money.format(row.budget)}원`},
   {id:'due',header:'마감일',accessor:row=>row.due,width:150,filter:'text'},
@@ -46,7 +48,7 @@ const responsiveColumns:DataGridColumn<Project>[] = [
   {id:'name',header:'프로젝트',accessor:row=>row.name,flex:2,minWidth:180,pinned:'start'},
   {id:'team',header:'담당 팀',accessor:row=>row.team,flex:1,minWidth:120,maxWidth:260},
   {id:'owner',header:'담당자',accessor:row=>row.owner,width:'25%',minWidth:110,maxWidth:300,cell:row=>row.owner ?? <span className="table-muted">미지정</span>},
-  {id:'status',header:'상태',accessor:row=>row.status,width:120,minWidth:120,maxWidth:120,resizable:false,cell:row=><Badge>{row.status}</Badge>},
+  {id:'status',header:'상태',accessor:row=>row.status,width:120,minWidth:120,maxWidth:120,resizable:false,cell:row=><ProjectStatusBadge value={row.status} />},
 ];
 
 const virtualProject = (index:number):Project => ({
@@ -107,6 +109,7 @@ export function DataGridDemos() {
       <p role="status" className="component-helper">정렬: {sortModel.length ? sortModel.map((sort,index)=>`${index+1}. ${projectColumns.find(column=>column.id===sort.columnId)?.header} ${sort.direction === 'asc' ? '오름차순' : '내림차순'}`).join(' · ') : '원래 순서'}</p>
       <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV와 Excel(.xlsx)은 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다. Excel 버튼에는 엑셀 아이콘을 사용합니다.</p>
     </Section>
+    <DataGridStatusDemos />
     <DataGridMultiFilterDemo />
     <Section title="셀 편집과 값 바인딩" description="텍스트·숫자 편집, 입력 검증과 읽기 전용 행을 비교합니다. 저장한 값은 React 상태에 반영되어 다시 검색·정렬할 수 있습니다.">
       <DataGrid label="작업 편집 데이터그리드" rows={tasks} columns={taskColumns}
@@ -167,10 +170,16 @@ export function DataGridDemos() {
 }
 
 export const dataGridUsage = `import { useState } from 'react';
-import { DataGrid, type DataGridColumn, type DataGridSort } from '@idenflu/mono-react';
+import { Badge, DataGrid, Icon, type DataGridColumn, type DataGridSort } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
-type Project = { id: string; name: string; hours: number };
+type Project = { id: string; name: string; hours: number; status:'준비 중'|'진행 중'|'완료'|'보류' };
+const statusAppearance = {
+  '준비 중':{variant:'neutral',icon:'circle-dashed'},
+  '진행 중':{variant:'primary',icon:'circle-dot'},
+  '완료':{variant:'success',icon:'check-circle'},
+  '보류':{variant:'neutral',icon:'pause-circle'},
+} as const;
 const columns: DataGridColumn<Project>[] = [
   { id: 'name', header: '프로젝트', accessor: row => row.name,
     width: 260, pinned: 'start', filter: 'text', editable: true,
@@ -178,12 +187,16 @@ const columns: DataGridColumn<Project>[] = [
   { id: 'hours', header: '예상 시간', accessor: row => row.hours,
     width: 180, align: 'end', filter: 'number', editable: true, editor: 'number',
     validate: value => value.trim() && Number(value) >= 0 ? undefined : '0 이상 입력해주세요.' },
+  { id:'status', header:'상태', accessor:row=>row.status, width:130,
+    cell:row=><Badge variant={statusAppearance[row.status].variant}>
+      <Icon name={statusAppearance[row.status].icon} />{row.status}
+    </Badge> },
 ];
 
 export function ProjectGrid() {
   const [rows, setRows] = useState<Project[]>([
-    { id: 'p1', name: '디자인 시스템', hours: 24 },
-    { id: 'p2', name: '브랜드 가이드', hours: 16 },
+    { id: 'p1', name: '디자인 시스템', hours: 24, status:'진행 중' },
+    { id: 'p2', name: '브랜드 가이드', hours: 16, status:'완료' },
   ]);
   const [selected, setSelected] = useState<string[]>([]);
   const [sortModel, setSortModel] = useState<DataGridSort[]>([]);

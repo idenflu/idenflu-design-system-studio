@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { Button, Icon, Select, Spinner, Switch, Table, TableContainer, TextField } from '../src';
 import { Section } from './demo-layout';
+import { IconExpansionDemos } from './icon-expansion-demos';
+import {StatusIconDemos} from './status-demos';
+import {AccessIconDemos} from './icon-access-demos';
 
 const sizes = [
   {value:'sm', name:'Small', height:30, padding:10, icon:14, switchTrack:'28 × 16'},
@@ -23,7 +26,7 @@ export function IconDemos() {
   </Section>
   <Section title="Outline / Filled" description="기본 탐색·동작에는 Outline을, 선택·활성 강조에는 Filled를 사용할 수 있습니다. 상태는 색이나 모양만으로 전달하지 않고 텍스트와 함께 표시합니다. 두 유형 모두 24 × 24 그리드를 사용합니다.">
     <ul className="react-studio-icon-pairs">{pairs.map(name => <li key={name}><span className="react-studio-caption">{name}</span><div className="react-studio-icon-pair"><span><Icon name={name} /><small>Outline</small></span><span><Icon name={`${name}-fill`} /><small>Filled</small></span></div></li>)}</ul>
-  </Section></>;
+  </Section><IconExpansionDemos /><StatusIconDemos /><AccessIconDemos /></>;
 }
 
 export function TypographyDemos() {

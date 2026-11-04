@@ -1,11 +1,8 @@
 import * as React from 'react';
 import { Avatar, Badge, Button, Checkbox, Pagination, Segmented, Table, TableContainer } from '../src';
 import { Section } from './demo-layout';
+import {ProjectStatusBadge} from './status-definitions';
 
-type StatusVariant = 'neutral' | 'primary' | 'success' | 'warning' | 'danger';
-const projectStatus: Record<string, StatusVariant> = {
-  '준비 중': 'neutral', '진행 중': 'primary', '검토 중': 'warning', '완료': 'success', '보류': 'neutral', '지연': 'danger',
-};
 const projects = [
   { name: '디자인 시스템', team: '프로덕트 디자인', owner: '김민수', status: '진행 중' },
   { name: '브랜드 가이드', team: '브랜드 디자인', owner: '이서연', status: '완료' },
@@ -79,7 +76,7 @@ export function TableDemos() {
           <caption className="sr-only">프로젝트별 담당 팀·담당자와 진행 상태</caption>
           <colgroup><col className="table-col-project" /><col className="table-col-team" /><col className="table-col-owner" /><col className="table-col-status" /></colgroup>
           <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col">상태</th></tr></thead>
-          <tbody>{visible.map(row => <tr key={row.name}><td>{row.name}</td><td>{row.team}</td><td>{row.owner ?? <span className="table-muted">미지정</span>}</td><td><Badge variant={projectStatus[row.status]}>{row.status}</Badge></td></tr>)}</tbody>
+          <tbody>{visible.map(row => <tr key={row.name}><td>{row.name}</td><td>{row.team}</td><td>{row.owner ?? <span className="table-muted">미지정</span>}</td><td><ProjectStatusBadge value={row.status} /></td></tr>)}</tbody>
         </Table>
       </TableContainer>
       <div className="react-studio-table-footer">

@@ -106,15 +106,19 @@ export function FileExample() {
   </>;
 }`,
   'components/feedback': `import { useState } from 'react';
-import { Alert, Badge, Button } from '@idenflu/mono-react';
+import { Alert, Badge, Button, Icon } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function FeedbackExample() {
   const [failed, setFailed] = useState(false);
   return <div style={{ display: 'grid', gap: 16 }}>
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-      <Badge variant="warning">검토 필요</Badge>
-      <Badge variant="warning" appearance="solid">검토 필요</Badge>
+      <Badge variant="warning"><Icon name="warning" />검토 필요</Badge>
+      <Badge variant="warning" appearance="solid"><Icon name="warning-fill" />검토 필요</Badge>
+      <Badge><Icon name="circle-dashed" />대기</Badge>
+      <Badge variant="primary"><Icon name="circle-dot" />진행 중</Badge>
+      <Badge><Icon name="pause-circle" />보류</Badge>
+      <Badge variant="danger"><Icon name="error-circle" />오류</Badge>
     </div>
     <Alert variant="info"><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert>
     <Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert>

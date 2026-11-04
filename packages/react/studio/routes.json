@@ -32,7 +32,7 @@
     "title": "Icons",
     "group": "Foundations",
     "description": "기존 idenflu 디자인 시스템의 아이콘을 같은 색상과 크기 규칙으로 사용합니다.",
-    "searchTerms": ""
+    "searchTerms": "아이콘 상태 권한 역할 접근 허용 거부 잠금 소유자 permission role status shield key circle"
   },
   {
     "route": "foundations/states",

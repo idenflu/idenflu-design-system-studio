@@ -215,11 +215,13 @@ test('Toast exposes urgency and keeps its action separate from dismissing the no
 test('Toast supplies status icons and supports replacing or hiding them', async () => {
   const f = fixture();
   try {
-    for (const [variant,icon] of [['info','info'],['success','check-circle'],['warning','warning'],['danger','warning-fill']]) {
-      await f.render(h(Toast, {variant,appearance:'solid'}, '상태 안내'));
+    for (const appearance of ['default','solid']) for (const [variant,base] of [['info','info'],['success','check-circle'],['warning','warning'],['danger','error-circle']]) {
+      const icon=base+(appearance==='solid'?'-fill':'');
+      await f.render(h(Toast, {variant,appearance}, '상태 안내'));
       assert.ok(f.container.querySelector(`.toast-icon .icon-${icon}`));
       assert.equal(f.container.querySelector('.toast-icon').getAttribute('aria-hidden'), 'true');
       assert.equal(f.container.querySelector('.toast').getAttribute('appearance'), null);
+      assert.equal(f.container.querySelector('.toast').getAttribute('role'),variant==='danger'?'alert':'status');
     }
     await f.render(h(Toast, {icon:h(Icon,{name:'download'})}, '다운로드 완료'));
     assert.ok(f.container.querySelector('.toast-icon .icon-download'));

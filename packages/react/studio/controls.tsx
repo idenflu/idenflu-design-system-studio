@@ -142,7 +142,7 @@ export function ThemeControl() {
   }, []);
   const label = `${theme === 'dark' ? '라이트' : '다크'} 모드로 전환`;
   return <Tooltip content={label}><button type="button" className="icon-button theme-toggle" aria-label={label} aria-pressed={theme === 'dark'} onClick={() => selectTheme(theme === 'dark' ? 'light' : 'dark')}>
-    <svg className="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M20.3 15.2A8.5 8.5 0 0 1 8.8 3.7 8.5 8.5 0 1 0 20.3 15.2Z" /></svg>
-    <svg className="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+    <Icon name="moon" className="theme-icon-moon" />
+    <Icon name="sun" className="theme-icon-sun" />
   </button></Tooltip>;
 }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Checkbox, DataGrid, Select, type DataGridColumn, type DataGridExportFormat, type DataGridToolbarItem } from '../src';
 import { Section } from './demo-layout';
 import { DataGridExtensionsDemo } from './data-grid-extensions-demo';
+import {ProjectStatusBadge} from './status-definitions';
 
 type Project = {id:string; name:string; owner:string; status:string};
 const initialRows:Project[] = [
@@ -14,7 +15,7 @@ const statusOptions=[...new Set(initialRows.map(row=>row.status))].map(value=>({
 const columns:DataGridColumn<Project>[] = [
   {id:'name',header:'프로젝트',accessor:row=>row.name,flex:1,minWidth:200,maxWidth:1200,filter:'text'},
   {id:'owner',header:'담당자',accessor:row=>row.owner,width:120,filter:'select',filterOptions:ownerOptions},
-  {id:'status',header:'상태',accessor:row=>row.status,width:120,filter:'select',filterOptions:statusOptions},
+  {id:'status',header:'상태',accessor:row=>row.status,width:120,filter:'select',filterOptions:statusOptions,cell:row=><ProjectStatusBadge value={row.status} />},
 ];
 type ToolbarOrderPreset = 'default'|'filters'|'export';
 const toolbarOrders:Record<ToolbarOrderPreset,readonly DataGridToolbarItem[]|undefined> = {

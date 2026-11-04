@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Badge, DataGrid, Select, type DataGridColumn, type DataGridFilters } from '../src';
+import { DataGrid, Select, type DataGridColumn, type DataGridFilters } from '../src';
 import { Section } from './demo-layout';
+import {ProjectStatusBadge} from './status-definitions';
 
 type Task = {id:string; name:string; team:string; status:string; hours:number};
 const rows:Task[] = [
@@ -17,7 +18,7 @@ const columns:DataGridColumn<Task>[] = [
     filterOptions:['프로덕트 디자인','개발','기획'].map(value=>({value,label:value}))},
   {id:'status',header:'상태',accessor:row=>row.status,width:160,filter:'multi-select',
     filterOptions:['진행 중','검토 중','준비 중','완료'].map(value=>({value,label:value})),
-    cell:row=><Badge variant={row.status==='완료'?'success':'neutral'}>{row.status}</Badge>},
+    cell:row=><ProjectStatusBadge value={row.status} />},
   {id:'hours',header:'예상 시간',accessor:row=>row.hours,width:160,filter:'number',align:'end'},
 ];
 

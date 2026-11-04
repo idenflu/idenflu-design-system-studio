@@ -20,7 +20,7 @@ async function colors(toast) {
 test('solid toast variants color the whole background and provide matching status icons', {tag:['@theme','@mobile']}, async ({page})=>{
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   const backgrounds=new Set();
-  for(const [name,variant,icon] of [['성공','success','check-circle'],['안내','info','info'],['주의','warning','warning'],['오류','danger','warning-fill']]) {
+  for(const [name,variant,icon] of [['성공','success','check-circle-fill'],['안내','info','info-fill'],['주의','warning','warning-fill'],['오류','danger','error-circle-fill']]) {
     const trigger=page.getByRole('button',{name:`${name} 배경 토스트`,exact:true});
     await trigger.click();
     const toast=page.locator('.toast');
@@ -63,7 +63,7 @@ test('solid retry retains the appearance and undo restores the archived example'
   await retry.press('Enter');
   await expect(toast).toHaveClass(/toast--solid/);
   await expect(toast).toHaveClass(/toast--success/);
-  await expect(toast.locator('.icon-check-circle')).toBeVisible();
+  await expect(toast.locator('.icon-check-circle-fill')).toBeVisible();
   await expect(toast).toHaveAttribute('role','status');
   await expect(error).toBeFocused();
   expect((await colors(toast)).background).not.toBe(background);
