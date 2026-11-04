@@ -15,6 +15,7 @@ import { DocumentShell, Overview, useDocumentRoute } from './shell';
 import { DividerDemos } from './divider-demos';
 import { patternPages, patternSnippets } from './patterns';
 import { componentUsage } from './component-usage';
+import completeExamples from './dist/complete-examples.json';
 import { DataGridDemos, dataGridUsage } from './data-grid-demos';
 import { SidebarLayoutSample } from './layout-samples';
 import icons from './dist/icons.json';
@@ -115,13 +116,6 @@ export function IconExample() {
 <Switch size="md" label="자동 저장" />
 <Switch size="lg" label="활동 알림" defaultChecked />
 <Switch label="비활성 설정" disabled />`,
-  'components/number-fields':`import { Icon, NumberField } from '@idenflu/mono-react';
-
-<NumberField label="참여 인원" prefixIcon={<Icon name="person" />}
-             defaultValue="8" min="0" max="100" unit="명" />
-<NumberField label="작업 기간" prefixIcon={<Icon name="calendar" />}
-             defaultValue="3" min="0" decimals={1} step="0.5" unit="일" />`,
-  'components/date-picker':'<DatePicker label="시작일" />\n<DateRangePicker label="기간" />',
   'components/progress':`import { Progress, SegmentedProgress, CircleProgress } from '@idenflu/mono-react';
 
 <Progress value={60} max={100} aria-label="파일 업로드" />
@@ -204,44 +198,19 @@ export function ProcessingDialogExample({ blocking = false }: { blocking?: boole
     </Dialog>
   </>;
 }`,
-  'components/table':`import { Checkbox, Table, TableContainer } from '@idenflu/mono-react';
-
-<TableContainer label="프로젝트 목록">
-  <Table density="compact">
-    <colgroup><col style={{ width: '44%' }} /><col /><col /><col /></colgroup>
-    <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col" className="table-numeric">진행률</th></tr></thead>
-    <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td><td>김민수</td><td className="table-numeric">72%</td></tr></tbody>
-  </Table>
-</TableContainer>
-
-<TableContainer label="공유 파일 목록">
-  <Table interactive>
-    <thead><tr><th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allSelected} onChange={toggleAll} /></th><th scope="col">파일</th></tr></thead>
-    <tbody><tr data-selected={selected || undefined} onClick={toggleOnRowClick}><td><Checkbox label={<span className="sr-only">design-tokens.json 선택</span>} checked={selected} onChange={toggle} /></td><td>design-tokens.json</td></tr></tbody>
-  </Table>
-</TableContainer>
-
-// density="default"는 기본 간격, "compact"는 조밀한 간격입니다.
-// interactive는 행 hover를 표시하고, data-selected="true"는 선택한 행을 강조합니다.`,
-  'components/chips':`import { Chip } from '@idenflu/mono-react';
-
-<Chip interactive={false}>디자인</Chip>
-<Chip interactive={false} variant="secondary">보조 정보</Chip>
-<Chip interactive={false} rounded variant="success">완료</Chip>
-<Chip rounded variant="primary" aria-pressed={selected} onClick={() => setSelected(!selected)}>프로젝트 필터</Chip>`,
   'components/list':'<List><ListItem>디자인 시스템</ListItem></List>',
   'components/slider':'<Slider aria-label="진행률" defaultValue={50} />',
   'components/tooltip':'<Tooltip content="도움말"><Button>정보</Button></Tooltip>',
   'components/popover':'<Popover trigger="표시 설정" label="표시 설정" align="end">내용</Popover>',
   'components/stepper':'<Stepper aria-label="프로젝트 생성" steps={["기본 정보", "확인"]} currentStep={0} />',
   'components/card':'<Card><h3>프로젝트</h3><p>상세 내용</p></Card>',
-  'patterns/form/basic':'<TextField label="이름" name="name" required error={errors.name} />\n<TextField label="이메일" name="email" type="email" required error={errors.email} />',
   ...patternSnippets,
   ...componentUsage,
+  ...completeExamples,
 };
-function CodeExample({ code }: { code:string }) {
+function CodeExample({ code, complete = false }: { code:string; complete?:boolean }) {
   const [message, setMessage] = React.useState('');
-  return <Section title="React 사용 예시" description="패키지에서 컴포넌트를 가져와 사용합니다."><div className="react-studio-code" role="region" aria-label="React 사용 예시 코드" tabIndex={0}><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
+  return <Section title="React 사용 예시" description={complete ? "현재 화면의 데이터·상태·이벤트와 예제용 배치를 포함한 전체 TSX 코드입니다. 복사 후 내보낸 컴포넌트를 렌더링하세요." : "패키지에서 컴포넌트를 가져와 사용합니다."}><div className="react-studio-code" role="region" aria-label="React 사용 예시 코드" tabIndex={0}><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
 }
 function FoundationIcons() {
   const [query, setQuery] = React.useState('');
@@ -297,7 +266,7 @@ function DocumentationApp() {
     <ComponentPage key={`page-${current.route}`} route={current.route} />
     {current.route === 'components/datetime-picker'
       ? <DateTimeUsageExamples />
-      : snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} />}
+      : snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} complete={current.route in completeExamples} />}
   </DocumentShell>;
 }
 function App() {

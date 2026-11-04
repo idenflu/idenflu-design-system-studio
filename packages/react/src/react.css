@@ -23,6 +23,19 @@
 .icon-person { --icon:url('./assets/icons/idenflu/person.svg'); }
 .select-prefix-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--text-secondary); }
 .search-select-control > .select-prefix-icon, .multi-inline-control > .select-prefix-icon { margin-inline-start:var(--control-px); }
+.multi-inline-control { min-width:0; max-width:100%; height:var(--control-height); cursor:pointer; }
+.multi-inline-control:has(.multi-inline-trigger:disabled) { cursor:not-allowed; }
+.multi-inline-tags { position:relative; flex:1 1 0; flex-wrap:nowrap; height:calc(var(--control-height) - 2px); overflow:hidden; }
+.multi-inline-tags :is(.multi-inline-chip,.multi-inline-tag-metric) { flex:0 0 auto; min-width:0; height:var(--multi-chip-height); min-height:var(--multi-chip-height); padding:1px calc(var(--space-unit) * 1.5) 1px var(--space-2); gap:var(--space-1); border:1px solid var(--divider); background:var(--surface); white-space:nowrap; }
+.multi-inline-tags.has-overflow > .multi-inline-chip { max-width:calc(100% - var(--multi-more-width, 48px) - var(--space-1)); }
+.multi-inline-chip-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.multi-inline-tags :is(.ui-icon,.select-option-icon) { flex:none; }
+.multi-inline-more { display:inline-flex; flex:none; align-items:center; justify-content:center; height:var(--multi-chip-height); padding:0 var(--space-2); border:1px solid var(--divider); border-radius:var(--radius-control); background:var(--surface); color:var(--text-secondary); font:inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.multi-inline-more:hover:not(:disabled) { background:var(--surface-hover); color:var(--text); }
+.multi-inline-more:disabled { color:var(--disabled-text); cursor:not-allowed; }
+.multi-inline-chip:focus-visible, .multi-inline-more:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
+.multi-inline-metrics { position:absolute; inset:0; display:flex; align-items:center; gap:var(--space-1); overflow:hidden; visibility:hidden; pointer-events:none; }
+.multi-inline-metrics .multi-inline-tag-metric { flex:none; max-width:none; }
 .search-select-control > .select-prefix-icon + .search-select-input { padding-inline-start:var(--space-2); }
 .select-trigger:disabled .select-prefix-icon, .search-select-control:has(input:disabled) > .select-prefix-icon, .multi-inline-control:has(.multi-inline-trigger:disabled) > .select-prefix-icon { color:var(--disabled-text); }
 .action-option:has(.action-option-icon) { display:flex; align-items:center; gap:var(--space-2); }
@@ -121,6 +134,7 @@
 .data-grid-export-error { flex-basis:100%; margin:0; }
 .data-grid-search { width:240px; max-width:100%; min-width:0; }
 .data-grid-search input::-webkit-search-cancel-button { display:none; }
+.text-field-search::-webkit-search-cancel-button { appearance:none; display:none; }
 .data-grid-tools .popover-content { width:240px; max-width:calc(100vw - 48px); }
 /* Touch hover can linger across wrapped toolbar rows. Keep nearby actions tappable. */
 @media (hover:none) {

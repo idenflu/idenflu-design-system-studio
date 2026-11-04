@@ -137,6 +137,9 @@
 .react-studio .docs-toc { max-width:1040px; }
 .react-studio-field-wide { grid-column:1 / -1; }
 .react-studio-code { max-height:480px; overflow:auto; overscroll-behavior:contain; padding:var(--space-4); background:var(--surface); }
+.form-pattern-preview { display:grid; gap:var(--space-2); min-width:0; }
+.form-pattern-preview pre, .field-binding-output { max-width:100%; max-height:320px; overflow:auto; padding:var(--space-4); background:var(--surface); color:var(--text); font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.form-pattern-preview pre:focus-visible, .field-binding-output:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
 .react-studio-code:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .react-studio-code pre { font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; }
 .react-datetime-usage .tab-list { overflow-x:auto; }

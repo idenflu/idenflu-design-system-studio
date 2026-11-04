@@ -4,6 +4,8 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { documentStyles } from '../../../scripts/styles.mjs';
+import { createCompleteExamples } from './complete-examples.mjs';
+import { checkCompleteExamples } from './check-complete-examples.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const system = resolve(root, '../../systems/idenflu-mono');
@@ -17,6 +19,9 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
   await writeFile(resolve(metadata, 'navigation.json'), JSON.stringify(routes.map(item => item.route), null, 2));
   const icons = (await readdir(resolve(system, 'assets/icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
   await writeFile(resolve(metadata, 'icons.json'), JSON.stringify(icons, null, 2));
+  const examples=await createCompleteExamples();
+  checkCompleteExamples(examples);
+  await writeFile(resolve(metadata, 'complete-examples.json'), JSON.stringify(examples, null, 2));
   const result = await build({ entryPoints: [resolve(root, 'studio/app.tsx')], outfile: 'app.js', bundle: true, write: false, format: 'esm', target: 'es2020', minify: hashed });
   const components = ((await readFile(resolve(system, 'reset.css'), 'utf8')) + '\n' + (await readFile(resolve(root, 'dist/styles.css'), 'utf8'))).replaceAll('./assets/', '../assets/');
   const docs = (await Promise.all(documentStyles.map(name => readFile(resolve(system, name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(root, 'studio/studio.css'), 'utf8');

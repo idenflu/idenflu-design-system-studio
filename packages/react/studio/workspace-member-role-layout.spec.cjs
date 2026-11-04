@@ -25,7 +25,10 @@ for (const { width, adjusted } of [{ width: 1440, adjusted: false }, { width: 10
     }
     const { panel, row } = await openMemberRoles(page);
     const chips = row.locator('.multi-inline-chip');
-    await expect(chips).toHaveCount(3);
+    const visibleCount = await chips.count();
+    expect(visibleCount).toBeGreaterThan(0);
+    expect(visibleCount).toBeLessThanOrEqual(3);
+    if (visibleCount < 3) await expect(row.locator('button.multi-inline-more')).toHaveText(`+${3-visibleCount}개`);
     const boxes = await chips.evaluateAll(nodes => nodes.map(node => ({ top: node.getBoundingClientRect().top, bottom: node.getBoundingClientRect().bottom })));
     expect(Math.max(...boxes.map(box => box.top)) - Math.min(...boxes.map(box => box.top))).toBeLessThanOrEqual(1);
     const firstControl = await row.locator('.multi-inline-control').boundingBox();
@@ -35,23 +38,25 @@ for (const { width, adjusted } of [{ width: 1440, adjusted: false }, { width: 10
   });
 }
 
-test('narrow role fields keep tags keyboard accessible and editable', async ({ page, isMobile }) => {
+test('narrow role fields summarize tags and keep all roles keyboard editable', async ({ page, isMobile }) => {
   test.skip(isMobile);
   await page.setViewportSize({ width: 1024, height: 900 });
   const { panel, row, trigger } = await openMemberRoles(page);
   await row.locator('.layout-inline-select').evaluate(element => { element.style.width = '140px'; });
   const tags = row.locator('.multi-inline-tags');
-  await expect.poll(() => tags.evaluate(element => element.scrollWidth - element.clientWidth)).toBeGreaterThan(0);
+  const more = tags.getByRole('button', { name: /더 보기$/ });
+  await expect(more).toBeVisible();
+  expect(await tags.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
   const firstControl = await row.locator('.multi-inline-control').boundingBox();
   const otherControl = await panel.locator('tbody tr').filter({ hasText: 'seoyeon@example.com' }).locator('.multi-inline-control').boundingBox();
   expect(Math.abs(firstControl.height - otherControl.height)).toBeLessThanOrEqual(1);
-  const lastTag = row.getByRole('button', { name: '뷰어 제거', exact: true });
-  await lastTag.focus();
-  await expect(lastTag).toBeFocused();
-  await expect.poll(() => tags.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-  await lastTag.press('Enter');
-  await expect(lastTag).toHaveCount(0);
+  await more.focus();
+  await more.press('Enter');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  await row.getByRole('option', { name: '뷰어', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await expect(trigger).not.toHaveAttribute('aria-label', /뷰어/);
   await trigger.click();
   await row.getByRole('option', { name: '뷰어', exact: true }).click();
-  await expect(lastTag).toHaveCount(1);
+  await expect(trigger).toHaveAttribute('aria-label', /뷰어/);
 });

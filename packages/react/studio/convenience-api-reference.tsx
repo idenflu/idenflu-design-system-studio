@@ -76,7 +76,19 @@ export function ProjectFilters() {
 export function HiddenLabelReference({ kind = 'text-field' }: { kind?: 'text-field' | 'select' }) {
   return <Section id={`${kind}-hide-label-api`} title="숨김 라벨 API" description="주변 제목과 플레이스홀더로 입력 목적이 충분히 보이는 툴바에서 사용합니다. 플레이스홀더와 별개로 label은 항상 제공합니다.">
     <ApiTable title="숨김 라벨 속성" rows={hiddenLabelProps} />
+    {kind === 'text-field' && <p className="component-helper">TextField의 type="search"는 검색어가 있을 때 공통 지우기 버튼을 표시합니다. 클릭하면 onChange로 빈 문자열을 전달하고 입력 포커스를 유지합니다. readOnly·disabled에서는 숨기며, action을 지정하면 사용자 버튼을 우선합니다.</p>}
     <CodeExample title="검색과 필터에 hideLabel 적용">{hiddenLabelCode}</CodeExample>
+  </Section>;
+}
+
+export function MultiSelectTagReference() {
+  return <Section id="select-tag-summary-api" title="복수 선택 축약 API" description="표시만 축약하며 실제 선택값과 폼 제출값은 그대로 유지합니다. +N개 버튼으로 옵션을 열어 숨겨진 항목도 선택·해제할 수 있습니다.">
+    <ApiTable title="복수 선택 표시 속성" rows={[
+      ['presentation', "'default' | 'inline'", "'default'", '기본은 선택한 라벨을 한 줄로 표시하며, inline은 제거 가능한 태그를 표시합니다.'],
+      ['maxVisibleTags', "number | 'responsive'", "'responsive'", '태그형은 가용 너비에 맞춰 자동으로 +N개를 표시합니다. 0 이상 정수는 최대 표시 개수를 제한합니다. 너비가 부족하면 더 적게 표시하며, 0은 개수만 표시합니다.'],
+      ['maxVisibleLabels', 'number', 'undefined', '기본 문자열 표시에서 보이는 라벨 수를 제한하고 나머지는 외 N개로 요약합니다. 태그형에는 maxVisibleTags를 사용합니다.'],
+    ]} />
+    <p className="component-helper">입력 높이와 너비는 선택 수에 따라 바뀌지 않습니다. 창 너비·크기 토큰·글자 크기가 바뀌면 표시 태그 수를 다시 계산합니다. 남은 개수는 선택된 라벨의 원래 순서를 따릅니다.</p>
   </Section>;
 }
 

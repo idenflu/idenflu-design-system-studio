@@ -92,6 +92,11 @@ export function IconActions() {
 
 ### 숨김 라벨
 
+`TextField type="search"`는 값이 있을 때 공통 `.input-action` 스타일의
+지우기 버튼을 표시합니다. 클릭하면 일반 `onChange`에 빈 문자열을 전달하고
+입력에 포커스합니다. `readOnly`·`disabled`에서는 숨기며, `action`을 지정하면
+사용자가 전달한 동작을 우선합니다.
+
 `TextField`, `Select`, `SearchSelect`, `MultiSelect`는 `hideLabel`로 화면의 라벨과 라벨 여백을 숨깁니다. `label`은 계속 필수이며 스크린 리더에 연결됩니다. 제목이나 플레이스홀더로 입력 목적이 드러나는 검색·필터 툴바에 사용합니다. `TextField`의 `labelPosition="left"`와 함께 사용하면 좌측 라벨 공간도 제거합니다.
 
 | 속성 | 타입 | 기본값 | 설명 |
@@ -460,6 +465,22 @@ function ProjectForm() {
 
 `MultiSelect`의 `maxVisibleLabels`에 양의 정수를 지정하면 기본 표시에서 나머지 선택값을 `외 N개`로 요약합니다. 생략하면 모든 라벨을 표시하며, 접근 가능한 이름에는 항상 전체 선택값을 유지합니다. 태그형(`presentation="inline"`)에는 적용하지 않습니다. DataGrid 복수 필터는 `maxVisibleLabels={1}`을 사용해 높이를 유지합니다.
 
+태그형은 기본적으로 가용 너비에 맞는 태그만 한 줄로 표시하고 나머지를 `+N개`로 축약합니다. 선택 수가 늘거나 화면·글자 크기가 바뀌어도 입력 높이와 너비를 유지하며 가로 스크롤바가 생기지 않습니다. `+N개`를 클릭하면 옵션 목록에서 전체 선택을 확인·해제할 수 있습니다. 숨겨진 태그도 실제 선택값과 폼 제출에는 유지됩니다.
+
+| 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `maxVisibleTags` | `number \| 'responsive'` | `'responsive'` | 태그형 표시 개수입니다. 기본은 가용 너비에 맞춰 자동 축약합니다. 0 이상 정수는 최대 표시 개수를 제한하며, 너비가 부족하면 그보다 적게 표시합니다. `0`은 개수만 표시합니다. 기본 문자열 표시에는 적용하지 않습니다. |
+
+```tsx
+<MultiSelect label="참여 팀" options={options} presentation="inline"
+  value={teams} onValueChange={setTeams} searchable clearable
+  maxVisibleTags="responsive" />
+<MultiSelect label="최대 두 개 태그" options={options} presentation="inline"
+  value={teams} onValueChange={setTeams} maxVisibleTags={2} />
+```
+
+태그형 `MultiSelect`는 입력 영역의 빈 공간·플레이스홀더·프리픽스 아이콘을 클릭해도 옵션을 엽니다. `searchable`이면 팝업 검색창에, 검색이 없으면 콤보박스 버튼에 포커스합니다. 열린 상태에서 빈 공간을 다시 눌러도 검색어와 옵션 목록을 유지합니다. 태그 제거·전체 지우기는 선택값만 변경하며 닫힌 목록을 열지 않습니다. 화살표 버튼은 열기·닫기, 키보드는 방향키·Enter·Escape를 지원하며, `disabled`에서는 빈 공간도 반응하지 않습니다.
+
 `NumberField`도 `prefixIcon`을 지원합니다. 아이콘은 입력값 앞에 표시되고, `unit`은 오른쪽에 표시됩니다. 아이콘을 눌러 입력에 포커스할 수 있으며 아이콘은 제출 값과 읽기 설명에서 제외됩니다.
 
 ```tsx
@@ -520,14 +541,28 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu
 `Chip`은 기본적으로 선택·삭제 동작에 사용하는 버튼입니다. `interactive={false}`는 표시 전용 `span`을 렌더링하며 클릭·호버·Tab 포커스가 없습니다. `rounded`로 알약 형태를 선택하고 `variant="neutral | primary | secondary | success | warning | danger"`로 색상을 지정합니다. 색상과 함께 텍스트로 의미를 설명합니다. 표시용 칩은 `HTMLSpanElement`, 기본 칩은 `HTMLButtonElement` ref를 받습니다. 표시용에서 `density="compact"`를 지정하면 SM·MD·LG의 기본 높이가 24·26·30px인 작은 칩을 사용합니다. 기본값 `density="comfortable"`는 기존 컨트롤 높이를 따릅니다.
 
 ```tsx
-import { Chip } from '@idenflu/mono-react';
+import { useState } from 'react';
+import { Button, Chip, Icon } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
 
-<Chip interactive={false}>프론트엔드</Chip>
-<Chip interactive={false} variant="secondary">보조 정보</Chip>
-<Chip interactive={false} density="compact" size="sm">목록 분류</Chip>
-<Chip interactive={false} rounded variant="success">완료</Chip>
-<Chip rounded variant="primary" aria-pressed={selected}
-  onClick={() => setSelected(!selected)}>프로젝트 필터</Chip>
+export function ChipExample() {
+  const [selected, setSelected] = useState(false);
+  const [tags, setTags] = useState(['프로젝트', '브랜드', '문서']);
+  return <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+    <Chip interactive={false}>프론트엔드</Chip>
+    <Chip interactive={false} density="compact" size="sm">목록 분류</Chip>
+    <Chip interactive={false} rounded variant="success">완료</Chip>
+    <Chip rounded variant="primary" aria-pressed={selected}
+      onClick={() => setSelected(value => !value)}>프로젝트 필터</Chip>
+    {tags.map(tag => <Chip key={tag} aria-label={`${tag} 제거`}
+      onClick={() => setTags(current => current.filter(item => item !== tag))}>
+      {tag}<Icon name="close" />
+    </Chip>)}
+    <Button variant="outline" onClick={() => {
+      setSelected(false); setTags(['프로젝트', '브랜드', '문서']);
+    }}>초기화</Button>
+  </div>;
+}
 ```
 
 컴포넌트의 값 변경은 React 콜백으로 받고 폼 유효성 검사는 앱에서 관리합니다. 이전 HTML 런타임과 DOM 이벤트 API는 제거했으며, 전환 방법은 [프로젝트 적용 가이드](../../docs/consumer-guide.md)를 참고하세요.
@@ -549,34 +584,50 @@ import { Divider } from '@idenflu/mono-react';
 행 hover 배경은 `interactive`를 지정한 표에만 표시합니다. 행 클릭으로 선택하거나 상세를 여는 표에 사용하며, 포인터 커서와 행 안의 키보드 포커스 표시도 함께 적용합니다. 선택한 행에는 `data-selected="true"`를 지정해 배경과 시작선으로 강조합니다. 선택 상태는 체크박스처럼 키보드로 조작할 수 있는 컨트롤로도 제공합니다.
 
 ```tsx
+import { useState } from 'react';
 import { Checkbox, Table, TableContainer } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
 
-<TableContainer label="프로젝트 목록">
-  <Table density="compact">
-    <caption className="sr-only">프로젝트와 담당 팀</caption>
-    <colgroup><col style={{ width: '60%' }} /><col style={{ width: '40%' }} /></colgroup>
-    <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th></tr></thead>
-    <tbody><tr><td>디자인 시스템</td><td>프로덕트 디자인</td></tr></tbody>
-  </Table>
-</TableContainer>
+const files = [
+  { id: 'tokens', name: 'design-tokens.json', size: 0.2 },
+  { id: 'brand', name: '브랜드 가이드.pdf', size: 24.8 },
+  { id: 'draft', name: '릴리스 노트.md', size: 0.1 },
+];
 
-<TableContainer label="공유 파일 목록">
-  <Table interactive>
-    <caption className="sr-only">공유 파일과 선택 상태</caption>
-    <thead><tr><th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allSelected} onChange={toggleAll} /></th><th scope="col">파일</th><th scope="col" className="table-numeric">크기</th></tr></thead>
-    <tbody>{files.map(file => (
-      <tr key={file.id} data-selected={selected.has(file.id) || undefined}
+export function FileTableExample() {
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(['tokens']));
+  const allSelected = files.length > 0 && files.every(file => selected.has(file.id));
+  const toggle = (id: string) => setSelected(current => {
+    const next = new Set(current);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  return <TableContainer label="공유 파일 목록">
+    <Table interactive density="compact">
+      <caption className="sr-only">공유 파일과 선택 상태</caption>
+      <thead><tr>
+        <th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>}
+          checked={allSelected} indeterminate={selected.size > 0 && !allSelected}
+          onChange={() => setSelected(allSelected ? new Set() : new Set(files.map(file => file.id)))} /></th>
+        <th scope="col">파일</th><th scope="col" className="table-numeric">크기</th>
+      </tr></thead>
+      <tbody>{files.map(file => <tr key={file.id}
+        data-selected={selected.has(file.id) || undefined}
         onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggle(file.id); }}>
-        <td><Checkbox label={<span className="sr-only">{file.name} 선택</span>} checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></td>
-        <td>{file.name}</td>
-        <td className="table-numeric">{file.size}MB</td>
-      </tr>
-    ))}</tbody>
-  </Table>
-</TableContainer>
+        <td><Checkbox label={<span className="sr-only">{file.name} 선택</span>}
+          checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></td>
+        <td>{file.name}</td><td className="table-numeric">{file.size}MB</td>
+      </tr>)}</tbody>
+    </Table>
+  </TableContainer>;
+}
 ```
 
 ## 로컬 예제
+
+문서 스튜디오의 Table·Chips·폼 8종과 Select·Number fields·Date picker에는 데이터·상태·이벤트·배치 스타일을 포함한 전체 TSX 예제를 제공합니다. 화면에서 사용하는 구현을 기반으로 코드를 만들고, 문서 빌드 시 공개 패키지 타입으로 검사합니다. 폼은 검증·초기화와 FormData 미리보기를 포함하며 비밀번호·파일 내용은 미리보기에 노출하지 않습니다.
+
+입력 문서는 공통 속성·이벤트·키보드·스타일 형식을 사용합니다. NumberField의 `onValueChange`는 쉼표 없는 확정 문자열이지만 FormData는 표시 문자열입니다. DateRangePicker의 `name="trip"`은 `trip-start`·`trip-end`로 제출합니다. 제어 상태 초기화는 부모 값을 복원하고, 아직 확정하지 않은 입력까지 되돌릴 때는 예제처럼 `key`도 갱신합니다.
 
 저장소 루트와 이 디렉터리에서 `npm ci`를 실행하고 루트의 `npm run dev`로 서버를 시작합니다. 별도 패키지 예제는 아래 명령으로 빌드한 뒤 `/packages/react/examples/index.html`에서 엽니다.
 

@@ -119,7 +119,7 @@ test('basic React form validates, accepts corrected data and resets', {tag:'@mob
   const name = page.getByRole('textbox', { name: /이름/ });
   const email = page.getByRole('textbox', { name: /이메일/ });
   await expect(name).toBeFocused();
-  await expect(page.getByText('이름을 입력해주세요.')).toBeVisible();
+  await expect(page.getByText('이름을 입력해주세요.', { exact: true })).toBeVisible();
   await name.fill('김민수');
   await email.fill('minsu@example.com');
   await page.getByRole('button', { name: '확인', exact: true }).click();

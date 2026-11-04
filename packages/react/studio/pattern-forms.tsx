@@ -19,7 +19,7 @@ function ContactForm({profile = false}:{profile?:boolean}) {
         <div className="form-pattern-field--wide"><TextField label={fieldLabel('웹사이트')} name="website" inputMode="url" prefix="https://" placeholder="example.com" /></div>
       </>}
     </div>
-    <FormActions submit={profile ? '변경사항 저장' : '확인'} /><FormResult>{form.result}</FormResult>
+    <FormActions submit={profile ? '변경사항 저장' : '확인'} /><FormResult values={form.values}>{form.result}</FormResult>
   </form>;
 }
 export function BasicFormPattern() { return <Section title="기본 정보 입력" description="필수 정보를 입력한 후 확인을 눌러보세요."><ContactForm /></Section>; }
@@ -33,7 +33,7 @@ export function PreferencesPattern() {
       <fieldset className="form-pattern-choices"><legend>{fieldLabel('선호 연락 방법',true)}</legend>{[['email','이메일'],['phone','전화']].map(([value,label]) => <Radio key={value} label={label} name="contact" value={value} required aria-invalid={!!form.errors.contact || undefined} aria-describedby={form.errors.contact ? 'contact-error' : undefined} />)}<GroupError id="contact-error">{form.errors.contact}</GroupError></fieldset>
       <div className="form-pattern-field--wide"><Select label="시간대" name="timezone" defaultValue="seoul" options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'london',label:'런던'},{value:'new-york',label:'뉴욕'}]} onValueChange={form.clearResult} /></div>
       <div className="form-pattern-field--wide"><Switch label="주간 요약 받기" name="weekly" defaultChecked aria-describedby="weekly-help" /><p id="weekly-help" className="react-studio-caption">한 주의 활동을 요약해 이메일로 받습니다.</p></div>
-    </div><FormActions submit="설정 확인" /><FormResult>{form.result}</FormResult>
+    </div><FormActions submit="설정 확인" /><FormResult values={form.values}>{form.result}</FormResult>
   </form></Section>;
 }
 
@@ -50,7 +50,7 @@ export function PasswordPattern() {
     <div className="form-pattern-field--wide"><PasswordField key={`current-${form.revision}`} label="현재 비밀번호" name="current" error={form.errors.current} /></div>
     <PasswordField key={`password-${form.revision}`} label="새 비밀번호" name="password" error={form.errors.password} helperText="8자 이상 입력해주세요." />
     <PasswordField key={`confirm-${form.revision}`} label="새 비밀번호 확인" name="confirm" error={form.errors.confirm} />
-  </div><FormActions /><FormResult>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 계정 비밀번호는 변경되지 않습니다.</p></form></Section>;
+  </div><FormActions /><FormResult values={form.values}>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 계정 비밀번호는 변경되지 않습니다.</p></form></Section>;
 }
 
 export function InquiryPattern() {
@@ -61,7 +61,7 @@ export function InquiryPattern() {
     <TextField label={fieldLabel('제목')} name="subject" maxLength={80} placeholder="문의 제목" />
     <div className="form-pattern-field--wide"><TextArea label={fieldLabel('문의 내용',true)} name="message" required rows={5} minLength={10} maxLength={500} placeholder="문의 내용을 입력해주세요" onChange={event => setCount(event.target.value.length)} error={form.errors.message || undefined} helperText={<span className="react-studio-field-meta"><span>10자 이상 입력해주세요.</span><span>{count} / 500자</span></span>} /></div>
     <div className="form-pattern-field--wide react-pattern-stack"><span className="field-label">{fieldLabel('첨부 파일')}</span><FileUpload name="attachment" label="파일 선택" onFilesChange={form.clearResult} /><p className="react-studio-caption">예제에서 선택한 파일은 전송되지 않습니다.</p></div>
-  </div><FormActions submit="내용 확인" /><FormResult>{form.result}</FormResult></form></Section>;
+  </div><FormActions submit="내용 확인" /><FormResult values={form.values}>{form.result}</FormResult></form></Section>;
 }
 
 export function ProjectPattern() {
@@ -78,7 +78,7 @@ export function ProjectPattern() {
       <div className="form-pattern-field--wide"><MultiSelect label="참여 팀 · 선택" name="teams" defaultValue={['design']} options={[{value:'design',label:'디자인'},{value:'engineering',label:'개발'},{value:'research',label:'리서치'}]} presentation="inline" searchable clearable onValueChange={form.clearResult} /></div>
       <NumberField className="form-pattern-budget" label={fieldLabel('예산')} name="budget" min="0" max="9007199254740991" unit="만원" helperText="0~9,007,199,254,740,991의 10진 정수로 입력하세요." error={form.errors.budget || undefined} onValueChange={form.afterChange} />
       <div className="react-pattern-stack"><label className="field-label" htmlFor="project-progress">진행률 <output htmlFor="project-progress">{progress}%</output></label><Slider id="project-progress" name="progress" value={progress} step={5} onValueChange={value => {setProgress(value); form.clearResult();}} /><p className="react-studio-caption">5% 단위로 조정합니다.</p></div>
-    </div></fieldset><FormActions /><FormResult>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 프로젝트는 생성되지 않습니다.</p></form></Section>;
+    </div></fieldset><FormActions /><FormResult values={form.values}>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 프로젝트는 생성되지 않습니다.</p></form></Section>;
 }
 
 function validDate(text:string) {
@@ -97,16 +97,17 @@ export function BookingPattern() {
     </div></fieldset>
     <fieldset className="form-pattern-choices"><legend>{fieldLabel('참석 방식',true)}</legend><Radio label="온라인 · 화상 회의로 참여합니다." name="format" value="online" required aria-invalid={!!form.errors.format || undefined} aria-describedby={form.errors.format ? 'booking-format-error' : undefined} /><Radio label="오프라인 · 회의실에 직접 방문합니다." name="format" value="offline" required aria-invalid={!!form.errors.format || undefined} aria-describedby={form.errors.format ? 'booking-format-error' : undefined} /><GroupError id="booking-format-error">{form.errors.format}</GroupError></fieldset>
     <Switch label="시작 전 알림" name="reminder" defaultChecked /><p className="react-studio-caption">시작 10분 전에 알림을 받습니다.</p>
-    <FormActions /><FormResult>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 일정이 실제로 예약되지는 않습니다.</p>
+    <FormActions /><FormResult values={form.values}>{form.result}</FormResult><p className="react-studio-caption">입력 확인용 예시이며 일정이 실제로 예약되지는 않습니다.</p>
   </form></Section>;
 }
 
 export function FormStatesPattern() {
-  return <Section title="입력 상태" description="읽기 전용 정보는 선택하거나 복사할 수 있고, 비활성 항목은 입력과 제출에서 제외됩니다."><div className="form-pattern-grid react-pattern-form-states">
-    <TextField label="계정 ID · 읽기 전용" readOnly defaultValue="idenflu-user" helperText="계정 ID는 변경할 수 없습니다." />
-    <TextField label="팀 · 비활성" disabled defaultValue="지정되지 않음" helperText="팀에 가입하면 변경할 수 있습니다." />
-    <Select label="프로젝트 · 비활성" disabled options={[]} placeholder="선택할 수 없습니다" /><Switch label="알림 · 비활성" disabled defaultChecked />
-    <div className="form-pattern-field--wide"><TextArea label="설명 · 읽기 전용" readOnly rows={3} defaultValue="관리자가 설정한 프로젝트 설명입니다. 내용을 선택하거나 복사할 수 있습니다." /></div>
+  const form=usePatternForm(()=>({}),'읽기 전용 값은 포함하고 비활성 값은 제외했습니다.');
+  return <Section title="입력 상태" description="읽기 전용 정보는 선택하거나 복사할 수 있고, 비활성 항목은 입력과 제출에서 제외됩니다."><form {...form.props}><div className="form-pattern-grid react-pattern-form-states">
+    <TextField label="계정 ID · 읽기 전용" name="accountId" readOnly defaultValue="idenflu-user" helperText="계정 ID는 변경할 수 없습니다." />
+    <TextField label="팀 · 비활성" name="team" disabled defaultValue="지정되지 않음" helperText="팀에 가입하면 변경할 수 있습니다." />
+    <Select label="프로젝트 · 비활성" name="project" disabled options={[]} placeholder="선택할 수 없습니다" /><Switch label="알림 · 비활성" name="notifications" disabled defaultChecked />
+    <div className="form-pattern-field--wide"><TextArea label="설명 · 읽기 전용" name="description" readOnly rows={3} defaultValue="관리자가 설정한 프로젝트 설명입니다. 내용을 선택하거나 복사할 수 있습니다." /></div>
     <div><Button disabled>저장</Button></div>
-  </div></Section>;
+  </div><FormActions submit="제출값 확인" /><FormResult values={form.values}>{form.result}</FormResult></form></Section>;
 }

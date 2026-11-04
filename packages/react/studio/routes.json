@@ -53,7 +53,7 @@
     "title": "Select",
     "group": "Components",
     "description": "하나 또는 여러 개의 항목을 선택합니다.",
-    "searchTerms": "선택 셀렉트 검색 복수 멀티 태그 combobox"
+    "searchTerms": "선택 셀렉트 검색 복수 멀티 태그 combobox 속성 이벤트 스타일 키보드 maxVisibleTags maxVisibleLabels searchable clearable popupStrategy onValueChange FormData 축약 바인딩"
   },
   {
     "route": "components/selection",
@@ -74,7 +74,7 @@
     "title": "Number fields",
     "group": "Components",
     "description": "정수와 소수 입력, 증감 단위와 범위를 일관되게 관리합니다.",
-    "searchTerms": "숫자 정수 소수 금액 수량 number"
+    "searchTerms": "숫자 정수 소수 금액 수량 number 천 단위 콤마 grouping decimals step min max selectOnFocus onValueChange FormData 속성 이벤트 스타일 키보드 바인딩"
   },
   {
     "route": "components/chips",
@@ -95,7 +95,7 @@
     "title": "Date picker",
     "group": "Components",
     "description": "날짜를 직접 입력하거나 달력에서 선택합니다.",
-    "searchTerms": "날짜 달력 기간 예약 date calendar"
+    "searchTerms": "날짜 달력 기간 예약 date calendar DateRangePicker DateValue DateRangeValue onValueChange startLabel endLabel min max FormData 속성 이벤트 스타일 키보드 바인딩"
   },
   {
     "route": "components/time-picker",

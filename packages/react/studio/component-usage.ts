@@ -92,33 +92,6 @@ export function DrawerExample() {
     </Drawer>
   </>;
 }`,
-  'components/select': `import { useState } from 'react';
-import { Select, SearchSelect, MultiSelect } from '@idenflu/mono-react';
-import '@idenflu/mono-react/styles.css';
-
-const options = [
-  { value: 'design', label: '디자인' },
-  { value: 'development', label: '개발' },
-  { value: 'marketing', label: '마케팅' },
-];
-
-export function SelectExample() {
-  const [team, setTeam] = useState('design');
-  const [teams, setTeams] = useState<string[]>(['design']);
-  return <div style={{ display: 'grid', gap: 24, maxWidth: 440 }}>
-    <Select label="담당 팀" options={options}
-            value={team} onValueChange={setTeam} />
-    <Select label="툴바 담당 팀 필터" hideLabel options={options}
-            value={team} onValueChange={setTeam} />
-    <SearchSelect label="담당 팀 검색" options={options}
-                  value={team} onValueChange={setTeam} />
-    <MultiSelect label="참여 팀" options={options} value={teams}
-                 onValueChange={setTeams} presentation="inline" searchable clearable />
-    <MultiSelect label="참여 팀 · 검색 없음" options={options} value={teams}
-                 onValueChange={setTeams} presentation="inline" clearable />
-    <p role="status">담당: {team} / 참여: {teams.join(', ') || '없음'}</p>
-  </div>;
-}`,
   'components/file-upload': `import { useState } from 'react';
 import { FileUpload } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';

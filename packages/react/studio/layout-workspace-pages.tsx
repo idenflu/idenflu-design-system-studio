@@ -49,12 +49,13 @@ export function ProfileForm({id,member,members,onSave}: {id:string;member:Member
 }
 
 export function ProjectsPage({page,projects,onOpen,onCreate,onDelete}: {page:'projects'|'active-projects'|'reviews'|'completed';projects:Project[];onOpen:(id:string)=>void;onCreate:()=>void;onDelete:(ids:string[])=>void}){
-  const [team,setTeam]=React.useState('all'),[status,setStatus]=React.useState('all');
-  const [filters,setFilters]=React.useState({team:'all',status:'all'});
+  const [team,setTeam]=React.useState('all');
+  const [selectedStatuses,setSelectedStatuses]=React.useState<string[]>([]);
+  const [filters,setFilters]=React.useState<{team:string;statuses:string[]}>({team:'all',statuses:[]});
   const [columnFilters,setColumnFilters]=React.useState<DataGridFilters>({});
   const [selected,setSelected]=React.useState<string[]>([]);
   const filterStatus=page==='active-projects'?'진행 중':page==='reviews'?'검토 중':page==='completed'?'완료':null;
-  const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(filters.team==='all'||project.team===filters.team)&&(filters.status==='all'||project.status===filters.status)),[projects,filterStatus,filters]);
+  const rows=React.useMemo(()=>projects.filter(project=>(!filterStatus||project.status===filterStatus)&&(filters.team==='all'||project.team===filters.team)&&(!filters.statuses.length||filters.statuses.includes(project.status))),[projects,filterStatus,filters]);
   const availableIds=React.useMemo(()=>new Set(rows.map(row=>row.id)),[rows]);
   const visibleSelected=selected.filter(id=>availableIds.has(id));
   React.useEffect(()=>{setSelected(current=>{const next=current.filter(id=>availableIds.has(id));return next.length===current.length?current:next;});},[availableIds]);
@@ -67,7 +68,13 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onDelete}: {page:'pr
     {id:'due',header:'마감일',accessor:row=>row.due,width:135,filter:'text'},
   ];
   return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description} eyebrow="PROJECT MANAGEMENT" action={<Button onClick={onCreate}><Icon name="add"/>새 프로젝트</Button>}/>
-    <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();setFilters({team,status});}}><Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/><Select label="프로젝트 상태 필터" value={status} onValueChange={setStatus} options={[{value:'all',label:'전체 상태'},...statuses]} popupStrategy="fixed"/><Button variant="ghost" onClick={()=>{setTeam('all');setStatus('all');setFilters({team:'all',status:'all'});setColumnFilters({});setSelected([]);}}><Icon name="refresh"/>필터 초기화</Button><Button type="submit"><Icon name="search"/>검색</Button><Button className="layout-filter-delete" variant="danger" disabled={!visibleSelected.length} onClick={()=>onDelete(visibleSelected)}><Icon name="trash"/>삭제</Button></form>
+    <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();setFilters({team,statuses:selectedStatuses});}}>
+      <Select label="담당 팀 필터" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/>
+      <MultiSelect className="layout-inline-select layout-project-status-filter" label="프로젝트 상태 필터" value={selectedStatuses} onValueChange={setSelectedStatuses} options={statuses} placeholder="전체 상태" presentation="inline" clearable popupStrategy="fixed"/>
+      <Button variant="ghost" onClick={()=>{setTeam('all');setSelectedStatuses([]);setFilters({team:'all',statuses:[]});setColumnFilters({});setSelected([]);}}><Icon name="refresh"/>필터 초기화</Button>
+      <Button type="submit"><Icon name="search"/>검색</Button>
+      <Button className="layout-filter-delete" variant="danger" disabled={!visibleSelected.length} onClick={()=>onDelete(visibleSelected)}><Icon name="trash"/>삭제</Button>
+    </form>
     <DataGrid label={`${pageInfo[page].title} 목록`} rows={rows} columns={columns} getRowId={row=>row.id} getRowLabel={row=>row.name} searchable={false} showColumnFilterToggle filters={columnFilters} onFiltersChange={next=>{setColumnFilters(next);setSelected([]);}} pagination={false} defaultDensity="compact" showColumnVisibility={false} selectable selectedRowIds={visibleSelected} onSelectedRowIdsChange={setSelected} exportable exportFormats={['csv','xlsx']} exportFileName="workspace-projects.csv"/>
   </>;
 }

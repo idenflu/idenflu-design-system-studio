@@ -27,6 +27,48 @@ async function click(element) { assert.ok(element, 'expected a clickable element
 async function key(element, value) { await act(async () => element.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }))); }
 after(() => dom.window.close());
 
+test('search TextField clears controlled values through onChange and preserves its ref and focus', async () => {
+  const f=fixture(), ref=React.createRef(), changes=[];
+  function Search() {
+    const [value,setValue]=React.useState('디자인');
+    return h(TextField,{label:'프로젝트 검색',type:'search',name:'query',ref,value,onChange:event=>{changes.push(event.target.value);setValue(event.target.value);}});
+  }
+  try {
+    await f.render(h(Search));
+    const input=f.container.querySelector('input'), clear=f.container.querySelector('.text-field-clear');
+    assert.equal(ref.current,input);assert.equal(clear.hidden,false);
+    await click(clear);
+    assert.equal(input.value,'');assert.deepEqual(changes,['']);assert.equal(document.activeElement,input);assert.equal(clear.hidden,true);assert.equal(ref.current,input);
+  } finally {await f.dispose();}
+});
+
+test('uncontrolled search TextField clears the real named input and follows permitted form resets', async () => {
+  const f=fixture(), changes=[];let preventReset=false;
+  try {
+    await f.render(h('form',{onReset:event=>{if(preventReset)event.preventDefault();}},h(TextField,{label:'문서 검색',type:'search',name:'query',defaultValue:'원래 검색어',onChange:event=>changes.push(event.target.value)})));
+    const input=f.container.querySelector('input'),clear=f.container.querySelector('.text-field-clear'),form=f.container.querySelector('form');
+    await click(clear);assert.equal(input.value,'');assert.deepEqual(changes,['']);assert.equal(new dom.window.FormData(form).get('query'),'');
+    preventReset=true;await act(async()=>form.reset());assert.equal(input.value,'');assert.equal(clear.hidden,true);
+    preventReset=false;await act(async()=>form.reset());assert.equal(input.value,'원래 검색어');assert.equal(clear.hidden,false);
+    assert.deepEqual(changes,['']);
+  } finally {await f.dispose();}
+});
+
+test('search clear respects controlled rejection, readonly, disabled and custom actions', async () => {
+  const f=fixture(), changes=[];
+  try {
+    await f.render(h(TextField,{label:'검색',type:'search',value:'유지',onChange:event=>changes.push(event.target.value)}));
+    await click(f.container.querySelector('.text-field-clear'));assert.equal(f.container.querySelector('input').value,'유지');assert.equal(f.container.querySelector('.text-field-clear').hidden,false);assert.deepEqual(changes,['']);
+    for(const state of [{readOnly:true},{disabled:true}]) {
+      await f.render(h(TextField,{label:'검색',type:'search',value:'유지',...state,onChange:event=>changes.push(event.target.value)}));
+      const clear=f.container.querySelector('.text-field-clear');assert.equal(clear.hidden,true);await click(clear);assert.equal(f.container.querySelector('input').value,'유지');
+    }
+    await f.render(h(TextField,{label:'검색',type:'search',defaultValue:'검색어',action:h('button',{type:'button'},'사용자 동작')}));
+    assert.equal(f.container.querySelectorAll('button').length,1);assert.equal(f.container.querySelector('.text-field-clear'),null);
+    await f.render(h(TextField,{label:'일반 입력',defaultValue:'텍스트'}));assert.equal(f.container.querySelector('.text-field-clear'),null);
+  } finally {await f.dispose();}
+});
+
 
 test('display Chip uses a span, forwards its ref and ignores activation props', async () => {
   const f = fixture(), ref = React.createRef(); let clicks = 0;
