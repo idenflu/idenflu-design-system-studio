@@ -53,6 +53,11 @@ export function FeedbackDemos() {
       <div className="react-studio-row" role="group" aria-label="상태별 배지"><Badge>대기</Badge><Badge variant="primary">진행 중</Badge><Badge variant="success">완료</Badge><Badge variant="warning">주의</Badge><Badge variant="danger">오류</Badge></div>
       <p className="react-studio-caption">배지는 상태를 안내하는 표시입니다. 선택하거나 필터링할 때는 칩을 사용합니다.</p>
     </Section>
+    <Section title="반전 배지" description="상태색으로 배경을 채우고 글자색을 반전해 중요한 상태를 강조합니다.">
+      <div className="react-studio-row" role="group" aria-label="반전 상태별 배지"><Badge appearance="solid">대기</Badge><Badge variant="primary" appearance="solid">진행 중</Badge><Badge variant="success" appearance="solid">완료</Badge><Badge variant="warning" appearance="solid">주의</Badge><Badge variant="danger" appearance="solid">오류</Badge></div>
+      <div className="react-studio-row" role="group" aria-label="아이콘 반전 배지"><Badge variant="success" appearance="solid"><Icon name="check" /> 완료</Badge><Badge variant="danger" appearance="solid"><Icon name="warning" /> 점검 필요</Badge></div>
+      <p className="react-studio-caption"><code>appearance="solid"</code>로 반전 스타일을 사용합니다. 기본값인 <code>appearance="default"</code>는 연한 배경을 표시합니다. 색상은 <code>variant</code>로 지정합니다.</p>
+    </Section>
     <Section title="인라인 알림" description="관련된 입력이나 작업 영역 가까이에 안내와 결과를 표시합니다.">
       <div className="react-studio-field-grid"><Alert><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert><Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert><Alert variant="warning"><strong>주의</strong><p>저장 공간이 부족합니다. 불필요한 파일을 정리해주세요.</p></Alert><Alert variant="danger"><strong>오류</strong><p>변경사항을 저장하지 못했습니다. 연결을 확인하고 다시 시도해주세요.</p></Alert></div>
       <p className="react-studio-caption">작업 후 새로 나타나는 완료 안내에는 role="status", 즉시 알려야 하는 오류에는 role="alert"를 지정합니다.</p>

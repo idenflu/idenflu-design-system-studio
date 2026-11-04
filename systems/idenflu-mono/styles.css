@@ -89,6 +89,11 @@
 .badge--success { background: var(--success-surface); color: var(--success); }
 .badge--warning { background: var(--warning-surface); color: var(--warning); }
 .badge--danger { background: var(--danger-surface); color:var(--danger-text); }
+.badge--solid { background:var(--badge-solid-neutral-background); color:var(--inverse-text); }
+.badge--solid.badge--primary { background:var(--badge-solid-primary-background); }
+.badge--solid.badge--success { background:var(--badge-solid-success-background); }
+.badge--solid.badge--warning { background:var(--badge-solid-warning-background); color:var(--badge-solid-warning-text); }
+.badge--solid.badge--danger { background:var(--badge-solid-danger-background); }
 .inline-alert { padding: calc(var(--space-unit) * 3.5) var(--space-4); border-left: 2px solid var(--primary); background: var(--info-surface); }
 .inline-alert strong { font-size:var(--font-size-body); line-height:var(--line-height-body); font-weight:var(--font-weight-medium); }
 .inline-alert p { margin-top: calc(var(--space-unit) * 0.5); color: var(--text-secondary); }

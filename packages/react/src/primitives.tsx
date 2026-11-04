@@ -142,8 +142,12 @@ export const Switch = React.forwardRef<HTMLInputElement, ChoiceProps>(function S
   return <label className={classes('switch-setting', containerClassName)} data-size={size}><span className="switch"><input {...props} ref={ref} type="checkbox" role="switch" className={className} /><span className="switch-track" aria-hidden="true" /></span><span>{label}</span></label>;
 });
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> { variant?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger' }
-export function Badge({ variant = 'neutral', className, ...props }: BadgeProps) { return <span {...props} className={classes('badge', variant !== 'neutral' && `badge--${variant}`, className)} />; }
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger';
+  /** Fill the background with the status color and use contrasting text. */
+  appearance?: 'default' | 'solid';
+}
+export function Badge({ variant = 'neutral', appearance = 'default', className, ...props }: BadgeProps) { return <span {...props} className={classes('badge', variant !== 'neutral' && `badge--${variant}`, appearance === 'solid' && 'badge--solid', className)} />; }
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> { variant?: 'info' | 'success' | 'warning' | 'danger' }
 export function Alert({ variant = 'info', className, ...props }: AlertProps) { return <div {...props} className={classes('inline-alert', variant !== 'info' && `inline-alert--${variant}`, className)} />; }
 export { Chip } from './chip';

@@ -112,7 +112,10 @@ import '@idenflu/mono-react/styles.css';
 export function FeedbackExample() {
   const [failed, setFailed] = useState(false);
   return <div style={{ display: 'grid', gap: 16 }}>
-    <div><Badge variant="warning">검토 필요</Badge></div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <Badge variant="warning">검토 필요</Badge>
+      <Badge variant="warning" appearance="solid">검토 필요</Badge>
+    </div>
     <Alert variant="info"><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert>
     <Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert>
     <Alert variant="warning"><strong>주의</strong><p>저장 공간을 확인해주세요.</p></Alert>

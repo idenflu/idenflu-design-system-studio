@@ -18,6 +18,7 @@
   --color-neutral-400: #b0b5bf;
   --color-neutral-450: #939aa5;
   --color-neutral-500: #858c97;
+  --color-neutral-525: #707580;
   --color-neutral-550: #666c77;
   --color-neutral-600: #626a77;
   --color-neutral-650: #646d78;
@@ -36,6 +37,7 @@
   --color-blue-350: #b4c2ff;
   --color-blue-400: #869ff2;
   --color-blue-450: #657dc0;
+  --color-blue-475: #5c71be;
   --color-blue-500: #4263cc;
   --color-blue-550: #3858ba;
   --color-blue-600: #2f4ca6;
@@ -49,6 +51,7 @@
   --color-red-200: #efb2b6;
   --color-red-300: #f2a3a7;
   --color-red-400: #b65c63;
+  --color-red-425: #b45961;
   --color-red-500: #c43d3d;
   --color-red-600: #ad3131;
   --color-red-700: #922727;
@@ -59,9 +62,11 @@
   --color-green-50: #eaf3ed;
   --color-green-300: #9acba6;
   --color-green-600: #38754d;
+  --color-green-650: #547e68;
   --color-green-900: #23332a;
   --color-amber-50: #faf1df;
   --color-amber-300: #e2c27f;
+  --color-amber-500: #966d39;
   --color-amber-600: #8c641b;
   --color-amber-900: #352e20;
   --color-switch-off-light: #a9a9b2;
@@ -113,6 +118,12 @@
   --info-surface: var(--color-blue-50);
   --inverse-canvas: var(--color-ink);
   --inverse-text: var(--color-white);
+  --badge-solid-neutral-background: var(--color-neutral-525);
+  --badge-solid-primary-background: var(--color-blue-475);
+  --badge-solid-success-background: var(--color-green-650);
+  --badge-solid-warning-background: var(--color-amber-500);
+  --badge-solid-warning-text: var(--color-white);
+  --badge-solid-danger-background: var(--color-red-425);
   --toast-on-info: var(--inverse-text);
   --toast-on-success: var(--inverse-text);
   --toast-on-warning: var(--inverse-text);
@@ -211,6 +222,12 @@
   --info-surface: var(--color-blue-850);
   --inverse-canvas: var(--color-neutral-100);
   --inverse-text: var(--color-neutral-900);
+  --badge-solid-neutral-background: var(--color-neutral-450);
+  --badge-solid-primary-background: var(--info);
+  --badge-solid-success-background: var(--success);
+  --badge-solid-warning-background: var(--warning);
+  --badge-solid-warning-text: var(--inverse-text);
+  --badge-solid-danger-background: var(--danger);
   --selection-background: var(--color-blue-800);
   --selection-text: var(--color-white);
   --switch-off: var(--color-switch-off-dark);
