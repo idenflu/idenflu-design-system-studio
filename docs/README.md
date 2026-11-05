@@ -15,6 +15,7 @@
 | --- | --- |
 | [React 컴포넌트](reference/react-components.md) | 속성·값·이벤트·키보드 계약과 코드 예제 |
 | [아이콘](reference/icons.md) | 공개 이름·분류·표현·접근성·사용 예제 |
+| [아이콘 디자인 원칙](reference/icon-design-principles.md) | Outline 아이콘의 형태·그리드·공간 기준 |
 
 ## 개발과 운영 · `development/`
 
