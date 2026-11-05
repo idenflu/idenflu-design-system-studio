@@ -1,6 +1,6 @@
 # React 프로젝트에 적용하기
 
-컴포넌트는 `@idenflu/mono-react` 패키지로 제공합니다. [패키지 설치와 API](../packages/react/README.md)를 확인하고 앱 진입점에서 스타일을 한 번 불러옵니다.
+컴포넌트는 `@idenflu/mono-react` 패키지로 제공합니다. [패키지 설치](../../packages/react/README.md)와 [컴포넌트 API](../reference/react-components.md)를 확인하고 앱 진입점에서 스타일을 한 번 불러옵니다.
 
 ```tsx
 import { useState } from 'react';
@@ -54,10 +54,6 @@ HTML 소비자용 `IdenfluMono` 런타임과 바닐라 어댑터는 제거했습
 ```
 
 문서의 화면 조정 UI와 개인 저장값은 재사용 React 컴포넌트 패키지에 포함되지 않습니다. 실제 데이터 조회·서버 저장·파일 전송·예약 동작은 앱에서 연결합니다.
-
-## 문서 배포
-
-`npm run build`는 `dist/`에 갤러리와 React 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포하고 `dist/systems/idenflu-mono/manifest.json`에서 문서·CSS·테마·설정 번들 파일명을 확인합니다. 이전 manifest의 `files.runtime`과 `files.styles`는 제거했으며, 문서용 스타일은 `files.docsComponents`와 `files.docsStyles`를 사용합니다. 앱에서 재사용할 때는 문서 번들 대신 React 패키지를 설치합니다.
 
 ## 스타일 적용 범위
 

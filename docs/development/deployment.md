@@ -1,0 +1,58 @@
+# 문서 사이트 배포와 React 패키지 게시
+
+문서 사이트와 재사용 React 패키지는 각각 배포합니다. 변경·버전·호환성 기준은 [CONTRIBUTING.md](../../CONTRIBUTING.md), 검사 명령은 [검사 안내](testing.md)를 따릅니다.
+
+## 정적 문서 빌드
+
+[로컬 개발 안내](local-development.md)에 따라 의존성을 설치한 뒤 저장소 루트에서 실행합니다.
+
+```sh
+npm run build
+```
+
+`npm run build`는 React 패키지를 빌드한 뒤 `dist/`에 갤러리와 정식 모노 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포합니다. React 문서·CSS·테마·설정은 내용 기반 해시를 사용하며 `dist/systems/idenflu-mono/manifest.json`에서 파일명을 확인합니다. 폰트·아이콘과 라이선스도 함께 복사합니다. 이전 React 미리보기 주소의 리다이렉트도 배포물에 포함합니다.
+
+이전 manifest의 `files.runtime`과 `files.styles`는 제거했으며, 문서용 스타일은 `files.docsComponents`와 `files.docsStyles`를 사용합니다. 앱에서 재사용할 때는 React 패키지를 설치합니다.
+
+## GitHub Pages 배포
+
+저장소의 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 설정합니다. `Deploy from a branch` 방식은 빌드되지 않은 소스만 올리므로 Git에서 제외한 `docs-dist` 파일이 없어 모노 문서가 표시되지 않습니다.
+
+[Pages 워크플로](../../.github/workflows/pages.yml)는 `main`에 푸시하거나 **Actions → Deploy GitHub Pages → Run workflow**에서 `main`을 선택하면 실행됩니다. 루트와 React 의존성을 설치하고, 검사·`npm run build`·타입 검사를 통과한 `dist/` 전체를 배포합니다. 생성된 JS·CSS를 직접 커밋할 필요는 없습니다.
+
+`dev` 푸시·PR에는 자동 Actions를 실행하지 않습니다. 품질 검사와 Pages 배포는 `main`에 푸시할 때 실행합니다. 수동 품질 검사·Pages 배포·React 패키지 게시도 `main`에서만 작업을 실행합니다.
+
+**Settings → Environments → github-pages → Deployment branches and tags**에서도 `main`만 허용합니다. Pages의 Source는 계속 **GitHub Actions**를 사용합니다.
+
+배포할 변경을 개발 브랜치 `dev`에 커밋·푸시한 뒤 다음과 같이 반영합니다.
+
+```sh
+git fetch origin
+git switch dev
+git pull --ff-only
+git switch main
+git pull --ff-only
+git merge dev
+git push origin main
+git switch dev
+```
+
+`dev`에서 개발하고 배포할 변경을 `main`에 병합합니다. 별도 배포 브랜치는 사용하지 않습니다.
+
+- [디자인 시스템 갤러리](https://idenflu.github.io/idenflu-design-system-studio/)
+- [idenflu mono 문서](https://idenflu.github.io/idenflu-design-system-studio/systems/idenflu-mono/index.html#/overview)
+- [Datetime picker](https://idenflu.github.io/idenflu-design-system-studio/systems/idenflu-mono/index.html#/components/datetime-picker)
+
+설정을 바꾸고 `main`을 푸시한 뒤, Actions에서 build와 deploy가 모두 성공했는지 확인합니다. 문서는 저장소 하위 경로에서도 동작하도록 상대 경로와 해시 라우팅을 사용합니다.
+
+## React 패키지 게시
+
+루트와 `packages/react/`의 의존성을 설치하고 [전체 검사](testing.md)를 통과한 뒤 패키지 구성을 확인합니다.
+
+```sh
+npm --prefix packages/react pack --dry-run
+```
+
+빌드 결과에 ESM·CommonJS, TypeScript 선언, `styles.css`·`tokens.css`·`reset.css`와 참조하는 에셋 및 에셋 라이선스가 포함됩니다. 배포 전에 개발 브랜치에서 패키지 버전을 올리고 변경을 `main`에 반영한 뒤, [Publish React package 워크플로](../../.github/workflows/publish-react.yml)에서 `main`을 선택해 수동 실행합니다. `dev`에서는 게시 작업을 실행하지 않습니다. 해당 워크플로는 저장소의 `GITHUB_TOKEN`으로 GitHub Packages에 게시하며 저장소의 Packages 쓰기 권한이 필요합니다.
+
+설치·레지스트리 인증은 [패키지 README](../../packages/react/README.md)를 확인합니다.

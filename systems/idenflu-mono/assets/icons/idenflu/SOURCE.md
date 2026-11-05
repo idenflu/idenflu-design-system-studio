@@ -41,7 +41,7 @@ The original 47 assets and their source/license records above are preserved.
 These 52 additions and the application icon below brought the catalog to
 100 SVG files before the workflow expansion below. The current catalog has
 140 SVG files: 106 outline icons and 34 filled icons.
-Research sources and selection rationale: [icon-research.md](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/icon-research.md).
+Research sources and selection rationale: [icon-research.md](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/research/icon-research.md).
 
 ## Application icons
 

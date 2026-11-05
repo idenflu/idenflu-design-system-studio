@@ -77,7 +77,7 @@
 ### 호환성 변경
 
 - 테이블 행 hover 배경은 `interactive`(`data-interactive`)를 지정한 표에서만 표시합니다. 기존 hover가 필요하면 `<Table interactive>` 또는 `<table class="data-table" data-interactive>`로 지정합니다.
-- 기존 HTML 소비자용 `IdenfluMono` 런타임·바닐라 어댑터·독립 HTML 예제와 이전 HTML 생성 스크립트를 제거했습니다. React 컴포넌트와 콜백으로 전환해야 합니다. [마이그레이션 안내](docs/consumer-guide.md)를 확인하세요.
+- 기존 HTML 소비자용 `IdenfluMono` 런타임·바닐라 어댑터·독립 HTML 예제와 이전 HTML 생성 스크립트를 제거했습니다. React 컴포넌트와 콜백으로 전환해야 합니다. [마이그레이션 안내](docs/guides/consumer-guide.md)를 확인하세요.
 - 배포 manifest의 `files.runtime`·`files.styles`를 제거했습니다. React 문서는 `files.docsComponents`의 CSS와 `files.docs` 번들을 사용합니다.
 
 ## 0.2.0 — 2026-11-02
