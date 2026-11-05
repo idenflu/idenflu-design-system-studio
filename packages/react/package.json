@@ -26,6 +26,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./icons": {
+      "import": {
+        "types": "./dist/icons/index.d.ts",
+        "default": "./dist/icons/index.js"
+      },
+      "require": {
+        "types": "./dist/icons/index.d.cts",
+        "default": "./dist/icons/index.cjs"
+      }
+    },
     "./styles.css": "./dist/styles.css",
     "./tokens.css": "./dist/tokens.css",
     "./reset.css": "./dist/reset.css",
@@ -36,6 +46,8 @@
     "**/*.css"
   ],
   "scripts": {
+    "generate:icons": "node scripts/generate-icons.mjs",
+    "check:icons": "node scripts/generate-icons.mjs --check",
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "test": "npm run build && node --test tests/*.test.mjs",

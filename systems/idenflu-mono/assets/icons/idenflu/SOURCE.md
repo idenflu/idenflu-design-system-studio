@@ -43,6 +43,23 @@ These 52 additions and the application icon below brought the catalog to
 140 SVG files: 106 outline icons and 34 filled icons.
 Research sources and selection rationale: [icon-research.md](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/research/icon-research.md).
 
+## Component sprite
+
+The separate `../icons.svg` sprite is the source for the planned 0.4.2 React
+icon components. It contains outline variants only and may differ from these
+preserved 0.4.1 assets. Its `copy`, `visibility-off`, `trash`, `download`,
+`upload`, `folder`, `menu`, `moon`, and `rotate` drawings derive from matching
+drawings in the local `idenflu-design-system/packages/icons/src/icons.svg`
+sprite; `trash` was subsequently adjusted. `user` follows that sprite's
+`person` drawing, and the composite user drawings use it as a reference.
+`folder-open` was redrawn using a user-provided Lucide example as a reference.
+The additional `arrow-right-left`, `asterisk-square`, `calendar-clock`,
+`crop`, `file-pen`, `folder-input`, `folder-output`, `line-height`, `list`,
+`pen-line`, `play-disabled`, `restart`, `rotate-asterisk`, `table`, `table2`,
+`text`, and `tree` drawings come from the same local design system sprite.
+Other drawings originate from the
+assets documented here and have been adjusted for the icon design principles.
+
 ## Application icons
 
 `microsoft-excel` is an original monochrome drawing of an X tile and worksheet

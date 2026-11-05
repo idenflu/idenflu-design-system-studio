@@ -2,14 +2,16 @@ import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'tsup';
+import { execFileSync } from 'node:child_process';
 import { componentStyles } from '../../../scripts/styles.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = resolve(root, '../../systems/idenflu-mono');
 const output = resolve(root, 'dist');
 
+execFileSync(process.execPath, [resolve(root, 'scripts/generate-icons.mjs'), '--check'], { stdio: 'inherit' });
 await build({
-  entry: [resolve(root, 'src/index.ts')],
+  entry: { index: resolve(root, 'src/index.ts'), 'icons/index': resolve(root, 'src/icons/index.ts') },
   format: ['esm', 'cjs'],
   dts: true,
   clean: true,

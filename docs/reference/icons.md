@@ -16,6 +16,23 @@
 
 Outline은 기존의 24×24 기준, 1.5px 선과 각진 선 끝을 유지합니다. Filled는 `-fill` 접미사로 선택하며 모든 아이콘에 Filled가 있는 것은 아닙니다.
 
+Outline 아이콘을 설계할 때의 형태·그리드·공간 기준은 [아이콘 디자인 원칙](icon-design-principles.md)을 참고합니다. Filled 아이콘은 이 문서의 기존 사용 정책을 따릅니다.
+
+## 개별 React 아이콘
+
+`icons.svg`의 심볼을 독립 React 컴포넌트로 생성합니다. 스프라이트 설치 없이 사용할 수 있습니다.
+
+```tsx
+import { PlusIcon, BookmarkIcon } from '@idenflu/mono-react/icons';
+
+<PlusIcon size={20} />
+<BookmarkIcon size={20} label="저장됨" />
+```
+
+0.4.2 예정 컴포넌트는 Outline만 제공합니다. 기본 크기는 16px이며, `label`이 없으면 장식으로 숨깁니다. 아이콘 자체가 의미를 전달할 때는 `label`을 지정합니다. 원본은 `systems/idenflu-mono/assets/icons/icons.svg`이며 React 패키지 폴더에서 `npm run generate:icons`로 생성하고 `npm run check:icons`로 최신 상태를 확인합니다. 생성 파일은 직접 수정하지 않습니다.
+
+기존 `<Icon name="…">`과 CSS 마스크는 보존된 개별 SVG를 계속 사용하며 Filled도 유지합니다. 스프라이트 수정은 이 기존 자산에 자동 반영되지 않으므로 버전별 도형이 다를 수 있습니다. 새 아이콘을 기존 API에서도 제공하려면 개별 자산과 CSS·이름 등록을 별도로 갱신해야 합니다.
+
 ## 업무·데이터 아이콘
 
 업무·데이터 아이콘 24종을 추가했습니다. `sun`·`moon`은 기존 테마 버튼의 도형을 공통 자산으로 옮겼습니다.
