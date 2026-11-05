@@ -50,7 +50,7 @@ git switch dev
 루트와 `packages/react/`의 의존성을 설치하고 [전체 검사](testing.md)를 통과한 뒤 패키지 구성을 확인합니다.
 
 ```sh
-npm --prefix packages/react pack --dry-run
+npm pack ./packages/react --dry-run
 ```
 
 빌드 결과에 ESM·CommonJS, TypeScript 선언, `styles.css`·`tokens.css`·`reset.css`와 참조하는 에셋 및 에셋 라이선스가 포함됩니다. 배포 전에 개발 브랜치에서 패키지 버전을 올리고 변경을 `main`에 반영한 뒤, [Publish React package 워크플로](../../.github/workflows/publish-react.yml)에서 `main`을 선택해 수동 실행합니다. `dev`에서는 게시 작업을 실행하지 않습니다. 해당 워크플로는 저장소의 `GITHUB_TOKEN`으로 GitHub Packages에 게시하며 저장소의 Packages 쓰기 권한이 필요합니다.

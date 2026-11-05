@@ -264,7 +264,7 @@ test('file example rejects unsupported types and displays removable PDF selectio
 test('document contents omit titles belonging to closed dialogs', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/drawer');
   const contents = page.getByRole('navigation', {name:'이 페이지 목차', exact:true});
-  await expect(contents.getByRole('link', {name:'사이드 패널', exact:true})).toBeVisible();
+  await expect(contents.getByRole('link', {name:'설정 편집', exact:true})).toBeVisible();
   await expect(contents.getByRole('link', {name:'프로젝트 설정', exact:true})).toHaveCount(0);
   await page.goto('/systems/idenflu-mono/index.html#/components/overlays');
   await expect(page.getByRole('heading', {level:1})).toHaveText('Dialog & toast');

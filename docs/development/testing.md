@@ -18,7 +18,7 @@ npx playwright test --config packages/react/studio/playwright.config.cjs
 
 정적 검사, 설정 계약·결정적 빌드, React 단위 테스트와 라이트·다크·320px 브라우저 회귀를 실행합니다.
 
-패키지 배포 파일의 포함 여부는 `npm --prefix packages/react pack --dry-run`으로 확인합니다.
+패키지 배포 파일의 포함 여부는 `npm pack ./packages/react --dry-run`으로 확인합니다.
 
 ## 브라우저 환경 선택
 

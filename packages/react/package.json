@@ -1,6 +1,6 @@
 {
   "name": "@idenflu/mono-react",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "React components for the idenflu mono design system",
   "license": "MIT",
   "type": "module",
