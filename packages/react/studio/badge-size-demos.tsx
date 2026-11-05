@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Badge, Table, TableContainer } from '../src';
+import { Grid, Badge, Table, TableContainer } from '../src';
 import { Section } from './demo-layout';
 import { StatusBadge } from './status-definitions';
 
@@ -21,10 +21,10 @@ const props = [
 export function BadgeSizeDemos() {
   return <>
     <Section id="badge-sizes" title="배지 사이즈" description="SM·MD·LG에 같은 상태색과 표현을 적용합니다. 주변 글자와 정보 밀도에 맞춰 크기를 선택하세요.">
-      <div className="react-studio-size-grid">{sizes.map(({size}) => <div key={size} className="react-studio-stack" role="group" aria-label={`${size.toUpperCase()} 배지`}>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{sizes.map(({size}) => <div key={size} className="react-studio-stack" role="group" aria-label={`${size.toUpperCase()} 배지`}>
         <h3 className="react-studio-example-title">{size.toUpperCase()}{size === 'md' ? ' · 기본' : ''}</h3>
         <div className="react-studio-row"><Badge size={size} variant="success">완료</Badge><StatusBadge size={size} status="success" /><StatusBadge size={size} status="success" appearance="solid" /></div>
-      </div>)}</div>
+      </div>)}</Grid>
       <TableContainer label="Badge 기본 크기">
         <Table>
           <caption className="sr-only">기본 설정에서의 배지 크기, 단위 px</caption>

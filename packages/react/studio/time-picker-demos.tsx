@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Table, TableContainer, TimePicker, type TimeValue } from '../src';
+import { Grid, Button, Table, TableContainer, TimePicker, type TimeValue } from '../src';
 import { Section } from './demo-layout';
 
 const props = [
@@ -35,17 +35,17 @@ export function TimePickerDemos() {
       <p role="status" className="component-helper">확정된 시간: {time ?? '선택하지 않음'}</p>
     </Section>
     <Section title="범위와 분 단위" description="선택 목록과 직접 입력에 같은 범위·분 단위 검증을 적용합니다. 허용되지 않는 시간은 비활성으로 표시합니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <TimePicker id="time-bounded" label="예약 가능 시간" min="09:00" max="18:00" defaultValue="10:30" minuteStep={30} helperText="09:00–18:00 사이에서 30분 단위로 선택합니다." />
         <TimePicker id="time-hourly" label="정각 시간" defaultValue="14:00" minuteStep={60} helperText="분은 00만 선택할 수 있습니다." />
-      </div>
+      </Grid>
     </Section>
     <Section title="입력 상태" description="읽기 전용·비활성·부모 오류 메시지를 기존 필드와 같은 방식으로 표시합니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <TimePicker label="읽기 전용 시간" defaultValue="09:30" readOnly />
         <TimePicker label="비활성 시간" defaultValue="09:30" disabled />
         <TimePicker label="오류 상태" defaultValue="08:30" error="운영 시간 안에서 선택해주세요." />
-      </div>
+      </Grid>
     </Section>
     <Section title="폼 입력과 초기화" description="필수 입력을 검증하고 확정된 시간만 폼에 제출합니다. 초기화하면 최초 기본값으로 돌아갑니다.">
       <form className="react-studio-stack" style={{maxWidth:360}} onReset={()=>setMessage('')} onSubmit={event=>{
@@ -58,7 +58,7 @@ export function TimePickerDemos() {
       </form>
     </Section>
     <Section title="사이즈" description="SM·MD·LG 필드에 같은 시간 선택 동작을 제공합니다.">
-      <div className="react-studio-size-grid">{(['sm','md','lg'] as const).map(size=><TimePicker key={size} label={`${size.toUpperCase()} 시간`} size={size} defaultValue="14:30" minuteStep={15} />)}</div>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{(['sm','md','lg'] as const).map(size=><TimePicker key={size} label={`${size.toUpperCase()} 시간`} size={size} defaultValue="14:30" minuteStep={15} />)}</Grid>
     </Section>
     <Section title="속성" description="시간은 날짜·시간대 변환 없이 HH:mm 문자열로 주고받습니다. 빈 값은 null입니다.">
       <ReferenceTable label="Time picker 속성" rows={props} />

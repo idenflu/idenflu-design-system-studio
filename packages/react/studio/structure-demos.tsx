@@ -1,6 +1,6 @@
 import { IconButtonDemos, PopupAlignDemos } from './convenience-api-demos';
 import * as React from 'react';
-import { Badge, Button, Checkbox, Chip, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
+import { Grid, Badge, Button, Checkbox, Chip, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
 import { Section } from './demo-layout';
 import { ButtonDisabledDemos } from './button-disabled-demos';
 export { TableDemos } from './table-demos';
@@ -54,14 +54,14 @@ export function SelectionDemos() {
   const [selected, setSelected] = React.useState(['email']);
   const choices = [{value:'email', label:'이메일 알림'}, {value:'push', label:'푸시 알림'}];
   return <><Section title="선택 컨트롤" description="복수 선택은 체크박스, 하나의 선택은 라디오, 즉시 반영되는 설정은 스위치로 표현합니다.">
-    <div className="react-studio-size-grid">
+    <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">
       <fieldset className="choice-group react-studio-example react-studio-stack"><legend>체크박스</legend><Checkbox label="전체 선택" checked={selected.length === choices.length} indeterminate={selected.length > 0 && selected.length < choices.length} onChange={event => setSelected(event.target.checked ? choices.map(item => item.value) : [])} />{choices.map(item => <Checkbox key={item.value} label={item.label} checked={selected.includes(item.value)} onChange={event => { const checked = event.target.checked; setSelected(current => checked ? [...current,item.value] : current.filter(value => value !== item.value)); }} />)}<Checkbox label="비활성 옵션" disabled /></fieldset>
       <fieldset className="choice-group react-studio-example react-studio-stack"><legend>라디오</legend><Radio label="개인" name="plan" defaultChecked /><Radio label="팀" name="plan" /><Radio label="조직" name="plan" /><Radio label="비활성" name="plan" disabled /></fieldset>
       <fieldset className="choice-group react-studio-example react-studio-stack"><legend>스위치</legend><Switch label="알림" defaultChecked /><Switch label="자동 저장" /><Switch label="비활성 스위치" disabled /><Switch label="켜진 비활성 스위치" disabled defaultChecked /></fieldset>
-    </div>
+    </Grid>
   </Section>
     <Section title="스위치 사이즈" description="기본 크기는 md입니다. 트랙은 작고 가볍게, 클릭 영역은 같은 사이즈의 입력 컨트롤 높이로 유지합니다. 라벨을 누르거나 Tab·Space로 조작해보세요.">
-      <div className="react-studio-size-grid">
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">
         {([{size:'sm', track:'28 × 16', thumb:12, target:32}, {size:'md', track:'36 × 20', thumb:16, target:38}, {size:'lg', track:'44 × 24', thumb:20, target:44}] as const).map(item => <fieldset key={item.size} className="choice-group react-studio-example react-studio-stack" aria-label={`${item.size.toUpperCase()} 스위치 예시`}>
           <legend>{item.size.toUpperCase()}{item.size === 'md' ? ' · 기본' : ''}</legend>
           <div><p className="react-studio-caption">트랙 {item.track}px · 핸들 {item.thumb}px</p><p className="react-studio-caption">클릭 영역 높이 {item.target}px</p></div>
@@ -70,7 +70,7 @@ export function SelectionDemos() {
           <Switch size={item.size} label="비활성 · 꺼짐" disabled />
           <Switch size={item.size} label="비활성 · 켜짐" disabled defaultChecked />
         </fieldset>)}
-      </div>
+      </Grid>
     </Section>
     <Section title="선택 예시" description="알림 수신 여부를 선택합니다."><div className="react-studio-row"><Checkbox label="메일로 받기" /><Switch label="일정 알림" /></div></Section>
   </>;
@@ -114,24 +114,24 @@ export function ChipDemos() {
       <p role="status" className="component-helper">{selected.length ? `선택: ${selected.join(', ')}` : '선택한 항목이 없습니다.'}</p>
     </Section>
     <Section title="모서리 스타일" description="기본 모서리와 알약 형태의 라운드를 비교합니다. 표시용·선택형 모두 같은 모양을 사용할 수 있습니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <div className="react-studio-example"><h3 className="react-studio-example-title">기본</h3><div className="react-studio-row"><Chip interactive={false}>기본 표시</Chip><Chip interactive={false} variant="primary">강조 표시</Chip></div></div>
         <div className="react-studio-example"><h3 className="react-studio-example-title">라운드</h3><div className="react-studio-row"><Chip interactive={false} rounded>라운드 표시</Chip><Chip rounded variant="primary" aria-pressed={roundSelected} onClick={() => setRoundSelected(!roundSelected)}>라운드 선택</Chip></div></div>
-      </div>
+      </Grid>
     </Section>
     <Section title="색상" description="각 색상의 기본 표시·라운드 표시·선택 상태를 비교합니다. 선택형을 누르면 상태가 바뀝니다. 색상과 함께 텍스트로 의미를 전달합니다.">
-      <div className="react-studio-size-grid react-studio-chip-palette">{chipColors.map(({variant,label,example}) => <div className="react-studio-example react-studio-stack" key={variant}>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid react-studio-chip-palette">{chipColors.map(({variant,label,example}) => <div className="react-studio-example react-studio-stack" key={variant}>
         <h3 className="react-studio-example-title">{label}<span className="react-studio-caption">{variant}</span></h3>
         <div className="react-studio-row"><Chip interactive={false} variant={variant}>{example}</Chip></div>
         <div className="react-studio-row"><Chip interactive={false} variant={variant} rounded>{example}</Chip></div>
         <div className="react-studio-row"><Chip variant={variant} aria-label={`${label} 색상 선택`} aria-pressed={selectedColors.includes(variant)} onClick={() => setSelectedColors(current => current.includes(variant) ? current.filter(item => item !== variant) : [...current,variant])}>선택</Chip></div>
-      </div>)}</div>
+      </div>)}</Grid>
     </Section>
     <Section title="사이즈" description="표시용·라운드 칩도 SM·MD·LG 높이와 글자 크기 설정을 따릅니다.">
-      <div className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} size={size}>기본 표시</Chip><Chip interactive={false} rounded variant="primary" size={size}>라운드</Chip></div></div>)}</div>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} size={size}>기본 표시</Chip><Chip interactive={false} rounded variant="primary" size={size}>라운드</Chip></div></div>)}</Grid>
     </Section>
     <Section title="컴팩트 표시용 칩" description={'표나 목록의 분류·상태를 작은 공간에 표시합니다. SM·MD·LG의 기본 높이는 24·26·30px이며 표시용 칩에서 density="compact"로 사용합니다.'}>
-      <div className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} density="compact" size={size}>문서</Chip><Chip interactive={false} density="compact" rounded variant="success" size={size}>완료</Chip><Chip interactive={false} density="compact" variant="secondary" size={size}><Icon name="calendar" />일정</Chip></div></div>)}</div>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{sizes.map(size => <div className="react-studio-example" key={size}><h3 className="react-studio-example-title">{size.toUpperCase()}</h3><div className="react-studio-row"><Chip interactive={false} density="compact" size={size}>문서</Chip><Chip interactive={false} density="compact" rounded variant="success" size={size}>완료</Chip><Chip interactive={false} density="compact" variant="secondary" size={size}><Icon name="calendar" />일정</Chip></div></div>)}</Grid>
     </Section>
     <Section title="삭제 가능한 칩" description="선택된 값을 제거하고, 초기화로 다시 표시할 수 있습니다."><div className="react-studio-row">{removable.map(name => <Chip key={name} rounded aria-label={`${name} 제거`} onClick={() => setRemovable(current => current.filter(item => item !== name))}>{name}<Icon name="close" /></Chip>)}{!removable.length && <p className="react-studio-caption" role="status">모든 칩을 제거했습니다.</p>}</div><div className="react-studio-row"><Button variant="outline" onClick={() => setRemovable(['프로젝트','브랜드','문서'])}>초기화</Button></div></Section>
     <Section title="아이콘이 있는 칩" description="아이콘은 분류의 의미를 보조하며 칩은 선택 상태를 유지합니다."><div className="react-studio-row"><Chip aria-pressed={iconSelected} onClick={() => setIconSelected(!iconSelected)}><Icon name="calendar" />일정 필터</Chip><Chip aria-pressed={componentSelected} onClick={() => setComponentSelected(!componentSelected)}><Icon name="grid" />컴포넌트</Chip></div></Section>

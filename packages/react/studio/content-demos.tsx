@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip, type ToastProps } from '../src';
+import { Grid, Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip, type ToastProps } from '../src';
 import { Section } from './demo-layout';
 import {StatusBadge} from './status-definitions';
 import { ProcessingDialogDemo } from './processing-dialog-demo';
@@ -66,7 +66,7 @@ export function FeedbackDemos() {
       <p className="react-studio-caption">기본은 Outline을 사용합니다. 반전 스타일의 완료·안내·주의·오류·차단은 같은 의미의 Filled로 강조하며, 대기·진행·보류·비활성은 기본 도형을 유지합니다.</p>
     </Section>
     <Section title="인라인 알림" description="관련된 입력이나 작업 영역 가까이에 안내와 결과를 표시합니다.">
-      <div className="react-studio-field-grid"><Alert><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert><Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert><Alert variant="warning"><strong>주의</strong><p>저장 공간이 부족합니다. 불필요한 파일을 정리해주세요.</p></Alert><Alert variant="danger"><strong>오류</strong><p>변경사항을 저장하지 못했습니다. 연결을 확인하고 다시 시도해주세요.</p></Alert></div>
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Alert><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert><Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert><Alert variant="warning"><strong>주의</strong><p>저장 공간이 부족합니다. 불필요한 파일을 정리해주세요.</p></Alert><Alert variant="danger"><strong>오류</strong><p>변경사항을 저장하지 못했습니다. 연결을 확인하고 다시 시도해주세요.</p></Alert></Grid>
       <p className="react-studio-caption">작업 후 새로 나타나는 완료 안내에는 role="status", 즉시 알려야 하는 오류에는 role="alert"를 지정합니다.</p>
     </Section>
     <Section title="아이콘이 있는 배지와 알림" description="상태를 아이콘과 문구로 함께 전달합니다."><div className="react-studio-row"><StatusBadge status="success" /><Badge variant="primary"><Icon name="calendar" /> 예약됨</Badge></div><Alert variant="success"><div className="react-studio-icon-alert"><Icon name="check-circle" /><div><strong>저장 완료</strong><p>변경한 내용이 저장되었습니다.</p></div></div></Alert></Section>
@@ -150,10 +150,10 @@ export function OverlayDemos() {
     </Section>
     <ProcessingDialogDemo />
     <Section title="구분선이 있는 다이얼로그" description="헤더·본문·하단을 회색 구분선으로 나눕니다. 긴 내용은 본문 안에서만 스크롤되며, 제목과 하단 버튼은 계속 표시됩니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <div className="react-studio-example"><h3 className="react-studio-example-title">기본 구성</h3><p className="react-studio-caption">제목과 닫기, 상세 내용, 확인 버튼을 세 영역으로 구성합니다.</p><div className="react-studio-row"><Button variant="outline" onClick={() => setDialog('divided')}>구분선 타입 열기</Button></div></div>
         <div className="react-studio-example"><h3 className="react-studio-example-title">긴 본문</h3><p className="react-studio-caption">본문을 스크롤해도 헤더와 하단 버튼의 위치는 유지됩니다.</p><div className="react-studio-row"><Button variant="outline" onClick={() => setDialog('divided-scroll')}>스크롤 타입 열기</Button></div></div>
-      </div>
+      </Grid>
       <p role="status" className="component-helper">{dividedFeedback}</p>
       <Dialog variant="divided" open={dialog === 'divided'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-divided-title" aria-describedby="studio-divided-description">
         <DialogHeader><div><h2 id="studio-divided-title">프로젝트 상세</h2><p id="studio-divided-description">프로젝트의 기본 정보와 공유 범위를 확인합니다.</p></div><button type="button" className="icon-button" aria-label="프로젝트 상세 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button></DialogHeader>
@@ -201,10 +201,10 @@ export function OverlayDemos() {
 
 export function TooltipDemos() {
   return <Section title="기본 툴팁" description="버튼에 마우스를 올리거나 키보드로 포커스하면 보조 설명을 표시합니다. 버튼을 실행하거나 Escape 키를 누르면 닫힙니다.">
-    <div className="react-studio-field-grid">
+    <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
       <div className="react-studio-example"><h3 className="react-studio-example-title">텍스트 버튼</h3><div className="react-studio-row"><Tooltip content="프로젝트를 구분할 수 있는 이름입니다."><Button variant="outline">프로젝트 이름</Button></Tooltip></div></div>
       <div className="react-studio-example"><h3 className="react-studio-example-title">아이콘 버튼</h3><div className="react-studio-row"><Tooltip content="화면에 표시할 항목을 설정합니다."><button type="button" className="icon-button" aria-label="표시 설정 도움말"><Icon name="settings" /></button></Tooltip></div></div>
-    </div>
+    </Grid>
     <p className="react-studio-caption">필수 설명과 오류 안내는 툴팁 안에만 넣지 않습니다.</p>
   </Section>;
 }
@@ -212,11 +212,11 @@ export function TooltipDemos() {
 export function CardDemos() {
   return <>
     <Section title="기본 카드" description="제목, 요약, 상태와 보조 정보를 같은 순서로 배치합니다.">
-      <div className="react-studio-field-grid"><Card><span className="card-label">PROJECT</span><h3>디자인 시스템</h3><p>일관된 제품 경험을 위한 공통 기준을 만듭니다.</p><div className="card-footer"><Badge variant="primary">진행 중</Badge><span>최근 수정 · 오늘</span></div></Card><Card><span className="card-label">GUIDE</span><h3>브랜드 가이드</h3><p>브랜드의 시각 언어와 사용 원칙을 정리합니다.</p><div className="card-footer"><Badge>검토 중</Badge><span>최근 수정 · 어제</span></div></Card></div>
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Card><span className="card-label">PROJECT</span><h3>디자인 시스템</h3><p>일관된 제품 경험을 위한 공통 기준을 만듭니다.</p><div className="card-footer"><Badge variant="primary">진행 중</Badge><span>최근 수정 · 오늘</span></div></Card><Card><span className="card-label">GUIDE</span><h3>브랜드 가이드</h3><p>브랜드의 시각 언어와 사용 원칙을 정리합니다.</p><div className="card-footer"><Badge>검토 중</Badge><span>최근 수정 · 어제</span></div></Card></Grid>
     </Section>
     <Section title="동작이 있는 카드" description="카드 전체를 누르게 만들기보다 이동할 곳을 설명하는 링크를 제공합니다.">
       <Card className="react-studio-card-sample"><span className="card-label">RESOURCE</span><h3>컴포넌트 살펴보기</h3><p>자주 쓰는 UI 요소와 사용 예시를 확인합니다.</p><div className="card-footer"><a className="button button--outline button-inline" href="#/components/buttons">컴포넌트 보기 <Icon name="arrow-right" /></a></div></Card>
     </Section>
-    <Section title="아이콘이 있는 카드" description="아이콘으로 콘텐츠 종류를 보조하고 제목과 설명을 함께 표시합니다."><div className="react-studio-field-grid"><Card><h3 className="react-studio-icon-label"><Icon name="grid" />컴포넌트</h3><p>공통 요소와 사용 예시를 확인합니다.</p></Card><Card><h3 className="react-studio-icon-label"><Icon name="calendar" />일정</h3><p>프로젝트 일정을 확인합니다.</p></Card></div></Section>
+    <Section title="아이콘이 있는 카드" description="아이콘으로 콘텐츠 종류를 보조하고 제목과 설명을 함께 표시합니다."><Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Card><h3 className="react-studio-icon-label"><Icon name="grid" />컴포넌트</h3><p>공통 요소와 사용 예시를 확인합니다.</p></Card><Card><h3 className="react-studio-icon-label"><Icon name="calendar" />일정</h3><p>프로젝트 일정을 확인합니다.</p></Card></Grid></Section>
   </>;
 }

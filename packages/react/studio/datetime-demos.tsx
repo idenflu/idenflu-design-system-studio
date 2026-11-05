@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DateTimePicker, DateTimeRangePicker } from '../src';
+import { Grid, DateTimePicker, DateTimeRangePicker } from '../src';
 import { Section } from './demo-layout';
 
 const sizes = ['sm', 'md', 'lg'] as const;
@@ -28,16 +28,16 @@ export function DateTimeDemos() {
     </Section>
 
     <Section title="선택 범위와 시간 단위" description="날짜뿐 아니라 같은 날의 시작·종료 시간까지 제한합니다. 허용되지 않는 값은 입력해도 확정되지 않습니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <DateTimePicker id="datetime-bounded" label="예약 가능 시간" defaultValue="2026-11-12T10:30" min="2026-11-12T09:00" max="2026-11-12T18:00" minuteStep={30} helperText="2026년 11월 12일 09:00–18:00, 30분 단위로 선택합니다." />
-      </div>
+      </Grid>
     </Section>
 
     <Section title="입력 상태" description="읽기 전용은 값을 확인할 수 있고, 비활성 상태는 입력과 팝업 조작을 막습니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <DateTimePicker id="datetime-readonly" label="읽기 전용 일시" defaultValue="2026-11-12T14:30" readOnly />
         <DateTimePicker id="datetime-disabled" label="비활성 일시" defaultValue="2026-11-12T14:30" disabled />
-      </div>
+      </Grid>
       <div className="react-studio-stack" style={{ maxWidth: 720 }}>
         <DateTimeRangePicker id="datetime-range-readonly" label="읽기 전용 기간" startLabel="읽기 전용 시작 일시" endLabel="읽기 전용 종료 일시" defaultValue={['2026-11-12T09:00', '2026-11-12T17:30']} readOnly />
         <DateTimeRangePicker id="datetime-range-disabled" label="비활성 기간" startLabel="비활성 시작 일시" endLabel="비활성 종료 일시" defaultValue={['2026-11-12T09:00', '2026-11-12T17:30']} disabled />

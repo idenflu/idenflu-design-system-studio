@@ -1,4 +1,4 @@
-import { Divider } from '../src';
+import { Grid, Divider } from '../src';
 import { Section } from './demo-layout';
 
 export function DividerDemos() {
@@ -21,10 +21,10 @@ export function DividerDemos() {
       <div className="react-studio-example"><div className="react-studio-divider-inline"><span>디자인 팀</span><Divider orientation="vertical" aria-label="담당 팀과 문서 수 구분" /><span>문서 3개</span></div></div>
     </Section>
     <Section title="선 스타일" description="기본 실선과 점선을 비교합니다. 장식만 필요한 경우 decorative로 구분선의 의미를 숨깁니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <div className="react-studio-example"><h3 className="react-studio-example-title">실선</h3><Divider decorative /><p className="react-studio-caption">관련 영역 사이의 기본 경계</p></div>
         <div className="react-studio-example"><h3 className="react-studio-example-title">점선</h3><Divider variant="dashed" decorative /><p className="react-studio-caption">보조 영역 사이의 가벼운 경계</p></div>
-      </div>
+      </Grid>
     </Section>
   </>;
 }

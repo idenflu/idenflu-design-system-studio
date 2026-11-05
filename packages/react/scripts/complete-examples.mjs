@@ -29,8 +29,6 @@ const exampleStyles = `
 .mono-copy-example .react-studio-section-heading p, .mono-copy-example .react-studio-caption { color:var(--text-secondary); }
 .mono-copy-example .react-studio-demo, .mono-copy-example .react-studio-stack, .mono-copy-example .react-pattern-stack, .mono-copy-example .react-pattern-form { display:grid; gap:20px; min-width:0; }
 .mono-copy-example .react-studio-row, .mono-copy-example .form-pattern-actions, .mono-copy-example .react-studio-table-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-.mono-copy-example .react-studio-field-grid, .mono-copy-example .form-pattern-grid, .mono-copy-example .react-studio-size-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:24px; }
-.mono-copy-example .form-pattern-field--wide { grid-column:1/-1; }
 .mono-copy-example .form-pattern-required { color:var(--primary); font-size:var(--font-size-caption); margin-left:4px; }
 .mono-copy-example .form-pattern-optional { color:var(--text-muted); font-size:var(--font-size-caption); margin-left:4px; }
 .mono-copy-example fieldset { min-width:0; border:0; padding:0; margin:0; }
@@ -46,7 +44,6 @@ const exampleStyles = `
 .mono-copy-example .table-date { white-space:nowrap; }
 .mono-copy-example .table-muted { color:var(--text-muted); }
 .mono-copy-example pre { max-width:100%; overflow:auto; padding:16px; background:var(--surface); font-size:13px; }
-@media(max-width:600px) { .mono-copy-example .react-studio-field-grid, .mono-copy-example .form-pattern-grid, .mono-copy-example .react-studio-size-grid { grid-template-columns:minmax(0,1fr); } }
 `;
 
 export async function createCompleteExamples() {

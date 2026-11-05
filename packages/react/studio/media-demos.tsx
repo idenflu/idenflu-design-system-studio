@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, Button, CircleProgress, FileUpload, Progress, SegmentedProgress, Skeleton, Slider, Slides, Spinner } from '../src';
+import { Grid, Avatar, Button, CircleProgress, FileUpload, Progress, SegmentedProgress, Skeleton, Slider, Slides, Spinner } from '../src';
 import { Section } from './demo-layout';
 import { NovaSpinnerDemos } from './nova-spinner-demos';
 
@@ -17,14 +17,14 @@ function SliderExample({id, label, initialValue = 50, step = 1, disabled = false
 export function SliderDemos() {
   return <>
     <Section title="슬라이더" description="값과 범위를 함께 표시합니다. 방향키로도 값을 조절할 수 있습니다.">
-      <div className="react-studio-size-grid">
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">
         <div className="react-studio-example"><SliderExample id="studio-slider" label="진행률" /></div>
         <div className="react-studio-example"><SliderExample id="studio-slider-step" label="단계별 조절" initialValue={60} step={10} /><p className="react-studio-caption">10 단위로 조절합니다.</p></div>
         <div className="react-studio-example"><SliderExample id="studio-slider-disabled" label="비활성" initialValue={35} disabled /></div>
-      </div>
+      </Grid>
     </Section>
     <Section title="사이즈" description="SM·MD·LG의 조작 영역과 손잡이 크기를 비교해보세요.">
-      <div className="react-studio-size-grid">{sizes.map(size => <div key={size} className="react-studio-example"><SliderExample id={`studio-slider-${size}`} label={`${size.toUpperCase()} 슬라이더`} size={size} /></div>)}</div>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{sizes.map(size => <div key={size} className="react-studio-example"><SliderExample id={`studio-slider-${size}`} label={`${size.toUpperCase()} 슬라이더`} size={size} /></div>)}</Grid>
     </Section>
     <Section title="슬라이드" description="이전·다음 버튼으로 순서가 있는 콘텐츠를 확인합니다.">
       <Slides label="프로젝트 안내" slides={[
@@ -50,21 +50,21 @@ export function ProgressDemos() {
       </div>
     </Section>
     <Section title="상태별 표현" className="react-studio-progress-section" description="같은 크기의 예시에서 상태를 비교합니다. 색상과 함께 현재 상황을 문구로 설명합니다.">
-      <div className="react-studio-field-grid">{([
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">{([
         {label:'파일 업로드 중', value:60, variant:'primary', description:'작업이 정상적으로 진행되고 있습니다.'},
         {label:'업로드 완료', value:100, variant:'success', description:'모든 파일이 업로드되었습니다.'},
         {label:'저장 공간 주의', value:80, variant:'warning', description:'전체 용량의 80%를 사용하고 있습니다.'},
         {label:'동기화 중단', value:35, variant:'danger', description:'연결을 확인한 뒤 다시 시도해주세요.'},
-      ] as const).map(item => <div className="react-studio-example" key={item.variant}><ProgressExample {...item} /></div>)}</div>
+      ] as const).map(item => <div className="react-studio-example" key={item.variant}><ProgressExample {...item} /></div>)}</Grid>
     </Section>
     <Section title="두께 비교" className="react-studio-progress-section" description="모두 60%로 표시해 두께를 비교합니다. 기본은 8px이며, 표시 공간에 따라 선택합니다.">
       <div className="react-studio-example react-studio-progress-thickness">{([{value:'thin', label:'얇게', height:4}, {value:'normal', label:'기본', height:8}, {value:'thick', label:'두껍게', height:12}] as const).map(item => <div className="react-studio-progress-thickness-row" key={item.value}><div><span>{item.label}</span><small>{item.height}px</small></div><Progress value={60} max={100} thickness={item.value} aria-label={`${item.label} ${item.height}px 진행률`} /></div>)}</div>
     </Section>
     <Section title="형태별 사용" className="react-studio-progress-section" description="단계 수를 보여줄 때는 분할형, 작은 영역에 비율을 보여줄 때는 원형을 사용합니다.">
-      <div className="react-studio-field-grid">
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <div className="react-studio-example"><div><h3 className="react-studio-example-title">분할형</h3><p className="react-studio-caption">단계가 정해진 설정이나 등록 과정</p></div><div className="react-studio-progress-shape"><div className="react-studio-progress-example"><div className="react-studio-progress-meta"><span>프로젝트 설정</span><strong>3 / 5 단계</strong></div><SegmentedProgress value={3} total={5} label="프로젝트 설정 진행률" /></div></div></div>
         <div className="react-studio-example"><div><h3 className="react-studio-example-title">원형</h3><p className="react-studio-caption">카드나 요약 영역의 진행 상태</p></div><div className="react-studio-progress-shape react-studio-progress-circles"><div className="react-studio-progress-circle-sample"><CircleProgress value={60} label="원형 진행률" /><span>진행 중</span></div><div className="react-studio-progress-circle-sample"><CircleProgress value={100} label="원형 완료" variant="success" /><span>완료</span></div></div></div>
-      </div>
+      </Grid>
     </Section>
   </>;
 }
@@ -84,7 +84,7 @@ export function LoadingDemos() {
       ] as const).map(item => <div className="react-studio-example react-studio-stack" key={item.kind}><div className="react-studio-row"><Spinner kind={item.kind} label={`${item.title} 로딩 중`} /></div><h3 className="react-studio-example-title">{item.title}</h3><p className="react-studio-caption">{item.description}</p></div>)}</div>
     </Section>
     <Section title="사이즈" description="주변 요소의 크기에 맞춰 선택합니다.">
-      <div className="react-studio-size-grid">{([{size:'small', label:'SM', dimension:'16px'}, {size:'medium', label:'MD', dimension:'24px'}, {size:'large', label:'LG', dimension:'32px'}] as const).map(item => <div key={item.size} className="react-studio-example"><div className="react-studio-row"><Spinner size={item.size} label={`${item.label} 로딩 중`} /><strong>{item.label}</strong><span className="react-studio-caption">{item.dimension}</span></div></div>)}</div>
+      <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{([{size:'small', label:'SM', dimension:'16px'}, {size:'medium', label:'MD', dimension:'24px'}, {size:'large', label:'LG', dimension:'32px'}] as const).map(item => <div key={item.size} className="react-studio-example"><div className="react-studio-row"><Spinner size={item.size} label={`${item.label} 로딩 중`} /><strong>{item.label}</strong><span className="react-studio-caption">{item.dimension}</span></div></div>)}</Grid>
     </Section>
     <Section title="색상과 사용 예시" description="배경에 대비되는 색상을 사용하고 현재 작업을 짧은 문구로 설명합니다.">
       <div className="react-studio-sample-grid"><div className="react-studio-example react-studio-stack"><h3 className="react-studio-example-title">Primary</h3><div className="react-studio-row" role="status"><Spinner size="small" aria-hidden="true" />불러오는 중</div></div><div className="react-studio-example react-studio-stack"><h3 className="react-studio-example-title">Neutral</h3><div className="react-studio-row" role="status"><Spinner size="small" variant="neutral" aria-hidden="true" />동기화 중</div></div><div className="react-studio-example react-studio-stack react-studio-inverse spinner-usage--dark"><h3 className="react-studio-example-title">Inverse</h3><div className="react-studio-row" role="status"><Spinner size="small" variant="inverse" aria-hidden="true" />불러오는 중</div></div></div>
@@ -104,7 +104,7 @@ export function AvatarDemos() {
     <Section title="사각형 아바타" description="크기별 이니셜과 사용자를 지정하지 않은 기본 아이콘을 비교합니다."><AvatarExamples shape="square" /></Section>
     <Section title="원형 아바타" description="같은 크기와 색상을 원형으로 사용할 수 있습니다."><AvatarExamples shape="circle" /></Section>
     <Section title="아바타 그룹" description="참여자를 모아 표시하고, 남은 인원은 숫자로 안내합니다.">
-      <div className="react-studio-field-grid">{(['square','circle'] as const).map(shape => <div className="react-studio-example" key={shape}><h3 className="react-studio-example-title">{shape === 'square' ? '사각형' : '원형'}</h3><div className="avatar-group" role="group" aria-label={`${shape === 'square' ? '사각형' : '원형'} 참여자 4명`}>{people.map((person, index) => <Avatar key={person.name} shape={shape} variant={index === 1 ? 'neutral' : 'primary'} role="img" aria-label={person.name}>{person.initial}</Avatar>)}<Avatar shape={shape} variant="neutral" role="img" aria-label="외 1명">+1</Avatar></div></div>)}</div>
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">{(['square','circle'] as const).map(shape => <div className="react-studio-example" key={shape}><h3 className="react-studio-example-title">{shape === 'square' ? '사각형' : '원형'}</h3><div className="avatar-group" role="group" aria-label={`${shape === 'square' ? '사각형' : '원형'} 참여자 4명`}>{people.map((person, index) => <Avatar key={person.name} shape={shape} variant={index === 1 ? 'neutral' : 'primary'} role="img" aria-label={person.name}>{person.initial}</Avatar>)}<Avatar shape={shape} variant="neutral" role="img" aria-label="외 1명">+1</Avatar></div></div>)}</Grid>
     </Section>
   </>;
 }

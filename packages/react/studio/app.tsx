@@ -13,6 +13,7 @@ import { ButtonDemos, SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemo
 import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from './media-demos';
 import { DocumentShell, Overview, useDocumentRoute } from './shell';
 import { DividerDemos } from './divider-demos';
+import { GridDemos, gridUsage } from './grid-demos';
 import { patternPages, patternSnippets } from './patterns';
 import { componentUsage } from './component-usage';
 import completeExamples from './dist/complete-examples.json';
@@ -21,6 +22,7 @@ import { SidebarLayoutSample } from './layout-samples';
 import icons from './dist/icons.json';
 
 const snippets: Record<string, string> = {
+  'components/grid': gridUsage,
   'components/time-picker': timePickerUsage,
   'components/data-grid': dataGridUsage,
   'components/divider':`import { Divider } from '@idenflu/mono-react';
@@ -266,6 +268,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/chips': return <ChipDemos />;
     case 'components/list': return <ListDemos />;
     case 'components/divider': return <DividerDemos />;
+    case 'components/grid': return <GridDemos />;
     case 'components/slider': return <SliderDemos />;
     case 'components/tooltip': return <TooltipDemos />;
     case 'components/dropdown-menu': return <MenuDemos />;

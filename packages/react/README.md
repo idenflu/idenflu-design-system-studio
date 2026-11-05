@@ -58,6 +58,7 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 - 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `TimePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
 - 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `DataGrid`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
+- 레이아웃: `Grid`, `GridItem`
 - 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `NovaSpinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
 - 데이터 상태: `DataState`, `useDataState` (로딩·실패·빈 목록·검색 결과 없음·정상 목록)
 
@@ -66,6 +67,8 @@ CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용�
 속성·값과 이벤트 계약·키보드 동작·전체 코드 예시는 [React 컴포넌트 참조](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/reference/react-components.md)를 확인합니다.
 
 `Drawer`는 `side`로 네 방향, `size`로 SM·MD·LG·전체 화면 또는 픽셀 크기를 지정합니다. `variant="divided"`와 `DrawerHeader`·`DrawerBody`·`DrawerFooter`를 조합하면 본문만 스크롤하고 헤더와 하단 버튼은 유지됩니다. 기본 크기는 오른쪽 480px이며 배경 클릭으로 닫힙니다. [Drawer 사용 안내](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/reference/react-components.md#dialogdrawer)를 참고하세요.
+
+`Grid`와 `GridItem`은 반응형 열 수·토큰 간격·정렬·열과 행 병합을 제공합니다. `columns={{base:1, sm:2, lg:3}}`처럼 구간별 값을 지정하고 `colSpan="full"`로 전체 너비 항목을 배치합니다. 기본 `gap={6}`은 여백 토큰 `--space-6`을 사용합니다. [Grid 사용 안내](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/reference/react-components.md#gridgriditem)를 참고하세요.
 
 ## 아이콘
 

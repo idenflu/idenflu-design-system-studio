@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Checkbox, DropdownMenu, Icon, IconButton, MultiSelect, Popover, SearchSelect, Select, TextField } from '../src';
+import { Grid, Button, Checkbox, DropdownMenu, Icon, IconButton, MultiSelect, Popover, SearchSelect, Select, TextField } from '../src';
 import { Section } from './demo-layout';
 import { HiddenLabelReference, IconButtonReference, PopupAlignReference } from './convenience-api-reference';
 
@@ -44,13 +44,13 @@ export function HiddenLabelDemos({ kind = 'text-field' }: { kind?: 'text-field' 
       <HiddenLabelToolbar />
     </Section>
     <Section id={`${kind}-hide-label-compare`} title="보이는 라벨과 숨김 라벨" description="같은 label을 유지한 채 hideLabel만 바꿉니다. Tab으로 이동해도 입력 이름과 선택 동작은 같습니다.">
-      {kind === 'text-field' ? <div className="react-studio-field-grid">
+      {kind === 'text-field' ? <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <div className="react-studio-stack"><h3 className="react-studio-example-title">기본 라벨</h3><TextField label="프로젝트 검색" type="search" placeholder="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative /></div>
         <div className="react-studio-stack"><h3 className="react-studio-example-title">hideLabel</h3><TextField label="프로젝트 검색" hideLabel type="search" placeholder="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative /></div>
-      </div> : <div className="react-studio-field-grid">
+      </Grid> : <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
         <div className="react-studio-stack"><h3 className="react-studio-example-title">기본 라벨</h3><Select label="담당 팀" options={teams} defaultValue="design" /><SearchSelect label="팀 검색" options={teams} placeholder="팀 검색" /><MultiSelect label="참여 팀" options={teams} defaultValue={['design']} clearable /></div>
         <div className="react-studio-stack"><h3 className="react-studio-example-title">hideLabel</h3><Select label="담당 팀" hideLabel options={teams} defaultValue="design" /><SearchSelect label="팀 검색" hideLabel options={teams} placeholder="팀 검색" /><MultiSelect label="참여 팀" hideLabel options={teams} defaultValue={['design']} clearable /></div>
-      </div>}
+      </Grid>}
     </Section>
     <HiddenLabelReference kind={kind} />
   </>;

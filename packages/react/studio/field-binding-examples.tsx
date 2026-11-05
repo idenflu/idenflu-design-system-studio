@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, DatePicker, DateRangePicker, Icon, MultiSelect, NumberField, SearchSelect, Select, type DateValue, type DateRangeValue} from '../src';
+import { Grid, GridItem,Button, DatePicker, DateRangePicker, Icon, MultiSelect, NumberField, SearchSelect, Select, type DateValue, type DateRangeValue} from '../src';
 
 const bindingTeams = [
   {value:'design',label:'디자인'}, {value:'development',label:'개발'},
@@ -21,11 +21,11 @@ export function SelectBindingExample() {
     // 같은 name의 복수 선택은 getAll로 읽습니다. 단일 값은 get으로 읽습니다.
     setResult({team:data.get('team'),reviewer:data.get('reviewer')||null,teams:data.getAll('teams')});
   }} onReset={()=>{setTeam('design');setReviewer('');setTeams(['design']);setResult(null);setRevision(value=>value+1);}}>
-    <div className="form-pattern-grid" key={revision}>
+    <Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid" key={revision}>
       <Select label="바인딩 담당 팀" name="team" required options={bindingTeams} value={team} onValueChange={value=>{setTeam(value);setResult(null);}} />
       <SearchSelect label="바인딩 검토 팀" name="reviewer" options={bindingTeams} value={reviewer} onValueChange={value=>{setReviewer(value);setResult(null);}} />
-      <div className="form-pattern-field--wide"><MultiSelect label="바인딩 참여 팀" name="teams" options={bindingTeams} value={teams} onValueChange={value=>{setTeams(value);setResult(null);}} searchable presentation="inline" clearable maxVisibleTags={2} /></div>
-    </div>
+      <GridItem colSpan="full" className="form-pattern-field--wide"><MultiSelect label="바인딩 참여 팀" name="teams" options={bindingTeams} value={teams} onValueChange={value=>{setTeams(value);setResult(null);}} searchable presentation="inline" clearable maxVisibleTags={2} /></GridItem>
+    </Grid>
     <div className="form-pattern-actions"><Button type="submit">선택값 확인</Button><Button type="reset" variant="outline" onPointerDown={event=>event.preventDefault()}>초기값 복원</Button></div>
     <pre className="field-binding-output" role="region" aria-label="선택 제출 데이터" tabIndex={0}>{result ? JSON.stringify(result,null,2) : '선택값 확인을 누르면 제출할 객체를 표시합니다.'}</pre>
   </form>;

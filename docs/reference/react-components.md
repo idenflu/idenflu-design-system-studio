@@ -25,6 +25,7 @@
 - [Toast](#toast)
 - [Chip](#chip)
 - [Divider](#divider)
+- [Grid·GridItem](#gridgriditem)
 - [Table](#table)
 
 ## 컴포넌트 범주
@@ -33,6 +34,7 @@
 - 입력: `TextField`, `TextArea`, `NumberField`, `DatePicker`, `DateRangePicker`, `TimePicker`, `DateTimePicker`, `DateTimeRangePicker`, `Slider`, `FileUpload`
 - 선택: `Select`, `SearchSelect`, `MultiSelect`, `NativeSelect`, `Checkbox`, `Radio`, `Switch`, `Segmented`, `Chip`
 - 탐색과 정보: `Tabs`, `Tree`, `Accordion`, `List`, `Table`, `DataGrid`, `Pagination`, `Stepper`, `Card`, `Avatar`, `Icon`, `Divider`
+- 레이아웃: `Grid`, `GridItem`
 - 피드백과 오버레이: `Badge`, `Alert`, `Progress`, `Spinner`, `NovaSpinner`, `Skeleton`, `Dialog`, `Drawer`, `Toast`, `Tooltip`, `Popover`, `DropdownMenu`, `Slides`
 - 데이터 상태: `DataState`, `useDataState` (로딩·실패·빈 목록·검색 결과 없음·정상 목록)
 
@@ -629,6 +631,50 @@ import { Divider } from '@idenflu/mono-react';
 <Divider align="start">추가 정보</Divider>
 <Divider variant="dashed" decorative />
 ```
+
+## Grid·GridItem
+
+`Grid`는 CSS Grid를 기반으로 카드·폼·대시보드의 열 수, 간격과 정렬을 지정합니다. `GridItem`은 직접 자식 항목의 열·행 병합과 개별 정렬을 지정합니다. 두 컴포넌트는 `div`의 일반 HTML 속성·이벤트·`className`·`style`·`ref`를 전달하며 별도의 ARIA 역할을 부여하지 않습니다. 데이터 표의 검색·정렬·선택 기능은 `DataGrid`에서 제공합니다.
+
+| 컴포넌트 | 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- | --- |
+| Grid | `columns` | `ResponsiveValue<number>` | `1` | 양의 정수 열 수. 각 열은 가용 공간을 균등하게 나눕니다. |
+| Grid | `gap` | `ResponsiveValue<GridSpacing>` | `6` | 두 축의 기본 간격 토큰 |
+| Grid | `rowGap`·`columnGap` | `ResponsiveValue<GridSpacing>` | — | 행·열 간격을 각각 재정의합니다. |
+| Grid | `alignItems` | `ResponsiveValue<'start' \| 'center' \| 'end' \| 'stretch' \| 'baseline'>` | `'stretch'` | 모든 항목의 세로 정렬 |
+| Grid | `justifyItems` | `ResponsiveValue<'start' \| 'center' \| 'end' \| 'stretch'>` | `'stretch'` | 모든 항목의 가로 정렬 |
+| GridItem | `colSpan` | `ResponsiveValue<number \| 'full'>` | `1` | 양의 정수 열 병합 수 또는 전체 열 |
+| GridItem | `rowSpan` | `ResponsiveValue<number>` | `1` | 양의 정수 행 병합 수 |
+| GridItem | `alignSelf`·`justifySelf` | 반응형 정렬 값 또는 `'auto'` | `'auto'` | 항목 하나의 세로·가로 정렬을 재정의합니다. `alignSelf`는 baseline도 지원합니다. |
+
+`GridSpacing`은 `0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 10 | 12`입니다. 숫자는 픽셀이 아닌 디자인 토큰이며 `gap={6}`은 `--space-6`을 사용합니다. 기본 여백에서 24px이고 `--space-unit`이나 화면 조정의 여백 배율을 바꾸면 함께 바뀝니다. `rowGap`·`columnGap`을 명시한 구간부터 해당 축의 값이 유지되며, 축 값을 아직 지정하지 않은 구간은 `gap`을 따릅니다.
+
+각 배치 속성은 단일 값 또는 `{ base, sm, md, lg, xl }` 객체를 받습니다. `sm`은 600px, `md`는 900px, `lg`는 1200px, `xl`은 1440px부터 적용하는 화면 너비 기준입니다. 생략한 구간은 앞 구간의 값을 이어받으며 `base`도 생략하면 해당 속성의 기본값을 사용합니다. 화면 크기에 따라 DOM을 교체하지 않아 입력값과 포커스를 유지합니다.
+
+```tsx
+import { Grid, GridItem, Select, TextArea, TextField, Button } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function ProjectForm() {
+  return <form onSubmit={event => event.preventDefault()}>
+    <Grid columns={{ base:1, sm:2, lg:3 }} gap={6} alignItems="start">
+      <TextField label="프로젝트 이름" name="name" required />
+      <Select label="담당 팀" name="team" defaultValue="design"
+              options={[{ value:'design', label:'프로덕트 디자인' },
+                        { value:'engineering', label:'플랫폼 개발' }]} />
+      <TextField label="담당자" name="owner" />
+      <GridItem colSpan={{ base:1, sm:2 }}>
+        <TextArea label="프로젝트 설명" name="description" rows={3} />
+      </GridItem>
+      <GridItem colSpan="full"><Button type="submit">저장</Button></GridItem>
+    </Grid>
+  </form>;
+}
+```
+
+숫자 `colSpan`은 현재 Grid의 열 수 안으로 제한합니다. 전체 너비에는 `colSpan="full"`을 사용하면 열 수가 바뀌어도 해당 행의 처음부터 끝까지 배치합니다. `GridItem`은 해당 `Grid`의 직접 자식으로 배치하고, 중첩 영역에는 새 `Grid`를 사용합니다. 내용이 길면 줄바꿈·말줄임 또는 해당 영역의 스크롤 정책을 함께 지정하세요.
+
+시각적 배치와 읽기·키보드 탐색 순서를 일치시키도록 DOM 순서를 구성합니다. `Grid`에는 키보드 이동이나 `role="grid"`를 자동으로 추가하지 않습니다. `style`은 기본 배치보다 우선하므로 필요한 CSS Grid 설정을 직접 확장할 수 있습니다.
 
 ## Table
 

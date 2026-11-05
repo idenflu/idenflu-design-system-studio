@@ -81,9 +81,7 @@
 .react-studio-icon-label > .ui-icon, .react-studio-icon-alert > .ui-icon { flex:0 0 16px; width:16px; height:16px; color:var(--text-secondary); }
 .react-studio-icon-alert { display:flex; align-items:flex-start; gap:var(--space-3); }
 .react-studio-icon-alert > .ui-icon { margin-top:3px; }
-.react-studio-size-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--space-6); align-items:start; }
-.react-studio-field-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:var(--space-6) var(--space-8); align-items:start; }
-.react-studio-field-grid > *, .react-studio-size-grid > *, .react-studio-demo > * { min-width:0; }
+.react-studio-demo > * { min-width:0; }
 .react-studio-stack { display:grid; gap:var(--space-4); min-width:0; }
 .react-studio-sample-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:var(--space-4); align-items:start; }
 .react-studio-example { min-width:0; display:grid; align-content:start; gap:var(--space-4); padding:var(--space-5); border:1px solid var(--divider); }
@@ -139,7 +137,6 @@
 @media (max-width:600px) { .studio-drawer-controls { grid-template-columns:minmax(0,1fr); } .studio-drawer-controls > .button { justify-self:start; } }
 .react-studio-section .simple-list, .react-studio-section .selectable-list, .react-studio-section .step-panel { margin-top:0; }
 .react-studio .docs-toc { max-width:1040px; }
-.react-studio-field-wide { grid-column:1 / -1; }
 .react-studio-code { max-height:480px; overflow:auto; overscroll-behavior:contain; padding:var(--space-4); background:var(--surface); }
 .studio-icon-expansion-groups { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-6); }
 .studio-icon-expansion-group { display:grid; gap:var(--space-3); align-content:start; min-width:0; }
@@ -218,7 +215,7 @@
   .react-studio .theme-toggle { width:32px; height:32px; flex-basis:32px; }
 }
 @media (max-width:600px) {
-  .react-studio-field-grid, .react-studio-size-grid, .react-studio .overview-links { grid-template-columns:minmax(0, 1fr); }
+  .react-studio .overview-links { grid-template-columns:minmax(0, 1fr); }
   .react-pattern-form :is(.number-field-feedback,.date-field-error) { min-height:0; }
   .react-pattern-form :is(.number-field-feedback,.date-field-error)[hidden] { display:none !important; }
   .react-studio-table-toolbar, .react-studio-table-footer { align-items:flex-start; }
