@@ -45,7 +45,7 @@ Research sources and selection rationale: [icon-research.md](https://github.com/
 
 ## Component sprite
 
-The separate `../icons.svg` sprite is the source for the planned 0.4.2 React
+The separate `../icons.svg` sprite is the source for the planned 0.5.0 React
 icon components. It contains outline variants only and may differ from these
 preserved 0.4.1 assets. Its `copy`, `visibility-off`, `trash`, `download`,
 `upload`, `folder`, `menu`, `moon`, and `rotate` drawings derive from matching

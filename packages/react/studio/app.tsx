@@ -27,8 +27,8 @@ const componentIcons = spriteIcons.map(name => {
   const component = name.split('-').map(part => part[0].toUpperCase() + part.slice(1)).join('') + 'Icon';
   return { name, component, IconComponent: generatedIcons[component as keyof typeof generatedIcons] };
 });
-type IconVersion = '0.4.1' | '0.4.2';
-const iconVersionLabels = { '0.4.1': '0.4.1', '0.4.2': '0.4.2 예정' } as const;
+type IconVersion = '0.4.1' | '0.5.0';
+const iconVersionLabels = { '0.4.1': '0.4.1', '0.5.0': '0.5.0 예정' } as const;
 const componentIconExample = `import { Button, IconButton } from '@idenflu/mono-react';
 import { SaveIcon, BellIcon, BookmarkIcon } from '@idenflu/mono-react/icons';
 import '@idenflu/mono-react/styles.css';
@@ -264,10 +264,10 @@ function FoundationIcons({ version }: { version: IconVersion }) {
 }
 function IconsPage() {
   const [version, setVersion] = React.useState<IconVersion>('0.4.1');
-  const versions: IconVersion[] = ['0.4.1', '0.4.2'];
+  const versions: IconVersion[] = ['0.4.1', '0.5.0'];
   const updateVersion = (value: string) => setVersion(value as IconVersion);
   return <><IconDemos />
-    <Section title="아이콘 목록" description="패키지 버전을 선택하고 유형이나 이름으로 아이콘을 찾아보세요. 0.4.2는 출시 예정입니다.">
+    <Section title="아이콘 목록" description="패키지 버전을 선택하고 유형이나 이름으로 아이콘을 찾아보세요. 0.5.0은 출시 예정입니다.">
       <Tabs label="아이콘 목록 패키지 버전" value={version} onValueChange={updateVersion} items={versions.map(value => ({ value, label: iconVersionLabels[value], content: value === version ? <><p className="react-studio-caption">{value === '0.4.1' ? '표시된 이름을 Icon의 name에 사용합니다.' : 'Outline 컴포넌트를 @idenflu/mono-react/icons에서 가져옵니다.'}</p><FoundationIcons version={value} /></> : null }))} />
     </Section>
     <Section title="React 사용 예시" description="선택한 패키지 버전의 사용 예시입니다.">
