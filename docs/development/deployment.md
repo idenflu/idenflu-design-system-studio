@@ -55,4 +55,6 @@ npm pack ./packages/react --dry-run
 
 빌드 결과에 ESM·CommonJS, TypeScript 선언, `styles.css`·`tokens.css`·`reset.css`와 참조하는 에셋 및 에셋 라이선스가 포함됩니다. 배포 전에 개발 브랜치에서 패키지 버전을 올리고 변경을 `main`에 반영한 뒤, [Publish React package 워크플로](../../.github/workflows/publish-react.yml)에서 `main`을 선택해 수동 실행합니다. `dev`에서는 게시 작업을 실행하지 않습니다. 해당 워크플로는 저장소의 `GITHUB_TOKEN`으로 GitHub Packages에 게시하며 저장소의 Packages 쓰기 권한이 필요합니다.
 
+게시 워크플로는 `packages/react/package.json`의 버전에 해당하는 `## 0.4.2` 형식의 제목이 CHANGELOG에 정확히 하나 있고, 그 아래에 실제 목록 항목이 하나 이상 있는지 게시 전에 검사합니다. 날짜는 게시 후 실제 KST 날짜로 기록하므로 검사에서 필수로 요구하지 않습니다. 로컬에서는 `npm run check:changelog`로 같은 검사를 실행할 수 있습니다. 이 검사는 항목의 유무만 확인하므로 내용의 정확성과 충분성은 별도로 검토해야 합니다.
+
 설치·레지스트리 인증은 [패키지 README](../../packages/react/README.md)를 확인합니다.
