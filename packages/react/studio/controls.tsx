@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Icon, Segmented, Slider, Tooltip } from '../src';
+import { Button, Icon, Segmented, Select, Slider, Tooltip } from '../src';
 import { useEscapeLayer } from '../src/escape-layer';
 
 type PreferenceKey = 'fontSize' | 'lineHeight' | 'spacing' | 'controlHeight' | 'radius';
+type PreferenceFont = 'pretendard' | 'wanted-sans';
 type Theme = 'light' | 'dark';
 type ColorToken = '--primary' | '--text' | '--text-secondary' | '--surface' | '--border' | '--primary-control' | '--canvas' | '--danger' | '--success' | '--warning' | '--info';
-export type PreferenceValues = Record<PreferenceKey, number> & { colors?: Partial<Record<Theme, Partial<Record<ColorToken, string>>>> };
+export type PreferenceValues = Record<PreferenceKey, number> & { fontFamily:PreferenceFont; colors?: Partial<Record<Theme, Partial<Record<ColorToken, string>>>> };
 type PreferenceUpdate = Partial<Omit<PreferenceValues, 'colors'>> & { colors?: Partial<Record<Theme, Partial<Record<ColorToken, string | null>>>> };
 const baseColors: [ColorToken, string][] = [['--primary','Primary'],['--text','Text Primary'],['--text-secondary','Text Secondary'],['--surface','Surface'],['--border','Border'],['--primary-control','Control Primary'],['--canvas','Canvas']];
 const semanticColors: [ColorToken, string][] = [['--danger','Danger'],['--success','Success'],['--warning','Warning'],['--info','Info']];
@@ -54,7 +55,7 @@ function ColorField({token,label,value,custom,onChange,onReset}:{token:ColorToke
     </div>
   </div>;
 }
-declare global { interface Window { IdenfluTheme: { get():Theme; set(theme:Theme):void }; IdenfluPreferences: { get():PreferenceValues; set(value:PreferenceUpdate):PreferenceValues; reset():PreferenceValues; cssText():string; contrastRatio(foreground:string,background:string):number|null; ranges:Record<PreferenceKey, {min:number;max:number;step:number}> } } }
+declare global { interface Window { IdenfluTheme: { get():Theme; set(theme:Theme):void }; IdenfluPreferences: { get():PreferenceValues; set(value:PreferenceUpdate):PreferenceValues; reset():PreferenceValues; cssText():string; contrastRatio(foreground:string,background:string):number|null; ranges:Record<PreferenceKey, {min:number;max:number;step:number}>; fonts:readonly {value:PreferenceFont;label:string;family:string}[] } } }
 export function usePreferences() {
   const [values, setValues] = React.useState(() => window.IdenfluPreferences.get());
   React.useEffect(() => {
@@ -94,7 +95,7 @@ export function StudioSettings() {
   React.useEffect(() => {
     if (!open || !body.current) return;
     body.current.scrollTop = 0;
-    body.current.querySelector<HTMLInputElement>('input')?.focus({preventScroll:true});
+    body.current.querySelector<HTMLElement>('button:not(:disabled), input:not([type="hidden"]):not(:disabled)')?.focus({preventScroll:true});
   }, [open]);
   const fields: [PreferenceKey, string][] = [['fontSize','글자 크기'],['lineHeight','행간'],['spacing','여백'],['controlHeight','컨트롤 높이'],['radius','모서리']];
   return <>
@@ -102,6 +103,12 @@ export function StudioSettings() {
     {createPortal(<dialog ref={panel} id="studio-settings-dialog" open={open} aria-modal="false" aria-labelledby="react-settings-title" aria-describedby="react-settings-description">
       <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={close}><Icon name="close" /></button></header>
       <div className="studio-preferences-body" ref={body}>
+        <section aria-labelledby="studio-font-title">
+          <h3 id="studio-font-title" className="studio-preferences-section-title">폰트</h3>
+          <Select label="글꼴" value={values.fontFamily} options={window.IdenfluPreferences.fonts.map(({value,label}) => ({value,label}))} popupStrategy="fixed" onValueChange={value => window.IdenfluPreferences.set({fontFamily:value === 'wanted-sans' ? 'wanted-sans' : 'pretendard'})} />
+          <p className="studio-preferences-hint">기본 글꼴은 Pretendard입니다. 선택한 글꼴을 문서와 예제 화면에 적용합니다.</p>
+          <div className="studio-preferences-font-preview" role="group" aria-label="글꼴 미리보기"><p>생각을 또렷하게, 일상을 간결하게.</p><p lang="en">Design with clarity. 0123456789</p></div>
+        </section>
         <section aria-labelledby="studio-layout-title">
           <h3 id="studio-layout-title" className="studio-preferences-section-title">크기·간격</h3>
           {fields.map(([key, label]) => {

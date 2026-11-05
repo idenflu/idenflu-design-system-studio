@@ -5,7 +5,12 @@
   const storageKey = "idenflu-mono-preferences-v1";
   const defaultsVersion = 2;
   const root = document.documentElement;
-  const defaults = Object.freeze({ fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0 });
+  const defaults = Object.freeze({ fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0, fontFamily: "pretendard" });
+  const fonts = Object.freeze([
+    Object.freeze({ value: "pretendard", label: "Pretendard", family: 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }),
+    Object.freeze({ value: "wanted-sans", label: "Wanted Sans", family: '"Wanted Sans Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }),
+  ]);
+  const font = (value) => fonts.find(item => item.value === value);
   const ranges = Object.freeze({
     fontSize: Object.freeze({ min: 12, max: 18, step: 1 }),
     lineHeight: Object.freeze({ min: 18, max: 32, step: 1 }),
@@ -19,8 +24,9 @@
     spacing: "--space-unit",
     controlHeight: "--control-base-height",
     radius: "--radius-control",
+    fontFamily: "--font-family-body",
   };
-  const keys = Object.keys(defaults);
+  const keys = Object.keys(ranges);
   const colorTokens = Object.freeze(["--primary", "--text", "--text-secondary", "--surface", "--border", "--primary-control", "--canvas", "--danger", "--success", "--warning", "--info"]);
   const themes = ["light", "dark"];
   const appliedColors = new Set();
@@ -48,6 +54,7 @@
     if (Object.keys(colors).length) next.colors = colors;
     else delete next.colors;
     if (object(partial)) {
+      if (own(partial, "fontFamily") && font(partial.fontFamily)) next.fontFamily = partial.fontFamily;
       keys.forEach((key) => {
         if (!own(partial, key) || !numeric(partial[key])) return;
         const { min, max, step } = ranges[key];
@@ -61,7 +68,10 @@
   }
 
   function cssValues() {
-    return keys.map((key) => [properties[key], `${key === "spacing" ? Number((4 * values.spacing / 100).toFixed(2)) : values[key]}px`]);
+    return [
+      ...keys.map((key) => [properties[key], `${key === "spacing" ? Number((4 * values.spacing / 100).toFixed(2)) : values[key]}px`]),
+      [properties.fontFamily, font(values.fontFamily).family],
+    ];
   }
   const channels = (hex) => expandColor(hex).slice(1).match(/../g).map(value => parseInt(value, 16));
   function contrastRatio(foreground, background) {
@@ -175,6 +185,7 @@
   function get() { return normalize({}, values); }
   function valid(partial) {
     if (!object(partial)) return false;
+    if (own(partial, "fontFamily") && font(partial.fontFamily)) return true;
     if (keys.some(key => own(partial, key) && numeric(partial[key]))) return true;
     return own(partial, "colors") && object(partial.colors) && themes.some(theme => own(partial.colors, theme) && object(partial.colors[theme]) && colorTokens.some(token => own(partial.colors[theme], token) && (color(partial.colors[theme][token]) || partial.colors[theme][token] === null)));
   }
@@ -216,7 +227,7 @@
     }).filter(Boolean)].join("\n\n");
   }
 
-  window.IdenfluPreferences = Object.freeze({ get, set, reset, cssText, defaults, ranges, contrastRatio });
+  window.IdenfluPreferences = Object.freeze({ get, set, reset, cssText, defaults, ranges, fonts, contrastRatio });
   let stored = null;
   try { stored = parse(localStorage.getItem(storageKey)); } catch { /* Use defaults when reading storage is blocked. */ }
   if (stored) { values = stored; apply(); }

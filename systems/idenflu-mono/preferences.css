@@ -66,6 +66,9 @@
 .studio-preferences-body { min-height: 0; padding: 16px 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .studio-preferences-body > section + section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--divider); }
 .studio-preferences-section-title { margin: 0 0 8px; font-size: 14px; line-height: 22px; font-weight: 600; }
+.studio-preferences-font-preview { display:grid; gap:4px; margin-top:12px; padding:12px; border:1px solid var(--divider); background:var(--surface); font-family:var(--font-family-body); font-size:16px; line-height:26px; overflow-wrap:anywhere; }
+.studio-preferences-font-preview p { margin:0; }
+.studio-preferences-font-preview p[lang="en"] { color:var(--text-secondary); font-size:14px; line-height:22px; }
 .studio-preferences-field { display: grid; grid-template-columns: 88px minmax(0, 1fr) 48px; align-items: center; gap: 12px; min-height: 40px; }
 .studio-preferences-field + .studio-preferences-field { margin-top: 8px; }
 .studio-preferences-label { display: contents; }

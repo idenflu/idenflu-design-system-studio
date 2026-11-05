@@ -30,6 +30,9 @@ test('distribution is deterministic and contains React documentation and license
     assert(redirect.includes('location.replace(target.href)'));
     assert(redirect.includes('target.hash = location.hash'));
     assert((await readFile(resolve(target, 'assets/fonts/LICENSE.txt'), 'utf8')).length > 0);
+    assert((await readFile(resolve(target, 'assets/fonts/wanted-sans/OFL.txt'), 'utf8')).includes('SIL OPEN FONT LICENSE Version 1.1'));
+    assert.equal((await readFile(resolve(target, 'assets/fonts/wanted-sans/WantedSansVariable.woff2'))).subarray(0, 4).toString(), 'wOF2');
+    assert(styles.includes('Wanted Sans Variable') && styles.includes('../assets/fonts/wanted-sans/WantedSansVariable.woff2'));
     assert((await readFile(resolve(target, 'assets/icons/idenflu/SOURCE.md'), 'utf8')).length > 0);
     const notices = await readFile(resolve(target, 'docs-dist/THIRD_PARTY_NOTICES.txt'), 'utf8');
     assert(notices.includes('@tanstack/react-virtual') && notices.includes('@tanstack/virtual-core'));

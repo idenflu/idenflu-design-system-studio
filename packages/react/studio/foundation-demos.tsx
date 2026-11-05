@@ -4,6 +4,7 @@ import { Section } from './demo-layout';
 import { IconExpansionDemos } from './icon-expansion-demos';
 import {StatusIconDemos} from './status-demos';
 import {AccessIconDemos} from './icon-access-demos';
+import {usePreferences} from './controls';
 
 const sizes = [
   {value:'sm', name:'Small', height:30, padding:10, icon:14, switchTrack:'28 × 16'},
@@ -30,6 +31,8 @@ export function IconDemos() {
 }
 
 export function TypographyDemos() {
+  const {fontFamily} = usePreferences();
+  const typeface = window.IdenfluPreferences.fonts.find(font => font.value === fontFamily)?.label ?? 'Pretendard';
   const scale = [
     {name:'Heading', metrics:'32 / 40 · Semibold', className:'sample-heading', text:'Form follows function.'},
     {name:'Section', metrics:'24 / 32 · Semibold', className:'sample-section', text:'명확한 구조, 일관된 경험.'},
@@ -37,11 +40,11 @@ export function TypographyDemos() {
     {name:'Caption', metrics:'12 / 18 · Regular', className:'sample-caption', text:'보조 설명과 상태 정보를 전달하는 작은 텍스트입니다.'},
   ];
   return <>
-    <Section title="Typeface" description="Pretendard를 사용해 한글·영문·숫자의 위계를 일관되게 표현합니다.">
+    <Section title="Typeface" description="Pretendard가 기본 글꼴입니다. 화면 조정에서 Wanted Sans를 선택해 한글·영문·숫자의 표현을 비교할 수 있습니다.">
       <div className="react-studio-field-grid">
         <div className="react-studio-example react-studio-stack">
           <p className="type-specimen" aria-hidden="true">Aa</p>
-          <strong className="type-name">Pretendard</strong>
+          <strong className="type-name">{typeface}</strong>
           <p className="react-studio-caption">간결한 인터페이스의 기준</p>
         </div>
         <div className="react-studio-example react-studio-stack">

@@ -5,8 +5,8 @@ import vm from 'node:vm';
 
 const source = await readFile(new URL('../systems/idenflu-mono/preferences.js', import.meta.url), 'utf8');
 const storageKey = 'idenflu-mono-preferences-v1';
-const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0 };
-const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6 };
+const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0, fontFamily: 'pretendard' };
+const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6, fontFamily: 'pretendard' };
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
 function engine({ stored, values = new Map(), blocked = {} } = {}) {
@@ -105,16 +105,55 @@ test('strict partial updates ignore invalid types, unknown keys and inherited va
   assert.deepEqual(Object.keys(JSON.parse(app.storage.get(storageKey))), [...Object.keys(defaults), 'defaultsVersion']);
 });
 
+test('font choices persist, export and synchronize while preserving sizes, colors and reset ownership', () => {
+  const app = engine({values:new Map([['consumer-draft','keep']])});
+  app.api.set({...custom, colors:{light:{'--primary':'#2255aa'}}});
+  const next = app.api.set({fontFamily:'wanted-sans'});
+  assert.equal(next.fontFamily, 'wanted-sans');
+  assert.equal(next.fontSize, custom.fontSize);
+  assert.equal(next.colors.light['--primary'], '#2255aa');
+  assert.match(app.styles.get('--font-family-body'), /^"Wanted Sans Variable", Pretendard,/);
+  assert.match(app.api.cssText(), /--font-family-body: "Wanted Sans Variable", Pretendard,/);
+  const restored = engine({stored:app.storage.get(storageKey)});
+  assert.deepEqual(plain(restored.api.get()), plain(next));
+  restored.storageEvent({key:storageKey,newValue:JSON.stringify({fontFamily:'pretendard',fontSize:16})});
+  assert.equal(restored.api.get().fontFamily, 'pretendard');
+  assert.match(restored.styles.get('--font-family-body'), /^Pretendard,/);
+  app.api.reset();
+  assert.equal(app.api.get().fontFamily, 'pretendard');
+  assert.equal(app.styles.has('--font-family-body'), false);
+  assert.equal(app.storage.get('consumer-draft'), 'keep');
+});
+
+test('font preferences accept only registered own values and hydrate legacy size records with Pretendard', () => {
+  const app = engine();
+  for (const fontFamily of ['Arial','toString','__proto__','url(evil)',null,12,{}]) {
+    assert.deepEqual(plain(app.api.set({fontFamily})), defaults);
+  }
+  assert.deepEqual(plain(app.api.set(Object.create({fontFamily:'wanted-sans'}))), defaults);
+  assert.equal(app.events.length, 1);
+  assert.equal(app.storage.has(storageKey), false);
+  const legacy = engine({stored:JSON.stringify({fontSize:16,lineHeight:26,spacing:125,controlHeight:44,radius:6})});
+  assert.deepEqual(plain(legacy.api.get()), custom);
+  const fontOnly = engine({stored:JSON.stringify({fontFamily:'wanted-sans'})});
+  assert.deepEqual(plain(fontOnly.api.get()), {...defaults,fontFamily:'wanted-sans'});
+  assert.match(fontOnly.styles.get('--font-family-body'), /Wanted Sans Variable/);
+  const invalidStored = engine({stored:JSON.stringify({fontFamily:'Arial'})});
+  assert.deepEqual(plain(invalidStored.api.get()), defaults);
+  assert.equal(invalidStored.events[0].detail.saved, false);
+  assert.deepEqual(plain(app.api.fonts).map(({value}) => value), ['pretendard','wanted-sans']);
+});
+
 test('ranges snap to permitted steps and enforce font-linked line and control minimums', () => {
   const app = engine();
   assert.deepEqual(plain(app.api.set({ fontSize: 99, lineHeight: 1, spacing: 149, controlHeight: 31, radius: 99 })), {
-    fontSize: 18, lineHeight: 22, spacing: 150, controlHeight: 36, radius: 12,
+    ...defaults, fontSize: 18, lineHeight: 22, spacing: 150, controlHeight: 36, radius: 12,
   });
   assert.deepEqual(plain(app.api.set({ fontSize: -1, lineHeight: 100, spacing: -10, controlHeight: 99, radius: -9 })), {
-    fontSize: 12, lineHeight: 32, spacing: 75, controlHeight: 48, radius: 0,
+    ...defaults, fontSize: 12, lineHeight: 32, spacing: 75, controlHeight: 48, radius: 0,
   });
   assert.deepEqual(plain(app.api.set({ fontSize: 15.4, lineHeight: 18.2, spacing: 111, controlHeight: 33, radius: 2.6 })), {
-    fontSize: 15, lineHeight: 19, spacing: 110, controlHeight: 34, radius: 3,
+    ...defaults, fontSize: 15, lineHeight: 19, spacing: 110, controlHeight: 34, radius: 3,
   });
 });
 
@@ -139,7 +178,7 @@ test('successful updates apply CSS, persist exact state and return exportable cu
 
 test('stored records hydrate before UI and corrupt or incorrectly typed records fall back', () => {
   const stored = engine({ stored: JSON.stringify({ fontSize: 18, lineHeight: 18, spacing: 101, controlHeight: 32, radius: 2, unknown: 99 }) });
-  assert.deepEqual(plain(stored.api.get()), { fontSize: 18, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 2 });
+  assert.deepEqual(plain(stored.api.get()), { ...defaults, fontSize: 18, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 2 });
   assert.equal(stored.styles.get('--font-size-base'), '18px');
   assert.equal(stored.events[0].detail.reason, 'load');
   assert.equal(stored.events[0].detail.saved, true);

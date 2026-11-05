@@ -2,8 +2,8 @@ const { test, expect } = require('@playwright/test');
 const documents = require('../packages/react/studio/routes.json');
 
 const storageKey = 'idenflu-mono-preferences-v1';
-const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0 };
-const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6 };
+const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0, fontFamily: 'pretendard' };
+const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6, fontFamily: 'pretendard' };
 const ranges = {
   fontSize: '#react-pref-fontSize',
   lineHeight: '#react-pref-lineHeight',
@@ -213,7 +213,7 @@ test('settings support keyboard adjustment, nonmodal focus and Escape return', {
   await page.keyboard.press('Enter');
   await expect(page.locator('#studio-settings-dialog')).toBeVisible();
   const font = page.locator('#react-pref-fontSize');
-  await expect(font).toBeFocused();
+  await expect(page.getByRole('combobox',{name:/^글꼴:/})).toBeFocused();
   await font.focus();
   await font.press('ArrowRight');
   await expect(font).toHaveValue('15');
