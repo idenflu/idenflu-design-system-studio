@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Button, Icon, Segmented, TextField, type IconName } from '../src';
+import { Button, Icon, Segmented, Tabs, TextField, type IconName } from '../src';
+import * as generatedIcons from '../src/icons';
 import { Section } from './demo-layout';
 import { ColorDemos } from './color-demos';
 import { TextFields, SelectDemos, NumberDemos, DateDemos } from './form-demos';
@@ -19,7 +20,26 @@ import { componentUsage } from './component-usage';
 import completeExamples from './dist/complete-examples.json';
 import { DataGridDemos, dataGridUsage } from './data-grid-demos';
 import { SidebarLayoutSample } from './layout-samples';
-import icons from './dist/icons.json';
+import releasedIcons from './icon-names-0.4.1.json';
+import spriteIcons from './dist/sprite-icons.json';
+
+const componentIcons = spriteIcons.map(name => {
+  const component = name.split('-').map(part => part[0].toUpperCase() + part.slice(1)).join('') + 'Icon';
+  return { name, component, IconComponent: generatedIcons[component as keyof typeof generatedIcons] };
+});
+type IconVersion = '0.4.1' | '0.4.2';
+const iconVersionLabels = { '0.4.1': '0.4.1', '0.4.2': '0.4.2 예정' } as const;
+const componentIconExample = `import { Button, IconButton } from '@idenflu/mono-react';
+import { SaveIcon, BellIcon, BookmarkIcon } from '@idenflu/mono-react/icons';
+import '@idenflu/mono-react/styles.css';
+
+export function IconExample() {
+  return <>
+    <Button><SaveIcon />저장</Button>
+    <IconButton label="알림"><BellIcon /></IconButton>
+    <BookmarkIcon size={20} label="저장됨" />
+  </>;
+}`;
 
 const snippets: Record<string, string> = {
   'components/grid': gridUsage,
@@ -227,15 +247,33 @@ export function ProcessingDialogExample({ blocking = false }: { blocking?: boole
   ...componentUsage,
   ...completeExamples,
 };
-function CodeExample({ code, complete = false }: { code:string; complete?:boolean }) {
+function CodeContent({ code }: { code:string }) {
   const [message, setMessage] = React.useState('');
-  return <Section title="React 사용 예시" description={complete ? "현재 화면의 데이터·상태·이벤트와 예제용 배치를 포함한 전체 TSX 코드입니다. 복사 후 내보낸 컴포넌트를 렌더링하세요." : "패키지에서 컴포넌트를 가져와 사용합니다."}><div className="react-studio-code" role="region" aria-label="React 사용 예시 코드" tabIndex={0}><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></Section>;
+  return <><div className="react-studio-code" role="region" aria-label="React 사용 예시 코드" tabIndex={0}><pre><code>{code}</code></pre></div><div className="react-studio-row"><Button variant="outline" onClick={async () => { try { await navigator.clipboard.writeText(code); setMessage('코드를 복사했습니다.'); } catch { setMessage('복사할 수 없습니다. 위 코드를 선택해 복사하세요.'); } }}>코드 복사</Button><span className="component-helper" role="status" hidden={!message}>{message}</span></div></>;
 }
-function FoundationIcons() {
+function CodeExample({ code, complete = false }: { code:string; complete?:boolean }) {
+  return <Section title="React 사용 예시" description={complete ? "현재 화면의 데이터·상태·이벤트와 예제용 배치를 포함한 전체 TSX 코드입니다. 복사 후 내보낸 컴포넌트를 렌더링하세요." : "패키지에서 컴포넌트를 가져와 사용합니다."}><CodeContent code={code} /></Section>;
+}
+function FoundationIcons({ version }: { version: IconVersion }) {
   const [query, setQuery] = React.useState('');
   const [variant, setVariant] = React.useState('all');
-  const visible = icons.filter(name => name.includes(query.trim().toLowerCase()) && (variant === 'all' || name.endsWith('-fill') === (variant === 'filled')));
-  return <><div className="react-studio-stack"><Segmented label="아이콘 유형" value={variant} onValueChange={setVariant} options={[{value:'all', label:'전체'}, {value:'outline', label:'Outline'}, {value:'filled', label:'Filled'}]} /><div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: bookmark, cart, chart" /></div></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 이름이나 유형을 바꿔 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(name => <li key={name}><Icon name={name as IconName} /><span>{name}</span></li>)}</ul></>;
+  const options = version === '0.4.1' ? releasedIcons.map(name => ({ name, component: '', IconComponent: null })) : componentIcons;
+  const term = query.trim().toLowerCase();
+  const visible = options.filter(item => (item.name.includes(term) || item.component.toLowerCase().includes(term)) && (variant === 'all' || item.name.endsWith('-fill') === (variant === 'filled')));
+  return <><div className="react-studio-stack">{version === '0.4.1' && <Segmented label="아이콘 유형" value={variant} onValueChange={setVariant} options={[{value:'all', label:'전체'}, {value:'outline', label:'Outline'}, {value:'filled', label:'Filled'}]} />}<div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: bookmark, cart, chart" /></div></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 이름이나 유형을 바꿔 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(({name, component, IconComponent}) => <li key={name}>{IconComponent ? <IconComponent size={16} /> : <Icon name={name as IconName} />}<span>{component || name}</span></li>)}</ul></>;
+}
+function IconsPage() {
+  const [version, setVersion] = React.useState<IconVersion>('0.4.1');
+  const versions: IconVersion[] = ['0.4.1', '0.4.2'];
+  const updateVersion = (value: string) => setVersion(value as IconVersion);
+  return <><IconDemos />
+    <Section title="아이콘 목록" description="패키지 버전을 선택하고 유형이나 이름으로 아이콘을 찾아보세요. 0.4.2는 출시 예정입니다.">
+      <Tabs label="아이콘 목록 패키지 버전" value={version} onValueChange={updateVersion} items={versions.map(value => ({ value, label: iconVersionLabels[value], content: value === version ? <><p className="react-studio-caption">{value === '0.4.1' ? '표시된 이름을 Icon의 name에 사용합니다.' : 'Outline 컴포넌트를 @idenflu/mono-react/icons에서 가져옵니다.'}</p><FoundationIcons version={value} /></> : null }))} />
+    </Section>
+    <Section title="React 사용 예시" description="선택한 패키지 버전의 사용 예시입니다.">
+      <Tabs label="사용 예시 패키지 버전" value={version} onValueChange={updateVersion} items={versions.map(value => ({ value, label: iconVersionLabels[value], content: value === version ? <CodeContent key={value} code={value === '0.4.1' ? snippets['foundations/icons'] : componentIconExample} /> : null }))} />
+    </Section>
+  </>;
 }
 function ComponentPage({ route }: { route:string }) {
   const Pattern = patternPages[route as keyof typeof patternPages];
@@ -245,7 +283,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'foundations/colors': return <ColorDemos />;
     case 'foundations/typography': return <TypographyDemos />;
     case 'foundations/sizes': return <SizeDemos />;
-    case 'foundations/icons': return <><IconDemos /><Section title="아이콘 목록" description="유형별로 살펴보거나 이름으로 검색하세요. 표시된 이름을 React Icon의 name에 그대로 사용합니다. Filled 이름에는 -fill이 붙습니다."><FoundationIcons /></Section></>;
+    case 'foundations/icons': return <IconsPage />;
     case 'foundations/states': return <StateDemos />;
     case 'components/buttons': return <ButtonDemos />;
     case 'components/text-fields': return <TextFields />;
@@ -286,7 +324,7 @@ function DocumentationApp() {
     <ComponentPage key={`page-${current.route}`} route={current.route} />
     {current.route === 'components/datetime-picker'
       ? <DateTimeUsageExamples />
-      : snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} complete={current.route in completeExamples} />}
+      : current.route !== 'foundations/icons' && snippets[current.route] && <CodeExample key={`code-${current.route}`} code={snippets[current.route]} complete={current.route in completeExamples} />}
   </DocumentShell>;
 }
 function App() {

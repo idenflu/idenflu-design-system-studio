@@ -6,6 +6,7 @@ import { build } from 'esbuild';
 import { documentStyles } from '../../../scripts/styles.mjs';
 import { createCompleteExamples } from './complete-examples.mjs';
 import { checkCompleteExamples } from './check-complete-examples.mjs';
+import { JSDOM } from 'jsdom';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const system = resolve(root, '../../systems/idenflu-mono');
@@ -19,6 +20,10 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
   await writeFile(resolve(metadata, 'navigation.json'), JSON.stringify(routes.map(item => item.route), null, 2));
   const icons = (await readdir(resolve(system, 'assets/icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
   await writeFile(resolve(metadata, 'icons.json'), JSON.stringify(icons, null, 2));
+  const sprite = new JSDOM(await readFile(resolve(system, 'assets/icons/icons.svg'), 'utf8'), { contentType: 'image/svg+xml' });
+  const spriteIcons = [...sprite.window.document.documentElement.children].map(symbol => symbol.getAttribute('id')).sort();
+  sprite.window.close();
+  await writeFile(resolve(metadata, 'sprite-icons.json'), JSON.stringify(spriteIcons, null, 2));
   const examples=await createCompleteExamples();
   checkCompleteExamples(examples);
   await writeFile(resolve(metadata, 'complete-examples.json'), JSON.stringify(examples, null, 2));

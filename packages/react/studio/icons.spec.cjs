@@ -50,3 +50,30 @@ test('theme controls use common sun and moon icons and preserve theme across rel
   await expect(page.locator('html')).toHaveAttribute('data-theme',changed);await verify(changed);
   await page.reload();await verify(changed);
 });
+
+test('version tabs synchronize the catalog and usage example', {tag:['@mobile','@theme']}, async ({page, context}) => {
+  await page.goto(url);
+  const catalog = page.getByRole('tablist', {name:'아이콘 목록 패키지 버전'});
+  const example = page.getByRole('tablist', {name:'사용 예시 패키지 버전'});
+  await expect(catalog.getByRole('tab', {name:'0.4.1'})).toHaveAttribute('aria-selected', 'true');
+  await catalog.getByRole('tab', {name:'0.4.2 예정'}).click();
+  await expect(example.getByRole('tab', {name:'0.4.2 예정'})).toHaveAttribute('aria-selected', 'true');
+  const search = page.getByRole('searchbox', {name:'아이콘 검색'});
+  await search.fill('trash');
+  await expect(page.locator('.react-studio-icons li')).toHaveText(['TrashIcon']);
+  await search.fill('calendar-clock');
+  await expect(page.locator('.react-studio-icons li')).toHaveText(['CalendarClockIcon']);
+  await search.fill('bookmark');
+  await expect(page.locator('.react-studio-icons li')).toHaveText(['BookmarkIcon']);
+  await expect(page.getByRole('group', {name:'아이콘 유형'})).toHaveCount(0);
+  await expect(page.locator('.react-studio-icons li svg')).toHaveCount(1);
+  const code = page.getByRole('region', {name:'React 사용 예시 코드'});
+  await expect(code).toContainText('@idenflu/mono-react/icons');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', {name:'코드 복사'}).click();
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toContain('BookmarkIcon');
+  await example.getByRole('tab', {name:'0.4.2 예정'}).press('ArrowLeft');
+  await expect(catalog.getByRole('tab', {name:'0.4.1'})).toHaveAttribute('aria-selected', 'true');
+  await expect(code).toContainText('<Icon name="save"');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
+});
