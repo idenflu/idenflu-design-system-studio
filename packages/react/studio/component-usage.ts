@@ -59,12 +59,14 @@ export function MenuExample() {
                       action === 'copy' ? '복사를 선택했습니다.' : ''}</p>
   </>;
 }`,
-  'components/drawer': `import { useId, useState } from 'react';
-import { Button, Drawer, TextField } from '@idenflu/mono-react';
+  'components/drawer': `import { useId, useRef, useState } from 'react';
+import { Button, Drawer, DrawerHeader, DrawerBody, DrawerFooter, Icon, TextField } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function DrawerExample() {
   const titleId = useId();
+  const formId = useId();
+  const nameRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('디자인 시스템');
   const [draft, setDraft] = useState(name);
@@ -74,21 +76,29 @@ export function DrawerExample() {
       setOpen(true);
     }}>상세 정보 열기</Button>
     <p role="status">저장한 이름: {name}</p>
-    <Drawer open={open} onOpenChange={setOpen} aria-labelledby={titleId}>
-      <h2 id={titleId}>프로젝트 설정</h2>
-      <form onSubmit={event => {
-        event.preventDefault();
-        if (!draft.trim()) return;
-        setName(draft.trim());
-        setOpen(false);
-      }} style={{ display: 'grid', gap: 24, marginTop: 24 }}>
-        <TextField label="프로젝트 이름" required value={draft}
-                   onChange={event => setDraft(event.target.value)} />
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button variant="outline" onClick={() => setOpen(false)}>취소</Button>
-          <Button type="submit" disabled={!draft.trim()}>저장</Button>
-        </div>
-      </form>
+    <Drawer side="right" size="md" variant="divided"
+            open={open} onOpenChange={setOpen}
+            initialFocusRef={nameRef} aria-labelledby={titleId}>
+      <DrawerHeader>
+        <h2 id={titleId}>프로젝트 설정</h2>
+        <Button variant="ghost" iconOnly aria-label="패널 닫기"
+                onClick={() => setOpen(false)}><Icon name="close" /></Button>
+      </DrawerHeader>
+      <DrawerBody>
+        <form id={formId} onSubmit={event => {
+          event.preventDefault();
+          if (!draft.trim()) return;
+          setName(draft.trim());
+          setOpen(false);
+        }}>
+          <TextField ref={nameRef} label="프로젝트 이름" required value={draft}
+                     onChange={event => setDraft(event.target.value)} />
+        </form>
+      </DrawerBody>
+      <DrawerFooter>
+        <Button variant="outline" onClick={() => setOpen(false)}>취소</Button>
+        <Button type="submit" form={formId} disabled={!draft.trim()}>저장</Button>
+      </DrawerFooter>
     </Drawer>
   </>;
 }`,

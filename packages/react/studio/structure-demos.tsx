@@ -1,6 +1,6 @@
 import { IconButtonDemos, PopupAlignDemos } from './convenience-api-demos';
 import * as React from 'react';
-import { Badge, Button, Checkbox, Chip, Drawer, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
+import { Badge, Button, Checkbox, Chip, DropdownMenu, Icon, Popover, Radio, Segmented, SelectableList, SelectableListItem, Spinner, Stepper, Switch, TextArea, TextField, Tree } from '../src';
 import { Section } from './demo-layout';
 import { ButtonDisabledDemos } from './button-disabled-demos';
 export { TableDemos } from './table-demos';
@@ -169,19 +169,4 @@ export function PopoverDemos() {
   </Popover></div><p role="status" className="component-helper">{message}</p></Section><PopupAlignDemos /></>;
 }
 
-export function DrawerDemos() {
-  const initial = {name:'디자인 시스템', note:'제품 전반의 일관된 경험을 위한 가이드입니다.'};
-  const [saved, setSaved] = React.useState(initial), [draft, setDraft] = React.useState(initial);
-  const [open, setOpen] = React.useState(false), [error, setError] = React.useState(''), [feedback, setFeedback] = React.useState('변경 사항이 없습니다.');
-  const nameRef = React.useRef<HTMLInputElement>(null);
-  return <Section title="사이드 패널" description="현재 화면을 유지하면서 프로젝트 설정을 수정합니다. 취소하면 마지막으로 저장한 값이 유지됩니다."><div className="react-studio-row"><Button variant="outline" onClick={() => { setDraft(saved); setError(''); setOpen(true); }}>상세 정보 열기</Button></div><p role="status" className="component-helper">{feedback}</p>
-    <Drawer open={open} onOpenChange={setOpen} aria-labelledby="studio-drawer-title" aria-describedby="studio-drawer-description">
-      <div className="drawer-head"><div><span className="drawer-kicker">PROJECT DETAILS</span><h2 id="studio-drawer-title">프로젝트 설정</h2></div><button className="icon-button" type="button" aria-label="패널 닫기" onClick={() => setOpen(false)}><Icon name="close" /></button></div><p id="studio-drawer-description">프로젝트의 기본 정보를 확인하고 수정하세요.</p>
-      <form className="react-studio-stack" noValidate onSubmit={event => { event.preventDefault(); const name = draft.name.trim(); if (!name) { setError('프로젝트 이름을 입력해주세요.'); nameRef.current?.focus(); return; } setSaved({name, note:draft.note}); setFeedback(`${name} 설정을 저장했습니다.`); setOpen(false); }}>
-        <TextField ref={nameRef} label="프로젝트 이름" required maxLength={60} value={draft.name} error={error || undefined} onChange={event => { setDraft({...draft,name:event.target.value}); setError(''); }} autoFocus />
-        <TextArea label="설명" rows={4} value={draft.note} onChange={event => setDraft({...draft,note:event.target.value})} />
-        <div className="drawer-actions" style={{marginTop:0}}><Button variant="outline" onClick={() => setOpen(false)}>취소</Button><Button type="submit">저장</Button></div>
-      </form>
-    </Drawer>
-  </Section>;
-}
+export { DrawerDemos } from './drawer-demos';

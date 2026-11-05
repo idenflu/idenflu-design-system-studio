@@ -255,3 +255,21 @@
   .data-grid .data-grid-table tbody .data-grid-pinned, .data-grid .data-grid-table tbody .data-grid-select-cell { position:static; }
   .data-grid .data-grid-table thead :is(.data-grid-pinned,.data-grid-select-cell) { inset-inline-start:auto !important; }
 }
+/* Modal drawers retain the legacy class while exposing edge and size options. */
+.dialog.drawer { --drawer-size:480px; inset:0 0 0 auto; width:min(var(--drawer-size), 100vw); max-width:100vw; height:100dvh; max-height:100dvh; min-width:0; margin:0; border:0; border-left:1px solid var(--border); border-radius:0; overscroll-behavior:contain; }
+.drawer[data-drawer-size="sm"] { --drawer-size:320px; }
+.drawer[data-drawer-size="lg"] { --drawer-size:640px; }
+.drawer[data-drawer-size="full"] { --drawer-size:100%; }
+.dialog.drawer[data-side="left"] { inset:0 auto 0 0; border-left:0; border-right:1px solid var(--border); }
+.dialog.drawer[data-side="top"], .dialog.drawer[data-side="bottom"] { width:100vw; height:min(var(--drawer-size), 100dvh); border-left:0; }
+.dialog.drawer[data-side="top"] { inset:0 0 auto; border-bottom:1px solid var(--border); }
+.dialog.drawer[data-side="bottom"] { inset:auto 0 0; border-top:1px solid var(--border); }
+.drawer[open] { animation:drawer-enter var(--motion-normal) var(--motion-easing); }
+.dialog.drawer.dialog--divided { padding:0; overflow:hidden; }
+.drawer.dialog--divided > :is(.dialog-header, .dialog-body, .dialog-footer) { min-width:0; }
+.drawer.dialog--divided > .dialog-header { padding-top:max(var(--space-5), env(safe-area-inset-top)); }
+.drawer.dialog--divided > .dialog-header h2 { overflow-wrap:anywhere; }
+.drawer.dialog--divided > .dialog-body form { margin-top:0; }
+.drawer.dialog--divided > .dialog-footer { padding-bottom:max(var(--space-4), env(safe-area-inset-bottom)); }
+@keyframes drawer-enter { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .drawer[open] { animation:none; } }

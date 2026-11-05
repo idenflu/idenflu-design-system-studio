@@ -8,10 +8,15 @@ export type { PopupAlign } from './popup-position';
 const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
-export type DialogProps = DismissibleProps & { closeOnBackdrop?: boolean; variant?: 'default' | 'divided' } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>;
+export type DialogProps = DismissibleProps & {
+  closeOnBackdrop?: boolean;
+  variant?: 'default' | 'divided';
+  /** Focus this descendant after the native modal opens. */
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
+} & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>;
 
 /** Native modal dialog with keyboard focus wrapping and restoration. */
-export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, variant = 'default', onClick, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
+export function Dialog({ open, onOpenChange, children, className = '', closeOnBackdrop = false, variant = 'default', initialFocusRef, onClick, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
   const ref = React.useRef<HTMLDialogElement>(null);
   const backdropPointerDown = React.useRef(false);
   useClientLayoutEffect(() => {
@@ -21,12 +26,14 @@ export function Dialog({ open, onOpenChange, children, className = '', closeOnBa
       const lock = lockDialogScroll(dialog.ownerDocument);
       try {
         if (!dialog.open) dialog.showModal();
+        const target = initialFocusRef?.current;
+        if (target && dialog.contains(target)) target.focus({preventScroll:true});
         lock.restorePosition();
       } catch (error) { lock.release(); throw error; }
       return lock.release;
     }
     else if (!open) { backdropPointerDown.current = false; if (dialog.open) dialog.close(); }
-  }, [open]);
+  }, [open, initialFocusRef]);
   const isTopLayer = useEscapeLayer(open, ref, () => onOpenChange(false));
   const isBackdrop = (event: React.MouseEvent<HTMLDialogElement> | React.PointerEvent<HTMLDialogElement>) => {
     if (event.target !== event.currentTarget) return false;
@@ -59,9 +66,31 @@ export const DialogFooter = React.forwardRef<HTMLElement, React.HTMLAttributes<H
   return <footer {...props} ref={ref} className={`dialog-footer${className ? ` ${className}` : ''}`} />;
 });
 
-export function Drawer({ className = '', closeOnBackdrop = true, ...props }: React.ComponentProps<typeof Dialog>) {
-  return <Dialog {...props} closeOnBackdrop={closeOnBackdrop} className={`demo-drawer ${className}`} />;
+export type DrawerSide = 'right' | 'left' | 'top' | 'bottom';
+export type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
+export type DrawerProps = DialogProps & {
+  /** Physical edge from which the panel opens. */
+  side?: DrawerSide;
+  /** Width for left/right, height for top/bottom. Numbers are pixels. */
+  size?: DrawerSize | number;
+};
+
+/** Edge-aligned modal. Use divided sections to keep actions outside the scroll area. */
+export function Drawer({ className = '', closeOnBackdrop = true, side = 'right', size = 'md', style, ...props }: DrawerProps) {
+  const customSize = typeof size === 'number' ? { '--drawer-size': `${size}px` } : undefined;
+  return <Dialog {...props} closeOnBackdrop={closeOnBackdrop} data-side={side} data-drawer-size={typeof size === 'number' ? undefined : size}
+    style={{ ...customSize, ...style }} className={`demo-drawer drawer${className ? ` ${className}` : ''}`} />;
 }
+
+export const DrawerHeader = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DrawerHeader({className = '', ...props}, ref) {
+  return <DialogHeader {...props} ref={ref} className={`drawer-header${className ? ` ${className}` : ''}`} />;
+});
+export const DrawerBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function DrawerBody({className = '', ...props}, ref) {
+  return <DialogBody {...props} ref={ref} className={`drawer-body${className ? ` ${className}` : ''}`} />;
+});
+export const DrawerFooter = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DrawerFooter({className = '', ...props}, ref) {
+  return <DialogFooter {...props} ref={ref} className={`drawer-footer${className ? ` ${className}` : ''}`} />;
+});
 
 /** Tooltip content is exposed as the trigger's accessible description. */
 export function Tooltip({ content, children }: { content: React.ReactNode; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {

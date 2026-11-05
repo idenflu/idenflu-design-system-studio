@@ -21,6 +21,26 @@ function fixture() {
 }
 const props = {onOpenChange() {}};
 
+test('initial focus targets only a modal descendant and does not repeat on content updates', async () => {
+  const f = fixture(), focusRef = React.createRef();
+  const outside = document.createElement('button'); document.body.append(outside);
+  const view = (open, text, target = focusRef) => h(Drawer, {...props, open, initialFocusRef:target},
+    h('button', {ref:focusRef}, '이름 편집'), h('button', {id:'other-focus'}, text));
+  try {
+    await f.render(view(false, '다음'));
+    outside.focus();
+    await f.render(view(true, '다음'));
+    assert.equal(document.activeElement, focusRef.current);
+    document.getElementById('other-focus').focus();
+    await f.render(view(true, '바뀐 내용'));
+    assert.equal(document.activeElement.id, 'other-focus');
+    await f.render(view(false, '다음'));
+    focusRef.current.focus();
+    await f.render(view(true, '다음', {current:outside}));
+    assert.notEqual(document.activeElement, outside);
+  } finally { await f.dispose(); outside.remove(); }
+});
+
 test('Dialog restores authored overflow styles and priorities without removing unrelated changes', async () => {
   const f = fixture(), root = document.documentElement, body = document.body;
   root.style.setProperty('overflow-x', 'clip');

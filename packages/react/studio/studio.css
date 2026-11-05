@@ -130,8 +130,13 @@
 .react-studio-processing-progress { display:grid; gap:var(--space-2); width:100%; min-width:0; font-variant-numeric:tabular-nums; }
 .react-studio-processing-progress > div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--space-2); font-size:var(--font-size-caption); color:var(--text-secondary); }
 .react-studio-processing-progress .progress-bar { width:100%; }
-.react-studio-section .demo-drawer form { display:grid; gap:var(--space-5); }
-.react-studio-section .demo-drawer .drawer-actions { margin-top:var(--space-3); }
+.studio-drawer-controls { display:grid; grid-template-columns:repeat(2,minmax(0,200px)) auto; align-items:end; justify-content:start; gap:var(--space-4); }
+.studio-drawer-form { display:grid; gap:var(--space-6); }
+.studio-drawer-options > div { padding-block:var(--space-4); border-bottom:1px solid var(--divider); }
+.studio-drawer-options > div:first-child { padding-top:0; }
+.studio-drawer-options .switch-setting { margin:0; }
+.studio-drawer-options p { margin-top:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); }
+@media (max-width:600px) { .studio-drawer-controls { grid-template-columns:minmax(0,1fr); } .studio-drawer-controls > .button { justify-self:start; } }
 .react-studio-section .simple-list, .react-studio-section .selectable-list, .react-studio-section .step-panel { margin-top:0; }
 .react-studio .docs-toc { max-width:1040px; }
 .react-studio-field-wide { grid-column:1 / -1; }

@@ -519,7 +519,7 @@ import { Icon, Select } from '@idenflu/mono-react';
 
 ## Dialog·Drawer
 
-`Dialog`는 `open`과 `onOpenChange`로 제어하며, 제목과 설명을 `aria-labelledby`·`aria-describedby`로 연결합니다. `closeOnBackdrop`은 배경 클릭으로 닫을지 정하며 기본값은 `false`입니다. Escape는 취소로 처리합니다.
+`Dialog`는 `open`과 `onOpenChange`로 제어하며, 제목과 설명을 `aria-labelledby`·`aria-describedby`로 연결합니다. `closeOnBackdrop`은 배경 클릭으로 닫을지 정하며 기본값은 `false`입니다. Escape는 취소로 처리합니다. `initialFocusRef`에 내부 요소의 ref를 전달하면 모달이 열린 직후 해당 요소에 포커스를 줍니다. 생략하면 브라우저의 기본 포커스를 사용하며, 이 속성은 Drawer에서도 사용할 수 있습니다.
 
 열려 있는 동안 문서 루트와 본문의 배경 스크롤을 잠그고, 기존 스크롤바의 공간을 유지해 가로 밀림을 방지합니다. 중첩 모달은 마지막 창이 닫힐 때 해제하며 닫기·언마운트 시 기존 인라인 스크롤 스타일과 원래 스크롤 위치를 복원합니다. `Drawer`와 처리 중 다이얼로그에도 동일하게 적용하고 모달 내부 스크롤은 유지합니다.
 
@@ -541,6 +541,33 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu
     <Button onClick={() => setOpen(false)}>확인</Button>
   </DialogFooter>
 </Dialog>
+```
+
+`Drawer`는 `Dialog`의 모달 동작과 속성을 공유하며 배경 클릭 닫기의 기본값은 `true`입니다. 기존 기본형은 본문 전체를 스크롤합니다. 고정된 헤더·하단이 필요하면 `variant="divided"`와 `DrawerHeader`·`DrawerBody`·`DrawerFooter`를 직접 자식으로 배치합니다. 본문의 기본 `tabIndex`는 `0`이며 각 구성 요소는 HTML 속성과 ref를 전달합니다. 기존 `DialogHeader`·`DialogBody`·`DialogFooter`도 함께 사용할 수 있습니다.
+
+| Drawer 속성 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `side` | `'right' \| 'left' \| 'top' \| 'bottom'` | `'right'` | 패널이 열리는 물리적 화면 가장자리 |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'full' \| number` | `'md'` | 좌우는 너비, 위아래는 높이. SM 320px·MD 480px·LG 640px·full 전체 화면. 숫자는 px |
+| `variant` | `'default' \| 'divided'` | `'default'` | 기본 본문 또는 고정 헤더·하단과 스크롤 본문 |
+| `closeOnBackdrop` | `boolean` | `true` | 배경 클릭 닫기. `false`여도 Escape로 닫을 수 있음 |
+| `initialFocusRef` | `React.RefObject<HTMLElement \| null>` | — | 열린 직후 포커스를 받을 내부 요소의 ref |
+
+크기는 화면 안으로 제한하며 `className`·`style`로 조정할 수 있습니다. `--drawer-size`는 패널 크기를 지정하는 CSS 변수입니다. 등장 효과는 움직임 줄이기 설정에서 생략합니다. 배경 닫기를 막아야 하는 편집·확인 흐름에는 `closeOnBackdrop={false}`를 사용하고, 명시적인 닫기 버튼을 제공합니다. 닫기 요청을 보류하려면 앱의 `onOpenChange`에서 미저장 변경이나 처리 상태를 확인합니다.
+
+```tsx
+import { Button, Drawer, DrawerHeader, DrawerBody, DrawerFooter, Icon } from '@idenflu/mono-react';
+
+<Drawer side="right" size="lg" variant="divided"
+        open={open} onOpenChange={setOpen} aria-labelledby="settings-title">
+  <DrawerHeader>
+    <h2 id="settings-title">프로젝트 설정</h2>
+    <Button variant="ghost" iconOnly aria-label="설정 닫기"
+            onClick={() => setOpen(false)}><Icon name="close" /></Button>
+  </DrawerHeader>
+  <DrawerBody><p>스크롤할 상세 내용을 배치합니다.</p></DrawerBody>
+  <DrawerFooter><Button onClick={() => setOpen(false)}>완료</Button></DrawerFooter>
+</Drawer>
 ```
 
 ## Alert

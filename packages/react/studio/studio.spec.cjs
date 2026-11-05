@@ -255,7 +255,7 @@ test('drawer validates, discards canceled changes, and restores saved settings',
   await expect(name).toHaveValue('디자인 시스템');
   await name.fill('  새 프로젝트  ');
   await dialog.getByRole('button', { name: '저장' }).click();
-  await expect(page.locator('.react-studio-demo').getByRole('status')).toHaveText('새 프로젝트 설정을 저장했습니다.');
+  await expect(page.locator('.react-studio-section').first().getByRole('status')).toHaveText('새 프로젝트 설정을 저장했습니다.');
   await trigger.click();
   await expect(name).toHaveValue('새 프로젝트');
   await page.keyboard.press('Escape');
