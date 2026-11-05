@@ -1,3 +1,10 @@
+[![Deploy GitHub Pages](https://github.com/idenflu/idenflu-design-system-studio/actions/workflows/pages.yml/badge.svg)](https://github.com/idenflu/idenflu-design-system-studio/actions/workflows/pages.yml)
+[![Design system quality](https://github.com/idenflu/idenflu-design-system-studio/actions/workflows/quality.yml/badge.svg)](https://github.com/idenflu/idenflu-design-system-studio/actions/workflows/quality.yml)
+[![Publish React package](https://github.com/idenflu/idenflu-design-system-studio/actions/workflows/publish-react.yml/badge.svg)](https://github.com/idenflu/idenflu-design-system-studio/actions/workflows/publish-react.yml)
+
+![GitHub package.json version](https://shields.io)
+
+
 # idenflu mono
 
 React 기반 디자인 시스템과 문서 스튜디오입니다. 컴포넌트는 `@idenflu/mono-react` 패키지로 제공합니다.
