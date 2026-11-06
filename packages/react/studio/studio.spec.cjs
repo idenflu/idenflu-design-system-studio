@@ -40,17 +40,17 @@ test('theme toggle updates color codes and persists across reload', {tag:'@theme
   const primary = page.locator('[data-color-token="--primary"] code');
   const control = page.locator('[data-color-token="--primary-control"] code');
   const danger = page.locator('[data-color-token="--danger"] code');
-  await expect(primary).toHaveText(initial === 'dark' ? '#9AAFFF' : '#4263CC');
+  await expect(primary).toHaveText(initial === 'dark' ? '#7FB3FD' : '#1062D3');
   await expect(page.locator('.react-studio-swatches code')).toHaveCount(11);
   await page.getByRole('button', { name: initial === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환' }).click();
   const expected = initial === 'dark' ? 'light' : 'dark';
   await expect(page.locator('html')).toHaveAttribute('data-theme', expected);
-  await expect(primary).toHaveText(expected === 'dark' ? '#9AAFFF' : '#4263CC');
-  await expect(control).toHaveText(expected === 'dark' ? '#4D64B8' : '#4263CC');
-  await expect(danger).toHaveText(expected === 'dark' ? '#F2A3A7' : '#C43D3D');
+  await expect(primary).toHaveText(expected === 'dark' ? '#7FB3FD' : '#1062D3');
+  await expect(control).toHaveText(expected === 'dark' ? '#336ABB' : '#1062D3');
+  await expect(danger).toHaveText(expected === 'dark' ? '#F2A3A7' : '#C1332F');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', expected);
-  await expect(primary).toHaveText(expected === 'dark' ? '#9AAFFF' : '#4263CC');
+  await expect(primary).toHaveText(expected === 'dark' ? '#7FB3FD' : '#1062D3');
 });
 
 test('topbar tooltips support keyboard focus and stay within the viewport', {tag:'@mobile'}, async ({ page }) => {

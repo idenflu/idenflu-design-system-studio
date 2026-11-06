@@ -135,9 +135,9 @@
     ["danger", "success", "warning", "info"].forEach((role) => {
       if (!overrides[`--${role}`]) return;
       put(`--${role}-surface`, mix(`--${role}`, 12, "var(--canvas)"));
-      put(`--toast-on-${role}`, readableColor(theme === "dark" ? "#151719" : "#ffffff", [overrides[`--${role}`]]));
+      put(`--toast-on-${role}`, readableColor(theme === "dark" ? "#111418" : "#ffffff", [overrides[`--${role}`]]));
       if (role === "danger") {
-        const canvas = overrides["--canvas"] || (theme === "dark" ? "#151719" : "#ffffff");
+        const canvas = overrides["--canvas"] || (theme === "dark" ? "#111418" : "#ffffff");
         const surface = blendColor(canvas, overrides["--danger"], 0.12);
         put("--danger-text", readableColor(overrides["--danger"], [canvas, surface]));
         // A filled danger button has its own background and text contract, independent of status text.
@@ -149,8 +149,8 @@
     });
     if (Object.keys(overrides).length) {
       const palette = theme === "dark"
-        ? { primary: "#9aafff", success: "#9acba6", warning: "#e2c27f", danger: "#f2a3a7", text: "#eceef2", canvas: "#151719", infoSurface: "#28314b", secondarySurface: "#343941" }
-        : { primary: "#4263cc", success: "#38754d", warning: "#8c641b", danger: "#ad3131", text: "#181c22", canvas: "#ffffff", infoSurface: "#edf0fb", secondarySurface: "#e1e4e9" };
+        ? { primary: "#7fb3fd", success: "#9acba6", warning: "#e2c27f", danger: "#f2a3a7", text: "#e8ebf0", canvas: "#111418", infoSurface: "#22334b", secondarySurface: "#2f363f" }
+        : { primary: "#1062d3", success: "#2a783c", warning: "#955e02", danger: "#aa2724", text: "#151b24", canvas: "#ffffff", infoSurface: "#eaf1fc", secondarySurface: "#e1e4e9" };
       const canvas = overrides["--canvas"] || palette.canvas;
       const text = overrides["--text"] || palette.text;
       // Selected chips use status/link accents, independently of filled button colors.

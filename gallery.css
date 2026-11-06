@@ -15,7 +15,7 @@
 .gallery-card { display:flex; flex-direction:column; min-width:0; border:1px solid var(--border-subtle); background:#fff; color:var(--text); transition:border-color 140ms ease,box-shadow 140ms ease; }
 .gallery-card:hover { border-color:#9ca5b3; box-shadow:0 6px 20px rgb(24 28 34 / 6%); }
 .gallery-card:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
-.gallery-preview { --gallery-ink:#252c38; --gallery-accent:#4263cc; --gallery-muted:#e4e7ed; position:relative; display:flex; flex-direction:column; height:232px; min-width:0; overflow:hidden; padding:24px 24px 0; background:#f1f3f6; }
+.gallery-preview { --gallery-ink:#252c38; --gallery-accent:#1062d3; --gallery-muted:#e4e7ed; position:relative; display:flex; flex-direction:column; height:232px; min-width:0; overflow:hidden; padding:24px 24px 0; background:#f1f3f6; }
 .gallery-preview-top { display:flex; align-items:center; justify-content:space-between; gap:8px; height:32px; flex:0 0 32px; padding:0 12px; border:1px solid #d9dce2; border-bottom:0; background:#fff; color:var(--gallery-ink); }
 .gallery-preview-brand { overflow:hidden; font-size:8px; line-height:12px; font-weight:700; letter-spacing:.25px; text-overflow:ellipsis; white-space:nowrap; }
 .gallery-preview-top::after { content:""; flex:0 0 30px; height:5px; background:var(--gallery-muted); }
@@ -31,7 +31,7 @@
 .gallery-preview-palette { display:flex; gap:5px; margin-top:8px; }
 .gallery-preview-palette > * { width:22px; height:22px; background:var(--gallery-ink); }
 .gallery-preview-palette > :nth-child(2) { background:var(--gallery-accent); }
-.gallery-preview-palette > :nth-child(3) { background:#c6c6cc; }
+.gallery-preview-palette > :nth-child(3) { background:#c3c9d2; }
 .gallery-preview-palette > :nth-child(4) { background:#edf0f4; }
 .gallery-preview-chip { display:inline-flex; align-items:center; justify-content:center; min-height:18px; padding:2px 9px; background:var(--gallery-accent); color:#fff; font-size:7px; line-height:10px; }
 .gallery-card-info { display:flex; flex:1 1 auto; flex-direction:column; min-width:0; padding:24px; }

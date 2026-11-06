@@ -405,8 +405,8 @@ test('solid toast foregrounds remain readable after status color overrides and r
 });
 const chipProperty = role => `--chip-${role}-selected-text`;
 const chipThemeDefaults = {
-  light: {primary:'#4263cc',success:'#38754d',warning:'#8c641b',danger:'#ad3131',neutral:'#edf0fb',secondary:'#e1e4e9'},
-  dark: {primary:'#9aafff',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#28314b',secondary:'#343941'},
+  light: {primary:'#1062d3',success:'#2a783c',warning:'#955e02',danger:'#aa2724',neutral:'#eaf1fc',secondary:'#e1e4e9'},
+  dark: {primary:'#7fb3fd',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#22334b',secondary:'#2f363f'},
 };
 function assertReadableChips(app, theme, customAccent) {
   for (const role of chipRoles) {
