@@ -90,7 +90,7 @@
 .text-area:hover:not(:disabled):not([readonly]):not(:focus):not([aria-invalid="true"]) { border-color: var(--border-control-hover); }
 .text-area:focus { outline: none; border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .badge { --icon-size:var(--badge-icon-size); border-radius:var(--radius-control); display:inline-flex; align-items:center; gap:var(--badge-gap); height:var(--badge-height); min-height:var(--badge-height); padding:0 var(--badge-padding-inline); background:var(--surface-hover); color:var(--text-secondary); font-size:var(--badge-font-size); line-height:var(--badge-line-height); font-weight:var(--font-weight-medium); white-space:nowrap; }
-.badge--primary { background: var(--info-surface); color: var(--info); }
+.badge--primary { background: var(--badge-primary-background); color: var(--badge-primary-text); }
 .badge--success { background: var(--success-surface); color: var(--success); }
 .badge--warning { background: var(--warning-surface); color: var(--warning); }
 .badge--danger { background: var(--danger-surface); color:var(--danger-text); }
@@ -125,7 +125,7 @@
 .data-table tfoot th { color: var(--text-secondary); font-weight:var(--font-weight-medium); }
 .data-table[data-interactive] tbody tr { cursor: pointer; }
 .data-table[data-interactive] tbody tr:where(:hover, :has(:focus-visible)) { background:var(--surface); }
-.data-table tbody tr[data-selected="true"] { background:var(--info-surface); }
+.data-table tbody tr[data-selected="true"] { background:var(--selected-surface); }
 .data-table tbody tr[data-selected="true"] > :first-child { box-shadow: inset 2px 0 var(--primary); }
 .data-table .choice { min-height: var(--line-height-body); }
 .data-table .choice-input { top: calc((var(--line-height-body) - var(--choice-size)) / 2); }

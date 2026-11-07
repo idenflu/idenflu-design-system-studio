@@ -32,6 +32,9 @@
     --success-surface:Canvas;
     --warning-surface:Canvas;
     --info-surface:Canvas;
+    --selected-surface:Canvas;
+    --badge-primary-background:Canvas;
+    --badge-primary-text:CanvasText;
     --border:CanvasText;
     --border-hover:CanvasText;
     --border-control:CanvasText;

@@ -17,7 +17,9 @@
   --color-neutral-300: #c6c6c6;
   --color-neutral-350: #bcbcbc;
   --color-neutral-400: #b3b3b3;
+  --color-neutral-425: #a6a6a6;
   --color-neutral-450: #999999;
+  --color-neutral-475: #949494;
   --color-neutral-500: #888888;
   --color-neutral-525: #808080;
   --color-neutral-550: #737373;
@@ -37,6 +39,7 @@
   --color-neutral-900: #141414;
   --color-blue-50: #eaf1fc;
   --color-blue-100: #e0ebfc;
+  --color-blue-150: #d2e2fa;
   --color-blue-200: #b3cef4;
   --color-blue-250: #9bc4fd;
   --color-blue-300: #7fb3fd;
@@ -51,7 +54,9 @@
   --color-blue-700: #3c74c6;
   --color-blue-750: #255aa6;
   --color-blue-800: #2e5083;
+  --color-blue-825: #2a4468;
   --color-blue-850: #22334b;
+  --color-blue-875: #1f2b3e;
   --color-red-50: #f5e4e2;
   --color-red-100: #edbfb9;
   --color-red-200: #efb2b6;
@@ -125,6 +130,10 @@
   --warning-surface: var(--color-amber-50);
   --info: var(--color-blue-500);
   --info-surface: var(--color-blue-50);
+  /* Selected rows and items sit one step above info-surface so primary badges stay visible on them. */
+  --selected-surface: var(--color-blue-100);
+  --badge-primary-background: var(--color-blue-150);
+  --badge-primary-text: var(--color-blue-600);
   --inverse-canvas: var(--color-ink);
   --inverse-text: var(--color-white);
   --badge-solid-neutral-background: var(--color-neutral-550);
@@ -209,8 +218,8 @@
   --focus-on-danger: var(--color-red-200);
   --focus-on-danger-control: var(--color-red-200);
   --text: var(--color-neutral-100);
-  --text-secondary: var(--color-neutral-400);
-  --text-muted: var(--color-neutral-450);
+  --text-secondary: var(--color-neutral-425);
+  --text-muted: var(--color-neutral-475);
   --border: var(--color-neutral-725);
   --border-hover: var(--color-border-hover-dark);
   --border-subtle: var(--color-neutral-750);
@@ -231,6 +240,9 @@
   --warning-surface: var(--color-amber-900);
   --info: var(--color-blue-300);
   --info-surface: var(--color-blue-850);
+  --selected-surface: var(--color-blue-875);
+  --badge-primary-background: var(--color-blue-825);
+  --badge-primary-text: var(--color-blue-250);
   --inverse-canvas: var(--color-neutral-100);
   --inverse-text: var(--color-neutral-900);
   --badge-solid-neutral-background: var(--color-neutral-450);

@@ -15,6 +15,8 @@
 
 - 기본 테마 색상을 NOVA 로고 블루(`#1062D3`)에 맞춰 조정. 중립색을 같은 청회색 계열로 통일하고 Success·Warning·Danger 채도를 보정하며, 다크 Control Primary는 `#336ABB`로 설정
 - 화면 조정의 기본값·내보내기, 갤러리 미리보기와 스튜디오 가이드의 색상 값을 새 기본 테마에 맞춤
+- 선택 행 배경을 `--selected-surface`로 분리하고 Primary 배지에 `--badge-primary-background`·`--badge-primary-text`를 추가. 선택한 행 위에서도 `진행 중` 같은 Primary 배지가 구분됨
+- 다크 테마의 보조 글자(`--text-secondary` `#A6A6A6`)와 흐린 글자(`--text-muted` `#949494`)를 한 단계 낮춰 본문과의 위계를 분리. 모든 배경에서 4.5:1 이상 유지
 
 ### 호환성
 

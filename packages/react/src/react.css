@@ -223,7 +223,7 @@
 .data-grid .data-grid-pinned { border-inline-end:1px solid var(--divider); }
 .data-grid .data-grid-table thead th:is(.data-grid-pinned,.data-grid-select-cell) { top:0; z-index:5; background:var(--surface); }
 .data-grid .data-grid-filter-row > td:is(.data-grid-pinned,.data-grid-select-cell) { top:var(--data-grid-header-height); z-index:4; background:var(--surface); }
-.data-grid .data-grid-table tbody tr[data-selected="true"] > td { background:var(--info-surface); }
+.data-grid .data-grid-table tbody tr[data-selected="true"] > td { background:var(--selected-surface); }
 .data-grid-scroll:not([data-scrolling]) .data-grid-table tbody tr:hover:not([data-selected="true"]) > td:not(.data-grid-state-cell) { background:var(--surface-hover); }
 .data-grid-scroll[data-scrolling] .data-grid-table tbody tr:hover:not([data-selected="true"]) { background:transparent; }
 .data-grid-cell-content { display:flex; align-items:center; justify-content:inherit; gap:var(--space-2); min-width:0; }

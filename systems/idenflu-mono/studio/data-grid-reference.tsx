@@ -426,7 +426,7 @@ const filters: DataGridFilters = {
           ['--field-background / --surface', '그리드·본문·고정 셀의 배경 / 헤더·필터 행의 배경입니다.'],
           ['--border / --divider / --radius-control', '바깥 테두리·행과 헤더 경계 / 고정 열과 선택 도구 구분선 / 모서리 반경입니다.'],
           ['--text / --text-secondary / --text-muted', '기본 글자 / 보조 안내와 편집 아이콘 / 숫자 필터 구분선 등의 색입니다.'],
-          ['--info-surface / --surface-hover', '선택 행 / 선택하지 않은 행의 hover 배경입니다. 고정 셀까지 같은 배경을 적용합니다.'],
+          ['--selected-surface / --surface-hover', '선택 행 / 선택하지 않은 행의 hover 배경입니다. 고정 셀까지 같은 배경을 적용합니다.'],
           ['--primary / --focus-on-light / --danger-text', '활성 정렬·너비 핸들 / 키보드 포커스 / 편집 검증 오류의 색입니다.'],
           ['--font-size-body / --line-height-body / --font-size-caption', '기본 글자 크기·줄 높이와 보조 안내·편집 오류의 글자 크기입니다.'],
           ['--space-1 ~ --space-4 / --space-8', '도구 간격, 툴바·푸터·필터·선택 셀의 여백, 빈 상태 안내의 여백에 사용합니다.'],

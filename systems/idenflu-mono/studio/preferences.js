@@ -107,6 +107,7 @@
       put("--primary-pressed", mix("--primary", 70, "var(--text)"));
       put("--focus-on-light", "var(--primary)");
       put("--selection-background", mix("--primary", 20, "var(--canvas)"));
+      put("--selected-surface", mix("--primary", 14, "var(--canvas)"));
     }
     const buttonColors = (token, background, foregroundToken, focusToken) => {
       const foreground = contrastRatio("#ffffff", background) >= contrastRatio("#000000", background) ? "#ffffff" : "#000000";
@@ -136,6 +137,10 @@
     ["danger", "success", "warning", "info"].forEach((role) => {
       if (!overrides[`--${role}`]) return;
       put(`--${role}-surface`, mix(`--${role}`, 12, "var(--canvas)"));
+      if (role === "info") {
+        put("--badge-primary-background", mix("--info", 22, "var(--canvas)"));
+        put("--badge-primary-text", "var(--info)");
+      }
       put(`--toast-on-${role}`, readableColor(theme === "dark" ? "#141414" : "#ffffff", [overrides[`--${role}`]]));
       if (role === "danger") {
         const canvas = overrides["--canvas"] || defaultCanvas;
