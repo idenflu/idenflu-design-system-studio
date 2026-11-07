@@ -158,11 +158,11 @@
 .button-group .button:last-child { border-right: 0; }
 .button-group .button:focus-visible { box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .custom-select { position: relative; min-width: 0; }
-.select-trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; height: var(--control-height); padding: 0 var(--control-px); border: 1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); font: inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); text-align: left; }
+.select-trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; height: var(--control-height); padding: 0 var(--control-px); border: 1px solid var(--border-control); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); font: inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); text-align: left; }
 .select-trigger > [data-select-label] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .select-trigger > .ui-icon { color: var(--text-secondary); }
 .select-trigger, .multi-inline-control { transition: border-color var(--motion-fast) var(--motion-easing); }
-.custom-select:not(.is-open):not(.is-invalid) > .select-trigger:hover:not(:disabled):not([aria-disabled="true"]):not(:focus-visible):not([aria-invalid="true"]) { border-color: var(--border-hover); }
+.custom-select:not(.is-open):not(.is-invalid) > .select-trigger:hover:not(:disabled):not([aria-disabled="true"]):not(:focus-visible):not([aria-invalid="true"]) { border-color: var(--border-control-hover); }
 .select-trigger:focus-visible, .custom-select.is-open > .select-trigger { outline: none; border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .select-trigger:disabled { background: var(--surface); color: var(--disabled-text); cursor: not-allowed; }
 .select-trigger:disabled .ui-icon { color: var(--disabled-text); }
@@ -187,8 +187,8 @@
 .multi-selection-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-3); }
 .multi-selected { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .multi-clear { color: var(--text-secondary); }
-.multi-inline-control { border-radius:var(--radius-control); position: relative; display: flex; align-items: center; min-height: var(--control-height); border: 1px solid var(--border); background:var(--field-background); }
-.custom-select:not(.is-open):not(.is-invalid) > .multi-inline-control:hover:not(:focus-within):not([aria-invalid="true"]):not(:has(:disabled, [aria-disabled="true"], [aria-invalid="true"])) { border-color: var(--border-hover); }
+.multi-inline-control { border-radius:var(--radius-control); position: relative; display: flex; align-items: center; min-height: var(--control-height); border: 1px solid var(--border-control); background:var(--field-background); }
+.custom-select:not(.is-open):not(.is-invalid) > .multi-inline-control:hover:not(:focus-within):not([aria-invalid="true"]):not(:has(:disabled, [aria-disabled="true"], [aria-invalid="true"])) { border-color: var(--border-control-hover); }
 .multi-inline-control:focus-within, .custom-select.is-open > .multi-inline-control { border-color: transparent; }
 .multi-inline-control:focus-within::after, .custom-select.is-open > .multi-inline-control::after { content: ""; position: absolute; inset: -1px; z-index: var(--z-focus); box-shadow: inset 0 0 0 2px var(--focus-on-light); pointer-events: none; }
 .multi-inline-tags { display: flex; flex: 1 1 auto; flex-wrap: wrap; align-items: center; gap: var(--space-1); min-width: 0; min-height: calc(var(--control-height) - 2px); padding: var(--multi-tag-padding-y) calc(var(--space-unit) * 1.5); }
@@ -205,8 +205,8 @@
 .field-horizontal { grid-template-columns:minmax(0, 1fr); gap:var(--space-2); }
 .field-horizontal__label { padding-top:0; }
 }
-.input-group { position: relative; display: flex; align-items: stretch; min-width: 0; height: var(--control-height); border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--field-background); transition: border-color var(--motion-fast) var(--motion-easing); }
-.input-group:hover:not(:focus-within):not(.is-invalid):not(:has(input:disabled, input[readonly], input[aria-invalid="true"])) { border-color: var(--border-hover); }
+.input-group { position: relative; display: flex; align-items: stretch; min-width: 0; height: var(--control-height); border: 1px solid var(--border-control); border-radius: var(--radius-control); background: var(--field-background); transition: border-color var(--motion-fast) var(--motion-easing); }
+.input-group:hover:not(:focus-within):not(.is-invalid):not(:has(input:disabled, input[readonly], input[aria-invalid="true"])) { border-color: var(--border-control-hover); }
 .input-group:focus-within { border-color: transparent; box-shadow: none; }
 .input-group:focus-within::after { content: ""; position: absolute; inset: -1px; z-index: var(--z-focus); box-shadow: inset 0 0 0 2px var(--focus-on-light); pointer-events: none; }
 .input-group input { flex: 1 1 auto; width: 100%; min-width: 0; height: 100%; padding: calc((var(--control-height) - var(--line-height-control) - 2px) / 2) var(--control-px); border: 0; outline: none; background: transparent; color: var(--text); font-size:var(--font-size-body); line-height:var(--line-height-control); }
@@ -229,6 +229,10 @@
 .input-group:has(input:disabled) { background: var(--surface); }
 .input-group:has(input:disabled) :is(input, .input-prefix, .input-suffix, .input-status) { color: var(--disabled-text); }
 .input-group input:disabled { cursor: not-allowed; }
+:is(.text-input, .text-area, .select-input, .select-trigger):disabled,
+.choice-input:disabled + :is(.choice-mark, .radio-mark),
+:is(.input-group, .search-select-control, .multi-search-field, .date-field, .date-range-fields, .number-field):has(input:disabled),
+.multi-inline-control:has(.multi-inline-trigger:disabled) { border-color:var(--border-subtle); }
 .component-helper.is-error { color:var(--danger-text); }
 :is(.text-input, .search-select-input)[type="search"]::-webkit-search-cancel-button, :is(.text-input, .number-field-input)[type="number"]::-webkit-inner-spin-button { appearance: none; }
 :is(.text-input, .number-field-input)[type="number"] { appearance: textfield; }

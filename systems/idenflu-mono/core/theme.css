@@ -34,6 +34,8 @@
     --info-surface:Canvas;
     --border:CanvasText;
     --border-hover:CanvasText;
+    --border-control:CanvasText;
+    --border-control-hover:CanvasText;
     --border-subtle:CanvasText;
     --divider:CanvasText;
     --disabled:Canvas;

@@ -41,7 +41,7 @@ test('theme toggle updates color codes and persists across reload', {tag:'@theme
   const control = page.locator('[data-color-token="--primary-control"] code');
   const danger = page.locator('[data-color-token="--danger"] code');
   await expect(primary).toHaveText(initial === 'dark' ? '#7FB3FD' : '#1062D3');
-  await expect(page.locator('.react-studio-swatches code')).toHaveCount(11);
+  for (const token of ['--surface-raised','--border-control']) await expect(page.locator(`[data-color-token="${token}"] code`)).toHaveText(/^#[0-9A-F]{6}$/);
   await page.getByRole('button', { name: initial === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환' }).click();
   const expected = initial === 'dark' ? 'light' : 'dark';
   await expect(page.locator('html')).toHaveAttribute('data-theme', expected);

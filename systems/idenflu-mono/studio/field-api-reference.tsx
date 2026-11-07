@@ -23,7 +23,7 @@ const sharedStyles:readonly Row[]=[
   ['size / className','지원 속성','md / undefined','크기는 size, 배치와 필요한 스타일 조정은 className을 먼저 사용합니다.'],
   ['--control-height / --control-px / --icon-size','공유 크기 토큰','현재 크기 토큰','입력 높이·좌우 여백·아이콘 크기입니다. 개별 height를 덮어쓰기보다 sm·md·lg를 함께 맞추세요.'],
   ['--field-background / --surface / --info-surface','공유 색상 토큰','현재 테마','입력·보조 영역·선택 항목의 배경입니다. data-theme="dark"에서도 같은 토큰을 사용합니다.'],
-  ['--border / --border-hover / --focus-on-light / --radius-control','공유 경계 토큰','현재 테마·크기','기본·호버·포커스와 모서리를 표현합니다. 포커스 표시와 오류 문구는 유지하세요.'],
+  ['--border-control / --border-control-hover / --focus-on-light / --radius-control','입력 경계 토큰','현재 테마·크기','입력창의 기본·호버·포커스와 모서리를 표현합니다. 카드·구분선에는 --border / --divider를 사용합니다.'],
 ];
 
 export function SelectAPIReference() {return <>

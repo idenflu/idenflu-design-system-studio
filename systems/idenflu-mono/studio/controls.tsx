@@ -124,7 +124,7 @@ export function StudioSettings() {
             <Segmented label="색상을 조정할 테마" size="sm" value={palette.theme} options={[{value:'light',label:'라이트'},{value:'dark',label:'다크'}]} onValueChange={value => selectTheme(value === 'dark' ? 'dark' : 'light')} />
           </div>
           {palette.forcedColors ? <p className="studio-preferences-hint">고대비 모드에서는 시스템 색상을 사용합니다. 색상 조정은 고대비 모드를 해제한 뒤 사용할 수 있습니다.</p> : <>
-          <p id="studio-color-format" className="studio-preferences-hint">선택한 테마의 색상 또는 HEX를 수정하세요. 버튼 색상은 읽기 쉬운 대비로 자동 보정됩니다.</p>
+          <p id="studio-color-format" className="studio-preferences-hint">기본색은 중립 회색, 주요 동작과 선택은 블루를 사용합니다. 버튼 글자의 대비는 자동 보정되며, 입력창도 Border 설정을 따릅니다.</p>
           <div id="studio-color-contrast" className="studio-preferences-contrast" role="status" aria-live="polite" aria-atomic="true">
             {palette.warnings.length > 0 && <><p>일부 글자색의 대비가 권장 기준 4.5:1보다 낮습니다.</p><ul>{palette.warnings.map(({label,ratio}) => <li key={label}>{label}: {ratio.toFixed(2)}:1</li>)}</ul><p>글자색이나 배경색을 조정해주세요.</p></>}
           </div>

@@ -104,17 +104,17 @@
 .slide-content p { margin-top:var(--space-2); color:var(--text-secondary); }
 .slide-actions { display:flex; gap:var(--space-2); margin-top:var(--space-6); }
 .date-picker { position:relative; }
-.date-field { border-radius:var(--radius-control); position:relative; display:flex; align-items:center; height:var(--control-height); border:1px solid var(--border); background:var(--field-background); }
+.date-field { border-radius:var(--radius-control); position:relative; display:flex; align-items:center; height:var(--control-height); border:1px solid var(--border-control); background:var(--field-background); }
 .date-field.has-error { border-color:var(--danger); }
-.date-text { display:block; min-width:0; width:100%; height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--border); background:var(--field-background); color:var(--text); font:inherit; line-height:var(--line-height-control); font-variant-numeric:tabular-nums; }
+.date-text { display:block; min-width:0; width:100%; height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--border-control); background:var(--field-background); color:var(--text); font:inherit; line-height:var(--line-height-control); font-variant-numeric:tabular-nums; }
 .date-text::placeholder { color:var(--text-muted); opacity:1; }
 .date-text:focus { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .date-text[aria-invalid="true"] { border-color:var(--danger); }
 .date-field .date-text { flex:1; height:100%; border:0; background:transparent; }
 .date-field .date-text:focus { box-shadow:none; }
-.date-range-fields { border-radius:var(--radius-control); position:relative; display:grid; grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr) calc(var(--control-height) - 2px); align-items:center; height:var(--control-height); border:1px solid var(--border); background:var(--field-background); }
+.date-range-fields { border-radius:var(--radius-control); position:relative; display:grid; grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr) calc(var(--control-height) - 2px); align-items:center; height:var(--control-height); border:1px solid var(--border-control); background:var(--field-background); }
 .date-field, .date-range-fields { transition:border-color var(--motion-fast) var(--motion-easing); }
-.date-field:hover:not(:focus-within):not(.has-error):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])), .date-range-fields:hover:not(:focus-within):not(.has-error):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])) { border-color:var(--border-hover); }
+.date-field:hover:not(:focus-within):not(.has-error):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])), .date-range-fields:hover:not(:focus-within):not(.has-error):not(:has(input:disabled,input[readonly],input[aria-invalid="true"])) { border-color:var(--border-control-hover); }
 .date-range-fields.has-error { border-color:var(--danger); }
 .date-range-fields .date-range-input { height:100%; padding-inline:var(--space-1); border:0; background:transparent; text-align:center; }
 .date-range-fields .date-range-input:focus { box-shadow:none; }

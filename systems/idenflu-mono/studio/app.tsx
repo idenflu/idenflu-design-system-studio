@@ -79,7 +79,7 @@ export function TypographyExample() {
                helperText="팀원이 알아보기 쉬운 이름을 입력해주세요." />
   </>;
 }`,
-  'foundations/colors': `import { Alert, Badge, Button } from '@idenflu/mono-react';
+  'foundations/colors': `import { Alert, Badge, Button, TextField } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function ColorExample() {
@@ -89,7 +89,8 @@ export function ColorExample() {
     <Badge variant="warning">검토 필요</Badge>
     <Alert variant="success"><strong>저장 완료</strong><p>변경사항이 적용되었습니다.</p></Alert>
     <div style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}>
-      프로젝트 설정
+      <h3>프로젝트 설정</h3>
+      <TextField label="프로젝트 이름" defaultValue="idenflu mono" />
     </div>
   </>;
 }`,

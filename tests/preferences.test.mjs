@@ -404,9 +404,23 @@ test('solid toast foregrounds remain readable after status color overrides and r
   for (const role of ['info','success','warning','danger']) assert.equal(app.styles.has(`--toast-on-${role}`), false);
 });
 const chipProperty = role => `--chip-${role}-selected-text`;
+test('custom border settings keep soft field aliases and reset every derived rule', () => {
+  for (const theme of ['light','dark']) {
+    const app = engine(); app.theme(theme);
+    const border = theme === 'dark' ? '#606060' : '#cccccc';
+    app.api.set({colors:{[theme]:{'--border':border}}});
+    assert.equal(app.styles.get('--border'),border);
+    assert.equal(app.styles.get('--border-hover'),'color-mix(in srgb, var(--border) 75%, var(--text))');
+    assert(!app.styles.has('--border-control'),'the CSS alias follows the chosen border without a stronger override');
+    assert(app.api.cssText().includes(`--border: ${border};`));
+    const restored=engine({stored:app.storage.get(storageKey)}); restored.theme(theme);
+    assert.equal(restored.styles.get('--border'),border);
+    app.api.reset(); assert(!app.styles.has('--border')); assert(!app.styles.has('--border-hover'));
+  }
+});
 const chipThemeDefaults = {
-  light: {primary:'#1062d3',success:'#2a783c',warning:'#955e02',danger:'#aa2724',neutral:'#eaf1fc',secondary:'#e1e4e9'},
-  dark: {primary:'#7fb3fd',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#22334b',secondary:'#2f363f'},
+  light: {primary:'#1062d3',success:'#2a783c',warning:'#955e02',danger:'#aa2724',neutral:'#eaf1fc',secondary:'#e4e4e4'},
+  dark: {primary:'#7fb3fd',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#22334b',secondary:'#333333'},
 };
 function assertReadableChips(app, theme, customAccent) {
   for (const role of chipRoles) {

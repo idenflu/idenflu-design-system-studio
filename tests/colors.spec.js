@@ -301,3 +301,39 @@ test('danger text consumers and inverse spinners retain contrast after a bright 
     }
   }
 });
+
+test('neutral themes keep readable text, soft field boundaries and blue focus at every viewport', {tag:'@mobile'}, async ({page}) => {
+  for (const theme of ['light','dark']) {
+    await selectTheme(page, theme === 'light' ? '라이트' : '다크');
+    await page.getByRole('button',{name:'화면 조정 닫기',exact:true}).click();
+    const sample = await page.evaluate(() => {
+      const probe=document.createElement('span'); document.body.append(probe);
+      const resolve=name=>{probe.style.color=`var(${name})`; return getComputedStyle(probe).color;};
+      const tokens=Object.fromEntries(['--canvas','--surface','--surface-raised','--surface-hover','--surface-pressed','--text','--text-secondary','--text-muted','--border','--border-control','--border-control-hover','--border-subtle','--divider','--disabled','--disabled-text','--switch-off','--focus-on-light'].map(name=>[name,resolve(name)]));
+      const input=document.querySelector('.react-studio-color-surface .text-input');
+      const result={tokens,card:getComputedStyle(input.closest('.react-studio-color-surface')).borderTopColor};
+      probe.remove();return result;
+    });
+    for (const [name,color] of Object.entries(sample.tokens)) {
+      if(name==='--focus-on-light') continue;
+      const channels=color.match(/[\d.]+/g).slice(0,3).map(Number);
+      expect(new Set(channels).size,`${theme} ${name} stays neutral`).toBe(1);
+    }
+    for(const background of ['--canvas','--surface','--surface-raised']) {
+      for(const foreground of ['--text','--text-secondary','--text-muted']) expect(measuredRgbContrast(sample.tokens[foreground],sample.tokens[background]),`${theme} ${foreground}/${background}`).toBeGreaterThanOrEqual(4.5);
+      expect(measuredRgbContrast(sample.tokens['--border-control-hover'],sample.tokens[background])).toBeGreaterThan(measuredRgbContrast(sample.tokens['--border-control'],sample.tokens[background]));
+    }
+    expect(sample.card).toBe(sample.tokens['--border']);
+    expect(sample.card).toBe(sample.tokens['--border-control']);
+    const input=page.locator('.react-studio-color-surface .text-input');
+    await expect(input).toHaveCSS('border-top-color',sample.tokens['--border-control']);
+    if(!test.info().project.use.isMobile) {
+      await input.hover();
+      await expect(input).toHaveCSS('border-top-color',sample.tokens['--border-control-hover']);
+    }
+    await input.focus();
+    await expect(input).toHaveCSS('box-shadow',/inset/);
+    expect(await input.evaluate(node=>getComputedStyle(node).boxShadow)).toContain(sample.tokens['--focus-on-light']);
+    if(theme==='light') await openSettings(page);
+  }
+});
