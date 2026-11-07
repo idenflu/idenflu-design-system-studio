@@ -8,9 +8,10 @@ import { watchStudio } from '../scripts/dev.mjs';
 
 async function fixture() {
   const root = await mkdtemp(resolve(tmpdir(), 'idenflu-dev-'));
-  for (const folder of ['packages/react/src', 'packages/react/studio/dist', 'packages/react/scripts', 'systems/idenflu-mono/docs-dist', 'systems/idenflu-mono/assets', 'scripts']) await mkdir(resolve(root, folder), {recursive:true});
+  for (const folder of ['packages/react/src', 'packages/react/scripts', 'systems/idenflu-mono/core/assets', 'systems/idenflu-mono/studio/dist', 'systems/idenflu-mono/studio/assets', 'systems/idenflu-mono/docs-dist', 'systems/idenflu-mono/assets', 'scripts']) await mkdir(resolve(root, folder), {recursive:true});
   await writeFile(resolve(root, 'packages/react/src/example.tsx'), 'initial');
-  await writeFile(resolve(root, 'systems/idenflu-mono/components.css'), 'initial css');
+  await writeFile(resolve(root, 'systems/idenflu-mono/core/components.css'), 'initial css');
+  await writeFile(resolve(root, 'systems/idenflu-mono/studio/app.tsx'), 'initial studio');
   return root;
 }
 async function until(check) {
@@ -41,27 +42,36 @@ test('development source edits rebuild the document without watching generated o
   const fake = fakeWatch();
   const watcher = watchStudio({root, debounce:20, watchFactory:fake.watchFactory, onError:error => errors.push(error), rebuild:async () => {
     const app = await readFile(resolve(root, 'packages/react/src/example.tsx'), 'utf8');
-    const css = await readFile(resolve(root, 'systems/idenflu-mono/components.css'), 'utf8');
-    const icon = await readFile(resolve(root, 'systems/idenflu-mono/assets/new.svg'), 'utf8').catch(() => '');
-    await writeFile(resolve(root, 'packages/react/studio/dist/routes.json'), '{}');
+    const css = await readFile(resolve(root, 'systems/idenflu-mono/core/components.css'), 'utf8');
+    const icon = await readFile(resolve(root, 'systems/idenflu-mono/core/assets/new.svg'), 'utf8').catch(() => '');
+    const studio = await readFile(resolve(root, 'systems/idenflu-mono/studio/app.tsx'), 'utf8');
+    const logo = await readFile(resolve(root, 'systems/idenflu-mono/studio/assets/logo.svg'), 'utf8').catch(() => '');
+    await writeFile(resolve(root, 'systems/idenflu-mono/studio/dist/routes.json'), '{}');
     await writeFile(resolve(root, 'systems/idenflu-mono/docs-dist/app.js'), app);
-    builds.push({app,css,icon});
+    builds.push({app,css,icon,studio,logo});
   }});
   try {
     await watcher.build();
     await writeFile(resolve(root, 'packages/react/src/example.tsx'), 'updated');
     fake.change(root, 'packages/react/src/example.tsx');
     await until(() => builds.some(item => item.app === 'updated'));
-    await writeFile(resolve(root, 'systems/idenflu-mono/components.css'), 'updated css');
-    fake.change(root, 'systems/idenflu-mono/components.css');
+    await writeFile(resolve(root, 'systems/idenflu-mono/core/components.css'), 'updated css');
+    fake.change(root, 'systems/idenflu-mono/core/components.css');
     await until(() => builds.some(item => item.css === 'updated css'));
-    await writeFile(resolve(root, 'systems/idenflu-mono/assets/new.svg'), '<svg/>');
-    fake.change(root, 'systems/idenflu-mono/assets/new.svg');
+    await writeFile(resolve(root, 'systems/idenflu-mono/core/assets/new.svg'), '<svg/>');
+    fake.change(root, 'systems/idenflu-mono/core/assets/new.svg');
     await until(() => builds.some(item => item.icon === '<svg/>'));
+    await writeFile(resolve(root, 'systems/idenflu-mono/studio/app.tsx'), 'updated studio');
+    fake.change(root, 'systems/idenflu-mono/studio/app.tsx');
+    await until(() => builds.some(item => item.studio === 'updated studio'));
+    await writeFile(resolve(root, 'systems/idenflu-mono/studio/assets/logo.svg'), '<svg>studio</svg>');
+    fake.change(root, 'systems/idenflu-mono/studio/assets/logo.svg');
+    await until(() => builds.some(item => item.logo === '<svg>studio</svg>'));
     const count = builds.length;
-    await writeFile(resolve(root, 'packages/react/studio/example.spec.cjs'), 'test only');
-    fake.change(root, 'packages/react/studio/example.spec.cjs');
-    fake.change(root, 'packages/react/studio/dist/routes.json');
+    await writeFile(resolve(root, 'systems/idenflu-mono/studio/example.spec.cjs'), 'test only');
+    fake.change(root, 'systems/idenflu-mono/studio/example.spec.cjs');
+    fake.change(root, 'systems/idenflu-mono/studio/dist/routes.json');
+    fake.change(root, 'systems/idenflu-mono/assets/new.svg');
     fake.change(root, 'systems/idenflu-mono/docs-dist/app.js');
     await delay(100);
     assert.equal(builds.length, count, 'generated assets and test files must not cause rebuild loops');

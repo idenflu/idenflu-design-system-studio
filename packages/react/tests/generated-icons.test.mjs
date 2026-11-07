@@ -8,7 +8,7 @@ import { build } from 'esbuild';
 import * as icons from '../dist/icons/index.js';
 import { generateIcons } from '../scripts/generate-icons.mjs';
 
-const sprite = await readFile(new URL('../../../systems/idenflu-mono/assets/icons/icons.svg', import.meta.url), 'utf8');
+const sprite = await readFile(new URL('../../../systems/idenflu-mono/core/assets/icons/icons.svg', import.meta.url), 'utf8');
 const parse = text => new JSDOM(text, { contentType: 'image/svg+xml' }).window.document;
 const nameOf = id => id.split('-').map(part => part[0].toUpperCase() + part.slice(1)).join('') + 'Icon';
 

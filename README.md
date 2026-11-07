@@ -51,8 +51,11 @@ npm run dev
 ## 파일 구성
 
 - `packages/react/src/`: 재사용 React 컴포넌트와 스타일
-- `packages/react/studio/`: 문서 셸·샘플·화면 조정 UI
-- `systems/idenflu-mono/`: React 문서 진입점·공유 스타일·에셋·초기 설정 엔진
+- `systems/idenflu-mono/core/`: 공유 CSS·선택적 초기화·폰트·아이콘 원본
+- `systems/idenflu-mono/studio/`: 문서 셸·샘플·화면 조정 UI·문서 스타일·브라우저 검사
+- `systems/idenflu-mono/index.html`: 정식 React 문서 진입점
+- `systems/idenflu-mono/docs-dist/`, `systems/idenflu-mono/assets/`: 빌드로 생성하는 문서 번들과 공개 에셋
+- `packages/react/studio/index.html`: 이전 주소의 리다이렉트
 - `scripts/`, `tests/`: 개발·검사·빌드 도구와 회귀 검사
 - `docs/`: 사용·참조·개발·QA·리서치·전환 문서
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 
-const source = await readFile(new URL('../systems/idenflu-mono/preferences.js', import.meta.url), 'utf8');
+const source = await readFile(new URL('../systems/idenflu-mono/studio/preferences.js', import.meta.url), 'utf8');
 const storageKey = 'idenflu-mono-preferences-v1';
 const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0, fontFamily: 'pretendard' };
 const custom = { fontSize: 16, lineHeight: 26, spacing: 125, controlHeight: 44, radius: 6, fontFamily: 'pretendard' };

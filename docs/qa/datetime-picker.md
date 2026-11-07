@@ -11,7 +11,7 @@
 - 좁은 화면의 팝업 위치·내부 스크롤·확인 버튼 접근, 마우스 스크롤바 조작 중 팝업 유지
 - 문서 사용 예시의 값 바인딩·FormData·UTC 변환과 표시 코드의 타입 검사
 
-단위 검사는 [일시 선택기 계약](../../packages/react/tests/datetime-picker.test.mjs)에 있습니다. 실제 브라우저의 팝업·포커스·스크롤 검사는 [일시 선택기](../../packages/react/studio/datetime-picker.spec.cjs), [스크롤바](../../packages/react/studio/datetime-scrollbar.spec.cjs), [사용 예시](../../packages/react/studio/datetime-usage.spec.cjs)에서 확인합니다.
+단위 검사는 [일시 선택기 계약](../../packages/react/tests/datetime-picker.test.mjs)에 있습니다. 실제 브라우저의 팝업·포커스·스크롤 검사는 [일시 선택기](../../systems/idenflu-mono/studio/datetime-picker.spec.cjs), [스크롤바](../../systems/idenflu-mono/studio/datetime-scrollbar.spec.cjs), [사용 예시](../../systems/idenflu-mono/studio/datetime-usage.spec.cjs)에서 확인합니다.
 
 ## 재현 방법
 
@@ -19,10 +19,10 @@
 
 ```sh
 npm --prefix packages/react run build
-node packages/react/scripts/build-studio.mjs
+npm --prefix packages/react run studio:build
 node --test packages/react/tests/datetime-picker.test.mjs
 npx playwright install chromium
-npx playwright test --config packages/react/studio/playwright.config.cjs datetime-picker.spec.cjs datetime-scrollbar.spec.cjs datetime-usage.spec.cjs --workers=2
+npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs datetime-picker.spec.cjs datetime-scrollbar.spec.cjs datetime-usage.spec.cjs --workers=2
 ```
 
 브라우저 검사는 로컬 개발 서버를 자동으로 실행합니다. `@theme`·`@mobile` 태그에 따라 해당 환경이 필요한 회귀만 추가 실행하며, 마우스 스크롤바 검사는 데스크톱에서 실행합니다. 전체 검사 방법과 환경 선택 기준은 [검사 안내](../development/testing.md)를 따릅니다.

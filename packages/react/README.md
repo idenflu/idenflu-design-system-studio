@@ -48,7 +48,7 @@ import '@idenflu/mono-react/reset.css'; // 선택 사항: 앱 전체에 적용
 import '@idenflu/mono-react/styles.css';
 ```
 
-CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용합니다. 문서 스튜디오의 레이아웃과 예시 CSS는 패키지에 포함하지 않습니다.
+CSS 변수만 필요한 경우에는 `@idenflu/mono-react/tokens.css`를 사용합니다. 문서 스튜디오의 레이아웃과 예시 CSS, 워크스페이스 로고 등 샘플 에셋은 패키지에 포함하지 않습니다. 패키지 에셋은 `systems/idenflu-mono/core/assets/`의 폰트·아이콘과 해당 라이선스만 복사합니다.
 
 스타일의 색상·크기는 `--font-size-base`, `--line-height-base`, `--space-unit`, `--control-base-height`, `--radius-control` CSS 변수로 조정할 수 있습니다. 다크 테마는 문서 루트에 `data-theme="dark"`를 설정합니다.
 

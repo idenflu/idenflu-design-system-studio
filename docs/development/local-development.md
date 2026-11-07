@@ -38,14 +38,23 @@ npm run example:build
 
 - `systems/idenflu-mono/index.html`: 정식 React 진입점
 - `packages/react/src/`: 재사용 React 컴포넌트와 스타일
-- `packages/react/studio/`: 문서 셸, 페이지 샘플과 화면 조정 UI
-- `packages/react/studio/routes.json`: 문서 메타데이터와 메뉴 순서
+- `systems/idenflu-mono/core/*.css`: 공유 토큰·컴포넌트 스타일과 선택적 전역 초기화 `reset.css`
+- `systems/idenflu-mono/core/assets/`: 공유 폰트·아이콘·출처·라이선스 원본
+- `systems/idenflu-mono/studio/`: 문서 셸, 페이지 샘플·화면 조정 UI·브라우저 검사
+- `systems/idenflu-mono/studio/routes.json`: 문서 메타데이터와 메뉴 순서
+- `systems/idenflu-mono/studio/styles/`: 문서 전용 레이아웃·예시 CSS
+- `systems/idenflu-mono/studio/assets/`: 워크스페이스 로고 등 문서 샘플 에셋 원본
+- `systems/idenflu-mono/studio/theme.js`, `preferences.js`: 초기 테마·설정 적용
+- `systems/idenflu-mono/studio/tsconfig.json`, `playwright.config.cjs`: 문서 타입·브라우저 검사 설정
 - `packages/react/scripts/build-studio.mjs`: 문서와 공유 스타일 번들
 - `systems/idenflu-mono/docs-dist/`: 생성되는 로컬 문서 번들, Git 제외
-- `systems/idenflu-mono/*.css`, `assets/`: 공유 토큰·컴포넌트 스타일·폰트·아이콘
-- `systems/idenflu-mono/reset.css`: 선택적 전역 초기화, `studio-layout.css`: 문서 전용 레이아웃
+- `systems/idenflu-mono/assets/`: `core/assets/`와 `studio/assets/`를 합친 공개 에셋, 빌드 생성·Git 제외
+- `packages/react/studio/index.html`: 이전 주소의 리다이렉트
 - `scripts/styles.mjs`: 패키지·문서 스타일 입력 목록
-- `systems/idenflu-mono/theme.js`, `preferences.js`: 초기 테마·설정 적용
 - `scripts/`: 개발 서버·검사·배포 빌드
+
+원본은 `core/`와 `studio/`에서 수정하고 생성된 `docs-dist/`·`assets/`는 직접 수정하지 않습니다. 패키지 빌드는 `core/assets/`만 복사하므로 스튜디오 샘플 에셋이 소비 앱에 포함되지 않습니다. 공개 문서 주소와 `/systems/idenflu-mono/assets/` 경로는 유지합니다.
+
+스튜디오의 컴포넌트 import는 공개 `@idenflu/mono-react` 경로를 사용합니다. 공개 API가 아닌 내부 공유 helper의 개발용 참조만 명시적 소스 경로를 사용합니다. `npm --prefix packages/react run studio:build`와 `studio:check`는 이동한 스튜디오 소스를 계속 빌드·검사합니다.
 
 기존 HTML 문서와 독립 바닐라 런타임·어댑터는 제거했습니다. React 진입점의 최소 HTML과 React에서 사용하는 공유 스타일·에셋·초기 설정 엔진을 유지합니다.

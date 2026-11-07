@@ -4,7 +4,7 @@
 
 ## 제공 범위
 
-Overview 1개, Foundations 5개, 컴포넌트 29개 분류와 Patterns의 Layout·Form 8개·데이터 상태·빈 상태를 포함한 총 46개 문서입니다. 목록과 메뉴 순서는 [routes.json](../../packages/react/studio/routes.json)을 기준으로 합니다.
+Overview 1개, Foundations 5개, 컴포넌트 29개 분류와 Patterns의 Layout·Form 8개·데이터 상태·빈 상태를 포함한 총 46개 문서입니다. 목록과 메뉴 순서는 [routes.json](../../systems/idenflu-mono/studio/routes.json)을 기준으로 합니다.
 
 Layout 개요에서는 사이드바 워크스페이스 샘플을 별도 화면으로 열 수 있습니다. 샘플에는 트리·카테고리 메뉴, 동적 탭, 프로젝트·멤버·역할 관리와 설정 화면이 있습니다. 독립 Page 예시는 제공하지 않습니다. 폼 검증·초기화·파일 선택·로딩·재시도와 워크스페이스의 데이터는 로컬 예시이며 실제 데이터 조회·서버 저장·파일 전송·예약은 앱에서 연결합니다.
 

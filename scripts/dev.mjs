@@ -36,9 +36,10 @@ export function watchStudio({ root = project, rebuild, onError = console.error, 
   function close() { closed = true; clearTimeout(timer); for (const watcher of watchers) watcher.close(); }
   const inputs = [
     ['packages/react/src', true],
-    ['packages/react/studio', true],
     ['packages/react/scripts', true],
-    ['systems/idenflu-mono', true],
+    ['systems/idenflu-mono/core', true],
+    ['systems/idenflu-mono/studio', true],
+    ['systems/idenflu-mono', false, new Set(['index.html'])],
     ['packages/react', false, new Set(['package.json', 'package-lock.json'])],
     ['scripts', false, new Set(['styles.mjs'])],
   ];

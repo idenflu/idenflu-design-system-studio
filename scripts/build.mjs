@@ -23,7 +23,7 @@ export async function build(destination = resolve(project, 'dist')) {
   await mkdir(output, { recursive: true });
   await cp(resolve(project, 'LICENSE'), resolve(destination, 'LICENSE'));
   async function bundle(names, extension, prefix) {
-    const chunks = await Promise.all(names.map(async (name) => `/* ${name} */\n${await readFile(resolve(source, name), 'utf8')}`));
+    const chunks = await Promise.all(names.map(async (name) => `/* ${name} */\n${await readFile(resolve(source, 'studio', name), 'utf8')}`));
     const text = chunks.join(extension === 'js' ? '\n;\n' : '\n');
     const file = `${prefix}.${digest(text)}.${extension}`;
     await writeFile(resolve(output, file), text);
@@ -35,13 +35,12 @@ export async function build(destination = resolve(project, 'dist')) {
   };
   const studio = await buildStudio(resolve(output, 'docs-dist'), { hashed: true });
   Object.assign(files, { docsStyles: `docs-dist/${studio.docs}`, docsComponents: `docs-dist/${studio.components}`, docs: `docs-dist/${studio.app}` });
-  const document = html.replace('./theme.js', `./${files.theme}`)
-    .replace('./preferences.js', `./${files.preferences}`)
+  const document = html.replace('./studio/theme.js', `./${files.theme}`)
+    .replace('./studio/preferences.js', `./${files.preferences}`)
     .replace('./docs-dist/components.css', `./${files.docsComponents}`)
     .replace('./docs-dist/docs.css', `./${files.docsStyles}`)
     .replace('./docs-dist/app.js', `./${files.docs}`);
   await writeFile(resolve(output, 'index.html'), document);
-  await cp(resolve(source, 'assets'), resolve(output, 'assets'), { recursive: true });
   for (const file of ['index.html', 'gallery.css', 'gallery-entry.js', 'gallery-assets']) await cp(resolve(project, file), resolve(destination, file), { recursive: true });
   await mkdir(resolve(destination, 'packages/react/studio'), { recursive: true });
   await cp(resolve(project, 'packages/react/studio/index.html'), resolve(destination, 'packages/react/studio/index.html'));

@@ -12,6 +12,8 @@ npm run build
 
 `npm run build`는 React 패키지를 빌드한 뒤 `dist/`에 갤러리와 정식 모노 문서를 생성합니다. 폴더 전체를 정적 호스팅에 배포합니다. React 문서·CSS·테마·설정은 내용 기반 해시를 사용하며 `dist/systems/idenflu-mono/manifest.json`에서 파일명을 확인합니다. 폰트·아이콘과 라이선스도 함께 복사합니다. 이전 React 미리보기 주소의 리다이렉트도 배포물에 포함합니다.
 
+공유 스타일·에셋 원본은 `systems/idenflu-mono/core/`, 문서 코드·스타일·샘플 에셋 원본은 `systems/idenflu-mono/studio/`에 있습니다. 문서 빌드는 `core/assets/`와 `studio/assets/`를 합쳐 생성된 공개 `systems/idenflu-mono/assets/` 경로로 제공합니다. 로컬 `docs-dist/`와 공개 `assets/`는 Git에서 제외하며 원본을 수정한 뒤 다시 빌드합니다.
+
 이전 manifest의 `files.runtime`과 `files.styles`는 제거했으며, 문서용 스타일은 `files.docsComponents`와 `files.docsStyles`를 사용합니다. 앱에서 재사용할 때는 React 패키지를 설치합니다.
 
 ## GitHub Pages 배포
@@ -53,7 +55,9 @@ git switch dev
 npm pack ./packages/react --dry-run
 ```
 
-빌드 결과에 ESM·CommonJS, TypeScript 선언, `styles.css`·`tokens.css`·`reset.css`와 참조하는 에셋 및 에셋 라이선스가 포함됩니다. 배포 전에 개발 브랜치에서 패키지 버전을 올리고 변경을 `main`에 반영한 뒤, [Publish React package 워크플로](../../.github/workflows/publish-react.yml)에서 `main`을 선택해 수동 실행합니다. `dev`에서는 게시 작업을 실행하지 않습니다. 해당 워크플로는 저장소의 `GITHUB_TOKEN`으로 GitHub Packages에 게시하며 저장소의 Packages 쓰기 권한이 필요합니다.
+빌드 결과에 ESM·CommonJS, TypeScript 선언, `styles.css`·`tokens.css`·`reset.css`, 개별 React 아이콘과 참조하는 에셋 및 에셋 라이선스가 포함됩니다. 공개 `@idenflu/mono-react`와 이 패키지의 `styles.css`·`tokens.css`·`reset.css`·`icons`·`assets/*` 하위 경로는 유지합니다. 에셋은 `core/assets/`만 복사하며 스튜디오 전용 CSS·워크스페이스 로고 등 샘플 에셋은 포함하지 않습니다.
+
+배포 전에 개발 브랜치에서 패키지 버전을 올리고 변경을 `main`에 반영한 뒤, [Publish React package 워크플로](../../.github/workflows/publish-react.yml)에서 `main`을 선택해 수동 실행합니다. `dev`에서는 게시 작업을 실행하지 않습니다. 해당 워크플로는 저장소의 `GITHUB_TOKEN`으로 GitHub Packages에 게시하며 저장소의 Packages 쓰기 권한이 필요합니다.
 
 게시 워크플로는 `packages/react/package.json`의 버전에 해당하는 `## 0.5.0` 형식의 제목이 CHANGELOG에 정확히 하나 있고, 그 아래에 실제 목록 항목이 하나 이상 있는지 게시 전에 검사합니다. 날짜는 게시 후 실제 KST 날짜로 기록하므로 검사에서 필수로 요구하지 않습니다. 로컬에서는 `npm run check:changelog`로 같은 검사를 실행할 수 있습니다. 이 검사는 항목의 유무만 확인하므로 내용의 정확성과 충분성은 별도로 검토해야 합니다.
 

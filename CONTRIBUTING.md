@@ -2,9 +2,11 @@
 
 ## 변경 전
 
-유사 컴포넌트와 `tokens.css`의 의미 토큰을 먼저 확인합니다. 색·높이·간격을 신규 파일에 중복 정의하지 않습니다. primitive 색상 → semantic 역할 → component 변수 순서를 사용하고 기존 공개 변수명을 유지합니다.
+유사 컴포넌트와 `systems/idenflu-mono/core/tokens.css`의 의미 토큰을 먼저 확인합니다. 색·높이·간격을 신규 파일에 중복 정의하지 않습니다. primitive 색상 → semantic 역할 → component 변수 순서를 사용하고 기존 공개 변수명을 유지합니다.
 
-React 컴포넌트는 `packages/react/src/`, 문서 예시는 `packages/react/studio/`에서 변경합니다. 문서 경로·메뉴 순서는 `routes.json`에서 관리합니다. 컴포넌트 동작은 React 상태와 콜백으로 구현합니다. 문서 id를 필수로 참조하거나 데모 데이터·서버 요청을 공통 컴포넌트에 넣지 않습니다. 이벤트·타이머·observer는 React effect의 cleanup에서 정리합니다.
+React 컴포넌트는 `packages/react/src/`, 문서 예시는 `systems/idenflu-mono/studio/`에서 변경합니다. 문서 경로·메뉴 순서는 같은 폴더의 `routes.json`에서 관리합니다. 공유 CSS·폰트·아이콘 원본은 `systems/idenflu-mono/core/`, 문서 전용 CSS·샘플 에셋은 스튜디오 폴더의 `styles/`·`assets/`에서 변경합니다. 생성된 `systems/idenflu-mono/docs-dist/`·`systems/idenflu-mono/assets/`는 직접 수정하지 않습니다.
+
+스튜디오는 컴포넌트를 공개 `@idenflu/mono-react` 경로로 가져옵니다. 공개 API가 아닌 내부 공유 helper의 개발용 참조만 명시적 소스 경로를 사용합니다. 컴포넌트 동작은 React 상태와 콜백으로 구현합니다. 문서 id를 필수로 참조하거나 데모 데이터·서버 요청을 공통 컴포넌트에 넣지 않습니다. 이벤트·타이머·observer는 React effect의 cleanup에서 정리합니다.
 
 ## 리뷰와 검증
 

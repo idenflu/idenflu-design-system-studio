@@ -1,6 +1,6 @@
-import { readFile, readdir, mkdir, writeFile, rm } from 'node:fs/promises';
+import { readFile, readdir, mkdir, writeFile, rm, cp } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { documentStyles } from '../../../scripts/styles.mjs';
@@ -10,26 +10,56 @@ import { JSDOM } from 'jsdom';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const system = resolve(root, '../../systems/idenflu-mono');
+const core = resolve(system, 'core');
+const studio = resolve(system, 'studio');
+
+async function buildAssets(destination) {
+  // Site URLs stay stable while package and documentation assets have separate owners.
+  for (const source of [resolve(core, 'assets'), resolve(studio, 'assets')]) {
+    const overlap = relative(source, destination);
+    if (!overlap || (!overlap.startsWith('..') && !overlap.startsWith('/'))) throw new Error('Asset output overlaps source assets');
+    const parentOverlap = relative(destination, source);
+    if (!parentOverlap || (!parentOverlap.startsWith('..') && !parentOverlap.startsWith('/'))) throw new Error('Asset output contains source assets');
+  }
+  await rm(destination, { recursive: true, force: true });
+  async function merge(source, output) {
+    await mkdir(output, { recursive: true });
+    for (const entry of await readdir(source, { withFileTypes: true })) {
+      const from = resolve(source, entry.name), to = resolve(output, entry.name);
+      if (entry.isDirectory()) await merge(from, to);
+      else await cp(from, to, { force: false, errorOnExist: true });
+    }
+  }
+  for (const source of [resolve(core, 'assets'), resolve(studio, 'assets')]) {
+    await merge(source, destination);
+  }
+}
 
 export async function buildStudio(destination = resolve(system, 'docs-dist'), { hashed = false } = {}) {
-  const metadata = resolve(root, 'studio/dist');
-  const routes = JSON.parse(await readFile(resolve(root, 'studio/routes.json'), 'utf8'));
+  const metadata = resolve(studio, 'dist');
+  const routes = JSON.parse(await readFile(resolve(studio, 'routes.json'), 'utf8'));
   if (routes[0]?.route !== 'overview' || new Set(routes.map(item => item.route)).size !== routes.length) throw new Error('문서 경로 목록을 확인해주세요.');
   await mkdir(metadata, { recursive: true });
   await writeFile(resolve(metadata, 'routes.json'), JSON.stringify(routes, null, 2));
   await writeFile(resolve(metadata, 'navigation.json'), JSON.stringify(routes.map(item => item.route), null, 2));
-  const icons = (await readdir(resolve(system, 'assets/icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
+  const icons = (await readdir(resolve(core, 'assets/icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
   await writeFile(resolve(metadata, 'icons.json'), JSON.stringify(icons, null, 2));
-  const sprite = new JSDOM(await readFile(resolve(system, 'assets/icons/icons.svg'), 'utf8'), { contentType: 'image/svg+xml' });
+  const sprite = new JSDOM(await readFile(resolve(core, 'assets/icons/icons.svg'), 'utf8'), { contentType: 'image/svg+xml' });
   const spriteIcons = [...sprite.window.document.documentElement.children].map(symbol => symbol.getAttribute('id')).sort();
   sprite.window.close();
   await writeFile(resolve(metadata, 'sprite-icons.json'), JSON.stringify(spriteIcons, null, 2));
   const examples=await createCompleteExamples();
   checkCompleteExamples(examples);
   await writeFile(resolve(metadata, 'complete-examples.json'), JSON.stringify(examples, null, 2));
-  const result = await build({ entryPoints: [resolve(root, 'studio/app.tsx')], outfile: 'app.js', bundle: true, write: false, format: 'esm', target: 'es2020', minify: hashed });
-  const components = ((await readFile(resolve(system, 'reset.css'), 'utf8')) + '\n' + (await readFile(resolve(root, 'dist/styles.css'), 'utf8'))).replaceAll('./assets/', '../assets/');
-  const docs = (await Promise.all(documentStyles.map(name => readFile(resolve(system, name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(root, 'studio/studio.css'), 'utf8');
+  const result = await build({
+    entryPoints: [resolve(studio, 'app.tsx')], outfile: 'app.js', bundle: true, write: false,
+    format: 'esm', target: 'es2020', minify: hashed,
+    nodePaths: [resolve(root, 'node_modules')],
+    // Share private helpers (including the Escape layer stack) with the documentation shell.
+    alias: { '@idenflu/mono-react': resolve(root, 'src/index.ts'), '@idenflu/mono-react/icons': resolve(root, 'src/icons/index.ts') },
+  });
+  const components = ((await readFile(resolve(core, 'reset.css'), 'utf8')) + '\n' + (await readFile(resolve(root, 'dist/styles.css'), 'utf8'))).replaceAll('./assets/', '../assets/');
+  const docs = (await Promise.all(documentStyles.map(name => readFile(resolve(studio, 'styles', name), 'utf8')))).join('\n') + '\n' + await readFile(resolve(studio, 'styles/studio.css'), 'utf8');
   const packageNotices = await readFile(resolve(root, 'dist/THIRD_PARTY_NOTICES.txt'), 'utf8');
   // React is external in the npm package but bundled into the documentation app.
   const documentNotices = await Promise.all(['react', 'react-dom', 'scheduler'].map(async name => {
@@ -49,6 +79,7 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
     await writeFile(resolve(destination, files[name]), content);
   }
   for (const file of ['app.js', 'app.js.map']) await rm(resolve(metadata, file), { force: true });
+  await buildAssets(resolve(destination, '../assets'));
   return files;
 }
 

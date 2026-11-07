@@ -9,7 +9,7 @@
 | 설정 값·저장·복원·색상 파생과 결정적 빌드 | [루트 Node 검사](../../tests/) |
 | 컴포넌트 값·이벤트·폼 초기화·다중 인스턴스·정리 | [React 단위 검사](../../packages/react/tests/) |
 | 전체 경로·제목·넘침·배포본·리다이렉트·소비 앱 CSS 격리 | [기본 브라우저 검사](../../tests/browser.spec.js), [CSS 격리 검사](../../tests/css-isolation.spec.js) |
-| 실제 포커스·키보드·팝업 배치·네이티브 모달·스크롤·반응형 | [Studio 브라우저 검사](../../packages/react/studio/) |
+| 실제 포커스·키보드·팝업 배치·네이티브 모달·스크롤·반응형 | [Studio 브라우저 검사](../../systems/idenflu-mono/studio/) |
 | 일시 입력·범위 단계·시간 목록·시간대 사용 예시 | [Datetime picker 검증 안내](datetime-picker.md) |
 
 동작 검사는 기본 라이트 환경에서 실행하고 색상·대비 회귀는 `@theme`, 반응형·터치·팝업·포커스·스크롤 회귀는 `@mobile`로 추가 환경을 선택합니다. 모바일 전용 회귀에는 `@mobile-only`를 함께 지정합니다. 테스트 안에서 양쪽 테마를 직접 확인하는 경우 같은 검사를 다크 환경에서 반복하지 않습니다.

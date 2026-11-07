@@ -53,7 +53,7 @@
     "test": "npm run build && node --test tests/*.test.mjs",
     "example:build": "npm run build && esbuild examples/app.tsx --bundle --format=esm --outfile=examples/dist/app.js",
     "studio:build": "npm run build && node scripts/build-studio.mjs",
-    "studio:check": "tsc -p tsconfig.studio.json --noEmit"
+    "studio:check": "tsc -p ../../systems/idenflu-mono/studio/tsconfig.json --noEmit"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",

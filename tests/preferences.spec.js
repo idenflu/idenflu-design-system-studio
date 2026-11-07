@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const documents = require('../packages/react/studio/routes.json');
+const documents = require('../systems/idenflu-mono/studio/routes.json');
 
 const storageKey = 'idenflu-mono-preferences-v1';
 const defaults = { fontSize: 14, lineHeight: 22, spacing: 100, controlHeight: 36, radius: 0, fontFamily: 'pretendard' };

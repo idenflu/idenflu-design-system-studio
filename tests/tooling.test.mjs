@@ -34,6 +34,9 @@ test('distribution is deterministic and contains React documentation and license
     assert.equal((await readFile(resolve(target, 'assets/fonts/wanted-sans/WantedSansVariable.woff2'))).subarray(0, 4).toString(), 'wOF2');
     assert(styles.includes('Wanted Sans Variable') && styles.includes('../assets/fonts/wanted-sans/WantedSansVariable.woff2'));
     assert((await readFile(resolve(target, 'assets/icons/idenflu/SOURCE.md'), 'utf8')).length > 0);
+    assert.equal(await readFile(resolve(target, 'assets/nova-workspace.svg'), 'utf8'), await readFile(resolve(project, 'systems/idenflu-mono/studio/assets/nova-workspace.svg'), 'utf8'));
+    assert.equal(await readFile(resolve(target, 'assets/icons/icons.svg'), 'utf8'), await readFile(resolve(project, 'systems/idenflu-mono/core/assets/icons/icons.svg'), 'utf8'));
+    await assert.rejects(access(resolve(project, 'packages/react/dist/assets/nova-workspace.svg')), {code:'ENOENT'});
     const notices = await readFile(resolve(target, 'docs-dist/THIRD_PARTY_NOTICES.txt'), 'utf8');
     assert(notices.includes('@tanstack/react-virtual') && notices.includes('@tanstack/virtual-core'));
     assert(notices.includes('MIT License') && notices.includes('Tanner Linsley'));

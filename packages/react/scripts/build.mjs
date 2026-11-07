@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { componentStyles } from '../../../scripts/styles.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const source = resolve(root, '../../systems/idenflu-mono');
+const source = resolve(root, '../../systems/idenflu-mono/core');
 const output = resolve(root, 'dist');
 
 execFileSync(process.execPath, [resolve(root, 'scripts/generate-icons.mjs'), '--check'], { stdio: 'inherit' });

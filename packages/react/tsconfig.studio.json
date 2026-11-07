@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": { "resolveJsonModule": true },
-  "include": ["src", "studio/app.tsx", "studio/dist/routes.json", "studio/dist/icons.json"]
-}

@@ -16,8 +16,8 @@ globalThis.IS_REACT_ACT_ENVIRONMENT=true;
 const React=await import('react');
 const {createRoot}=await import('react-dom/client');
 const examples=await createCompleteExamples();
-await mkdir(join(root,'studio/dist'),{recursive:true});
-const temporary=await mkdtemp(join(root,'studio/dist/copied-examples-test-'));
+await mkdir(join(root,'dist'),{recursive:true});
+const temporary=await mkdtemp(join(root,'dist/copied-examples-test-'));
 const components=new Map();
 for(const [route,code] of Object.entries(examples)) {
   const filename=join(temporary,route.replaceAll('/','-')+'.mjs');

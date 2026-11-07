@@ -13,7 +13,7 @@ npm --prefix packages/react run studio:check
 npm run build
 npx playwright install chromium
 npm run test:browser
-npx playwright test --config packages/react/studio/playwright.config.cjs
+npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs
 ```
 
 정적 검사, 설정 계약·결정적 빌드, React 단위 테스트와 라이트·다크·320px 브라우저 회귀를 실행합니다.
@@ -33,7 +33,7 @@ npx playwright test --config packages/react/studio/playwright.config.cjs
 로컬에서 Studio 분할 실행을 확인하려면 아래 명령의 `1`을 `1`~`4`로 바꿔 각 shard를 실행합니다.
 
 ```sh
-npx playwright test --config packages/react/studio/playwright.config.cjs --shard=1/4 --workers=2
+npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs --shard=1/4 --workers=2
 ```
 
 [품질 워크플로](../../.github/workflows/quality.yml)는 `main` 푸시와 수동 실행을 지원하며 실제 작업은 `main`에서만 실행합니다. `dev` 푸시·PR에는 자동 Actions를 실행하지 않습니다.

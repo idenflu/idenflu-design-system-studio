@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 const { readdirSync } = require('node:fs');
 const { resolve } = require('node:path');
-const documents = require('../packages/react/studio/routes.json');
-const iconNames = readdirSync(resolve(__dirname, '../systems/idenflu-mono/assets/icons/idenflu'))
+const documents = require('../systems/idenflu-mono/studio/routes.json');
+const iconNames = readdirSync(resolve(__dirname, '../systems/idenflu-mono/core/assets/icons/idenflu'))
   .filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
 const newOutlineNames = ['home', 'folder', 'edit', 'save', 'external-link', 'refresh', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'attachment', 'globe', 'users', 'shield-check', 'dashboard', 'chart-bar', 'chart-line', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle', 'logout', 'undo', 'redo', 'sort'];
 const newFilledNames = ['home', 'folder', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'users', 'shield-check', 'dashboard', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle'].map(name => `${name}-fill`);

@@ -12,7 +12,7 @@
 - 테마와 화면 조정의 실시간 반영·저장·복원·CSS 복사
 - 기본·의미 색상 11개 조정과 테마별 저장·개별 초기화
 
-총 46개 문서이며 [routes.json](../../packages/react/studio/routes.json)이 메타데이터와 메뉴 순서의 기준입니다. 문서 생성 시 원본 HTML이나 바닐라 문서 스크립트를 읽지 않습니다.
+총 46개 문서이며 [routes.json](../../systems/idenflu-mono/studio/routes.json)이 메타데이터와 메뉴 순서의 기준입니다. 문서 생성 시 원본 HTML이나 바닐라 문서 스크립트를 읽지 않습니다.
 
 Layout 개요의 링크는 `?layout=sidebar`의 별도 워크스페이스 샘플을 엽니다. 샘플에는 트리·카테고리 메뉴, 동적 탭, 프로젝트·멤버·역할 관리와 설정 화면이 있습니다. 독립된 Page 문서 분류는 제공하지 않습니다.
 
@@ -30,4 +30,4 @@ Layout 개요의 링크는 `?layout=sidebar`의 별도 워크스페이스 샘플
 
 폼 예시의 검증·초기화·파일 선택과 데이터 상태는 로컬 동작이며 서버 저장·파일 전송·실제 예약은 앱에서 연결합니다. 워크스페이스의 프로젝트·멤버·역할 예시도 로컬 샘플 데이터로 동작합니다.
 
-React 문서 컴포넌트 회귀는 `packages/react/studio/*.spec.cjs`, 정식 주소·배포·리다이렉트·환경설정 회귀는 루트 `tests/*.spec.js`에서 검증합니다. 컴포넌트의 단독 사용과 정리는 `packages/react/tests/`에서 검증합니다. 환경별 실행 기준은 [검사 안내](../development/testing.md)를 따릅니다.
+React 문서 컴포넌트 회귀는 `systems/idenflu-mono/studio/*.spec.cjs`, 정식 주소·배포·리다이렉트·환경설정 회귀는 루트 `tests/*.spec.js`에서 검증합니다. 컴포넌트의 단독 사용과 정리는 `packages/react/tests/`에서 검증합니다. 환경별 실행 기준은 [검사 안내](../development/testing.md)를 따릅니다.

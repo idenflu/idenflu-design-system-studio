@@ -95,7 +95,7 @@ export async function createCompleteExamples() {
       for(const ref of refs) if(ref!==name && (module.declarations.has(ref)||module.imports.has(ref))) await collect(file,ref);
       if(!nodes.some(item=>item.node===node)) nodes.push({node,source:module.source});
     }
-    await collect(resolve(root,'studio',filename),target);
+    await collect(resolve(root,'../../systems/idenflu-mono/studio',filename),target);
     const lines=[];
     for(const [from,items] of imports) {
       const values=[...items.values()];

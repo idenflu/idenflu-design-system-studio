@@ -88,7 +88,7 @@ jobs:
       - run: npm run build
       - run: node packages/react/scripts/build-studio.mjs
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test --config packages/react/studio/playwright.config.cjs --shard=${{ matrix.shard }}/4 --workers=2 --reporter=line,html
+      - run: npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs --shard=${{ matrix.shard }}/4 --workers=2 --reporter=line,html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -96,4 +96,5 @@ jobs:
           path: |
             playwright-report/
             packages/react/test-results/
+            systems/idenflu-mono/studio/test-results/
           retention-days: 14
