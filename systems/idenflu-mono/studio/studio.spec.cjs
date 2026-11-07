@@ -46,7 +46,7 @@ test('theme toggle updates color codes and persists across reload', {tag:'@theme
   const expected = initial === 'dark' ? 'light' : 'dark';
   await expect(page.locator('html')).toHaveAttribute('data-theme', expected);
   await expect(primary).toHaveText(expected === 'dark' ? '#7FB3FD' : '#1062D3');
-  await expect(control).toHaveText(expected === 'dark' ? '#336ABB' : '#1062D3');
+  await expect(control).toHaveText(expected === 'dark' ? '#3B6CAE' : '#2466C8');
   await expect(danger).toHaveText(expected === 'dark' ? '#F2A3A7' : '#C1332F');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', expected);

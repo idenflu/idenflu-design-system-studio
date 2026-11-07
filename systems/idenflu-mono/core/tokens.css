@@ -87,6 +87,13 @@
   --color-disabled-text-light: #8a8a8a;
   --color-focus-primary-dark: #ddebff;
   --color-border-hover-dark: #999999;
+  /* Filled primary controls sit near 50–70% saturation so they read calmly on the neutral surfaces. */
+  --color-primary-control-light: #2466c8;
+  --color-primary-control-light-hover: #1f5ab3;
+  --color-primary-control-light-pressed: #1a4f9e;
+  --color-primary-control-dark: #3b6cae;
+  --color-primary-control-dark-hover: #4376b8;
+  --color-primary-control-dark-pressed: #34619f;
 
   /* Semantic roles retain the public variable names used by existing components. */
   --canvas: var(--color-white);
@@ -97,9 +104,9 @@
   --primary: var(--color-blue-500);
   --primary-hover: var(--color-blue-550);
   --primary-pressed: var(--color-blue-600);
-  --primary-control: var(--color-blue-500);
-  --primary-control-hover: var(--color-blue-550);
-  --primary-control-pressed: var(--color-blue-600);
+  --primary-control: var(--color-primary-control-light);
+  --primary-control-hover: var(--color-primary-control-light-hover);
+  --primary-control-pressed: var(--color-primary-control-light-pressed);
   --text-on-primary: var(--color-white);
   --text-on-danger: var(--color-white);
   --focus-on-primary: var(--color-blue-200);
@@ -210,9 +217,9 @@
   --primary: var(--color-blue-300);
   --primary-hover: var(--color-blue-350);
   --primary-pressed: var(--color-blue-400);
-  --primary-control: var(--color-blue-650);
-  --primary-control-hover: var(--color-blue-700);
-  --primary-control-pressed: var(--color-blue-750);
+  --primary-control: var(--color-primary-control-dark);
+  --primary-control-hover: var(--color-primary-control-dark-hover);
+  --primary-control-pressed: var(--color-primary-control-dark-pressed);
   --focus-on-primary: var(--color-focus-primary-dark);
   --focus-on-light: var(--color-blue-250);
   --focus-on-danger: var(--color-red-200);

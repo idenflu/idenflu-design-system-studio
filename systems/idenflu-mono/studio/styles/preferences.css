@@ -145,9 +145,9 @@
   --border-control-hover: var(--border-hover);
   --divider: var(--color-divider-light);
   --primary: var(--color-blue-500);
-  --primary-control: var(--color-blue-500);
-  --primary-control-hover: var(--color-blue-550);
-  --primary-control-pressed: var(--color-blue-600);
+  --primary-control: var(--color-primary-control-light);
+  --primary-control-hover: var(--color-primary-control-light-hover);
+  --primary-control-pressed: var(--color-primary-control-light-pressed);
   --text-on-primary: var(--color-white);
   --focus-on-light: var(--color-blue-450);
   --info-surface: var(--color-blue-50);
@@ -168,9 +168,9 @@
   --border-control-hover: var(--border-hover);
   --divider: var(--color-neutral-750);
   --primary: var(--color-blue-300);
-  --primary-control: var(--color-blue-650);
-  --primary-control-hover: var(--color-blue-700);
-  --primary-control-pressed: var(--color-blue-750);
+  --primary-control: var(--color-primary-control-dark);
+  --primary-control-hover: var(--color-primary-control-dark-hover);
+  --primary-control-pressed: var(--color-primary-control-dark-pressed);
   --focus-on-light: var(--color-blue-250);
   --info-surface: var(--color-blue-850);
 }

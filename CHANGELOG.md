@@ -17,6 +17,7 @@
 - 화면 조정의 기본값·내보내기, 갤러리 미리보기와 스튜디오 가이드의 색상 값을 새 기본 테마에 맞춤
 - 선택 행 배경을 `--selected-surface`로 분리하고 Primary 배지에 `--badge-primary-background`·`--badge-primary-text`를 추가. 선택한 행 위에서도 `진행 중` 같은 Primary 배지가 구분됨
 - 다크 테마의 보조 글자(`--text-secondary` `#A6A6A6`)와 흐린 글자(`--text-muted` `#949494`)를 한 단계 낮춰 본문과의 위계를 분리. 모든 배경에서 4.5:1 이상 유지
+- 채움 버튼의 Control Primary 채도를 낮춤. 라이트 `#2466C8`(hover `#1F5AB3`, pressed `#1A4F9E`), 다크 `#3B6CAE`(hover `#4376B8`, pressed `#34619F`). 글자·링크용 `--primary`는 유지
 
 ### 호환성
 
