@@ -362,6 +362,18 @@ test('danger foregrounds remain readable against custom light and dark canvas an
   }
 });
 
+test('status edits use the layered theme canvas when no canvas override is saved', () => {
+  for (const [theme, canvas] of [['light', '#ffffff'], ['dark', '#161616']]) {
+    const app = engine();
+    app.theme(theme);
+    for (const danger of ['#737373', '#777777', '#888888', '#f2a3a7']) {
+      app.api.set({colors:{[theme]:{'--danger':danger}}});
+      assert(measuredContrast(app.styles.get('--danger-text'), canvas) >= 4.5, `${theme} edited danger on default canvas`);
+      assert.equal(app.styles.has('--canvas'), false, 'derived contrast does not create a canvas preference');
+    }
+  }
+});
+
 test('contrast-derived tokens hydrate, export by theme and clear with individual or full resets', () => {
   const app = engine();
   app.api.set({colors:{light:{'--primary-control':'#ffeb3b','--danger':'#eeeeee'},dark:{'--primary-control':'#000000','--danger':'#f2a3a7'}}});
@@ -404,14 +416,14 @@ test('solid toast foregrounds remain readable after status color overrides and r
   for (const role of ['info','success','warning','danger']) assert.equal(app.styles.has(`--toast-on-${role}`), false);
 });
 const chipProperty = role => `--chip-${role}-selected-text`;
-test('custom border settings keep soft field aliases and reset every derived rule', () => {
+test('custom structural border settings leave independent control boundaries intact and reset derived rules', () => {
   for (const theme of ['light','dark']) {
     const app = engine(); app.theme(theme);
     const border = theme === 'dark' ? '#606060' : '#cccccc';
     app.api.set({colors:{[theme]:{'--border':border}}});
     assert.equal(app.styles.get('--border'),border);
     assert.equal(app.styles.get('--border-hover'),'color-mix(in srgb, var(--border) 75%, var(--text))');
-    assert(!app.styles.has('--border-control'),'the CSS alias follows the chosen border without a stronger override');
+    assert(!app.styles.has('--border-control'),'structural border edits do not override the core control boundary');
     assert(app.api.cssText().includes(`--border: ${border};`));
     const restored=engine({stored:app.storage.get(storageKey)}); restored.theme(theme);
     assert.equal(restored.styles.get('--border'),border);
@@ -420,7 +432,7 @@ test('custom border settings keep soft field aliases and reset every derived rul
 });
 const chipThemeDefaults = {
   light: {primary:'#1062d3',success:'#2a783c',warning:'#955e02',danger:'#aa2724',neutral:'#eaf1fc',secondary:'#e4e4e4'},
-  dark: {primary:'#7fb3fd',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#22334b',secondary:'#333333'},
+  dark: {primary:'#7fb3fd',success:'#9acba6',warning:'#e2c27f',danger:'#f2a3a7',neutral:'#22334b',secondary:'#383838'},
 };
 function assertReadableChips(app, theme, customAccent) {
   for (const role of chipRoles) {

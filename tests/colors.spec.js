@@ -324,7 +324,7 @@ test('neutral themes keep readable text, soft field boundaries and blue focus at
       expect(measuredRgbContrast(sample.tokens['--border-control-hover'],sample.tokens[background])).toBeGreaterThan(measuredRgbContrast(sample.tokens['--border-control'],sample.tokens[background]));
     }
     expect(sample.card).toBe(sample.tokens['--border']);
-    expect(sample.card).toBe(sample.tokens['--border-control']);
+    expect(measuredRgbContrast(sample.tokens['--border-control'],sample.tokens['--surface-raised'])).toBeGreaterThan(measuredRgbContrast(sample.card,sample.tokens['--surface-raised']));
     const input=page.locator('.react-studio-color-surface .text-input');
     await expect(input).toHaveCSS('border-top-color',sample.tokens['--border-control']);
     if(!test.info().project.use.isMobile) {

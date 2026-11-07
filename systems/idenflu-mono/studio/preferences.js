@@ -98,6 +98,7 @@
   }
   function colorValues(theme) {
     const overrides = values.colors?.[theme] || {};
+    const defaultCanvas = theme === "dark" ? "#161616" : "#ffffff";
     const result = new Map(Object.entries(overrides));
     const mix = (token, amount, target) => `color-mix(in srgb, var(${token}) ${amount}%, ${target})`;
     const put = (token, value) => result.set(token, value);
@@ -137,7 +138,7 @@
       put(`--${role}-surface`, mix(`--${role}`, 12, "var(--canvas)"));
       put(`--toast-on-${role}`, readableColor(theme === "dark" ? "#141414" : "#ffffff", [overrides[`--${role}`]]));
       if (role === "danger") {
-        const canvas = overrides["--canvas"] || (theme === "dark" ? "#141414" : "#ffffff");
+        const canvas = overrides["--canvas"] || defaultCanvas;
         const surface = blendColor(canvas, overrides["--danger"], 0.12);
         put("--danger-text", readableColor(overrides["--danger"], [canvas, surface]));
         // A filled danger button has its own background and text contract, independent of status text.
@@ -149,9 +150,9 @@
     });
     if (Object.keys(overrides).length) {
       const palette = theme === "dark"
-        ? { primary: "#7fb3fd", success: "#9acba6", warning: "#e2c27f", danger: "#f2a3a7", text: "#ededed", canvas: "#141414", infoSurface: "#22334b", secondarySurface: "#333333" }
-        : { primary: "#1062d3", success: "#2a783c", warning: "#955e02", danger: "#aa2724", text: "#1c1c1c", canvas: "#ffffff", infoSurface: "#eaf1fc", secondarySurface: "#e4e4e4" };
-      const canvas = overrides["--canvas"] || palette.canvas;
+        ? { primary: "#7fb3fd", success: "#9acba6", warning: "#e2c27f", danger: "#f2a3a7", text: "#ededed", infoSurface: "#22334b", secondarySurface: "#383838" }
+        : { primary: "#1062d3", success: "#2a783c", warning: "#955e02", danger: "#aa2724", text: "#1c1c1c", infoSurface: "#eaf1fc", secondarySurface: "#e4e4e4" };
+      const canvas = overrides["--canvas"] || defaultCanvas;
       const text = overrides["--text"] || palette.text;
       // Selected chips use status/link accents, independently of filled button colors.
       ["primary", "success", "warning", "danger"].forEach(role => {

@@ -13,7 +13,7 @@
 
   function updateMeta() {
     const canvas = getComputedStyle(root).getPropertyValue("--canvas").trim();
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", canvas || (root.dataset.theme === "dark" ? "#141414" : "#ffffff"));
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", canvas || (root.dataset.theme === "dark" ? "#161616" : "#ffffff"));
   }
 
   function apply() {
