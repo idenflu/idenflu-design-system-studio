@@ -6,13 +6,14 @@ export type Project = {id:string; name:string; team:string; owner:string; status
 export type ProjectDraft = Pick<Project,'name'|'team'|'description'|'due'>;
 export type Member = {id:string; name:string; email:string; team:string; roles:string[]};
 export type WorkspaceSettings = {name:string; description:string; timezone:string; sideMenuStyle:'tree'|'category'; projectNotifications:boolean; weeklySummary:boolean; mentionNotifications:boolean};
-export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'master-detail'|'members'|'role-management'|'settings'|'notifications'|'vertical-settings';
+export type WorkspacePage = 'home'|'projects'|'active-projects'|'reviews'|'completed'|'master-detail'|'members'|'role-management'|'conveyors'|'conveyor-registration'|'inspections'|'settings'|'notifications'|'vertical-settings';
 export type WorkspaceTab = {key:string; page:WorkspacePage|'project-detail'|'not-found'; projectId?:string; path?:string};
-type WorkspaceMenuGroup='work'|'project-menu'|'team-menu'|'settings-menu';
+type WorkspaceMenuGroup='work'|'project-menu'|'equipment-menu'|'team-menu'|'settings-menu';
 type WorkspaceMenuGroupInfo={title:string;parent?:WorkspaceMenuGroup};
 const workspaceGroups:Record<WorkspaceMenuGroup,WorkspaceMenuGroupInfo>={
   work:{title:'업무 공간'},
   'project-menu':{title:'프로젝트 관리',parent:'work'},
+  'equipment-menu':{title:'설비 관리'},
   'team-menu':{title:'조직 관리'},
   'settings-menu':{title:'환경 설정'},
 };
@@ -25,6 +26,9 @@ export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:W
   'master-detail':{title:'마스터-디테일',group:'프로젝트 관리',parent:'project-menu',icon:'grid',description:'프로젝트 목록과 선택한 항목의 상세 정보를 함께 확인하세요.'},
   members:{title:'멤버 관리',group:'조직 관리',parent:'team-menu',icon:'person',description:'함께 일하는 팀원을 찾고 역할을 관리하세요.'},
   'role-management':{title:'역할 관리',group:'조직 관리',parent:'team-menu',icon:'shield-check',description:'역할별 사용 권한과 수신할 알림을 설정하세요.'},
+  conveyors:{title:'컨베이어',group:'설비 관리',parent:'equipment-menu',icon:'archive',description:'설비 상태와 하위 유닛 구성을 카드로 확인하고 관리하세요.'},
+  'conveyor-registration':{title:'컨베이어 등록',group:'설비 관리',parent:'equipment-menu',icon:'add',description:'기본 정보와 하위 유닛을 입력하고 검토한 뒤 설비를 등록하세요.'},
+  inspections:{title:'점검 일정',group:'설비 관리',parent:'equipment-menu',icon:'calendar',description:'월·주 캘린더에서 설비 점검을 예약하고 결과를 확인하세요.'},
   settings:{title:'워크스페이스 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'워크스페이스의 기본 정보와 표시 기준을 설정하세요.'},
   notifications:{title:'알림 설정',group:'환경 설정',parent:'settings-menu',icon:'bell',description:'필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다.'},
   'vertical-settings':{title:'버티컬 탭 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'설정 항목을 세로 탭으로 나누어 관리하세요.'},
@@ -35,7 +39,7 @@ export function workspacePagePath(page:WorkspacePage):string[]{
   while(parent){const group:WorkspaceMenuGroupInfo=workspaceGroups[parent];path.unshift(group.title);parent=group.parent;}
   return path;
 }
-export const defaultExpanded=['work','project-menu','team-menu','settings-menu'];
+export const defaultExpanded=['work','project-menu','equipment-menu','team-menu','settings-menu'];
 export const statuses=['준비 중','진행 중','검토 중','완료'].map(value=>({value,label:value}));
 export const teams=['프로덕트 디자인','플랫폼 개발','브랜드 디자인'].map(value=>({value,label:value}));
 export const roles=initialWorkspaceRoles.map(role=>({value:role.name,label:role.name}));
@@ -87,6 +91,7 @@ export function workspaceTree(style:WorkspaceSettings['sideMenuStyle']=initialSe
       leaf('home',true),
       group('project-menu',[leaf('projects'),leaf('active-projects'),leaf('reviews'),leaf('completed'),leaf('master-detail')],category?'folder':undefined),
     ],rootIcon),
+    group('equipment-menu',[leaf('conveyors',true),leaf('inspections',true)],rootIcon),
     group('team-menu',[leaf('members',true),leaf('role-management',true)],rootIcon),
     group('settings-menu',[leaf('settings',true),leaf('notifications',true),leaf('vertical-settings',true)],rootIcon),
   ];

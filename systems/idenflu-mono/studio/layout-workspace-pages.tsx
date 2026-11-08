@@ -177,7 +177,7 @@ function WorkspaceSettingsForm({settings,onSave}:SettingsProps){
     <TextField ref={nameInput} label="워크스페이스 이름" value={name} onChange={event=>{change('name',event.target.value);setError('');}} required error={error||undefined}/>
     <TextArea label="워크스페이스 소개" value={description} onChange={event=>change('description',event.target.value)} rows={3}/>
     <Select label="시간대" value={timezone} onValueChange={value=>change('timezone',value)} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/>
-    <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'category',label:'카테고리형 (기본)'},{value:'tree',label:'트리형'}]} helperText="카테고리형은 업무 공간·조직 관리·환경 설정을 제목으로 구분합니다."/>
+    <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'category',label:'카테고리형 (기본)'},{value:'tree',label:'트리형'}]} helperText="카테고리형은 업무 공간·설비 관리·조직 관리·환경 설정을 제목으로 구분합니다."/>
     <div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div>
   </form>;
 }

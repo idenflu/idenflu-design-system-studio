@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useEscapeLayer } from './escape-layer';
+const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 export type TimeValue = string | null;
 export interface TimePickerProps {
@@ -50,7 +51,7 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
   const invalid = !!error || ariaInvalid === true || ariaInvalid === 'true';
   const [open, setOpen] = React.useState(false);
   const [panel, setPanel] = React.useState<TimeValue>(null);
-  const [position, setPosition] = React.useState({top:'calc(100% + 6px)', bottom:'auto', left:0, maxWidth:280, maxHeight:480});
+  const [position, setPosition] = React.useState<{ top:number; left:number; maxWidth:number; maxHeight:number } | null>(null);
   const root = React.useRef<HTMLDivElement>(null), popup = React.useRef<HTMLDivElement>(null);
   const input = React.useRef<HTMLInputElement>(null), trigger = React.useRef<HTMLButtonElement>(null);
   React.useImperativeHandle(ref, () => input.current!);
@@ -111,18 +112,41 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
     setPanel(preferred && candidates.includes(preferred) ? preferred : candidates[0] ?? null);
     setOpen(true);
   };
-  React.useEffect(() => {
-    if (!open) return;
+  useClientLayoutEffect(() => {
+    if (!open) { setPosition(null); return; }
+    const layer = popup.current;
+    let shownAsPopover = false;
+    // Keep the layer inside its dialog and focus scope, while escaping the
+    // clipping and transforms of scrollable ancestors.
+    if (layer && typeof layer.showPopover === 'function') {
+      try { layer.showPopover(); shownAsPopover = true; } catch { layer.removeAttribute('popover'); }
+    }
     const update = () => {
-      const anchor = root.current?.getBoundingClientRect(), element = popup.current;
-      if (!anchor || !element) return;
+      const picker = root.current, anchor = picker?.getBoundingClientRect(), element = popup.current;
+      if (!picker || !anchor || !element) return;
       const edge = 12, gap = 6, width = document.documentElement.clientWidth, height = window.innerHeight;
+      let leftEdge = edge, rightEdge = width - edge;
+      for (let parent = picker.parentElement; parent; parent = parent.parentElement) {
+        const style = window.getComputedStyle(parent);
+        if (/(auto|scroll|hidden|clip)/.test(`${style.overflowX} ${style.overflowY}`)) {
+          const rect = parent.getBoundingClientRect();
+          if (anchor.bottom <= rect.top || anchor.top >= rect.bottom || anchor.right <= rect.left || anchor.left >= rect.right) { setOpen(false); return; }
+          leftEdge = Math.max(leftEdge, rect.left + parent.clientLeft);
+          rightEdge = Math.min(rightEdge, rect.left + parent.clientLeft + parent.clientWidth);
+        }
+        // A native modal is independent of a locked body's clipping bounds.
+        if (parent.tagName === 'DIALOG' && parent.hasAttribute('open')) break;
+      }
       if (anchor.bottom <= edge || anchor.top >= height - edge || anchor.right <= edge || anchor.left >= width - edge) { setOpen(false); return; }
       const below = Math.max(0, height - anchor.bottom - gap - edge), above = Math.max(0, anchor.top - gap - edge);
+      // scrollHeight includes the heading and confirmation footer, so upward
+      // placement reserves room for the whole panel rather than just its lists.
       const up = element.scrollHeight > below && above > below;
-      setPosition({top:up ? 'auto' : 'calc(100% + 6px)', bottom:up ? 'calc(100% + 6px)' : 'auto',
-        left:Math.max(edge, Math.min(anchor.left, width - element.offsetWidth - edge)) - anchor.left,
-        maxWidth:Math.max(0, Math.min(280, width - edge * 2)), maxHeight:up ? above : below});
+      const maxHeight = up ? above : below, maxWidth = Math.max(0, rightEdge - leftEdge);
+      const popupWidth = Math.min(element.offsetWidth, maxWidth);
+      const next = {top:up ? anchor.top - gap - Math.min(element.scrollHeight, maxHeight) : anchor.bottom + gap,
+        left:Math.max(leftEdge, Math.min(anchor.left, rightEdge - popupWidth)), maxWidth, maxHeight};
+      setPosition(previous => previous && previous.top === next.top && previous.left === next.left && previous.maxWidth === next.maxWidth && previous.maxHeight === next.maxHeight ? previous : next);
     };
     const outside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) close(); };
     update();
@@ -133,11 +157,13 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
     return () => {
       observer?.disconnect(); window.removeEventListener('resize', update); window.removeEventListener('scroll', update, true);
       document.removeEventListener('pointerdown', outside);
+      if (shownAsPopover && layer?.isConnected && layer.matches(':popover-open')) layer.hidePopover();
     };
   }, [open]);
-  React.useEffect(() => {
-    if (open) (popup.current?.querySelector<HTMLButtonElement>('[role="option"][tabindex="0"]') ?? popup.current)?.focus();
-  }, [open]);
+  const positioned = position !== null;
+  useClientLayoutEffect(() => {
+    if (open && positioned) (popup.current?.querySelector<HTMLButtonElement>('[role="option"][tabindex="0"]') ?? popup.current)?.focus();
+  }, [open, positioned]);
   React.useEffect(() => {
     if (!open) return;
     popup.current?.querySelectorAll<HTMLElement>('[aria-selected="true"]').forEach(option => {
@@ -194,7 +220,8 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
           onClick={() => open ? close(true) : openPanel()}><span className="ui-icon icon-clock" aria-hidden="true" /></button>
       </div>
       {name && <input type="hidden" name={name} value={current ?? ''} disabled={disabled} />}
-      {open && <div ref={popup} className="date-popup time-popup" id={`${base}-popup`} role="dialog" aria-label={title} tabIndex={-1} style={position}
+      {open && <div ref={popup} className="date-popup time-popup" id={`${base}-popup`} role="dialog" aria-label={title} tabIndex={-1} popover="manual"
+        style={{position:'fixed',margin:0,top:position?.top??0,bottom:'auto',left:position?.left??0,right:'auto',maxWidth:position?.maxWidth,maxHeight:position?.maxHeight,visibility:position?'visible':'hidden'}}
         onMouseDownCapture={event => { if (!(event.target as Element).closest('button')) popup.current?.focus({preventScroll:true}); }}>
         <div className="time-popup-heading"><span>시간 선택</span><strong aria-live="polite">{panel ?? '--:--'}</strong></div>
         <div className="datetime-time-panel">

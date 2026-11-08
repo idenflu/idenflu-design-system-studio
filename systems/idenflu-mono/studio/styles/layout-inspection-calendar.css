@@ -1,0 +1,110 @@
+.inspection-calendar { min-width:0; }
+.inspection-toolbar { display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); margin-bottom:var(--space-5); }
+.inspection-period-controls { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-3); }
+.inspection-period-controls > div { display:flex; gap:var(--space-1); }
+.inspection-period-controls h2 { min-width:150px; font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); }
+.inspection-toolbar .segmented-control { flex:none; }
+.inspection-filters { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-3); margin-bottom:var(--space-5); }
+.inspection-filters > div:has(> .custom-select) { width:280px; max-width:100%; }
+.inspection-filters > div:has(> .custom-select):nth-child(2) { width:144px; }
+.inspection-filters > p { margin-inline-start:auto; color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-filters > p strong { color:var(--text); font-weight:var(--font-weight-medium); }
+.inspection-layout { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:var(--space-5); align-items:start; }
+.inspection-calendar-panel { min-width:0; border:1px solid var(--border); background:var(--field-background); }
+.inspection-weekdays,.inspection-month-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+.inspection-weekdays { border-bottom:1px solid var(--border); background:var(--surface); }
+.inspection-weekdays > span { padding:var(--space-3) var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); text-align:center; }
+.inspection-month-day { min-width:0; min-height:126px; padding:var(--space-2); border-bottom:1px solid var(--divider); border-inline-end:1px solid var(--divider); }
+.inspection-month-day:nth-child(7n) { border-inline-end:0; }
+.inspection-month-day:nth-last-child(-n+7) { border-bottom:0; }
+.inspection-month-day[data-outside="true"] { background:var(--surface); }
+.inspection-month-day[data-selected="true"],.inspection-week-day[data-selected="true"] { box-shadow:inset 0 0 0 1px var(--primary); background:var(--selected-surface); }
+.inspection-day-button { display:flex; align-items:center; justify-content:space-between; gap:var(--space-1); width:100%; min-height:28px; margin-bottom:var(--space-1); padding:0 var(--space-1); border:0; border-radius:var(--radius-control); background:transparent; color:var(--text); text-align:start; font:inherit; font-size:var(--font-size-caption); cursor:pointer; }
+.inspection-day-button:hover { background:var(--surface-hover); }
+.inspection-day-button:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:1px; }
+.inspection-day-button small { color:var(--primary); font-size:var(--font-size-caption); }
+.inspection-day-button[aria-current="date"] > span:first-child { display:flex; align-items:center; justify-content:center; min-width:24px; min-height:24px; padding-inline:var(--space-1); color:var(--text-on-primary); background:var(--primary-control); border-radius:var(--radius-control); }
+.inspection-month-day[data-outside="true"] .inspection-day-button { color:var(--text-secondary); }
+.inspection-day-events { display:grid; gap:var(--space-1); }
+.inspection-event { --inspection-color:var(--primary); display:flex; flex-direction:column; gap:var(--space-1); min-width:0; width:100%; padding:var(--space-2); border:1px solid var(--divider); border-inline-start:2px solid var(--inspection-color); background:var(--field-background); color:var(--text); border-radius:var(--radius-control); text-align:start; font:inherit; cursor:pointer; }
+.inspection-event[data-status="in-progress"] { --inspection-color:var(--warning); }
+.inspection-event[data-status="completed"] { --inspection-color:var(--success); }
+.inspection-event[data-status="cancelled"] { --inspection-color:var(--text-muted); }
+.inspection-event:hover { background:var(--surface-hover); }
+.inspection-event:focus-visible,.inspection-agenda-item:focus-visible,.inspection-more:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:1px; }
+.inspection-event strong { min-width:0; width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:var(--font-size-caption); font-weight:var(--font-weight-medium); }
+.inspection-event small,.inspection-event-time { color:var(--text-secondary); font-size:max(11px,calc(var(--font-size-base) - 3px)); }
+.inspection-event small { word-break:keep-all; overflow-wrap:anywhere; }
+.inspection-event[data-status="cancelled"] strong { text-decoration:line-through; color:var(--text-secondary); }
+.inspection-event--compact { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0 var(--space-1); padding:var(--space-1); }
+.inspection-event--compact .inspection-event-time { font-variant-numeric:tabular-nums; }
+.inspection-event--compact strong { grid-column:1 / -1; grid-row:2; }
+.inspection-event--compact small { grid-column:2; grid-row:1; }
+.inspection-more { width:100%; padding:var(--space-1); border:0; background:transparent; color:var(--primary); text-align:start; font:inherit; font-size:var(--font-size-caption); cursor:pointer; }
+.inspection-legend { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-3); padding:var(--space-3); border-top:1px solid var(--border); }
+.inspection-legend > span { display:inline-flex; align-items:center; gap:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-legend i { width:7px; height:7px; background:var(--primary); }
+.inspection-legend i[data-status="in-progress"] { background:var(--warning); }
+.inspection-legend i[data-status="completed"] { background:var(--success); }
+.inspection-legend i[data-status="cancelled"] { background:var(--text-muted); }
+.inspection-legend .inspection-calendar-help { flex-basis:100%; }
+.inspection-mobile-count { display:none; }
+.inspection-agenda { min-width:0; padding:var(--space-5); border:1px solid var(--border); background:var(--field-background); }
+.inspection-agenda > header { padding-bottom:var(--space-4); border-bottom:1px solid var(--divider); }
+.inspection-agenda > header p { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-agenda > header h2 { margin:var(--space-2) 0 var(--space-1); font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); }
+.inspection-agenda > header > span { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-agenda-list { display:grid; gap:var(--space-3); padding-block:var(--space-4); }
+.inspection-agenda-item { display:grid; gap:var(--space-2); width:100%; min-width:0; padding:var(--space-3); border:1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); color:var(--text); text-align:start; font:inherit; cursor:pointer; }
+.inspection-agenda-item:hover { background:var(--surface-hover); }
+.inspection-agenda-item-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-2); }
+.inspection-agenda-item time { color:var(--text-secondary); font-size:var(--font-size-caption); font-variant-numeric:tabular-nums; }
+.inspection-agenda-item > strong { font-size:var(--font-size-body); font-weight:var(--font-weight-medium); overflow-wrap:anywhere; }
+.inspection-agenda-item > span:not(.inspection-agenda-item-top),.inspection-agenda-item > small { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); overflow-wrap:anywhere; }
+.inspection-agenda > .button { width:100%; justify-content:center; }
+.inspection-agenda-empty { padding:var(--space-6) 0; text-align:center; }
+.inspection-agenda-empty > .ui-icon { color:var(--text-muted); --icon-size:24px; }
+.inspection-agenda-empty h3 { margin:var(--space-3) 0 var(--space-2); font-size:var(--font-size-body); font-weight:var(--font-weight-medium); }
+.inspection-agenda-empty p,.inspection-day-empty { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.inspection-week-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); min-height:420px; }
+.inspection-week-day { min-width:0; padding:var(--space-2); border-inline-end:1px solid var(--divider); }
+.inspection-week-day:last-child { border-inline-end:0; }
+.inspection-week-day .inspection-day-button { flex-direction:column; align-items:flex-start; min-height:52px; padding-bottom:var(--space-2); }
+.inspection-week-day .inspection-day-empty { padding-block:var(--space-4); text-align:center; }
+.inspection-layout[data-view="week"] { grid-template-columns:minmax(0,1fr); }
+.inspection-layout[data-view="week"] .inspection-agenda-list { grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start; }
+.inspection-layout[data-view="week"] .inspection-agenda-empty { grid-column:1 / -1; }
+.inspection-layout[data-view="week"] .inspection-agenda > .button { width:auto; }
+@media (max-width:1250px) {
+  .inspection-layout { grid-template-columns:minmax(0,1fr); }
+  .inspection-agenda-list { grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start; }
+  .inspection-agenda-empty { grid-column:1 / -1; }
+  .inspection-agenda > .button { width:auto; }
+}
+@media (max-width:700px) {
+  .inspection-toolbar { flex-wrap:wrap; gap:var(--space-3); }
+  .inspection-period-controls { width:100%; gap:var(--space-2); }
+  .inspection-period-controls h2 { flex:1; min-width:0; font-size:var(--font-size-body); }
+  .inspection-toolbar .segmented-control { width:100%; }
+  .inspection-toolbar .segmented-control > * { flex:1; justify-content:center; }
+  .inspection-filters { gap:var(--space-2); }
+  .inspection-filters > div:has(> .custom-select) { width:100%; }
+  .inspection-filters > div:has(> .custom-select):nth-child(2) { flex:1; width:auto; min-width:120px; }
+  .inspection-filters > p { flex-basis:100%; margin-inline-start:0; }
+  .inspection-month-day { min-height:68px; padding:var(--space-1); }
+  .inspection-month-day .inspection-day-button { flex-direction:column; justify-content:flex-start; gap:0; min-height:58px; margin:0; padding:var(--space-1) 0; }
+  .inspection-month-day .inspection-day-button small { display:none; }
+  .inspection-month-day .inspection-day-events { display:none; }
+  .inspection-day-button .inspection-mobile-count { display:inline; margin-top:var(--space-1); color:var(--text-secondary); font-size:max(10px,calc(var(--font-size-base) - 3px)); }
+  .inspection-weekdays > span { padding:var(--space-2) var(--space-1); }
+  .inspection-legend { gap:var(--space-2); }
+  .inspection-layout { gap:var(--space-4); }
+  .inspection-agenda { padding:var(--space-4); }
+  .inspection-agenda-list,.inspection-layout[data-view="week"] .inspection-agenda-list { grid-template-columns:minmax(0,1fr); }
+  .inspection-agenda > .button,.inspection-layout[data-view="week"] .inspection-agenda > .button { width:100%; }
+  .inspection-week-grid { grid-template-columns:minmax(0,1fr); min-height:0; }
+  .inspection-week-day { padding:var(--space-3); border-inline-end:0; border-bottom:1px solid var(--divider); }
+  .inspection-week-day:last-child { border-bottom:0; }
+  .inspection-week-day .inspection-day-button { flex-direction:row; min-height:28px; }
+  .inspection-week-day .inspection-day-empty { padding-block:var(--space-2); text-align:start; }
+}

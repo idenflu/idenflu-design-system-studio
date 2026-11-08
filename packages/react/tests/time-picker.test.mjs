@@ -203,6 +203,64 @@ test('changing time constraints updates pending choices without publishing a new
   }finally{await f.dispose();}
 });
 
+test('time panels inside a dialog escape vertical clipping while keeping their footer inside the viewport',async()=>{
+  const f=fixture();
+  const width=Object.getOwnPropertyDescriptor(document.documentElement,'clientWidth');
+  const height=Object.getOwnPropertyDescriptor(window,'innerHeight');
+  const popupHeight=Object.getOwnPropertyDescriptor(HTMLElement.prototype,'scrollHeight');
+  const popupWidth=Object.getOwnPropertyDescriptor(HTMLElement.prototype,'offsetWidth');
+  try{
+    Object.defineProperty(document.documentElement,'clientWidth',{configurable:true,value:390});
+    Object.defineProperty(window,'innerHeight',{configurable:true,value:600});
+    Object.defineProperty(HTMLElement.prototype,'scrollHeight',{configurable:true,get(){return this.classList.contains('time-popup')?320:0;}});
+    Object.defineProperty(HTMLElement.prototype,'offsetWidth',{configurable:true,get(){return this.classList.contains('time-popup')?280:0;}});
+    await f.render(h('dialog',{open:true},h('div',{className:'scroll-body',style:{overflowY:'auto'}},h(TimePicker,{label:'시간',defaultValue:'09:30'}))));
+    const scroll=f.node.querySelector('.scroll-body'),picker=f.node.querySelector('.time-picker');
+    scroll.getBoundingClientRect=()=>({top:100,bottom:480,left:40,right:300,width:260,height:380,x:40,y:100,toJSON(){}});
+    Object.defineProperty(scroll,'clientWidth',{configurable:true,value:260});
+    picker.getBoundingClientRect=()=>({top:420,bottom:458,left:200,right:300,width:100,height:38,x:200,y:420,toJSON(){}});
+    await click(trigger(f.node));
+    const layer=popup(f.node);
+    assert.equal(layer.style.position,'fixed');
+    assert.equal(layer.style.visibility,'visible');
+    assert.equal(layer.style.top,'94px');
+    assert.equal(layer.style.left,'40px');
+    assert.equal(layer.style.maxWidth,'260px');
+    assert.ok(Number.parseFloat(layer.style.top)<scroll.getBoundingClientRect().top,'the panel may extend above the scroll body');
+    assert.ok(Number.parseFloat(layer.style.top)+320<=window.innerHeight-12,'the full panel, including its footer, fits in the viewport');
+    assert.equal(document.activeElement,option(f.node,'시','09'));
+    await click(button(layer,'확인'));
+    assert.equal(popup(f.node),null);
+    assert.equal(document.activeElement,trigger(f.node));
+  }finally{
+    await f.dispose();
+    Object.defineProperty(document.documentElement,'clientWidth',width);
+    Object.defineProperty(window,'innerHeight',height);
+    if(popupHeight)Object.defineProperty(HTMLElement.prototype,'scrollHeight',popupHeight);else delete HTMLElement.prototype.scrollHeight;
+    if(popupWidth)Object.defineProperty(HTMLElement.prototype,'offsetWidth',popupWidth);else delete HTMLElement.prototype.offsetWidth;
+  }
+});
+
+test('scrolling a time field out of its visible container dismisses its pending panel',async()=>{
+  const f=fixture(),changes=[];
+  try{
+    await f.render(h('div',{className:'scroll-body',style:{overflowY:'auto'}},h(TimePicker,{label:'시간',defaultValue:'09:30',onValueChange:value=>changes.push(value)})));
+    const scroll=f.node.querySelector('.scroll-body'),picker=f.node.querySelector('.time-picker');
+    scroll.getBoundingClientRect=()=>({top:200,bottom:500,left:40,right:420,width:380,height:300,x:40,y:200,toJSON(){}});
+    Object.defineProperty(scroll,'clientWidth',{configurable:true,value:380});
+    let top=400;
+    picker.getBoundingClientRect=()=>({top,bottom:top+38,left:100,right:420,width:320,height:38,x:100,y:top,toJSON(){}});
+    await click(trigger(f.node));
+    await click(option(f.node,'시','14'));
+    assert.ok(popup(f.node));
+    top=100;
+    await act(async()=>scroll.dispatchEvent(new Event('scroll')));
+    assert.equal(popup(f.node),null);
+    assert.equal(input(f.node).value,'09:30');
+    assert.deepEqual(changes,[]);
+  }finally{await f.dispose();}
+});
+
 test('TimePicker renders on the server and rejects invalid range or step configuration',()=>{
   assert.match(renderToString(h(TimePicker,{label:'시간',defaultValue:'14:30',name:'time'})),/14:30/);
   for(const props of [{minuteStep:7},{minuteStep:0},{min:'9:00'},{max:'24:00'},{min:'18:00',max:'09:00'}]){

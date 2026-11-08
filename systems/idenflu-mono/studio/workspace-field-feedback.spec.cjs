@@ -13,7 +13,7 @@ test('workspace settings connect select help and focus the field that needs corr
   await navigate(page,'워크스페이스 설정',isMobile);
   const name=panel(page).getByRole('textbox',{name:'워크스페이스 이름',exact:true});
   const menuStyle=panel(page).getByRole('combobox',{name:/^사이드 메뉴 스타일:/});
-  await expect(menuStyle).toHaveAccessibleDescription('카테고리형은 업무 공간·조직 관리·환경 설정을 제목으로 구분합니다.');
+  await expect(menuStyle).toHaveAccessibleDescription('카테고리형은 업무 공간·설비 관리·조직 관리·환경 설정을 제목으로 구분합니다.');
   const initialName=await name.inputValue();
   await name.fill('   ');
   await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();

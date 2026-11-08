@@ -18,18 +18,18 @@ async function chooseStyle(page,current,next){
 test('saved side menu styles keep one tree, category search and branch state',{tag:'@mobile'},async({page,isMobile})=>{
   await page.goto(sample);
   const desktopTree=page.locator('.layout-workspace-sidebar .demo-tree');
-  await expect(desktopTree.locator('.tree-category-label')).toHaveText(['업무 공간','조직 관리','환경 설정']);
+  await expect(desktopTree.locator('.tree-category-label')).toHaveText(['업무 공간','설비 관리','조직 관리','환경 설정']);
   await navigate(page,'워크스페이스 설정',isMobile);
   await chooseStyle(page,'카테고리형 (기본)','트리형');
   await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
-  await expect(desktopTree.locator(':scope > details')).toHaveCount(3);
+  await expect(desktopTree.locator(':scope > details')).toHaveCount(4);
   await chooseStyle(page,'트리형','카테고리형 (기본)');
   await expect(desktopTree.locator('.tree-category')).toHaveCount(0);
   await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
   await openMenu(page,isMobile);
   const tree=navigation(page).getByRole('group',{name:'워크스페이스 트리 메뉴',exact:true});
   await expect(tree).toHaveCount(1);
-  await expect(tree.locator('.tree-category-label')).toHaveText(['업무 공간','조직 관리','환경 설정']);
+  await expect(tree.locator('.tree-category-label')).toHaveText(['업무 공간','설비 관리','조직 관리','환경 설정']);
   const branch=tree.locator('details');
   await expect(branch).toHaveCount(1);
   await branch.locator('summary').click();
@@ -47,6 +47,6 @@ test('saved side menu styles keep one tree, category search and branch state',{t
   await panel(page).getByRole('button',{name:'변경사항 저장',exact:true}).click();
   await openMenu(page,isMobile);
   await expect(tree.locator('.tree-category-label')).toHaveCount(0);
-  await expect(tree.locator(':scope > details')).toHaveCount(3);
+  await expect(tree.locator(':scope > details')).toHaveCount(4);
   await expect(tree.locator('details details')).not.toHaveAttribute('open','');
 });

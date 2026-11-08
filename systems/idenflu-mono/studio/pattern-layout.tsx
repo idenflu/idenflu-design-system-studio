@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Icon, Table, TableContainer } from '@idenflu/mono-react';
+import { Card, Grid, Icon, Table, TableContainer } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import { LayoutReuseCandidates } from './layout-reuse-candidates';
 
@@ -14,7 +14,14 @@ export function LayoutPattern() {
         </div>
       </article>
     </Section>
-    <Section title="샘플에서 확인할 동작" description="기존 컴포넌트를 조합한 프로젝트 관리 화면에서 레이아웃을 살펴보세요.">
+    <Section id="layout-equipment-examples" title="설비 관리 예시" description="카드로 설비를 탐색하고, 단계별로 등록하고, 캘린더에서 점검 일정을 관리합니다. 아래 링크로 실제 업무 화면을 열어보세요.">
+      <Grid columns={{base:1,md:2,xl:3}} gap={6}>
+        <Card className="layout-pattern-example"><Icon name="grid"/><h3>카드형 설비 목록</h3><p>컨베이어의 상태·위치·유닛 수를 비교하고 검색·상태 필터로 대상을 찾습니다. 상세 Drawer에서 기본 정보와 하위 유닛을 확인합니다.</p><a className="button button--outline button-inline" href="?layout=sidebar#/equipment/conveyors" target="_blank" rel="noopener noreferrer" aria-label="컨베이어 카드형 목록 샘플 열기 (새 탭)">카드형 목록 열기 <span aria-hidden="true">↗</span></a></Card>
+        <Card className="layout-pattern-example"><Icon name="list"/><h3>단계형 설비 등록</h3><p>기본 정보 → 하위 유닛 → 최종 검토의 순서로 등록합니다. 이전 단계의 값을 유지하며 유닛을 추가·삭제하고 등록 결과를 목록에서 확인합니다.</p><a className="button button--outline button-inline" href="?layout=sidebar#/equipment/conveyors/new" target="_blank" rel="noopener noreferrer" aria-label="컨베이어 단계형 등록 샘플 열기 (새 탭)">단계형 등록 열기 <span aria-hidden="true">↗</span></a></Card>
+        <Card className="layout-pattern-example"><Icon name="calendar"/><h3>점검 일정 캘린더</h3><p>월·주별 일정과 선택한 날짜의 점검을 확인합니다. 설비·상태 필터, 일정 등록·변경, 완료 결과 기록과 설비 상세 연결을 사용해보세요.</p><a className="button button--outline button-inline" href="?layout=sidebar#/equipment/inspections" target="_blank" rel="noopener noreferrer" aria-label="점검 일정 캘린더 샘플 열기 (새 탭)">점검 캘린더 열기 <span aria-hidden="true">↗</span></a></Card>
+      </Grid>
+    </Section>
+    <Section title="샘플에서 확인할 동작" description="기존 컴포넌트를 조합한 프로젝트·설비 관리 화면에서 레이아웃을 살펴보세요.">
       <div className="layout-pattern-features">{[
         ['트리 탐색과 동적 탭','하위 메뉴를 선택하면 탭이 열립니다. 이미 열린 화면은 해당 탭으로 이동하며 메뉴의 선택 표시도 함께 바뀝니다.'],
         ['여러 업무 이어가기','목록의 검색 조건과 설정 입력값은 탭을 전환해도 유지됩니다. 프로젝트 상세에서 바꾼 상태는 목록에도 반영됩니다.'],

@@ -1,0 +1,76 @@
+.cv-registration { min-width:0; }
+.cv-registration-stepper { padding:var(--space-5) var(--space-6); margin-bottom:var(--space-6); border:1px solid var(--border); background:var(--field-background); }
+.cv-registration-form { min-width:0; }
+.cv-registration-main { display:grid; grid-template-columns:minmax(0,1fr) minmax(220px,280px); gap:var(--space-6); align-items:start; }
+.cv-registration-panel { min-width:0; border:1px solid var(--border); background:var(--field-background); }
+.cv-registration-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-3); padding:var(--space-6); border-bottom:1px solid var(--divider); }
+.cv-registration-heading > div { min-width:0; }
+.cv-registration-heading > div > span { color:var(--text-secondary); font-size:var(--font-size-caption); letter-spacing:.7px; }
+.cv-registration-heading h2 { margin:var(--space-1) 0 var(--space-2); font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); }
+.cv-registration-heading h2:focus { outline:none; }
+.cv-registration-heading p { color:var(--text-secondary); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.cv-registration-fields { display:grid; gap:var(--space-6); padding:var(--space-6); }
+.cv-registration-initial-status { display:flex; align-items:flex-start; gap:var(--space-2); padding:var(--space-3); color:var(--text-secondary); background:var(--surface); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.cv-registration-initial-status > .ui-icon { flex:none; margin-top:2px; }
+.cv-registration-error { display:flex; align-items:flex-start; gap:var(--space-2); margin:var(--space-5) var(--space-6) 0; padding:var(--space-3); border-inline-start:2px solid var(--danger); color:var(--danger-text); background:var(--danger-surface); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.cv-registration-error .ui-icon { flex:none; margin-top:2px; }
+.cv-registration-summary { min-width:0; padding:var(--space-5); border:1px solid var(--border); background:var(--surface); }
+.cv-registration-summary-icon { display:flex; align-items:center; justify-content:center; width:44px; height:44px; margin-bottom:var(--space-4); color:var(--primary); background:var(--selected-surface); }
+.cv-registration-summary-icon .ui-icon { --icon-size:24px; }
+.cv-registration-summary-kicker { color:var(--text-secondary); font-size:var(--font-size-caption); letter-spacing:.8px; }
+.cv-registration-summary > h2 { margin:var(--space-2) 0 var(--space-1); font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); overflow-wrap:anywhere; }
+.cv-registration-summary > p { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); overflow-wrap:anywhere; }
+.cv-registration-summary > dl { display:grid; gap:var(--space-4); padding:var(--space-5) 0; margin:var(--space-5) 0; border-top:1px solid var(--divider); border-bottom:1px solid var(--divider); }
+.cv-registration-summary dl > div { display:flex; align-items:start; justify-content:space-between; gap:var(--space-3); }
+.cv-registration-summary dt { flex:none; color:var(--text-secondary); font-size:var(--font-size-caption); }
+.cv-registration-summary dd { margin:0; text-align:end; font-size:var(--font-size-body); line-height:var(--line-height-body); overflow-wrap:anywhere; }
+.cv-registration-route { display:grid; gap:var(--space-3); margin:var(--space-4) 0 var(--space-5); }
+.cv-registration-route > div { display:flex; align-items:center; gap:var(--space-3); }
+.cv-registration-route > div > span { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.cv-registration-route > div > div { display:flex; flex:1; align-items:center; gap:var(--space-3); padding:var(--space-2) var(--space-3); border:1px solid var(--border); background:var(--field-background); color:var(--text-secondary); font-size:var(--font-size-caption); }
+.cv-registration-route i { width:32px; height:12px; border:1px solid var(--border-control); background:repeating-linear-gradient(90deg,var(--border) 0 1px,transparent 1px 6px); }
+.cv-registration-unit-list { display:grid; gap:var(--space-5); padding:var(--space-6); }
+.cv-registration-unit { min-width:0; padding:var(--space-5); border:1px solid var(--border); }
+.cv-registration-unit > header { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-bottom:var(--space-5); }
+.cv-registration-unit > header > div { display:flex; align-items:center; gap:var(--space-3); min-width:0; }
+.cv-registration-unit h3 { font-size:var(--font-size-body); font-weight:var(--font-weight-semibold); overflow-wrap:anywhere; }
+.cv-registration-unit-number { display:inline-flex; flex:none; align-items:center; justify-content:center; width:28px; height:28px; color:var(--text-secondary); background:var(--surface); font-size:var(--font-size-caption); }
+.cv-registration-add { width:100%; justify-content:center; min-height:var(--control-height); }
+.cv-registration-review { display:grid; gap:var(--space-6); padding:var(--space-6); }
+.cv-registration-review > section + section { padding-top:var(--space-5); border-top:1px solid var(--divider); }
+.cv-registration-review-title { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-bottom:var(--space-5); }
+.cv-registration-review-title h3 { font-size:var(--font-size-body); font-weight:var(--font-weight-semibold); }
+.cv-registration-review-title h3 > span { margin-inline-start:var(--space-1); color:var(--text-secondary); font-weight:400; }
+.cv-registration-definition { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-5); }
+.cv-registration-definition dt { margin-bottom:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); }
+.cv-registration-definition dd { margin:0; font-size:var(--font-size-body); line-height:var(--line-height-body); overflow-wrap:anywhere; }
+.cv-registration-description { margin-top:var(--space-5); }
+.cv-registration-description h4 { margin-bottom:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); font-weight:400; }
+.cv-registration-description p { font-size:var(--font-size-body); line-height:var(--line-height-body); white-space:pre-wrap; overflow-wrap:anywhere; }
+.cv-registration-review-units { display:grid; gap:var(--space-3); }
+.cv-registration-review-units > li { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-3); border:1px solid var(--border); }
+.cv-registration-review-units > li > div { min-width:0; }
+.cv-registration-review-units strong { font-size:var(--font-size-body); font-weight:var(--font-weight-medium); overflow-wrap:anywhere; }
+.cv-registration-review-units p { margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.cv-registration-actions { display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); margin-top:var(--space-6); padding:var(--space-4) 0; border-top:1px solid var(--divider); }
+.cv-registration-actions > div { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:var(--space-3); }
+.cv-registration-actions > div > span { color:var(--text-secondary); font-size:var(--font-size-caption); }
+@media (max-width:1200px) {
+  .cv-registration-main { grid-template-columns:minmax(0,1fr); }
+  .cv-registration-summary { display:none; }
+}
+@media (max-width:600px) {
+  .cv-registration-stepper { padding:var(--space-4); margin-bottom:var(--space-4); }
+  .cv-registration-heading,.cv-registration-fields,.cv-registration-unit-list,.cv-registration-review { padding:var(--space-4); }
+  .cv-registration-heading h2 { font-size:var(--font-size-title); }
+  .cv-registration-unit { padding:var(--space-4); }
+  .cv-registration-unit > header { align-items:flex-start; }
+  .cv-registration-unit > header > div { align-items:flex-start; }
+  .cv-registration-definition { grid-template-columns:minmax(0,1fr); }
+  .cv-registration-review-title { flex-wrap:wrap; }
+  .cv-registration-error { margin-inline:var(--space-4); }
+  .cv-registration-actions { flex-wrap:wrap; }
+  .cv-registration-actions > div { flex:1; min-width:0; }
+  .cv-registration-actions > div > span { flex-basis:100%; text-align:end; }
+  .cv-registration-actions .button { padding-inline:var(--space-3); }
+}

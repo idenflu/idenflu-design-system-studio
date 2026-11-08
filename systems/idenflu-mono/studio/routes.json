@@ -262,8 +262,8 @@
     "route": "patterns/layout",
     "title": "Layout",
     "group": "Patterns",
-    "description": "사이드바형 레이아웃의 개요를 살펴보고 실제 샘플 화면을 엽니다.",
-    "searchTerms": "레이아웃 사이드바 내비게이션 관리자 업무 화면 샘플 layout sidebar navigation sample"
+    "description": "사이드바형 레이아웃과 카드형 목록·단계형 등록·점검 캘린더의 실제 샘플 화면을 엽니다.",
+    "searchTerms": "레이아웃 사이드바 내비게이션 관리자 업무 화면 샘플 설비 컨베이어 카드형 목록 단계형 등록 카탈로그 점검 일정 캘린더 layout sidebar navigation sample wizard catalog inspection calendar"
   },
   {
     "route": "patterns/form/basic",

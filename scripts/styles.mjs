@@ -1,3 +1,3 @@
 // Filenames are relative to systems/idenflu-mono/core and studio/styles respectively.
 export const componentStyles = ['tokens.css', 'component-base.css', 'styles.css', 'components.css', 'extras.css', 'additional.css', 'search-select.css', 'multi-select-search.css', 'theme.css', 'number-fields.css', 'data-state.css', 'datetime-picker.css', 'time-picker.css'];
-export const documentStyles = ['studio-layout.css', 'docs.css', 'form-examples.css', 'preferences.css', 'layout-patterns.css'];
+export const documentStyles = ['studio-layout.css', 'docs.css', 'form-examples.css', 'preferences.css', 'layout-patterns.css', 'layout-conveyor-catalog.css', 'layout-conveyor-registration.css', 'layout-inspection-calendar.css', 'layout-inspection-dialogs.css'];

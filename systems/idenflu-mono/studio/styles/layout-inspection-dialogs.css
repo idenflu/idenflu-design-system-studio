@@ -1,0 +1,46 @@
+.inspection-editor.dialog { width:min(640px,calc(100vw - var(--space-8))); max-height:calc(100dvh - var(--space-8)); }
+.inspection-editor .dialog-header,.inspection-detail .drawer-header { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-4); }
+.inspection-editor .dialog-header > div,.inspection-detail .drawer-header > div { min-width:0; }
+.inspection-editor .dialog-header h2,.inspection-detail .drawer-header h2 { font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); overflow-wrap:anywhere; }
+.inspection-editor .dialog-header p { margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.inspection-editor .dialog-header > .button,.inspection-detail .drawer-header > .button { flex:none; }
+.inspection-editor-form { display:grid; gap:var(--space-5); }
+.inspection-editor-error { display:flex; align-items:flex-start; gap:var(--space-2); padding:var(--space-3); border-inline-start:2px solid var(--danger); background:var(--danger-surface); color:var(--danger-text); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.inspection-editor-error > .ui-icon { flex:none; margin-top:2px; }
+.inspection-editor-help { display:flex; align-items:flex-start; gap:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.inspection-editor-help > .ui-icon { flex:none; }
+.inspection-editor .dialog-footer { justify-content:flex-end; }
+.inspection-detail-eyebrow { color:var(--text-secondary); font-size:var(--font-size-caption); letter-spacing:.7px; }
+.inspection-detail .drawer-header h2 { margin-top:var(--space-1); }
+.inspection-detail-content { display:grid; gap:var(--space-6); }
+.inspection-detail-status { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-3); }
+.inspection-detail-status > span:last-child { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-detail-content > section { padding-top:var(--space-5); border-top:1px solid var(--divider); }
+.inspection-detail-content h3 { margin:0 0 var(--space-4); font-size:var(--font-size-body); font-weight:var(--font-weight-semibold); }
+.inspection-detail-time { display:flex; align-items:flex-start; gap:var(--space-4); padding:var(--space-5); border:1px solid var(--border); background:var(--surface); }
+.inspection-detail-time > .ui-icon { flex:none; width:24px; height:24px; color:var(--primary); }
+.inspection-detail-time > div { min-width:0; }
+.inspection-detail-time strong { font-size:var(--font-size-body); font-weight:var(--font-weight-medium); }
+.inspection-detail-time p { margin-top:var(--space-2); font-size:var(--font-size-title); line-height:var(--line-height-title); }
+.inspection-detail-time p > span { color:var(--text-secondary); font-size:var(--font-size-caption); white-space:nowrap; }
+.inspection-detail-section-title { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3); margin-bottom:var(--space-4); }
+.inspection-detail-section-title h3 { margin:0; }
+.inspection-detail-equipment { padding:var(--space-5); border:1px solid var(--border); }
+.inspection-detail-equipment > span { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-detail-equipment h4 { margin:var(--space-1) 0 var(--space-2); font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); overflow-wrap:anywhere; }
+.inspection-detail-equipment > p { display:flex; align-items:flex-start; gap:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); overflow-wrap:anywhere; }
+.inspection-detail-equipment > p > .ui-icon { flex:none; }
+.inspection-detail-equipment dl { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-4); padding-top:var(--space-4); margin-top:var(--space-4); border-top:1px solid var(--divider); }
+.inspection-detail-equipment dt { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.inspection-detail-equipment dd { display:flex; align-items:center; gap:var(--space-2); margin-top:var(--space-2); font-size:var(--font-size-body); }
+.inspection-detail-equipment dd .avatar { flex:none; }
+.inspection-detail-notes { white-space:pre-wrap; overflow-wrap:anywhere; font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.inspection-detail-empty { color:var(--text-secondary); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.inspection-detail .drawer-footer { justify-content:flex-end; }
+@media (max-width:600px) {
+  .inspection-editor.dialog { width:calc(100vw - var(--space-4)); max-height:calc(100dvh - var(--space-4)); }
+  .inspection-editor .dialog-header,.inspection-editor .dialog-body,.inspection-editor .dialog-footer,.inspection-detail .drawer-body { padding:var(--space-4); }
+  .inspection-detail-time,.inspection-detail-equipment { padding:var(--space-4); }
+  .inspection-detail-time { gap:var(--space-3); }
+  .inspection-detail-equipment dl { grid-template-columns:minmax(0,1fr); }
+}

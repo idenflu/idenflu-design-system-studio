@@ -4,6 +4,11 @@ import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer,
 import { StudioSettings, ThemeControl } from './controls';
 import { initialWorkspaceRoles, type WorkspaceRole } from './layout-role-data';
 import { RoleManagementPage } from './layout-role-management';
+import { ConveyorCatalogPage } from './layout-conveyor-catalog';
+import { ConveyorRegistrationPage } from './layout-conveyor-registration';
+import { initialConveyors, type Conveyor, type ConveyorDraft } from './layout-conveyor-data';
+import { InspectionCalendarPage } from './layout-inspection-calendar';
+import { createInitialInspections, syncConveyorInspectionDates, type Inspection, type InspectionDraft } from './layout-inspection-data';
 import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspacePagePath, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings, type WorkspaceTab } from './layout-workspace-data';
 import { HomePage, InviteMemberForm, MasterDetailPage, MembersPage, NotFoundPage, NotificationSettingsPage, ProfileForm, ProjectDetailContent, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage, VerticalSettingsPage } from './layout-workspace-pages';
 import { defaultWorkspaceTabKey, defaultWorkspaceTabs, notFoundWorkspaceTab, parseWorkspaceHash, readStoredWorkspaceTabs, storeWorkspaceTabs, workspaceTabHash, type WorkspaceRoute } from './layout-workspace-routes';
@@ -19,7 +24,7 @@ function resolveWorkspaceRoute(route:WorkspaceRoute,tabs:WorkspaceTab[],projects
   return {tabs:withTab(tabs,tab),active:tab.key};
 }
 // The parent menu group to expand for a tab, if it belongs to one.
-const tabMenuPage=(tab:WorkspaceTab|undefined):WorkspacePage|null=>!tab||tab.page==='not-found'?null:tab.page==='project-detail'?'projects':tab.page;
+const tabMenuPage=(tab:WorkspaceTab|undefined):WorkspacePage|null=>!tab||tab.page==='not-found'?null:tab.page==='project-detail'?'projects':tab.page==='conveyor-registration'?'conveyors':tab.page;
 function initialWorkspaceState(){
   const stored=readStoredWorkspaceTabs()??{tabs:defaultWorkspaceTabs,active:defaultWorkspaceTabKey};
   const hash=typeof location==='undefined'?'':location.hash;
@@ -73,6 +78,14 @@ function WorkspaceTabsToolbar({workspaceRef,items,onSelect}: {workspaceRef:React
 export function SidebarLayoutSample() {
   const [projects,setProjects]=React.useState(initialProjects),[members,setMembers]=React.useState(initialMembers),[settings,setSettings]=React.useState(initialSettings);
   const [workspaceRoles,setWorkspaceRoles]=React.useState(initialWorkspaceRoles);
+  const [conveyors,setConveyors]=React.useState<Conveyor[]>(initialConveyors);
+  const [selectedConveyorId,setSelectedConveyorId]=React.useState<string|null>(null);
+  const [conveyorResetKey,setConveyorResetKey]=React.useState(0);
+  const conveyorSequence=React.useRef(0);
+  const [inspections,setInspections]=React.useState(()=>createInitialInspections(initialConveyors));
+  const [inspectionRequest,setInspectionRequest]=React.useState<{key:number;conveyorId:string}>();
+  const inspectionSequence=React.useRef(0),inspectionRequestSequence=React.useRef(0);
+  const inspectedConveyors=React.useMemo(()=>syncConveyorInspectionDates(conveyors,inspections),[conveyors,inspections]);
   const roleOptions=workspaceRoles.map(role=>({value:role.name,label:role.name}));
   const defaultInviteRole=workspaceRoles.find(role=>role.id==='role-editor')?.name??workspaceRoles.find(role=>role.id==='role-viewer')?.name??'';
   const profileRoleOptions=workspaceRoles.map(role=>({value:role.name,label:role.id==='role-admin'&&role.name==='관리자'?'워크스페이스 관리자':role.name}));
@@ -101,11 +114,29 @@ export function SidebarLayoutSample() {
   const tabTitle=(tab:WorkspaceTab)=>tab.page==='not-found'?'찾을 수 없음':tab.page==='project-detail'?projects.find(project=>project.id===tab.projectId)?.name??'프로젝트 상세':pageInfo[tab.page].title;
   const breadcrumbs=selectedPage?workspacePagePath(selectedPage):[tabTitle(activeTab)];
   if(activeTab.page==='project-detail')breadcrumbs.push(tabTitle(activeTab));
+  if(activeTab.page==='conveyor-registration')breadcrumbs.push('등록');
   const expandFor=(tab:WorkspaceTab|undefined)=>{const page=tabMenuPage(tab);if(page)setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));};
   const activate=(key:string)=>{setActive(key);expandFor(tabs.find(item=>item.key===key));};
   // Opening a new screen adds a history entry; switching between open tabs only rewrites the current one.
   const openTab=(tab:WorkspaceTab)=>{if(!tabs.some(item=>item.key===tab.key)){const hash=workspaceTabHash(tab);if(location.hash!==hash)history.pushState(null,'',`${location.pathname}${location.search}${hash}`);}setTabs(values=>withTab(values,tab));setActive(tab.key);expandFor(tab);setMobileOpen(false);setSearchOpen(false);setMenuQuery('');};
   const openPage=(page:WorkspacePage)=>openTab({key:page,page});
+  const saveInspection=(draft:InspectionDraft,id?:string):Inspection=>{
+    const item:Inspection={...draft,id:id??`inspection-new-${++inspectionSequence.current}`};
+    setInspections(values=>id?values.map(value=>value.id===id?item:value):[...values,item]);
+    setNotice(`${draft.title} 점검 일정을 ${id?'변경':'등록'}했습니다.`);
+    return item;
+  };
+  const openInspections=(conveyorId:string)=>{setSelectedConveyorId(null);setInspectionRequest({key:++inspectionRequestSequence.current,conveyorId});openPage('inspections');};
+  const createConveyor=(draft:ConveyorDraft)=>{
+    const id=`conveyor-new-${++conveyorSequence.current}`;
+    const conveyor:Conveyor={...draft,id,lastInspectedAt:null,nextInspectionAt:null};
+    setConveyors(values=>[conveyor,...values]);
+    setConveyorResetKey(value=>value+1);
+    setSelectedConveyorId(id);
+    setTabs(values=>withTab(values.filter(tab=>tab.page!=='conveyor-registration'),{key:'conveyors',page:'conveyors'}));
+    setActive('conveyors');
+    setNotice(`${draft.name} 컨베이어를 등록했습니다.`);
+  };
   const openProject=(id:string)=>openTab({key:`project:${id}`,page:'project-detail',projectId:id});
   const closeTab=(key:string)=>setTabs(values=>values.filter(tab=>tab.key!==key||tab.page==='home'));
   const updateProject=(id:string,patch:Partial<Project>)=>{setProjects(values=>values.map(project=>project.id===id?{...project,...patch}:project));setNotice('프로젝트 변경사항을 적용했습니다.');};
@@ -122,6 +153,7 @@ export function SidebarLayoutSample() {
     setNotice(`${ids.size}개 프로젝트를 삭제했습니다.`);
   };
   React.useEffect(()=>{document.title=`${tabTitle(activeTab)} · ${settings.name} | NOVA Workspace`;},[activeTab,projects,settings.name]);
+  React.useEffect(()=>{if(activeTab.page!=='conveyors')setSelectedConveyorId(null);},[activeTab.page]);
   // The URL hash follows the active tab; the plain sample URL stays untouched while the default screen is showing.
   React.useEffect(()=>{
     const hash=workspaceTabHash(activeTab);
@@ -179,6 +211,9 @@ export function SidebarLayoutSample() {
     if(tab.page==='master-detail')return <MasterDetailPage projects={projects} members={members} onUpdate={updateProject} onOpen={openProject}/>;
     if(tab.page==='members')return <MembersPage members={members} roleOptions={roleOptions} onInvite={()=>setInviteOpen(true)} onRole={(id,roles)=>{const assigned=[...new Set(roles.filter(name=>workspaceRoles.some(role=>role.name===name)))];setMembers(values=>values.map(member=>member.id===id?{...member,roles:assigned}:member));setNotice('멤버 역할을 변경했습니다.');}}/>;
     if(tab.page==='role-management')return <RoleManagementPage roles={workspaceRoles} members={members} onCreate={createWorkspaceRole} onUpdate={updateWorkspaceRole} onDelete={deleteWorkspaceRole} onSave={(id,connections)=>{setWorkspaceRoles(values=>values.map(role=>role.id===id?{...role,...connections}:role));setNotice('역할의 권한과 알림 설정을 저장했습니다.');}}/>;
+    if(tab.page==='conveyors')return <ConveyorCatalogPage conveyors={inspectedConveyors} onCreate={()=>openPage('conveyor-registration')} selectedId={activeTab.page==='conveyors'?selectedConveyorId:null} onSelect={setSelectedConveyorId} resetKey={conveyorResetKey} onInspections={openInspections}/>;
+    if(tab.page==='conveyor-registration')return <ConveyorRegistrationPage active={activeTab.page==='conveyor-registration'} existingCodes={conveyors.map(conveyor=>conveyor.code)} onCreate={createConveyor} onCancel={()=>{setTabs(values=>withTab(values.filter(item=>item.page!=='conveyor-registration'),{key:'conveyors',page:'conveyors'}));setActive('conveyors');}}/>;
+    if(tab.page==='inspections')return <InspectionCalendarPage active={activeTab.page==='inspections'} conveyors={inspectedConveyors} inspections={inspections} request={inspectionRequest} onSave={saveInspection} onViewConveyor={id=>{setConveyorResetKey(value=>value+1);setSelectedConveyorId(id);openPage('conveyors');}}/>;
     if(tab.page==='settings')return <SettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}}/>;
     if(tab.page==='notifications')return <NotificationSettingsPage settings={settings} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;
     if(tab.page==='vertical-settings')return <VerticalSettingsPage settings={settings} onSave={patch=>{setSettings(values=>({...values,...patch}));setNotice('워크스페이스 설정을 저장했습니다.');}} onChange={patch=>setSettings(values=>({...values,...patch}))}/>;

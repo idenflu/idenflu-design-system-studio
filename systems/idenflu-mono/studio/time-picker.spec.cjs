@@ -27,7 +27,7 @@ test('time input submits canonical minutes through the required form and resets'
   await expect(page.locator('#time-required')).toHaveValue('09:15');
   await page.getByRole('button',{name:'예약하기',exact:true}).click();
   await expect(page.getByRole('status').filter({hasText:'알림을 예약했습니다.'})).toHaveText('09:15에 알림을 예약했습니다.');
-  await page.getByRole('button',{name:'초기화',exact:true}).click();
+  await page.locator('form').filter({has:page.locator('#time-required')}).getByRole('button',{name:'초기화',exact:true}).click();
   await expect(page.locator('#time-required')).toHaveValue('');
 });
 
