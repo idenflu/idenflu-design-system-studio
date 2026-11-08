@@ -1,8 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import {mkdtemp, writeFile, rm, readFile} from 'node:fs/promises';
 import {dirname, join, resolve} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 import {
   apiMetadataPath, assertDeclarationsCurrent, assertMetadataCurrent,
   canonicalType, checkAPIDocuments, collectPublicAPI,
@@ -30,6 +31,17 @@ test('Studio API tables cover the selected public contracts and use current decl
   assert.doesNotMatch(JSON.stringify(contracts), /Size\$|import\("\/|__api_docs_probe__/);
 });
 
+test('public API metadata stays identical from repository and package working directories', async () => {
+  const expected = JSON.parse(await readFile(apiMetadataPath, 'utf8'));
+  const scriptURL = pathToFileURL(resolve(packageRoot, 'scripts/check-api-docs.mjs')).href;
+  const source = `import {collectPublicAPI} from ${JSON.stringify(scriptURL)};
+process.stdout.write(JSON.stringify(collectPublicAPI()));`;
+  for (const cwd of [resolve(packageRoot, '../..'), packageRoot]) {
+    const output = execFileSync(process.execPath, ['--input-type=module', '-e', source], {cwd, encoding: 'utf8'});
+    assertMetadataCurrent(expected, JSON.parse(output));
+  }
+});
+
 test('an exported type or optionality change fails the metadata check and stale declarations are rejected', async () => {
   const temporary = await mkdtemp(join(packageRoot, 'dist/api-docs-test-'));
   try {
@@ -43,7 +55,7 @@ test('an exported type or optionality change fails the metadata check and stale 
     await writeFile(entryPath, 'export interface WidgetProps { value?: readonly string[]; }');
     const changedType = collectPublicAPI({entryPath, definitions});
     assert.match(changedType.contracts.Widget.value.type, /readonly string\[\]/);
-    assert.throws(() => assertMetadataCurrent(original, changedType), /metadata is stale/);
+    assert.throws(() => assertMetadataCurrent(original, changedType), /metadata is stale[\s\S]*contracts\.Widget\.value\.type: expected "string \| undefined"; actual "readonly string\[\] \| undefined"/);
     assert.throws(() => assertDeclarationsCurrent(changedType, original), /do not match the source exports/);
 
     await writeFile(entryPath, 'export interface WidgetProps { value: string; }');

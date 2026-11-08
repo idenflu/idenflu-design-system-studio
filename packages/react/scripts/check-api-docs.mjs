@@ -66,7 +66,9 @@ ${names.map((name, index) => `type Contract${index}${name.includes('<T>') ? '<T>
     strict: true, noEmit: true, skipLibCheck: true,
     target: ts.ScriptTarget.ES2020, module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.Bundler, jsx: ts.JsxEmit.ReactJSX,
-    esModuleInterop: true, baseUrl: packageRoot,
+    // Only types reached through the public imports belong to this probe.
+    // Automatic @types discovery otherwise changes React aliases with the CWD.
+    types: [], esModuleInterop: true, baseUrl: packageRoot,
     paths: {'@idenflu/mono-react': [entryPath]},
   };
   const host = ts.createCompilerHost(options);
@@ -126,9 +128,23 @@ ${names.map((name, index) => `type Contract${index}${name.includes('<T>') ? '<T>
 
 const serialize = metadata => `${JSON.stringify(metadata, null, 2)}\n`;
 
+function firstMetadataDifference(expected, actual, path = 'metadata') {
+  if (Object.is(expected, actual)) return null;
+  if (expected && actual && typeof expected === 'object' && typeof actual === 'object') {
+    const expectedKeys = Object.keys(expected), actualKeys = Object.keys(actual);
+    for (const key of new Set([...expectedKeys, ...actualKeys])) {
+      const difference = firstMetadataDifference(expected[key], actual[key], `${path}.${key}`);
+      if (difference) return difference;
+    }
+    if (expectedKeys.join('\0') !== actualKeys.join('\0')) return `${path}: property order differs`;
+    return null;
+  }
+  return `${path}: expected ${JSON.stringify(expected) ?? 'undefined'}; actual ${JSON.stringify(actual) ?? 'undefined'}`;
+}
+
 export function assertMetadataCurrent(expected, actual) {
   if (serialize(expected) !== serialize(actual)) {
-    throw new Error('Public API table metadata is stale. Build the React declarations, then run node packages/react/scripts/check-api-docs.mjs --write and review the diff.');
+    throw new Error(`Public API table metadata is stale. Build the React declarations, then run node packages/react/scripts/check-api-docs.mjs --write and review the diff.\nFirst difference at ${firstMetadataDifference(expected, actual)}.`);
   }
 }
 

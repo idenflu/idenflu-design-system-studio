@@ -8,8 +8,10 @@ async function open(grid,label){const trigger=triggerFor(grid,label);await trigg
 test('searchable multi-filters combine OR and AND, keep choices and reset to all rows',async({page})=>{
   await page.goto(route);
   const example=exampleFor(page),grid=gridFor(page),rows=grid.locator('tbody tr[data-grid-row-id]');
-  await page.locator('.studio-grid-reference-links a[href="#data-grid-multi-filter-demo"]').click();
-  await expect(page).toHaveURL(/#\/components\/data-grid$/);
+  const shortcut=page.getByRole('navigation',{name:'이 페이지 목차',exact:true}).getByRole('link',{name:'복수 선택 컬럼 필터',exact:true});
+  await expect(shortcut).toHaveAttribute('href','#/components/data-grid?section=data-grid-multi-filter-demo-title');
+  await shortcut.click();
+  await expect(page).toHaveURL(/#\/components\/data-grid\?section=data-grid-multi-filter-demo-title$/);
   await expect(example.getByRole('heading',{name:'복수 선택 컬럼 필터',exact:true})).toBeFocused();
   await expect(rows).toHaveCount(6);
   const height=await grid.locator('.data-grid-filter-row').evaluate(element=>element.getBoundingClientRect().height);

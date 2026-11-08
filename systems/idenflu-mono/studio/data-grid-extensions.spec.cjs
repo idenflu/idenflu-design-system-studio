@@ -25,13 +25,16 @@ async function expectNoOverflow(page, grid) {
   expect(await grid.locator('.data-grid-tools').evaluate(element => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
 }
 
-test('the extension example follows built-in tools and has its own accessible shortcut and actions',{tag:'@mobile'}, async ({page}) => {
+test('the extension example follows built-in tools and has its own accessible shortcut and actions',{tag:'@mobile'}, async ({page,isMobile}) => {
   await page.goto(route);
   const section = sectionFor(page), grid = gridFor(page), builtIn = builtInGridFor(page);
   await expect(section.getByRole('heading', {name:'상단 도구 확장',level:2,exact:true})).toBeVisible();
   expect(await section.evaluate(element => element.previousElementSibling?.id)).toBe('data-grid-toolbar-demo');
-  await page.locator('.studio-grid-reference-links a[href="#data-grid-extensions"]').click();
-  await expect(page).toHaveURL(/#\/components\/data-grid$/);
+  if (isMobile) await page.locator('.docs-toc > summary').click();
+  const shortcut = page.getByRole('navigation', {name:'이 페이지 목차',exact:true}).getByRole('link', {name:'상단 도구 확장',exact:true});
+  await expect(shortcut).toHaveAttribute('href', '#/components/data-grid?section=data-grid-extensions-title');
+  await shortcut.click();
+  await expect(page).toHaveURL(/#\/components\/data-grid\?section=data-grid-extensions-title$/);
   await expect(section.getByRole('heading', {name:'상단 도구 확장',level:2,exact:true})).toBeFocused();
   for (const name of ['확장 예제 데이터 초기화','프로젝트 추가','선택 완료 처리']) {
     await expect(builtIn.getByRole('button', {name,exact:true})).toHaveCount(0);
