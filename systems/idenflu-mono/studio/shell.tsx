@@ -9,18 +9,25 @@ const menuRoutes = navigation.map(path => routes.find(item => item.route === pat
 const groups = [...new Set(menuRoutes.filter(item => item.route !== 'overview').map(item => item.group.split(' / ')[0]))];
 const currentGroups = (group:string) => ({[group.split(' / ')[0]]:true, [group]:true});
 const normalize = (text: string) => text.toLocaleLowerCase().replace(/[\s_-]+/g, '');
-const aliases: Record<string, string> = {foundations:'foundations/colors', states:'foundations/states', components:'components/buttons', 'components/empty-state':'patterns/empty-state', 'patterns/profile':'patterns/form/profile'};
+const aliases: Record<string, string> = {foundations:'foundations/colors', states:'foundations/states', components:'components/buttons', patterns:'patterns/form/basic', 'components/empty-state':'patterns/empty-state', 'patterns/profile':'patterns/form/profile'};
+// An unknown hash renders a not-found document at the requested address instead of silently jumping to Overview.
+export const notFoundRouteId = 'not-found';
+const notFoundRoute = (requested:string):DocumentRoute => ({route:notFoundRouteId, title:'문서를 찾을 수 없습니다', group:'Not found', description:`#/${requested} 주소에 해당하는 문서가 없습니다. 주소를 확인하거나 아래에서 이동하세요.`, searchTerms:''});
 function resolveRoute() {
   const raw = location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
-  return routes.find(item => item.route === (aliases[raw] || raw || 'overview')) || routes[0];
+  return routes.find(item => item.route === (aliases[raw] || raw || 'overview')) || notFoundRoute(raw);
 }
+const syncHash = (current:DocumentRoute) => {
+  if (current.route === notFoundRouteId) return;
+  const canonical = `#/${current.route}`;
+  if (location.hash !== canonical) history.replaceState(history.state, '', canonical);
+};
 export function useDocumentRoute() {
   const [current, setCurrent] = React.useState(resolveRoute);
   React.useEffect(() => {
     const change = () => {
       const next = resolveRoute();
-      const canonical = `#/${next.route}`;
-      if (location.hash !== canonical) history.replaceState(history.state, '', canonical);
+      syncHash(next);
       setCurrent(next);
     };
     change();
@@ -28,8 +35,7 @@ export function useDocumentRoute() {
     return () => window.removeEventListener('hashchange', change);
   }, []);
   React.useEffect(() => {
-    const canonical = `#/${current.route}`;
-    if (location.hash !== canonical) history.replaceState(history.state, '', canonical);
+    syncHash(current);
     document.title = `${current.title} — idenflu mono`;
   }, [current]);
   return current;

@@ -12,7 +12,8 @@ import { IconDemos, TypographyDemos, SizeDemos, StateDemos } from './foundation-
 import { TabsDemos, FeedbackDemos, AccordionDemos, OverlayDemos, TooltipDemos, CardDemos } from './content-demos';
 import { ButtonDemos, SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemos, StepperDemos, MenuDemos, PopoverDemos, DrawerDemos } from './structure-demos';
 import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from './media-demos';
-import { DocumentShell, Overview, useDocumentRoute } from './shell';
+import { DocumentShell, Overview, notFoundRouteId, useDocumentRoute } from './shell';
+import { DocumentNotFound, LayoutNotFound } from './not-found';
 import { DividerDemos } from './divider-demos';
 import { GridDemos, gridUsage } from './grid-demos';
 import { patternPages, patternSnippets } from './patterns';
@@ -316,6 +317,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/avatar': return <AvatarDemos />;
     case 'components/stepper': return <StepperDemos />;
     case 'components/card': return <CardDemos />;
+    case notFoundRouteId: return <DocumentNotFound />;
     default: return null;
   }
 }
@@ -329,8 +331,9 @@ function DocumentationApp() {
   </DocumentShell>;
 }
 function App() {
-  return new URLSearchParams(location.search).get('layout') === 'sidebar'
-    ? <SidebarLayoutSample />
-    : <DocumentationApp />;
+  const layout = new URLSearchParams(location.search).get('layout');
+  if (layout === 'sidebar') return <SidebarLayoutSample />;
+  if (layout !== null) return <LayoutNotFound layout={layout} />;
+  return <DocumentationApp />;
 }
 createRoot(document.getElementById('root')!).render(<App />);

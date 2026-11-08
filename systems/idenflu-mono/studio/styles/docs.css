@@ -163,3 +163,17 @@
 .component-guide pre { max-width:100%; overflow:auto; padding:var(--space-4); background:var(--surface); color:var(--text); font:calc(var(--font-size-base) - 1px)/var(--line-height-control) ui-monospace, SFMono-Regular, Consolas, monospace; tab-size:2; }
 .route-view h2 { scroll-margin-top:100px; }
 @media(max-width:600px) { .guide-facts > div { grid-template-columns:1fr; gap:var(--space-2); } }
+/* Not-found views for unknown document hashes and layout query values. */
+.studio-not-found { display:grid; gap:var(--space-3); justify-items:start; max-width:640px; padding:var(--space-6); border:1px solid var(--border); background:var(--field-background); }
+.studio-not-found > p { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.studio-not-found > code, .studio-not-found-lead code { padding:var(--space-1) var(--space-2); background:var(--surface); font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:var(--font-size-caption); overflow-wrap:anywhere; }
+.studio-not-found ul { display:grid; gap:var(--space-2); justify-self:stretch; padding-left:var(--space-5); color:var(--text-secondary); list-style:disc; }
+.studio-not-found kbd { padding:0 var(--space-1); border:1px solid var(--border); font-family:inherit; font-size:var(--font-size-caption); }
+.studio-not-found-links { display:flex; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-2); }
+.studio-not-found-page { min-height:100vh; padding:var(--space-10) var(--space-6); background:var(--canvas); color:var(--text); font-family:var(--font-family-body); font-size:var(--font-size-body); line-height:var(--line-height-body); }
+.studio-not-found-page h1 { font-size:var(--font-size-heading); line-height:var(--line-height-heading); font-weight:var(--font-weight-semibold); overflow-wrap:anywhere; }
+.studio-not-found-lead { color:var(--text); }
+.studio-not-found-options { padding-left:0 !important; list-style:none !important; }
+.studio-not-found-options a { display:grid; gap:var(--space-1); padding:var(--space-3) var(--space-4); border:1px solid var(--border); color:var(--text); text-decoration:none; }
+.studio-not-found-options a:hover { border-color:var(--primary); }
+.studio-not-found-options span { color:var(--text-secondary); font-size:var(--font-size-caption); }

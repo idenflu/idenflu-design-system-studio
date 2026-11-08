@@ -123,6 +123,24 @@ test('legacy route aliases resolve to a canonical document and history remains u
   await page.goBack();
   await expect(page).toHaveURL(/#\/foundations\/colors$/);
   await expect(page.getByRole('heading', {level:1})).toHaveText('Colors');
-  await page.evaluate(() => { location.hash = '#/not-found'; });
+  await page.evaluate(() => { location.hash = '#/no-such-document'; });
+  await expect(page).toHaveURL(/#\/no-such-document$/);
+  await expect(page.getByRole('heading', {level:1})).toHaveText('문서를 찾을 수 없습니다');
+  await expect(page.locator('.studio-not-found code')).toHaveText('#/no-such-document');
+  await page.locator('.studio-not-found').getByRole('link', {name:'Overview', exact:true}).click();
   await expect(page).toHaveURL(/#\/overview$/);
+  await expect(page.getByRole('heading', {level:1})).toContainText('Form follows');
+  await page.evaluate(() => { location.hash = '#/patterns'; });
+  await expect(page).toHaveURL(/#\/patterns\/form\/basic$/);
+});
+
+test('an unknown layout query shows the available samples instead of the documentation', async ({ page }) => {
+  await page.goto('/systems/idenflu-mono/index.html?layout=sidebarddd#/patterns');
+  await expect(page.getByRole('heading', {level:1, name:'레이아웃을 찾을 수 없습니다', exact:true})).toBeVisible();
+  await expect(page.locator('.studio-not-found > code')).toHaveText('?layout=sidebarddd');
+  await expect(page.locator('.docs-layout')).toHaveCount(0);
+  await expect(page.locator('.layout-sample-app')).toHaveCount(0);
+  await page.getByRole('link', {name:/^sidebar/}).click();
+  await expect(page).toHaveURL(/\?layout=sidebar$/);
+  await expect(page.locator('.layout-sample-app')).toBeVisible();
 });
