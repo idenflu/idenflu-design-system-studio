@@ -170,7 +170,8 @@
 .react-studio-color-link { color:var(--primary); text-decoration:underline; text-underline-offset:2px; }
 .react-studio-icons { list-style:none; padding:0; }
 .react-studio-icons > li { display:flex; align-items:center; padding:var(--space-2); border-bottom:1px solid var(--divider); overflow-wrap:anywhere; }
-.react-studio-icons .ui-icon { flex:none; }
+.react-studio-icons .ui-icon { --icon-size:24px; flex:none; }
+.react-studio-icons svg { flex:none; }
 .react-studio-icon-pairs { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:var(--space-4); margin:0; padding:0; list-style:none; }
 .react-studio-icon-pairs > li { display:grid; gap:var(--space-4); min-width:0; padding-block:var(--space-4); border-top:1px solid var(--divider); }
 .react-studio-icon-pair { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); }
