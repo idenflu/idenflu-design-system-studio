@@ -150,12 +150,13 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
                 const count=items.filter(item=>draft.permissions.includes(item.id)).length;
                 const selectAllLabel=normalizedPermissionQuery?'검색 결과 전체 선택':'전체 선택';
                 return <section className="layout-role-permission-group" key={group} aria-label={`${group} 권한`}>
-                  <header><div className="layout-role-group-title"><h4>{group}</h4><span className="layout-role-group-count">{count} / {items.length} 허용</span></div><div className="layout-role-group-actions"><span aria-hidden="true">{selectAllLabel}</span><Checkbox containerClassName="layout-role-permission-check" label={<span className="sr-only">{group} {selectAllLabel}</span>} checked={count===items.length} indeterminate={count>0&&count<items.length} onChange={event=>updatePermissions(event.target.checked?[...new Set([...draft.permissions,...items.map(item=>item.id)])]:draft.permissions.filter(id=>!items.some(item=>item.id===id)))}/></div></header>
+                  <header><Checkbox containerClassName="layout-role-group-check" label={<span className="layout-role-group-title"><strong>{group}</strong><span className="layout-role-group-count">{count} / {items.length} 허용</span></span>} aria-label={`${group} ${selectAllLabel}`} checked={count===items.length} indeterminate={count>0&&count<items.length} onChange={event=>updatePermissions(event.target.checked?[...new Set([...draft.permissions,...items.map(item=>item.id)])]:draft.permissions.filter(id=>!items.some(item=>item.id===id)))}/></header>
                   <div className="layout-role-options">{items.map(item=>{
                     const changed=draft.permissions.includes(item.id)!==selected.permissions.includes(item.id);
+                    const descriptionId=`${selected.id}-${item.id}-description`;
                     return <div className="layout-role-option" key={item.id} data-changed={changed||undefined}>
-                      <div className="layout-role-permission-info"><div><strong>{item.name}</strong>{changed&&<span className="layout-role-change-mark">변경</span>}</div><p id={`${selected.id}-${item.id}-description`}>{item.description}</p></div>
-                      <Checkbox containerClassName="layout-role-permission-check" label={<span className="sr-only">{item.name}</span>} checked={draft.permissions.includes(item.id)} aria-describedby={`${selected.id}-${item.id}-description`} onChange={event=>togglePermission(item.id,event.target.checked)}/>
+                      <Checkbox containerClassName="layout-role-option-check" label={<span className="layout-role-option-label"><strong>{item.name}</strong>{changed&&<span className="layout-role-change-mark">변경</span>}</span>} aria-label={item.name} checked={draft.permissions.includes(item.id)} aria-describedby={descriptionId} onChange={event=>togglePermission(item.id,event.target.checked)}/>
+                      <p id={descriptionId} className="layout-role-option-description">{item.description}</p>
                     </div>;
                   })}</div>
                 </section>;
@@ -164,10 +165,18 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
             </>},
             {value:'notifications',label:`알림 ${notificationCount(draft)}`,content:<>
               <div className="layout-role-section-heading"><div><h3>수신 알림</h3><p>이 역할을 가진 멤버에게 전달할 알림과 수신 방법을 선택하세요.</p></div><Badge variant="neutral">{notificationCount(draft)} / {roleNotifications.length}</Badge></div>
-              <div className="layout-role-notifications">{roleNotifications.map(item=><div className="layout-role-notification" key={item.id} data-changed={roleNotificationChannels.some(channel=>!!draft.notifications[item.id]?.includes(channel)!==!!selected.notifications[item.id]?.includes(channel))||undefined}>
-                <div className="layout-role-notification-info"><strong>{item.name}</strong>{roleNotificationChannels.some(channel=>!!draft.notifications[item.id]?.includes(channel)!==!!selected.notifications[item.id]?.includes(channel))&&<span className="layout-role-change-mark">변경</span>}<p id={`${selected.id}-${item.id}-description`}>{item.description}</p></div>
-                <div className="layout-role-notification-channels">{roleNotificationChannels.map(channel=>{const label=channel==='app'?'앱':'이메일';return <Checkbox key={channel} label={label} containerClassName={`layout-role-channel--${channel}`} aria-label={`${item.name} ${label}`} aria-describedby={`${selected.id}-${item.id}-description`} checked={channel==='app'&&(draft.notifications[item.id]?.includes(channel)??false)} disabled={channel==='email'} onChange={event=>toggleNotification(item.id,channel,event.target.checked)}/>;})}</div>
-              </div>)}</div>
+              <div className="layout-role-notifications">
+                <div className="layout-role-notification-head" aria-hidden="true"><span>알림</span><span>앱</span><span>이메일</span></div>
+                {roleNotifications.map(item=>{
+                  const changed=roleNotificationChannels.some(channel=>!!draft.notifications[item.id]?.includes(channel)!==!!selected.notifications[item.id]?.includes(channel));
+                  const descriptionId=`${selected.id}-${item.id}-description`;
+                  return <div className="layout-role-notification" key={item.id} data-changed={changed||undefined}>
+                    <div className="layout-role-notification-info"><strong>{item.name}</strong>{changed&&<span className="layout-role-change-mark">변경</span>}<p id={descriptionId}>{item.description}</p></div>
+                    {roleNotificationChannels.map(channel=>{const label=channel==='app'?'앱':'이메일';return <Checkbox key={channel} label={<span className="sr-only">{label}</span>} containerClassName={`layout-role-channel layout-role-channel--${channel}`} aria-label={`${item.name} ${label}`} aria-describedby={descriptionId} checked={channel==='app'&&(draft.notifications[item.id]?.includes(channel)??false)} disabled={channel==='email'} onChange={event=>toggleNotification(item.id,channel,event.target.checked)}/>;})}
+                  </div>;
+                })}
+              </div>
+              <p className="component-helper layout-role-channel-note">이메일 채널은 준비 중이라 이 샘플에서는 선택할 수 없습니다.</p>
             </>},
           ]}/>
           <footer className="layout-role-footer"><span role="status" className={dirty?'layout-role-change-summary':undefined}>{dirty?`변경된 권한 ${changedPermissions}개 · 알림 ${changedNotifications}개`:feedback}</span><div><Button variant="outline" disabled={!dirty} onClick={()=>{clearDraft();setFeedback('변경사항을 취소했습니다.');}}>변경 취소</Button><Button disabled={!dirty} onClick={save}><Icon name="save"/>변경사항 저장</Button></div></footer>
