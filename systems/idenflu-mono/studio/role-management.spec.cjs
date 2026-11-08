@@ -53,7 +53,9 @@ async function replaceAndDeleteRole(page,name,replacement){
   const dialog=await openDeleteRole(page,name);
   const remove=dialog.getByRole('button',{name:'삭제',exact:true});
   await expect(remove).toBeDisabled();
-  await dialog.getByRole('combobox',{name:/^대체 역할:/}).click();
+  const replacementControl=dialog.getByRole('combobox',{name:/^대체 역할:/});
+  await expect(replacementControl).toHaveAccessibleDescription(/이 역할을 사용하는 멤버 \d+명에게 적용할 대체 역할을 선택하세요/);
+  await replacementControl.click();
   await dialog.getByRole('option',{name:replacement,exact:true}).click();
   await expect(remove).toBeEnabled();
   await remove.click();

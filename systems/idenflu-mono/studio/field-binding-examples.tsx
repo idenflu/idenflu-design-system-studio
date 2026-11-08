@@ -14,15 +14,15 @@ export function SelectBindingExample() {
   const [reviewer,setReviewer]=React.useState('');
   const [teams,setTeams]=React.useState<string[]>(['design']);
   const [result,setResult]=React.useState<Record<string,unknown>|null>(null);
-  const [revision,setRevision]=React.useState(0);
+  const teamRef=React.useRef<HTMLButtonElement>(null);
   return <form className="react-pattern-form" onSubmit={event=>{
     event.preventDefault();
     const data=new FormData(event.currentTarget);
     // 같은 name의 복수 선택은 getAll로 읽습니다. 단일 값은 get으로 읽습니다.
     setResult({team:data.get('team'),reviewer:data.get('reviewer')||null,teams:data.getAll('teams')});
-  }} onReset={()=>{setTeam('design');setReviewer('');setTeams(['design']);setResult(null);setRevision(value=>value+1);}}>
-    <Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid" key={revision}>
-      <Select label="바인딩 담당 팀" name="team" required options={bindingTeams} value={team} onValueChange={value=>{setTeam(value);setResult(null);}} />
+  }} onReset={()=>{setTeam('design');setReviewer('');setTeams(['design']);setResult(null);teamRef.current?.focus();}}>
+    <Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
+      <Select ref={teamRef} label="바인딩 담당 팀" name="team" required options={bindingTeams} value={team} onValueChange={value=>{setTeam(value);setResult(null);}} />
       <SearchSelect label="바인딩 검토 팀" name="reviewer" options={bindingTeams} value={reviewer} onValueChange={value=>{setReviewer(value);setResult(null);}} />
       <GridItem colSpan="full" className="form-pattern-field--wide"><MultiSelect label="바인딩 참여 팀" name="teams" options={bindingTeams} value={teams} onValueChange={value=>{setTeams(value);setResult(null);}} searchable presentation="inline" clearable maxVisibleTags={2} /></GridItem>
     </Grid>

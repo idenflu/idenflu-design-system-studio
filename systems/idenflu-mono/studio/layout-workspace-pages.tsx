@@ -22,11 +22,11 @@ export function InviteMemberForm({id,onInvite,existingEmails,roleOptions,default
   const [name,setName]=React.useState(''),[email,setEmail]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[role,setRole]=React.useState(initialRole);
   const selectedRole=roleOptions.some(option=>option.value===role)?role:initialRole;
   const [error,setError]=React.useState('');
-  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(!selectedRole)return;if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');return;}onInvite({name:name.trim(),email:email.trim(),team,roles:[selectedRole]});}}>
+  const emailInput=React.useRef<HTMLInputElement>(null);
+  return <form id={id} className="layout-project-form" onSubmit={event=>{event.preventDefault();if(!selectedRole)return;if(existingEmails.some(value=>value.toLowerCase()===email.trim().toLowerCase())){setError('이미 등록된 이메일입니다.');emailInput.current?.focus();return;}onInvite({name:name.trim(),email:email.trim(),team,roles:[selectedRole]});}}>
     <TextField label="이름" prefix={<Icon name="person"/>} prefixDecorative value={name} onChange={event=>setName(event.target.value)} required pattern=".*\S.*" autoFocus/>
-    <TextField label="이메일" type="email" prefix={<Icon name="mail"/>} prefixDecorative value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
-    <Select label="소속 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" prefixIcon={<Icon name="shield-check"/>} value={selectedRole} options={roleOptions} onValueChange={setRole} popupStrategy="fixed" required disabled={!roleOptions.length}/>
-    {!roleOptions.length&&<p className="component-helper">멤버를 초대하려면 역할을 먼저 추가하세요.</p>}
+    <TextField ref={emailInput} label="이메일" type="email" prefix={<Icon name="mail"/>} prefixDecorative value={email} onChange={event=>{setEmail(event.target.value);setError('');}} error={error||undefined} required placeholder="name@example.com"/>
+    <Select label="소속 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><Select label="역할" prefixIcon={<Icon name="shield-check"/>} value={selectedRole} options={roleOptions} onValueChange={setRole} popupStrategy="fixed" required disabled={!roleOptions.length} helperText={!roleOptions.length?'멤버를 초대하려면 역할을 먼저 추가하세요.':undefined}/>
     <p className="component-helper">샘플 멤버 목록에 추가하며 실제 초대 메일은 전송하지 않습니다.</p>
   </form>;
 }
@@ -47,7 +47,7 @@ export function ProfileForm({id,member,members,onSave,roleOptions}: {id:string;m
   }}>
     <TextField ref={nameInput} label="이름" value={name} onChange={event=>{setName(event.target.value);setNameError('');}} required maxLength={60} error={nameError||undefined} autoFocus/>
     <TextField ref={emailInput} label="이메일" type="email" value={email} onChange={event=>{setEmail(event.target.value);setEmailError('');}} required maxLength={254} error={emailError||undefined}/>
-    <div><MultiSelect label="역할" value={member.roles} options={roleOptions} presentation="inline" disabled aria-describedby={`${id}-role-help`} placeholder="지정된 역할이 없습니다"/><p id={`${id}-role-help`} className="component-helper" style={{marginTop:'var(--space-1)'}}>역할은 멤버 관리에서 변경할 수 있습니다.</p></div>
+    <MultiSelect label="역할" value={member.roles} options={roleOptions} presentation="inline" disabled helperText="역할은 멤버 관리에서 변경할 수 있습니다." placeholder="지정된 역할이 없습니다"/>
   </form>;
 }
 
@@ -173,18 +173,15 @@ type SettingsDraft=Partial<Pick<WorkspaceSettings,'name'|'description'|'timezone
 
 function WorkspaceSettingsForm({settings,onSave}:SettingsProps){
   const [draft,setDraft]=React.useState<SettingsDraft>({}),[error,setError]=React.useState(''),[saved,setSaved]=React.useState(false);
-  const menuStyleDescriptionId=React.useId();
+  const nameInput=React.useRef<HTMLInputElement>(null);
   const name=draft.name??settings.name,description=draft.description??settings.description,timezone=draft.timezone??settings.timezone,sideMenuStyle=draft.sideMenuStyle??settings.sideMenuStyle;
   const change=<K extends keyof SettingsDraft,>(key:K,value:WorkspaceSettings[K])=>{setDraft(current=>{const next={...current};if(value===settings[key])delete next[key];else next[key]=value;return next;});setSaved(false);};
-  return <form className="layout-panel layout-settings" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('워크스페이스 이름을 입력해주세요.');return;}onSave({...draft,...(draft.name!==undefined?{name:name.trim()}:{})});setDraft({});setSaved(true);}}>
+  return <form className="layout-panel layout-settings" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('워크스페이스 이름을 입력해주세요.');nameInput.current?.focus();return;}onSave({...draft,...(draft.name!==undefined?{name:name.trim()}:{})});setDraft({});setSaved(true);}}>
     <div><h2>기본 정보</h2><p>이 정보는 사이드바와 탑바에 함께 표시됩니다.</p></div>
-    <TextField label="워크스페이스 이름" value={name} onChange={event=>{change('name',event.target.value);setError('');}} required error={error||undefined}/>
+    <TextField ref={nameInput} label="워크스페이스 이름" value={name} onChange={event=>{change('name',event.target.value);setError('');}} required error={error||undefined}/>
     <TextArea label="워크스페이스 소개" value={description} onChange={event=>change('description',event.target.value)} rows={3}/>
     <Select label="시간대" value={timezone} onValueChange={value=>change('timezone',value)} options={[{value:'seoul',label:'서울 (UTC+09:00)'},{value:'tokyo',label:'도쿄 (UTC+09:00)'},{value:'utc',label:'UTC (UTC+00:00)'}]}/>
-    <div>
-      <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'category',label:'카테고리형 (기본)'},{value:'tree',label:'트리형'}]} aria-describedby={menuStyleDescriptionId}/>
-      <p id={menuStyleDescriptionId} className="component-helper">카테고리형은 업무 공간·조직 관리·환경 설정을 제목으로 구분합니다.</p>
-    </div>
+    <Select label="사이드 메뉴 스타일" value={sideMenuStyle} onValueChange={value=>change('sideMenuStyle',value as WorkspaceSettings['sideMenuStyle'])} options={[{value:'category',label:'카테고리형 (기본)'},{value:'tree',label:'트리형'}]} helperText="카테고리형은 업무 공간·조직 관리·환경 설정을 제목으로 구분합니다."/>
     <div className="layout-settings-actions"><span role="status">{saved?'변경사항을 저장했습니다.':''}</span><Button type="submit"><Icon name="save"/>변경사항 저장</Button></div>
   </form>;
 }

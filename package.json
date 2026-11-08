@@ -8,7 +8,9 @@
     "dev": "node scripts/dev.mjs",
     "check": "node scripts/check.mjs",
     "check:changelog": "node scripts/check-release-changelog.mjs",
-    "test": "node --test tests/tooling.test.mjs tests/preferences.test.mjs tests/dev.test.mjs tests/release-changelog.test.mjs",
+    "docs:tokens": "node scripts/sync-token-docs.mjs",
+    "check:tokens": "node scripts/sync-token-docs.mjs --check",
+    "test": "node --test tests/tooling.test.mjs tests/preferences.test.mjs tests/dev.test.mjs tests/release-changelog.test.mjs tests/token-docs.test.mjs",
     "test:browser": "playwright test",
     "build": "node scripts/build.mjs"
   },

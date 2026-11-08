@@ -21,7 +21,7 @@ export function ColorDemos() {
   }, []);
   const swatches = (items:string[][]) => <div className="react-studio-swatches">{items.map(([label, token]) => <div key={token} data-color-token={token}><span className="react-studio-swatch" style={{background:`var(${token})`}} aria-hidden="true" /><strong>{label}</strong><code className="token-value">{colors.values[token]}</code><small>{token}</small>{meanings[token] && <p className="react-studio-caption">{meanings[token]}</p>}</div>)}</div>;
   return <>
-    <Section title="기본 색상"><p className="component-helper">현재 테마: {colors.theme} · 기본색은 중립 회색, 주요 동작·선택·포커스는 블루를 사용합니다.</p>{swatches(baseColors)}<p className="react-studio-caption">Canvas는 화면 바탕, Surface Raised는 카드와 패널의 배경입니다. 라이트는 흰색을 공통으로 사용하고 다크는 명도 차이로 영역을 구분합니다. Border는 영역을 나누는 약한 구조선, Border Control은 입력창과 선택 컨트롤을 식별하는 더 선명한 경계입니다. 입력창은 hover에서 한 단계 선명해지고 포커스에서는 블루로 표시됩니다.</p></Section>
+    <Section title="기본 색상"><p className="component-helper">현재 테마: {colors.theme} · 기본색은 중립 회색, 주요 동작·선택·일반 포커스는 블루를 사용합니다.</p>{swatches(baseColors)}<p className="react-studio-caption">Canvas는 화면 바탕, Surface Raised는 카드와 패널의 배경입니다. 라이트는 흰색을 공통으로 사용하고 다크는 명도 차이로 영역을 구분합니다. Border는 영역을 나누는 약한 구조선, Border Control은 입력창과 선택 컨트롤을 식별하는 더 선명한 경계입니다. 입력창은 hover에서 한 단계 선명해지고, 일반 상태의 포커스는 블루로, 오류 상태의 경계와 포커스는 위험색으로 표시됩니다.</p></Section>
     <Section title="의미 색상">{swatches(semanticColors)}</Section>
     <Section title="색상 사용 예시" description="역할에 맞는 색상 토큰을 사용하면 라이트·다크 테마에 함께 적용됩니다.">
       <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">

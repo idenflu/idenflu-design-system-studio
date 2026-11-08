@@ -35,11 +35,13 @@ export function SelectAPIReference() {return <>
       ['name','string','undefined','단일 선택은 하나의 값, 복수 선택은 같은 name의 반복 값으로 제출합니다. 선택하지 않은 복수 값은 제출 항목이 없습니다.'],
       ['placeholder','string',"'선택하세요'",'선택값이 없을 때 표시합니다. label을 대신하지 않습니다.'],
       ['disabled / required','boolean','false','컴포넌트 비활성화 또는 필수값 검증입니다. required는 비활성·빈 value를 제외한 선택이 있어야 통과합니다.'],
+      ['helperText / error','ReactNode','undefined','필드 아래에 도움말과 외부 오류를 표시하고 실제 조작 컨트롤의 설명으로 연결합니다. 오류가 없으면 error를 undefined 또는 null로 지정하세요. 외부 error는 내부 필수 선택 오류보다 우선하며 같은 오류 문구를 중복 표시하지 않습니다.'],
+      ['ref','Ref<HTMLButtonElement> / Ref<HTMLInputElement>','undefined','Select·MultiSelect는 실제 트리거 button, SearchSelect는 검색 input을 가리킵니다. 태그형 MultiSelect도 트리거 button입니다. ref.current?.focus()로 첫 오류나 원하는 필드로 이동합니다.'],
       ['size',"'sm' | 'md' | 'lg'",'기본 크기(md)','트리거와 옵션 목록의 높이·여백을 같은 크기 토큰으로 적용합니다.'],
       ['prefixIcon','ReactNode','undefined','값 앞의 장식 아이콘입니다. 입력값이나 제출값에 포함하지 않습니다.'],
       ['popupStrategy',"'absolute' | 'fixed'","'absolute'",'기본은 래퍼 기준 배치입니다. 스크롤·클리핑 컨테이너에서는 fixed로 화면 경계를 따라 배치할 수 있습니다.'],
       ['className','string','undefined','custom-select 래퍼에 추가합니다. 라벨은 이 래퍼 밖에 있습니다.'],
-      ['aria-describedby / aria-invalid','string / boolean | "true" | "false"','undefined','외부 도움말·오류 설명과 연결합니다. 이 속성만으로 오류 문구를 만들지는 않으므로 별도 문구도 제공하세요.'],
+      ['aria-describedby / aria-invalid','string / boolean | "true" | "false"','undefined','aria-describedby의 외부 ID와 컴포넌트의 도움말·오류 ID를 함께 연결합니다. error나 내부 필수 오류가 있으면 aria-invalid가 true입니다. 외부 aria-invalid만 지정할 때는 오류 문구도 별도로 연결하세요.'],
     ]} />
     <ReferenceTable label="MultiSelect 추가 속성" rows={[
       ['searchable','boolean','false','MultiSelect 옵션 목록에 검색창을 표시합니다. 단일 검색은 SearchSelect를 사용합니다. 검색은 옵션 label의 대소문자를 구분하지 않는 부분 일치입니다.'],
@@ -58,6 +60,8 @@ export function SelectAPIReference() {return <>
     ['onValueChange','(value: string) => void 또는 (value: string[]) => void','undefined','옵션 선택·해제와 전체 지우기에서 호출합니다. 단일은 선택 후 닫히고 복수는 목록을 유지합니다. 검색어 입력만으로 선택 콜백을 호출하지 않습니다.'],
     ['제어 상태','value + onValueChange','선택 사항','부모 상태를 갱신해야 화면과 선택값이 함께 바뀝니다. 초기화는 부모의 onReset에서도 value를 복원하세요.'],
     ['비제어 상태','defaultValue','선택 사항','컴포넌트가 상태를 관리합니다. form.reset()은 초기 선택을 복원하고 목록·검색어·내부 필수 오류를 초기화합니다.'],
+    ['외부 오류와 초기화','error + 부모 상태','선택 사항','error는 부모가 관리합니다. 선택값을 바꿔도 자동으로 지워지지 않으므로 검증 결과에 맞춰 갱신하세요. form.reset()으로 외부 error를 지우려면 부모의 onReset에서 함께 초기화합니다. error는 표시·접근성 상태이며 서버 검증이나 제출 차단 로직은 앱에서 연결합니다.'],
+    ['오류 포커스','ref.current?.focus()','선택 사항','부모 검증에 실패하면 첫 오류 필드의 실제 트리거나 입력에 포커스를 이동할 수 있습니다. SearchSelect는 입력 포커스를 받으면 옵션 목록이 열리는 기존 동작을 유지합니다.'],
     ['FormData','get(name) / getAll(name)','name 필요','단일은 get, 복수는 getAll로 읽습니다. disabled 필드는 제외됩니다. 태그 축약은 실제 선택 배열과 제출값을 줄이지 않습니다.'],
   ]} /></Section>
   <Section id="select-keyboard" title="키보드" description="검색형은 열리면 검색창에 포커스합니다. 태그·전체 지우기·더 보기 버튼도 Tab으로 조작합니다."><ReferenceTable label="Select 키보드" rows={[
@@ -65,11 +69,13 @@ export function SelectAPIReference() {return <>
     ['↑ / ↓','트리거·검색창','열기·이동','목록을 열거나 비활성 항목을 건너뛰며 활성 옵션을 이동합니다.'],
     ['Home / End','열린 트리거','처음·마지막','처음 또는 마지막 유효 옵션으로 이동합니다. 검색창에서는 텍스트 커서의 기본 동작을 유지합니다.'],
     ['Escape / Tab','옵션 목록','취소·이동','Escape는 목록을 닫고 트리거로 포커스를 복원합니다. Tab은 목록을 닫고 다음 컨트롤로 이동합니다.'],
+    ['도움말·오류 안내','실제 트리거·검색 입력','설명 연결','helperText·error와 aria-describedby로 전달한 설명을 함께 연결합니다. 오류는 색상과 문구로 표시하며, 부모의 검증 동작에서 필요할 때 ref로 포커스를 이동하세요.'],
   ]} /></Section>
   <Section id="select-styles" title="스타일" description="입력과 팝업은 같은 테마·크기 토큰을 사용합니다."><ReferenceTable label="Select 스타일" rows={[
     ...sharedStyles,
     ['.custom-select / .select-trigger / .select-popup','CSS 선택자','컴포넌트 내부','전체 래퍼·기본 트리거·팝업입니다. className 아래에 범위를 제한해 조정하세요.'],
     ['.select-option / .multi-inline-tags / .multi-inline-more','CSS 선택자','컴포넌트 내부','옵션·태그 영역·축약 버튼입니다. 선택 배열은 CSS로 숨겨진 태그가 아니라 value에서 관리하세요.'],
+    ['.component-helper / .field-error','CSS 선택자','필드 도움말·오류','오류 문구와 연결된 ID, aria-describedby·aria-invalid는 유지하세요. error는 기본형·검색형·태그형의 오류 경계를 함께 표시합니다.'],
   ]} /></Section>
 </>;}
 

@@ -20,6 +20,8 @@ npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs
 
 패키지 배포 파일의 포함 여부는 `npm pack ./packages/react --dry-run`으로 확인합니다.
 
+`npm run check`에는 코어 색상 토큰과 React 참조 문서의 기본값 표가 일치하는지 확인하는 검사도 포함됩니다. `core/tokens.css`의 기본 색상을 변경한 뒤에는 `npm run docs:tokens`로 문서 표를 갱신합니다. `npm run check:tokens`로 이 항목만 확인할 수 있습니다.
+
 ## 브라우저 환경 선택
 
 브라우저 동작 검사는 기본적으로 데스크톱 라이트에서 한 번 실행합니다. 테스트 선언의 `tag`에 `@theme`을 지정하면 다크에서도, `@mobile`을 지정하면 320px 터치 환경에서도 실행합니다. 모바일 전용 검사는 `@mobile`과 `@mobile-only`를 함께 지정해 라이트 중복을 제외합니다. 새 색상·대비 회귀에는 `@theme`을, 반응형·팝업 위치·포커스·스크롤 회귀에는 필요한 환경 태그를 추가합니다. 테스트 안에서 두 테마를 직접 순회하는 검사는 라이트에서 한 번만 실행합니다.

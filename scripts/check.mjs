@@ -3,6 +3,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { componentStyles, documentStyles } from './styles.mjs';
+import { checkTokenDocumentation } from './sync-token-docs.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const system = resolve(root, 'systems/idenflu-mono');
@@ -27,6 +28,10 @@ const reactStyles = resolve(root, 'packages/react/src/react.css');
 const cssPaths = [...componentStyles, 'reset.css'].map(file => resolve(core, file))
   .concat(documentStyles.map(file => resolve(studio, 'styles', file)), reactStyles, resolve(studio, 'styles/studio.css'));
 const sheets = await Promise.all(cssPaths.map(async file => ({ file, text: await readFile(file, 'utf8') })));
+checkTokenDocumentation(
+  sheets.find(sheet => sheet.file === resolve(core, 'tokens.css')).text,
+  await readFile(resolve(root, 'docs/reference/react-components.md'), 'utf8'),
+);
 const css = sheets.map(sheet => sheet.text).join('\n');
 for (const { file, text } of sheets) for (const match of text.matchAll(/url\(\s*(['"]?)([^'"\)]+)\1\s*\)/g)) {
   const url = match[2].trim();

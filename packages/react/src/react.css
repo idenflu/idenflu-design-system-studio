@@ -13,7 +13,10 @@
 .spinner-dots.spinner--inverse > span, .spinner-bars.spinner--inverse > span { background:var(--spinner-inverse-color, var(--inverse-text)); }
 .tabs .tab:disabled { color:var(--disabled-text); background:transparent; cursor:not-allowed; }
 .upload-area:has(.upload-input:disabled) .upload-button { background:var(--disabled); color:var(--disabled-text); box-shadow:inset 0 0 0 1px var(--border); cursor:not-allowed; }
-.custom-select .select-trigger[aria-invalid="true"] { border-color:var(--danger); }
+.custom-select.is-invalid > :is(.select-trigger,.search-select-control,.multi-inline-control) { border-color:var(--danger); }
+.custom-select.is-invalid > .select-trigger:focus-visible, .custom-select.is-invalid.is-open > .select-trigger { border-color:transparent; box-shadow:inset 0 0 0 2px var(--focus-on-danger); }
+.custom-select.is-invalid > :is(.search-select-control,.multi-inline-control):focus-within, .custom-select.is-invalid.is-open > :is(.search-select-control,.multi-inline-control) { border-color:transparent; }
+.custom-select.is-invalid > :is(.search-select-control,.multi-inline-control):focus-within::after, .custom-select.is-invalid.is-open > :is(.search-select-control,.multi-inline-control)::after { box-shadow:inset 0 0 0 2px var(--focus-on-danger); }
 .select-option-content, .select-value-content { display:flex; align-items:center; gap:var(--space-2); min-width:0; }
 .select-option-copy, .select-value-text { min-width:0; overflow:hidden; text-overflow:ellipsis; }
 .select-value-summary { display:flex; align-items:center; gap:var(--space-1); min-width:0; }

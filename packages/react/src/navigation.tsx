@@ -41,6 +41,8 @@ interface SelectShared {
   className?: string;
   size?: Size;
   required?: boolean;
+  helperText?: React.ReactNode;
+  error?: React.ReactNode;
   /** Decorative icon shown before the value or placeholder. */
   prefixIcon?: React.ReactNode;
   /** Use fixed positioning for option lists inside scrolling or clipped containers. */
@@ -69,31 +71,47 @@ interface SelectCoreProps extends SelectShared {
   maxVisibleLabels?: number;
   maxVisibleTags?: number | 'responsive';
   onClear?: () => void;
+  buttonRef?: React.ForwardedRef<HTMLButtonElement>;
+  inputRef?: React.ForwardedRef<HTMLInputElement>;
 }
 
-function SelectCore({options, label, hideLabel = false, name, disabled, placeholder = '선택하세요', className, size, required, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, maxVisibleLabels, maxVisibleTags = 'responsive', onClear, ...aria}: SelectCoreProps) {
+function SelectCore({options, label, hideLabel = false, name, disabled, placeholder = '선택하세요', className, size, required, helperText, error, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, maxVisibleLabels, maxVisibleTags = 'responsive', onClear, buttonRef, inputRef, ...aria}: SelectCoreProps) {
   const id = React.useId();
   const root = React.useRef<HTMLDivElement>(null);
+  const native = React.useRef<HTMLSelectElement>(null);
   const trigger = React.useRef<HTMLButtonElement>(null);
   const search = React.useRef<HTMLInputElement>(null);
+  React.useImperativeHandle(buttonRef, () => trigger.current!, [presentation, searchable, multiple]);
+  React.useImperativeHandle(inputRef, () => search.current!, [searchable, multiple]);
   const popupElement = React.useRef<HTMLDivElement>(null);
   const [popupPosition, setPopupPosition] = React.useState<{top:number; left:number; width:number; maxHeight:number} | null>(null);
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [active, setActive] = React.useState<string | null>(null);
   const [attempted, setAttempted] = React.useState(false);
-  const [, setResetRevision] = React.useState(0);
   const selectedOptions = options.filter(option => selected.includes(option.value));
   const selectedLabels = selectedOptions.map(option => option.label);
   const labelLimit = maxVisibleLabels !== undefined && Number.isInteger(maxVisibleLabels) && maxVisibleLabels > 0 ? maxVisibleLabels : Infinity;
   const displayValue = multiple && selectedLabels.length > labelLimit
     ? <span className="select-value-summary"><span className="select-summary-labels">{selectedLabels.slice(0, labelLimit).join(', ')}</span><span className="select-summary-count">{` 외 ${selectedLabels.length - labelLimit}개`}</span></span> : selectedLabels.join(', ');
   const validSelected = selected.filter(value => value !== '' && options.some(option => option.value === value && !option.disabled));
-  const invalid = Boolean(attempted && required && !validSelected.length);
-  const describedBy = [aria['aria-describedby'], invalid ? `${id}-error` : ''].filter(Boolean).join(' ') || undefined;
+  useClientLayoutEffect(() => {
+    // A user-triggered native reset can run after reset listeners and React updates.
+    // Keep its defaults aligned with the committed selection so it cannot overwrite
+    // React's value with a stale placeholder after those updates have finished.
+    const values = new Set(multiple ? validSelected : [validSelected[0] ?? '']);
+    for (const option of native.current?.options ?? []) {
+      const isSelected = values.has(option.value);
+      if (option.defaultSelected !== isSelected) option.defaultSelected = isSelected;
+    }
+  });
+  const requiredInvalid = Boolean(attempted && required && !validSelected.length);
+  const message = error != null ? error : requiredInvalid ? '항목을 선택해주세요.' : null;
+  const invalid = message != null || aria['aria-invalid'] === true || aria['aria-invalid'] === 'true';
+  const describedBy = [aria['aria-describedby'], helperText != null && `${id}-help`, message != null && `${id}-error`].filter(Boolean).join(' ') || undefined;
   const visible = options.filter(option => !searchable || option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
   const enabled = visible.filter(option => !option.disabled);
-  useFormReset(root, () => { onReset(); setOpen(false); setQuery(''); setActive(null); setAttempted(false); queueMicrotask(() => setResetRevision(revision => revision + 1)); });
+  useFormReset(root, () => { onReset(); setOpen(false); setQuery(''); setActive(null); setAttempted(false); });
 
   React.useEffect(() => {
     if (!open || popupStrategy !== 'fixed') { setPopupPosition(null); return; }
@@ -191,7 +209,7 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
   return <div>
     <label className={`field-label${hideLabel ? ' sr-only' : ''}`} htmlFor={`${id}-trigger`}>{label}</label>
     <div ref={root} className={`custom-select${searchable && !multiple ? ' search-select' : ''}${open ? ' is-open' : ''}${invalid ? ' is-invalid' : ''}${className ? ` ${className}` : ''}`} data-size={size} data-multiselect={multiple ? '' : undefined}>
-    <select className="sr-only" aria-hidden="true" tabIndex={-1} name={name} multiple={multiple} required={required} disabled={disabled} value={multiple ? validSelected : validSelected[0] ?? ''} onChange={() => {}} onInvalid={event => { event.preventDefault(); setAttempted(true); const control = event.currentTarget; const firstInvalid = control.form && Array.from(control.form.elements).find(element => { const candidate = element as HTMLInputElement; return candidate.willValidate && !candidate.validity.valid; }); if (!firstInvalid || firstInvalid === control) (searchable && !multiple ? search : trigger).current?.focus(); }}>
+    <select ref={native} className="sr-only" aria-hidden="true" tabIndex={-1} name={name} multiple={multiple} required={required} disabled={disabled} value={multiple ? validSelected : validSelected[0] ?? ''} onChange={() => {}} onInvalid={event => { event.preventDefault(); setAttempted(true); const control = event.currentTarget; const firstInvalid = control.form && Array.from(control.form.elements).find(element => { const candidate = element as HTMLInputElement; return candidate.willValidate && !candidate.validity.valid; }); if (!firstInvalid || firstInvalid === control) (searchable && !multiple ? search : trigger).current?.focus(); }}>
       {!multiple && <option value="">{placeholder}</option>}
       {options.filter(option => option.value !== '').map(option => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}
     </select>
@@ -206,23 +224,30 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
       : <button id={`${id}-trigger`} ref={trigger} type="button" className="select-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span data-select-label className="select-value-content">{prefix}{!multiple && selectedOptions[0]?.icon && <span className="select-option-icon" aria-hidden="true">{selectedOptions[0].icon}</span>}<span className="select-value-text">{displayValue || placeholder}</span></span><span className="ui-icon icon-caret" aria-hidden="true" /></button>}
     {popup}
     {multiple && presentation !== 'inline' && clearable && <button type="button" className="button button--ghost button-inline multi-clear" disabled={disabled || !selected.length} onClick={onClear}>모두 지우기</button>}
-    {invalid && <p id={`${id}-error`} className="component-helper is-error" role="alert">항목을 선택해주세요.</p>}
     </div>
+    {helperText != null && <p id={`${id}-help`} className="component-helper" style={{marginTop:'var(--space-1)'}}>{helperText}</p>}
+    {message != null && <p id={`${id}-error`} className="field-error" role={error == null && requiredInvalid ? 'alert' : undefined}>{message}</p>}
   </div>;
 }
 
-export function Select({value, defaultValue = '', onValueChange, ...props}: SelectProps) {
+export const Select = React.forwardRef<HTMLButtonElement, SelectProps>(function Select(
+  {value, defaultValue = '', onValueChange, ...props}, ref,
+) {
   const [selected, setSelected, reset] = useValue(value, defaultValue, onValueChange);
-  return <SelectCore {...props} selected={selected ? [selected] : []} onSelect={setSelected} onReset={reset} />;
-}
-export function SearchSelect({value, defaultValue = '', onValueChange, ...props}: SelectProps) {
+  return <SelectCore {...props} buttonRef={ref} selected={selected ? [selected] : []} onSelect={setSelected} onReset={reset} />;
+});
+export const SearchSelect = React.forwardRef<HTMLInputElement, SelectProps>(function SearchSelect(
+  {value, defaultValue = '', onValueChange, ...props}, ref,
+) {
   const [selected, setSelected, reset] = useValue(value, defaultValue, onValueChange);
-  return <SelectCore {...props} searchable selected={selected ? [selected] : []} onSelect={setSelected} onReset={reset} />;
-}
-export function MultiSelect({value, defaultValue = [], onValueChange, ...props}: MultiSelectProps) {
+  return <SelectCore {...props} inputRef={ref} searchable selected={selected ? [selected] : []} onSelect={setSelected} onReset={reset} />;
+});
+export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(function MultiSelect(
+  {value, defaultValue = [], onValueChange, ...props}, ref,
+) {
   const [selected, setSelected, reset] = useValue<readonly string[]>(value, defaultValue, next => onValueChange?.([...next]));
-  return <SelectCore {...props} multiple selected={selected} onClear={() => setSelected([])} onSelect={next => setSelected(selected.includes(next) ? selected.filter(item => item !== next) : [...selected, next])} onReset={reset} />;
-}
+  return <SelectCore {...props} buttonRef={ref} multiple selected={selected} onClear={() => setSelected([])} onSelect={next => setSelected(selected.includes(next) ? selected.filter(item => item !== next) : [...selected, next])} onReset={reset} />;
+});
 
 export interface TabOption { value: string; label: React.ReactNode; content: React.ReactNode; disabled?: boolean; closable?: boolean; closeLabel?: string }
 export interface TabsProps { items: readonly TabOption[]; label: string; value?: string; defaultValue?: string; onValueChange?: (value: string) => void; onTabClose?: (value: string) => void; orientation?: 'horizontal' | 'vertical'; className?: string }

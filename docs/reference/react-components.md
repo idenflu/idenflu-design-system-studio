@@ -33,18 +33,29 @@
 
 텍스트·배경·일반 보더는 라이트·다크 모두 중립 회색을 사용합니다. 블루는 주요 동작·링크·선택·포커스·Info에 사용합니다.
 
+아래 기본값은 `core/tokens.css`에서 생성합니다. 토큰 변경 후 `npm run docs:tokens`로 갱신하며 `npm run check`가 최신 여부를 확인합니다.
+
+<!-- generated:token-colors:start -->
 | 토큰 | Light | Dark | 용도 |
 | --- | --- | --- | --- |
-| `--canvas` | `#FFFFFF` | `#141414` | 페이지 배경 |
-| `--surface-raised` | `#FFFFFF` | `#1A1A1A` | 카드·입력 배경 |
-| `--surface` | `#F5F5F5` | `#222222` | 보조 영역 |
+| `--canvas` | `#FFFFFF` | `#161616` | 페이지 배경 |
+| `--surface-raised` | `#FFFFFF` | `#222222` | 카드·패널·입력 배경 |
+| `--surface` | `#F5F5F5` | `#262626` | 보조 영역 |
+| `--surface-hover` | `#EDEDED` | `#2E2E2E` | 중립 영역 호버 |
+| `--surface-pressed` | `#E4E4E4` | `#383838` | 중립 영역 눌림 |
 | `--text` | `#1C1C1C` | `#EDEDED` | 본문·제목 |
-| `--text-secondary` | `#606060` | `#B3B3B3` | 보조 문구 |
-| `--border` | `#C6C6C6` | `#666666` | 카드·일반 경계 |
-| `--border-control` | `#C6C6C6` | `#666666` | 입력창·체크박스·라디오 |
+| `--text-secondary` | `#606060` | `#A6A6A6` | 보조 문구 |
+| `--text-muted` | `#6E6E6E` | `#949494` | 부가 문구 |
+| `--border` | `#E0E0E0` | `#393939` | 카드·패널의 구조 경계 |
+| `--border-subtle` | `#E6E6E6` | `#333333` | 약한 경계 |
+| `--divider` | `#E6E6E6` | `#333333` | 내부 구분선 |
+| `--border-control` | `#C6C6C6` | `#737373` | 입력창·체크박스·라디오 경계 |
 | `--border-control-hover` | `#999999` | `#999999` | 입력 경계 호버 |
+| `--primary` | `#1062D3` | `#7FB3FD` | 링크·선택·포커스 |
+| `--primary-control` | `#2466C8` | `#3B6CAE` | 주요 버튼 배경 |
+<!-- generated:token-colors:end -->
 
-`--border-subtle`·`--divider`는 약한 구분과 비활성 경계에 사용합니다. 입력 컴포넌트의 경계를 앱에서 조정할 때는 `--border-control`·`--border-control-hover`를 사용하고 포커스·오류 표시는 유지합니다. 입력창의 기본 경계는 `--border`, 호버는 `--border-hover`를 따릅니다. 화면 조정에서 Border를 변경하면 입력창에도 같은 톤이 적용됩니다. 사용자 지정 색상과 테마별 초기화 동작은 유지합니다.
+`--border`는 카드·패널의 구조 경계, `--border-subtle`·`--divider`는 약한 경계와 내부 구분선입니다. 입력창·체크박스·라디오는 더 선명한 `--border-control`을 사용하며 구조선과 독립적으로 조정합니다. 입력 경계 호버는 `--border-control-hover`를 사용하고 포커스·오류 표시는 유지합니다. 화면 조정의 Border 변경은 구조선에 적용되며 입력 경계는 코어 기본값을 유지합니다. 라이트에서는 캔버스와 카드가 흰색을 공유하고, 다크에서는 배경 명도 차이로 영역을 구분합니다.
 
 ## 컴포넌트 범주
 
@@ -488,17 +499,37 @@ import { NovaSpinner, Spinner } from '@idenflu/mono-react';
 ## Select·SearchSelect·MultiSelect
 
 ```tsx
-import { DatePicker, Select } from '@idenflu/mono-react';
-import { useState } from 'react';
+import { Button, DatePicker, Select } from '@idenflu/mono-react';
+import { useRef, useState } from 'react';
 
 function ProjectForm() {
+  const teamRef = useRef<HTMLButtonElement>(null);
+  const [team, setTeam] = useState('');
+  const [error, setError] = useState<string>();
   const [date, setDate] = useState<string | null>(null);
-  return <>
-    <Select label="담당 팀" name="team" required options={[{ value: 'design', label: '디자인' }]} />
+  return <form noValidate onSubmit={event => {
+    event.preventDefault();
+    setError(team ? undefined : '담당 팀을 선택해주세요.');
+    if (!team) teamRef.current?.focus();
+  }}>
+    <Select ref={teamRef} label="담당 팀" name="team" required
+      value={team} onValueChange={value => {
+        setTeam(value);
+        setError(undefined);
+      }}
+      helperText="프로젝트를 담당할 팀을 선택하세요."
+      error={error} options={[{ value: 'design', label: '디자인' }]} />
     <DatePicker label="시작일" name="start" value={date} onValueChange={setDate} />
-  </>;
+    <Button type="submit">입력 확인</Button>
+  </form>;
 }
 ```
+
+`Select`, `SearchSelect`, `MultiSelect`는 `TextField`와 같은 `helperText`·`error` 계약을 사용합니다. 도움말과 오류 ID를 실제 컨트롤의 `aria-describedby`에 연결하며, 외부에서 전달한 설명 ID도 유지합니다. `error`가 `null`·`undefined`가 아니면 오류 경계와 `aria-invalid`를 적용하고, 외부 `aria-invalid={false}`보다 우선합니다. 외부 오류가 있으면 내부 필수 선택 오류 대신 해당 메시지만 표시합니다.
+
+표준 `ref`는 `Select`·`MultiSelect`에서 `HTMLButtonElement`, `SearchSelect`에서 `HTMLInputElement`를 가리킵니다. 태그형 `MultiSelect`는 옵션 목록을 여는 버튼을 가리키며 팝업 검색창이나 숨겨진 네이티브 select를 가리키지 않습니다. `ref.current?.focus()`로 폼의 첫 오류 항목에 포커스를 옮길 수 있습니다.
+
+외부 `error`는 부모가 관리하므로 값 변경·폼 초기화 시 부모 오류 상태도 함께 갱신합니다. `form.reset()`은 비제어 선택값과 내부 필수 선택 오류를 초기화합니다. 외부 오류 표시는 앱의 제출 검증과 함께 사용하며, 네이티브 `required` 검증은 기존대로 유지됩니다. 위 예제는 `noValidate`로 부모 검증과 포커스 이동을 직접 처리합니다.
 
 `Select`, `SearchSelect`, `MultiSelect`에 `prefixIcon`을 지정하면 선택값 앞에 고정 아이콘을 표시합니다. 옵션에는 `description`과 `icon`을 지정할 수 있고, `DropdownMenu` 항목에도 `icon`을 지정할 수 있습니다. 아이콘은 장식으로 처리하므로 의미는 `label`로 전달합니다.
 

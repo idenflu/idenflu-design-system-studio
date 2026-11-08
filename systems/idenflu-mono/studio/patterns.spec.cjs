@@ -89,6 +89,9 @@ test('project form validates slug and exact budget and resets selected teams and
   await page.getByRole('button',{name:'입력 확인',exact:true}).click();
   await expect(budget).toBeFocused();
   await budget.fill('12500');
+  const status=page.getByRole('combobox',{name:/^상태:/});
+  await status.click();
+  await page.getByRole('listbox',{name:'상태',exact:true}).getByRole('option',{name:'진행 중',exact:true}).click();
   await page.getByRole('button',{name:'디자인 제거',exact:true}).click();
   await page.getByRole('slider',{name:'진행률'}).fill('50');
   await page.getByRole('button',{name:'입력 확인',exact:true}).click();
@@ -97,6 +100,11 @@ test('project form validates slug and exact budget and resets selected teams and
   await expect(slug).toHaveValue(''); await expect(budget).toHaveValue('');
   await expect(page.getByRole('button',{name:'디자인 제거',exact:true})).toBeVisible();
   await expect(page.getByRole('slider',{name:'진행률'})).toHaveValue('35');
+  await expect(status).toHaveAccessibleName('상태: 준비 중');
+  expect(await page.locator('form').evaluate(form=>{
+    const data=new FormData(form);
+    return {status:data.get('status'),teams:data.getAll('teams')};
+  })).toEqual({status:'planned',teams:['design']});
 });
 
 test('booking form validates dates, attendee bounds and attendance format', async ({page}) => {

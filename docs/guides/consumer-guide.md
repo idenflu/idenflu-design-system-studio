@@ -37,6 +37,14 @@ HTML 소비자용 `IdenfluMono` 런타임과 바닐라 어댑터는 제거했습
 
 선택 컴포넌트는 `defaultValue`로 비제어 방식으로 사용할 수도 있습니다. 날짜는 `YYYY-MM-DD` 또는 `null`, 기간은 두 날짜의 배열이며, 숫자는 정밀도를 보존하는 문자열을 사용합니다. `TimePicker`의 시간값은 날짜·시간대가 없는 `HH:mm` 또는 `null`입니다. `TextField`와 같은 네이티브 입력 래퍼는 일반 React `onChange`를 받습니다. React 콜백의 값 형식과 지원 속성은 패키지 문서를 기준으로 확인합니다.
 
+## 폼의 도움말·오류·포커스 연결
+
+`TextField`, `Select`, `SearchSelect`, `MultiSelect`는 `helperText`로 도움말을, `error`로 부모 폼의 검증 메시지를 받습니다. 전달한 메시지는 컨트롤의 접근 가능한 설명에 연결되며, `error`가 있으면 오류 경계와 `aria-invalid`도 함께 적용합니다. 선택 컴포넌트의 기존 `aria-describedby`는 도움말·오류 ID와 함께 유지됩니다.
+
+`ref`는 실제 조작 요소를 가리킵니다. `TextField`·`SearchSelect`는 `HTMLInputElement`, `Select`·`MultiSelect`는 `HTMLButtonElement`이므로 `ref.current?.focus()`로 첫 오류 항목에 포커스를 옮길 수 있습니다. 태그형 `MultiSelect`도 옵션을 여는 버튼을 가리킵니다.
+
+외부 `error`는 부모가 관리합니다. 입력값을 수정하거나 폼을 초기화할 때 부모의 오류 상태도 함께 갱신하세요. 선택 컴포넌트는 외부 오류 메시지를 우선 표시하고, 외부 오류가 없으면 기존 `required` 검증 안내를 사용합니다. 제출 가능 여부는 앱의 검증 로직과 네이티브 `required` 조건이 결정합니다. 컴포넌트 화면의 **Select → 도움말과 오류 연결**에서 검증·초기화·포커스 이동 예제를 확인할 수 있습니다.
+
 ## 테마와 크기 조정
 
 다크 테마는 문서 루트에 `data-theme="dark"`를 지정합니다. 앱이 테마 선택과 저장을 관리하며 CSS는 함께 배포하는 폰트·아이콘을 상대 경로로 참조합니다.
