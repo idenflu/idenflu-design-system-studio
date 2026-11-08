@@ -1,8 +1,8 @@
 const {test,expect}=require('@playwright/test');
 const base='/systems/idenflu-mono/index.html#/';
 
-test('complete examples cover Table, Chips, eight forms and three field bindings with public imports',{tag:['@mobile','@theme']},async({page})=>{
-  for(const route of ['components/table','components/chips','patterns/form/basic','patterns/form/preferences','patterns/form/password','patterns/form/inquiry','patterns/form/project','patterns/form/booking','patterns/form/states','patterns/form/profile','components/select','components/number-fields','components/date-picker']) {
+test('complete examples cover PageHeader, Table, Chips, eight forms and three field bindings with public imports',{tag:['@mobile','@theme']},async({page})=>{
+  for(const route of ['components/page-header','components/table','components/chips','patterns/form/basic','patterns/form/preferences','patterns/form/password','patterns/form/inquiry','patterns/form/project','patterns/form/booking','patterns/form/states','patterns/form/profile','components/select','components/number-fields','components/date-picker']) {
     await page.goto(base+route);
     const code=await page.getByRole('region',{name:'React 사용 예시 코드',exact:true}).textContent();
     expect(code).toContain("import '@idenflu/mono-react/styles.css'");
@@ -31,9 +31,10 @@ test('field API sections are linked in the contents and Number fields can be fou
   ]) {
     await page.goto(base+route);
     await expect(page.getByRole('heading',{name:props,exact:true})).toBeVisible();
+    if(isMobile) await page.locator('.docs-toc > summary').click();
     await page.getByRole('navigation',{name:'이 페이지 목차'}).getByRole('link',{name:events,exact:true}).click();
     await expect(page.getByRole('heading',{name:events,exact:true})).toBeFocused();
-    await expect(page).toHaveURL(new RegExp(route+'$'));
+    await expect(page).toHaveURL(new RegExp(route+'\\?section='));
   }
   if(isMobile) await page.getByRole('button',{name:'메뉴',exact:true}).click();
   const search=page.getByRole('searchbox',{name:'문서 검색',exact:true});

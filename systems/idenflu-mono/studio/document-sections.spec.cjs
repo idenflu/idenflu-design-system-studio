@@ -1,0 +1,70 @@
+const {test, expect} = require('@playwright/test');
+const base = '/systems/idenflu-mono/index.html#/';
+
+test('shared contents preserve document and section through new tabs, reload and history', async ({page, context}) => {
+  await page.goto(base + 'components/data-grid');
+  const contents = page.getByRole('navigation', {name:'이 페이지 목차', exact:true});
+  const props = contents.locator('a[href$="section=data-grid-props-title"]');
+  const events = contents.locator('a[href$="section=data-grid-events-title"]');
+  await expect(page.locator('.studio-grid-reference-links')).toHaveCount(0);
+  await expect(page.locator('.docs-toc-group > span')).toHaveText(['예제','API','사용 기준','코드']);
+  await expect(props).toHaveAttribute('href', '#/components/data-grid?section=data-grid-props-title');
+  const grid = page.locator('#data-grid-toolbar-demo').getByRole('group', {name:'상단 도구 모음 데이터그리드',exact:true});
+  const density = grid.getByRole('button', {name:'촘촘한 행 간격',exact:true});
+  await density.click();
+  await expect(density).toHaveAttribute('aria-pressed', 'false');
+  await props.click();
+  await expect(page).toHaveURL(/components\/data-grid\?section=data-grid-props-title$/);
+  await expect(page.locator('#data-grid-props-title')).toBeFocused();
+  await expect(density).toHaveAttribute('aria-pressed', 'false');
+  await events.click();
+  await expect(page.locator('#data-grid-events-title')).toBeFocused();
+  await page.goBack();
+  await expect(page.locator('#data-grid-props-title')).toBeFocused();
+  await page.goForward();
+  await expect(page.locator('#data-grid-events-title')).toBeFocused();
+  await page.reload();
+  await expect(page).toHaveURL(/components\/data-grid\?section=data-grid-events-title$/);
+  await expect(page.locator('#data-grid-events-title')).toBeFocused();
+  const opened = context.waitForEvent('page');
+  await props.click({button:'middle'});
+  const newTab = await opened;
+  await expect(newTab).toHaveURL(/components\/data-grid\?section=data-grid-props-title$/);
+  await expect(newTab.locator('#data-grid-props-title')).toBeFocused();
+  await expect(page).toHaveURL(/components\/data-grid\?section=data-grid-events-title$/);
+  await newTab.close();
+});
+
+test('direct section links and missing targets keep document navigation usable', async ({page}) => {
+  await page.goto(base + 'components?section=button-usage-title');
+  await expect(page).toHaveURL(/components\/buttons\?section=button-usage-title$/);
+  await expect(page.getByRole('heading', {level:1})).toHaveText('Buttons');
+  await page.goto(base + 'components/data-grid?section=not-a-heading');
+  await expect(page.getByRole('heading', {level:1})).toHaveText('Data grid');
+  await expect(page.getByRole('heading', {level:1})).toBeFocused();
+  await page.goto(base + 'no-such-document?section=data-grid-props-title');
+  await expect(page).toHaveURL(/no-such-document\?section=data-grid-props-title$/);
+  await expect(page.getByRole('heading', {level:1})).toHaveText('문서를 찾을 수 없습니다');
+  await page.locator('.studio-not-found').getByRole('link', {name:'Overview', exact:true}).click();
+  await expect(page).toHaveURL(/#\/overview$/);
+});
+
+test('mobile contents start collapsed and support keyboard section navigation', {tag:['@mobile','@mobile-only']}, async ({page,isMobile}) => {
+  test.skip(!isMobile, '모바일 목차 동작');
+  await page.goto(base + 'components/data-grid');
+  const details = page.locator('.docs-toc');
+  const summary = details.locator(':scope > summary');
+  await expect(details).not.toHaveAttribute('open');
+  const firstExample = page.locator('.route-view .react-studio-section').first();
+  expect(await firstExample.evaluate(element => element.getBoundingClientRect().top)).toBeLessThan(500);
+  await summary.focus();
+  await summary.press('Enter');
+  await expect(details).toHaveAttribute('open', '');
+  const link = details.locator('a[href$="section=data-grid-props-title"]');
+  await link.focus();
+  await link.press('Enter');
+  await expect(page).toHaveURL(/components\/data-grid\?section=data-grid-props-title$/);
+  await expect(details).not.toHaveAttribute('open');
+  await expect(page.locator('#data-grid-props-title')).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});

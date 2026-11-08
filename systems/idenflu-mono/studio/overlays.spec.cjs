@@ -59,7 +59,9 @@ async function mountFixture(page) {
     </head><body><div id="fixture"></div></body></html>`);
   await page.addScriptTag({ content: fixtureScript });
   const opener = page.getByRole('button', { name:'모달 열기', exact:true });
-  await opener.click();
+  // Test keyboard focus restoration explicitly; Safari does not focus a button on pointer click.
+  await opener.focus();
+  await opener.press('Enter');
   const dialog = page.getByRole('dialog', { name:'중첩 팝업 회귀', exact:true });
   await expect(dialog).toBeVisible();
   const popoverTrigger = page.getByRole('button', { name:'설정 팝업', exact:true });

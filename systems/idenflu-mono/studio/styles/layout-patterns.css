@@ -135,10 +135,7 @@
 .layout-floating-settings .studio-settings-open { width:48px; height:48px; padding:14px; border-radius:50%; background:var(--primary-control); color:var(--text-on-primary); box-shadow:var(--shadow-popup); }
 .layout-floating-settings .studio-settings-open:hover { background:var(--primary-control-hover); }
 .layout-floating-settings .studio-settings-open:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:3px; }
-.layout-page-heading { display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap; margin-bottom:var(--space-6); }
-.layout-eyebrow { margin-bottom:var(--space-2); font-size:max(10px,calc(var(--font-size-base) - 4px)); letter-spacing:1px; color:var(--text-secondary); }
-.layout-page-heading h1 { margin:0 0 var(--space-2); font-size:calc(var(--font-size-base) + 12px); line-height:1.3; font-weight:var(--font-weight-semibold); letter-spacing:-.7px; }
-.layout-page-heading > div > p:last-child { color:var(--text-secondary); font-size:max(10px,calc(var(--font-size-base) - 1px)); }
+.layout-page-heading { margin-bottom:var(--space-6); }
 .layout-filter-panel { display:flex; align-items:end; flex-wrap:wrap; gap:var(--space-3); padding:var(--space-4); margin-bottom:var(--space-5); border:1px solid var(--border); background:var(--field-background); }
 .layout-page-content:has(> .data-grid) > .layout-filter-panel.layout-filter-panel--borderless { border-color:transparent; border-inline-width:0; padding-inline:0; }
 .layout-filter-panel > div { width:180px; }
@@ -397,9 +394,8 @@
   .layout-topbar-location nav > strong { max-width:100px; }
   .layout-workspace-topbar { gap:var(--space-2); padding-inline:var(--space-3); }
   .layout-page-content { padding:var(--space-5) var(--space-4); }
-  .layout-page-heading h1 { font-size:calc(var(--font-size-base) + 9px); }
   .layout-page-heading { margin-bottom:var(--space-5); }
-  .layout-page-heading > .button { width:100%; }
+  .layout-page-heading .page-header-actions > .button { width:100%; }
   .layout-panel { padding:var(--space-4); }
   .layout-filter-panel > div { width:calc(50% - 6px); }
   .layout-filter-panel > .button { padding-inline:0; font-size:max(10px,calc(var(--font-size-base) - 3px)); }
@@ -420,9 +416,10 @@
   .layout-page-content:has(> .data-grid) { gap:var(--space-3); padding:var(--space-3); }
   .layout-page-content:has(> .data-grid) > .layout-page-heading { flex-wrap:nowrap; margin:0; gap:var(--space-2); }
   .layout-page-content:has(> .data-grid) .layout-page-heading > div { min-width:0; }
-  .layout-page-content:has(> .data-grid) .layout-page-heading :is(.layout-eyebrow,p:last-child) { display:none; }
+  .layout-page-content:has(> .data-grid) .layout-page-heading :is(.page-header-eyebrow,.page-header-description) { display:none; }
   .layout-page-content:has(> .data-grid) .layout-page-heading h1 { margin:0; font-size:calc(var(--font-size-base) + 6px); }
-  .layout-page-content:has(> .data-grid) .layout-page-heading > .button { flex:none; width:auto; padding-inline:var(--space-2); font-size:var(--font-size-caption); }
+  .layout-page-content:has(> .data-grid) .layout-page-heading > .page-header-actions { flex:none; width:auto; }
+  .layout-page-content:has(> .data-grid) .layout-page-heading .page-header-actions > .button { width:auto; padding-inline:var(--space-2); font-size:var(--font-size-caption); }
   .layout-page-content:has(> .data-grid) > .layout-filter-panel { margin:0; padding:var(--space-3); gap:var(--space-2); }
   .layout-page-content:has(> .data-grid) .layout-filter-panel > div { width:calc(50% - 4px); }
   .layout-page-content:has(> .data-grid) .layout-filter-panel > .button { min-height:28px; }
@@ -438,7 +435,7 @@
 }
 @media (min-width:601px) and (max-height:800px) {
   .layout-page-content:has(> .data-grid) { padding:var(--space-4); }
-  .layout-page-content:has(> .data-grid) .layout-eyebrow { display:none; }
+  .layout-page-content:has(> .data-grid) .page-header-eyebrow { display:none; }
   .layout-page-content:has(> .data-grid) > :is(.layout-page-heading,.layout-filter-panel) { margin-bottom:var(--space-4); }
   .layout-page-content:has(> .data-grid) > .layout-filter-panel { padding:var(--space-3); }
 }

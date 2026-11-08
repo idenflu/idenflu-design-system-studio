@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Grid, DateTimePicker, DateTimeRangePicker } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
+import {DateTimeAPIReference} from './datetime-api-reference';
+import {TemporalFieldFormExample} from './temporal-field-form-example';
 
 const sizes = ['sm', 'md', 'lg'] as const;
 const displayValue = (value: string | null) => value ? value.replace('T', ' ') : '선택하지 않음';
@@ -53,5 +55,7 @@ export function DateTimeDemos() {
         </div>)}
       </div>
     </Section>
+    <TemporalFieldFormExample kind="datetime" />
+    <DateTimeAPIReference />
   </>;
 }

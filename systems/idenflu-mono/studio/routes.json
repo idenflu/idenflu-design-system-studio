@@ -168,6 +168,13 @@
     "searchTerms": "구분선 디바이더 분리 경계 가로 세로 점선 divider separator"
   },
   {
+    "route": "components/page-header",
+    "title": "Page header",
+    "group": "Components",
+    "description": "화면 제목·설명과 주요 작업을 일관되게 배치합니다.",
+    "searchTerms": "페이지 헤더 제목 화면 작업 PageHeader actions eyebrow headingLevel titleId"
+  },
+  {
     "route": "components/grid",
     "title": "Grid",
     "group": "Components",

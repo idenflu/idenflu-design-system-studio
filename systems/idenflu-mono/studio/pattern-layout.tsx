@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Icon, Table, TableContainer } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
+import { LayoutReuseCandidates } from './layout-reuse-candidates';
 
 export function LayoutPattern() {
   return <>
@@ -17,7 +18,7 @@ export function LayoutPattern() {
       <div className="layout-pattern-features">{[
         ['트리 탐색과 동적 탭','하위 메뉴를 선택하면 탭이 열립니다. 이미 열린 화면은 해당 탭으로 이동하며 메뉴의 선택 표시도 함께 바뀝니다.'],
         ['여러 업무 이어가기','목록의 검색 조건과 설정 입력값은 탭을 전환해도 유지됩니다. 프로젝트 상세에서 바꾼 상태는 목록에도 반영됩니다.'],
-        ['실제 업무 흐름','프로젝트 생성·일괄 완료·멤버 초대·빠른 검색·알림을 사용해보세요. 공통 Tree, Tabs, DataGrid, Dialog 등을 조합했습니다.'],
+        ['실제 업무 흐름','프로젝트 생성·수정·선택 삭제·멤버 초대·빠른 검색·알림을 사용해보세요. 공통 Tree, Tabs, DataGrid, Dialog 등을 조합했습니다.'],
       ].map(([title,description])=><div key={title}><Icon name="check" /><h3>{title}</h3><p>{description}</p></div>)}</div>
     </Section>
     <Section title="반응형 구성" description="탐색과 주요 작업을 화면 크기에 맞춰 유지합니다.">
@@ -25,5 +26,6 @@ export function LayoutPattern() {
       <p className="react-studio-caption">탭은 닫기 버튼 또는 Delete 키로 닫습니다. 대시보드는 고정되며 방향키로 탭을 전환할 수 있습니다. 빠른 검색 단축키는 ⌘/Ctrl + K입니다.</p>
       <p className="react-studio-caption">샘플의 변경 사항은 현재 화면에서만 유지되며 새로고침하면 초기화됩니다.</p>
     </Section>
+    <LayoutReuseCandidates />
   </>;
 }

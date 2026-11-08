@@ -2,22 +2,30 @@ import * as React from 'react';
 import {Table,TableContainer} from '@idenflu/mono-react';
 import {Section} from './demo-layout';
 import {MultiSelectTagReference} from './convenience-api-reference';
+import {publicAPIType, publicAPINote, type APIContracts, type APIPropertyRow} from './public-api';
 
 type Row=readonly [name:string,type:string,initial:string,description:string];
-function ReferenceTable({label,rows}:{label:string;rows:readonly Row[]}) {
+type ReferenceTableProps = {label:string} & (
+  {contracts:APIContracts;rows:readonly APIPropertyRow[]} | {contracts?:undefined;rows:readonly Row[]}
+);
+function ReferenceTable(props:ReferenceTableProps) {
+  const {label}=props;
+  const rows:readonly Row[]=props.contracts === undefined ? props.rows : props.rows.map(([name,initial,description])=>[name,publicAPIType(props.contracts!,name),initial,description]);
   return <TableContainer label={label} className="studio-convenience-api-table"><Table density="compact">
     <caption className="sr-only">{label}: 항목, 타입, 기본값과 사용 방법</caption>
     <thead><tr><th scope="col">항목</th><th scope="col">타입</th><th scope="col">기본값</th><th scope="col">설명</th></tr></thead>
     <tbody>{rows.map(([name,type,initial,description])=><tr key={name}><th scope="row"><code>{name}</code></th><td><code>{type}</code></td><td><code>{initial}</code></td><td>{description}</td></tr>)}</tbody>
   </Table></TableContainer>;
 }
-const fieldProps:readonly Row[]=[
-  ['label','ReactNode','필수','입력 이름입니다. 문자열이나 필수·선택 표시를 포함한 React 노드를 전달합니다.'],
-  ['id / name','string','자동 ID / undefined','id는 입력·라벨 연결에 사용합니다. name을 지정해야 FormData에 포함됩니다. 범위 필드의 제출 이름은 아래 설명을 확인하세요.'],
-  ['required / readOnly / disabled','boolean','false','필수값 검증, 읽기 전용, 비활성 상태입니다. 읽기 전용 값은 제출되며 비활성 값은 FormData에서 제외됩니다.'],
-  ['size',"'sm' | 'md' | 'lg'",'기본 크기(md)','높이·여백·아이콘 크기를 같은 토큰으로 관리합니다.'],
-  ['helperText / error','ReactNode / string','undefined','도움말과 외부 오류입니다. 내부 형식·범위 오류도 표시하며 외부 error가 우선합니다.'],
-  ['className','string','undefined','최상위 래퍼에 클래스를 추가합니다. 내부 선택자는 이 클래스 아래에서 지정하세요.'],
+const fieldProps:readonly APIPropertyRow[]=[
+  ['label','필수','입력 이름입니다. 문자열이나 필수·선택 표시를 포함한 React 노드를 전달합니다.'],
+  ['id / name','자동 ID / undefined','id는 입력·라벨 연결에 사용합니다. name을 지정해야 FormData에 포함됩니다. 범위 필드의 제출 이름은 아래 설명을 확인하세요.'],
+  ['required / readOnly / disabled','false','필수값 검증, 읽기 전용, 비활성 상태입니다. 읽기 전용 값은 제출되며 비활성 값은 FormData에서 제외됩니다.'],
+  ['size','기본 크기(md)','높이·여백·아이콘 크기를 같은 토큰으로 관리합니다.'],
+  ['helperText / error','undefined','도움말과 외부 오류입니다. 내부 형식·범위 오류도 표시하며 외부 error가 우선합니다.'],
+  ['ref','undefined','실제 input을 가리킵니다. 범위 선택의 표준 ref는 시작 입력입니다. ref.current?.focus()로 첫 오류나 원하는 필드로 이동합니다.'],
+  ['aria-describedby / aria-invalid','undefined','외부 설명 ID와 내부 도움말·오류 ID를 함께 연결합니다. 외부 aria-invalid 또는 내부 오류가 있으면 오류 상태로 전달합니다. 오류 문구는 error나 별도 설명으로 제공하세요.'],
+  ['className','undefined','최상위 래퍼에 클래스를 추가합니다. 내부 선택자는 이 클래스 아래에서 지정하세요.'],
 ];
 const sharedStyles:readonly Row[]=[
   ['size / className','지원 속성','md / undefined','크기는 size, 배치와 필요한 스타일 조정은 className을 먼저 사용합니다.'],
@@ -28,32 +36,36 @@ const sharedStyles:readonly Row[]=[
 
 export function SelectAPIReference() {return <>
   <Section id="select-props" title="속성 · Select / SearchSelect / MultiSelect" description="Select와 SearchSelect는 단일 문자열, MultiSelect는 문자열 배열을 사용합니다. 네이티브 select의 모든 속성을 자동으로 전달하는 컴포넌트는 아닙니다.">
-    <ReferenceTable label="Select 공통 속성" rows={[
-      ['label / hideLabel','string / boolean','필수 / false','label은 숨겨도 접근 가능한 이름으로 유지합니다. hideLabel은 화면의 라벨과 라벨 여백을 제거합니다.'],
-      ['options','readonly SelectOption[]','필수','고유하고 안정적인 value를 가진 옵션 목록입니다. 옵션의 세부 구조는 다음 표를 확인하세요.'],
-      ['value / defaultValue','string 또는 readonly string[]',"'' / []",'단일 선택은 문자열, 복수 선택은 배열입니다. value는 부모가 제어하고 defaultValue는 비제어 상태의 초기값입니다. 두 방식을 섞지 마세요.'],
-      ['name','string','undefined','단일 선택은 하나의 값, 복수 선택은 같은 name의 반복 값으로 제출합니다. 선택하지 않은 복수 값은 제출 항목이 없습니다.'],
-      ['placeholder','string',"'선택하세요'",'선택값이 없을 때 표시합니다. label을 대신하지 않습니다.'],
-      ['disabled / required','boolean','false','컴포넌트 비활성화 또는 필수값 검증입니다. required는 비활성·빈 value를 제외한 선택이 있어야 통과합니다.'],
-      ['helperText / error','ReactNode','undefined','필드 아래에 도움말과 외부 오류를 표시하고 실제 조작 컨트롤의 설명으로 연결합니다. 오류가 없으면 error를 undefined 또는 null로 지정하세요. 외부 error는 내부 필수 선택 오류보다 우선하며 같은 오류 문구를 중복 표시하지 않습니다.'],
-      ['ref','Ref<HTMLButtonElement> / Ref<HTMLInputElement>','undefined','Select·MultiSelect는 실제 트리거 button, SearchSelect는 검색 input을 가리킵니다. 태그형 MultiSelect도 트리거 button입니다. ref.current?.focus()로 첫 오류나 원하는 필드로 이동합니다.'],
-      ['size',"'sm' | 'md' | 'lg'",'기본 크기(md)','트리거와 옵션 목록의 높이·여백을 같은 크기 토큰으로 적용합니다.'],
-      ['prefixIcon','ReactNode','undefined','값 앞의 장식 아이콘입니다. 입력값이나 제출값에 포함하지 않습니다.'],
-      ['popupStrategy',"'absolute' | 'fixed'","'absolute'",'기본은 래퍼 기준 배치입니다. 스크롤·클리핑 컨테이너에서는 fixed로 화면 경계를 따라 배치할 수 있습니다.'],
-      ['className','string','undefined','custom-select 래퍼에 추가합니다. 라벨은 이 래퍼 밖에 있습니다.'],
-      ['aria-describedby / aria-invalid','string / boolean | "true" | "false"','undefined','aria-describedby의 외부 ID와 컴포넌트의 도움말·오류 ID를 함께 연결합니다. error나 내부 필수 오류가 있으면 aria-invalid가 true입니다. 외부 aria-invalid만 지정할 때는 오류 문구도 별도로 연결하세요.'],
+    <p className="react-studio-caption">{publicAPINote}</p>
+    <ReferenceTable label="Select 공통 속성" contracts={['Select','SearchSelect','MultiSelect']} rows={[
+      ['label / hideLabel','필수 / false','label은 숨겨도 접근 가능한 이름으로 유지합니다. hideLabel은 화면의 라벨과 라벨 여백을 제거합니다.'],
+      ['options','필수','고유하고 안정적인 value를 가진 옵션 목록입니다. 옵션의 세부 구조는 다음 표를 확인하세요.'],
+      ['value / defaultValue',"'' / []",'단일 선택은 문자열, 복수 선택은 배열입니다. value는 부모가 제어하고 defaultValue는 비제어 상태의 초기값입니다. 두 방식을 섞지 마세요.'],
+      ['onValueChange','undefined','선택·해제·전체 지우기 후의 문자열 또는 전체 문자열 배열을 전달합니다. 검색어 입력만으로는 호출하지 않습니다.'],
+      ['name','undefined','단일 선택은 하나의 값, 복수 선택은 같은 name의 반복 값으로 제출합니다. 선택하지 않은 복수 값은 제출 항목이 없습니다.'],
+      ['placeholder',"'선택하세요'",'선택값이 없을 때 표시합니다. label을 대신하지 않습니다.'],
+      ['disabled / required','false','컴포넌트 비활성화 또는 필수값 검증입니다. required는 비활성·빈 value를 제외한 선택이 있어야 통과합니다.'],
+      ['helperText / error','undefined','필드 아래에 도움말과 외부 오류를 표시하고 실제 조작 컨트롤의 설명으로 연결합니다. 오류가 없으면 error를 undefined 또는 null로 지정하세요. 외부 error는 내부 필수 선택 오류보다 우선하며 같은 오류 문구를 중복 표시하지 않습니다.'],
+      ['ref','undefined','Select·MultiSelect는 실제 트리거 button, SearchSelect는 검색 input을 가리킵니다. 태그형 MultiSelect도 트리거 button입니다. ref.current?.focus()로 첫 오류나 원하는 필드로 이동합니다.'],
+      ['size','기본 크기(md)','트리거와 옵션 목록의 높이·여백을 같은 크기 토큰으로 적용합니다.'],
+      ['prefixIcon','undefined','값 앞의 장식 아이콘입니다. 입력값이나 제출값에 포함하지 않습니다.'],
+      ['popupStrategy',"'absolute'",'기본은 래퍼 기준 배치입니다. 스크롤·클리핑 컨테이너에서는 fixed로 화면 경계를 따라 배치할 수 있습니다.'],
+      ['className','undefined','custom-select 래퍼에 추가합니다. 라벨은 이 래퍼 밖에 있습니다.'],
+      ['aria-describedby / aria-invalid','undefined','aria-describedby의 외부 ID와 컴포넌트의 도움말·오류 ID를 함께 연결합니다. error나 내부 필수 오류가 있으면 aria-invalid가 true입니다. 외부 aria-invalid만 지정할 때는 오류 문구도 별도로 연결하세요.'],
     ]} />
-    <ReferenceTable label="MultiSelect 추가 속성" rows={[
-      ['searchable','boolean','false','MultiSelect 옵션 목록에 검색창을 표시합니다. 단일 검색은 SearchSelect를 사용합니다. 검색은 옵션 label의 대소문자를 구분하지 않는 부분 일치입니다.'],
-      ['clearable','boolean','false','전체 지우기 버튼을 표시합니다. 태그형은 필드 안에, 기본형은 필드 아래에 표시합니다. 빈 값에서는 비활성화됩니다.'],
-      ['presentation',"'default' | 'inline'","'default'",'기본은 선택 라벨 한 줄, inline은 제거 가능한 태그입니다. 표시 개수 옵션은 아래 축약 API를 참고하세요.'],
+    <ReferenceTable label="MultiSelect 추가 속성" contracts="MultiSelect" rows={[
+      ['searchable','false','MultiSelect 옵션 목록에 검색창을 표시합니다. 단일 검색은 SearchSelect를 사용합니다. 검색은 옵션 label의 대소문자를 구분하지 않는 부분 일치입니다.'],
+      ['clearable','false','전체 지우기 버튼을 표시합니다. 태그형은 필드 안에, 기본형은 필드 아래에 표시합니다. 빈 값에서는 비활성화됩니다.'],
+      ['presentation',"'default'",'기본은 선택 라벨 한 줄, inline은 제거 가능한 태그입니다. 표시 개수 옵션은 아래 축약 API를 참고하세요.'],
+      ['maxVisibleLabels','undefined','기본형에서 표시할 라벨 수를 제한하는 양의 정수입니다. 자세한 축약 규칙은 아래 표를 확인하세요.'],
+      ['maxVisibleTags','undefined','태그형에서 표시할 태그 수를 제한합니다. 0은 개수만, responsive는 입력 너비에 맞춰 표시합니다.'],
     ]} />
   </Section>
-  <Section id="select-options" title="옵션 · SelectOption" description="표시 문구와 제출값을 분리합니다. 같은 value를 여러 옵션에 사용하지 마세요."><ReferenceTable label="SelectOption" rows={[
-    ['value / label','string / string','필수','value는 상태·콜백·폼 제출값이고 label은 화면의 문구입니다. 빈 문자열은 단일 선택의 미선택 값이므로 실제 선택값에는 비어 있지 않은 value를 사용하세요.'],
-    ['disabled','boolean','false','선택·키보드 이동에서 제외합니다. 비활성 옵션은 유효한 폼 선택값으로 취급하지 않습니다.'],
-    ['description','string','undefined','옵션 목록에만 표시하는 보조 설명입니다. 트리거에는 label만 표시합니다.'],
-    ['icon','ReactNode','undefined','장식 아이콘입니다. 목록·단일 선택값·태그형에서 표시하며 의미는 label로 전달합니다.'],
+  <Section id="select-options" title="옵션 · SelectOption" description="표시 문구와 제출값을 분리합니다. 같은 value를 여러 옵션에 사용하지 마세요."><ReferenceTable label="SelectOption" contracts="SelectOption" rows={[
+    ['value / label','필수','value는 상태·콜백·폼 제출값이고 label은 화면의 문구입니다. 빈 문자열은 단일 선택의 미선택 값이므로 실제 선택값에는 비어 있지 않은 value를 사용하세요.'],
+    ['disabled','false','선택·키보드 이동에서 제외합니다. 비활성 옵션은 유효한 폼 선택값으로 취급하지 않습니다.'],
+    ['description','undefined','옵션 목록에만 표시하는 보조 설명입니다. 트리거에는 label만 표시합니다.'],
+    ['icon','undefined','장식 아이콘입니다. 목록·단일 선택값·태그형에서 표시하며 의미는 label로 전달합니다.'],
   ]} /></Section>
   <MultiSelectTagReference />
   <Section id="select-events" title="이벤트와 폼 연결" description="선택을 즉시 확정합니다. 별도 확인 버튼이나 onOpenChange 속성은 없습니다."><ReferenceTable label="Select 이벤트와 제출" rows={[
@@ -80,14 +92,15 @@ export function SelectAPIReference() {return <>
 </>;}
 
 export function NumberFieldAPIReference() {return <>
-  <Section id="number-props" title="속성 · NumberField" description="정밀도 보존을 위해 숫자 값을 number가 아닌 문자열 또는 null로 다룹니다."><ReferenceTable label="NumberField 공통 속성" rows={fieldProps} /><ReferenceTable label="NumberField 숫자 속성" rows={[
-    ['value / defaultValue','string | null','null','쉼표·단위가 없는 10진 문자열 또는 빈 값 null입니다. value는 제어 상태, defaultValue는 비제어 초기값입니다.'],
-    ['decimals','number','0','허용 소수 자릿수입니다. 정수값은 0~6으로 제한하며 비정수는 0으로 처리합니다. 초과 자릿수는 반올림하지 않고 오류로 표시합니다.'],
-    ['min / max','string','제한 없음','경계를 포함하는 허용 범위입니다. 부호와 소수는 가능하며 쉼표·지수 표기는 지원하지 않습니다.'],
-    ['step','string',"'1'",'증감 단위입니다. 양수이며 decimals 안에서 표현할 수 있어야 합니다. min·max·step의 잘못된 설정은 RangeError를 발생시킵니다.'],
-    ['grouping','boolean','false','표시값에 천 단위 쉼표를 사용합니다. onValueChange의 값에는 쉼표가 없습니다. FormData에는 입력창의 표시 문자열이 들어갑니다.'],
-    ['unit / prefixIcon','string / ReactNode','undefined','오른쪽 단위와 왼쪽 장식 아이콘입니다. 단위는 읽기 설명에 연결되며 두 항목 모두 입력값에 합쳐지지 않습니다.'],
-    ['selectOnFocus','boolean','false','포커스를 처음 받으면 전체 값을 선택합니다. 이미 포커스된 상태의 커서 이동과 텍스트 드래그 선택은 유지합니다.'],
+  <Section id="number-props" title="속성 · NumberField" description="정밀도 보존을 위해 숫자 값을 number가 아닌 문자열 또는 null로 다룹니다."><p className="react-studio-caption">{publicAPINote}</p><ReferenceTable label="NumberField 공통 속성" contracts="NumberField" rows={fieldProps} /><ReferenceTable label="NumberField 숫자 속성" contracts="NumberField" rows={[
+    ['value / defaultValue','null','쉼표·단위가 없는 10진 문자열 또는 빈 값 null입니다. value는 제어 상태, defaultValue는 비제어 초기값입니다.'],
+    ['onValueChange','undefined','Enter·포커스 이탈·증감에서 검증을 통과한 10진 문자열 또는 null을 전달합니다. 표시값의 천 단위 쉼표는 포함하지 않습니다.'],
+    ['decimals','0','허용 소수 자릿수입니다. 정수값은 0~6으로 제한하며 비정수는 0으로 처리합니다. 초과 자릿수는 반올림하지 않고 오류로 표시합니다.'],
+    ['min / max','제한 없음','경계를 포함하는 허용 범위입니다. 부호와 소수는 가능하며 쉼표·지수 표기는 지원하지 않습니다.'],
+    ['step',"'1'",'증감 단위입니다. 양수이며 decimals 안에서 표현할 수 있어야 합니다. min·max·step의 잘못된 설정은 RangeError를 발생시킵니다.'],
+    ['grouping','false','표시값에 천 단위 쉼표를 사용합니다. onValueChange의 값에는 쉼표가 없습니다. FormData에는 입력창의 표시 문자열이 들어갑니다.'],
+    ['unit / prefixIcon','undefined','오른쪽 단위와 왼쪽 장식 아이콘입니다. 단위는 읽기 설명에 연결되며 두 항목 모두 입력값에 합쳐지지 않습니다.'],
+    ['selectOnFocus','false','포커스를 처음 받으면 전체 값을 선택합니다. 이미 포커스된 상태의 커서 이동과 텍스트 드래그 선택은 유지합니다.'],
   ]} /></Section>
   <Section id="number-events" title="이벤트와 값 확정" description="키를 입력할 때의 임시 문자열과 검증을 통과한 확정값을 구분합니다."><ReferenceTable label="NumberField 이벤트" rows={[
     ['onValueChange','(value: string | null) => void','undefined','포커스 이탈·Enter·증감 동작에서 유효한 값을 확정해 전달합니다. 빈 값은 null이며 형식·범위 오류가 있으면 확정하지 않습니다. 입력할 때마다 호출하는 onChange 속성은 제공하지 않습니다.'],
@@ -109,11 +122,13 @@ export function NumberFieldAPIReference() {return <>
 </>;}
 
 export function DatePickerAPIReference() {return <>
-  <Section id="date-props" title="속성 · DatePicker / DateRangePicker" description="시간대 없는 날짜 문자열을 사용합니다. Date 객체나 타임스탬프를 직접 전달하지 않습니다."><ReferenceTable label="Date picker 공통 속성" rows={fieldProps} /><ReferenceTable label="Date picker 날짜 속성" rows={[
-    ['value / defaultValue','DateValue 또는 DateRangeValue','null / [null, null]','단일 DateValue는 YYYY-MM-DD 문자열 또는 null입니다. 범위 DateRangeValue는 readonly [DateValue, DateValue]입니다. value는 부모 제어, defaultValue는 비제어 초기값입니다.'],
-    ['min / max','string','제한 없음','YYYY-MM-DD 형식의 포함 경계입니다. 잘못된 날짜·형식 또는 min > max는 RangeError를 발생시킵니다.'],
-    ['startLabel / endLabel','string',"'시작일' / '종료일'",'DateRangePicker의 각 입력 이름입니다. 같은 페이지에 기간 선택이 여러 개라면 용도가 드러나는 라벨을 지정하세요.'],
-    ['name','string','undefined','단일은 name으로, 범위는 name-start와 name-end 두 항목으로 제출됩니다. 예: name="trip" → trip-start / trip-end.'],
+  <Section id="date-props" title="속성 · DatePicker / DateRangePicker" description="시간대 없는 날짜 문자열을 사용합니다. Date 객체나 타임스탬프를 직접 전달하지 않습니다."><p className="react-studio-caption">{publicAPINote}</p><ReferenceTable label="Date picker 공통 속성" contracts={['DatePicker','DateRangePicker']} rows={fieldProps} /><ReferenceTable label="Date picker 날짜 속성" contracts={['DatePicker','DateRangePicker']} rows={[
+    ['value / defaultValue','null / [null, null]','단일 DateValue는 YYYY-MM-DD 문자열 또는 null입니다. 범위 DateRangeValue는 readonly [DateValue, DateValue]입니다. value는 부모 제어, defaultValue는 비제어 초기값입니다.'],
+    ['onValueChange','undefined','직접 입력 또는 달력 선택에서 확정된 날짜나 범위를 전달합니다. 범위의 첫 날짜 선택은 [시작일, null]을 전달합니다.'],
+    ['min / max','제한 없음','YYYY-MM-DD 형식의 포함 경계입니다. 잘못된 날짜·형식 또는 min > max는 RangeError를 발생시킵니다.'],
+    ['startLabel / endLabel',"'시작일' / '종료일'",'DateRangePicker의 각 입력 이름입니다. 같은 페이지에 기간 선택이 여러 개라면 용도가 드러나는 라벨을 지정하세요.'],
+    ['endInputRef','undefined','DateRangePicker의 종료 input을 가리킵니다. 표준 ref는 시작 input이며 두 입력의 오류 포커스를 따로 제어할 수 있습니다.'],
+    ['name','undefined','단일은 name으로, 범위는 name-start와 name-end 두 항목으로 제출됩니다. 예: name="trip" → trip-start / trip-end.'],
   ]} /></Section>
   <Section id="date-events" title="이벤트와 날짜 처리" description="직접 입력과 달력 선택 모두 같은 날짜·범위 검증을 사용합니다."><ReferenceTable label="Date picker 이벤트" rows={[
     ['onValueChange','(value: DateValue) => void 또는 (value: DateRangeValue) => void','undefined','직접 입력은 Enter·포커스 이탈 시 정규화해 확정합니다. 유효하지 않은 날짜·범위는 오류를 표시하고 확정하지 않습니다.'],

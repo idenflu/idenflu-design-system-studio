@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Badge, DataGrid, Progress, Segmented, Select, type DataGridCellEdit, type DataGridColumn, type DataGridSort } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
-import { DataGridReference, DataGridReferenceLinks } from './data-grid-reference';
+import { DataGridReference } from './data-grid-reference';
 import { DataGridToolbarDemos } from './data-grid-toolbar-demos';
 import { DataGridMultiFilterDemo } from './data-grid-multi-filter-demo';
 import {ProjectStatusBadge} from './status-definitions';
@@ -97,7 +97,6 @@ export function DataGridDemos() {
     setNotice(`${rowId}의 ${taskColumns.find(column=>column.id === columnId)?.header} 값을 변경했습니다.`);
   };
   return <>
-    <DataGridReferenceLinks />
     <Section title="프로젝트 데이터그리드" description={`${projects.length}개 프로젝트에서 검색·열별 필터·정렬·선택·페이지 이동을 함께 사용합니다. 프로젝트 이름은 가로 스크롤 중에도 고정됩니다.`}>
 
       <DataGrid label="프로젝트 데이터그리드" rows={projects} columns={projectColumns}

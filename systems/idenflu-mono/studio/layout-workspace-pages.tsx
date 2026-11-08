@@ -1,10 +1,6 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, MultiSelect, NumberField, Progress, Select, Switch, Table, TableContainer, Tabs, TextArea, TextField, type DataGridColumn, type DataGridFilters, type DateValue, type SelectOption } from '@idenflu/mono-react';
+import { Avatar, Badge, Button, DataGrid, DatePicker, Icon, MultiSelect, NumberField, PageHeader, Progress, Select, Switch, Table, TableContainer, Tabs, TextArea, TextField, type DataGridColumn, type DataGridFilters, type DateValue, type SelectOption } from '@idenflu/mono-react';
 import { badgeVariant, pageInfo, statuses, teams, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings } from './layout-workspace-data';
-
-export function WorkspacePageHeader({title,description,eyebrow,action}: {title:string;description:string;eyebrow?:string;action?:React.ReactNode}){
-  return <header className="layout-page-heading"><div>{eyebrow&&<p className="layout-eyebrow">{eyebrow}</p>}<h1>{title}</h1><p>{description}</p></div>{action}</header>;
-}
 
 export function ProjectForm({id,onCreate}: {id:string;onCreate:(draft:ProjectDraft)=>void}){
   const [name,setName]=React.useState(''),[team,setTeam]=React.useState(teams[0].value),[description,setDescription]=React.useState('');
@@ -96,7 +92,7 @@ export function ProjectsPage({page,projects,onOpen,onCreate,onDelete}: {page:'pr
     {id:'progress',header:'진행률',accessor:row=>row.progress,width:160,filter:'number',cell:row=><span className="layout-progress-cell"><Progress value={row.progress} max={100} aria-label={`${row.name} 진행률`}/><span>{row.progress}%</span></span>},
     {id:'due',header:'마감일',accessor:row=>row.due,width:135,filter:'text'},
   ];
-  return <><WorkspacePageHeader title={pageInfo[page].title} description={pageInfo[page].description}/>
+  return <><PageHeader className="layout-page-heading" title={pageInfo[page].title} description={pageInfo[page].description}/>
     <form role="search" aria-label="프로젝트 필터 검색" className={`layout-filter-panel${page==='active-projects'?' layout-filter-panel--borderless':''}`} onSubmit={event=>{event.preventDefault();searchProjects();}}>
       <TextField className="layout-project-keyword" label="프로젝트명 / ID" type="search" value={keyword} onChange={event=>setKeyword(event.target.value)} placeholder="프로젝트명 또는 ID 입력" prefix={<Icon name="search"/>} prefixDecorative autoComplete="off"/>
       <Select label="담당 팀" value={team} onValueChange={setTeam} options={[{value:'all',label:'전체 팀'},...teams]} popupStrategy="fixed"/>
@@ -118,7 +114,7 @@ export function MasterDetailPage({projects,members,onUpdate,onOpen}: {projects:P
   const visible=React.useMemo(()=>projects.filter(project=>`${project.name} ${project.id} ${project.team} ${project.owner}`.toLocaleLowerCase().includes(needle)),[projects,needle]);
   const selected=visible.find(project=>project.id===selectedId)??visible[0];
   React.useEffect(()=>{const id=selected?.id??'';if(id!==selectedId)setSelectedId(id);},[selected?.id,selectedId]);
-  return <><WorkspacePageHeader title="마스터-디테일" description="목록에서 프로젝트를 선택하고 상세 내용을 확인하세요." eyebrow="PROJECT MANAGEMENT"/>
+  return <><PageHeader className="layout-page-heading" title="마스터-디테일" description="목록에서 프로젝트를 선택하고 상세 내용을 확인하세요." eyebrow="PROJECT MANAGEMENT"/>
     <div className="layout-master-detail">
       <section className="layout-master-panel" aria-label="프로젝트 목록">
         <div className="layout-master-toolbar"><h2>프로젝트 목록</h2><TextField label="프로젝트 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="프로젝트 검색"/></div>
@@ -138,7 +134,7 @@ export function MasterDetailPage({projects,members,onUpdate,onOpen}: {projects:P
 
 export function HomePage({projects,members,onOpen,onPage}: {projects:Project[];members:Member[];onOpen:(id:string)=>void;onPage:(page:WorkspacePage)=>void}){
   const reviewing=projects.filter(project=>project.status==='검토 중');
-  return <><WorkspacePageHeader title={pageInfo.home.title} description="팀의 주요 업무와 최근 활동을 한눈에 확인하세요." eyebrow="WORKSPACE OVERVIEW" action={<Button variant="outline" onClick={()=>onPage('projects')}>프로젝트 전체 보기<Icon name="arrow-right"/></Button>}/>
+  return <><PageHeader className="layout-page-heading" title={pageInfo.home.title} description="팀의 주요 업무와 최근 활동을 한눈에 확인하세요." eyebrow="WORKSPACE OVERVIEW" actions={<Button variant="outline" onClick={()=>onPage('projects')}>프로젝트 전체 보기<Icon name="arrow-right"/></Button>}/>
     <div className="layout-home-metrics">{[['전체 프로젝트',projects.length,'projects'],['진행 중',projects.filter(project=>project.status==='진행 중').length,'active-projects'],['검토 대기',reviewing.length,'reviews'],['팀 멤버',members.length,'members']].map(([label,value,page])=><button type="button" className="layout-panel layout-metric" key={label} onClick={()=>onPage(page as WorkspacePage)}><span>{label}</span><strong>{value}</strong><small>상세 보기 <Icon name="arrow-right"/></small></button>)}</div>
     <div className="layout-home-columns"><section className="layout-panel layout-recent"><header><div><h2>검토가 필요한 프로젝트</h2><p>작업을 확인하고 다음 단계를 진행해주세요.</p></div><Badge variant="warning">{reviewing.length}개</Badge></header>{reviewing.length?reviewing.slice(0,5).map(project=><button type="button" key={project.id} onClick={()=>onOpen(project.id)}><span><strong>{project.name}</strong><small>{project.owner} · {project.due}</small></span><Badge variant="warning">검토 중</Badge><Icon name="arrow-right"/></button>):<p className="layout-empty">모든 검토를 마쳤습니다.</p>}</section>
       <section className="layout-panel layout-team-card"><h2>함께하는 팀</h2><p>각자의 역할로 더 나은 제품을 만듭니다.</p><div>{members.slice(0,5).map(member=><Avatar key={member.id} shape="circle" variant="neutral" aria-label={member.name}>{member.name.slice(0,1)}</Avatar>)}</div><Button variant="outline" onClick={()=>onPage('members')}>멤버 관리<Icon name="arrow-right"/></Button></section></div>
@@ -147,7 +143,7 @@ export function HomePage({projects,members,onOpen,onPage}: {projects:Project[];m
 }
 
 export function ProjectDetailPage({project,members,onUpdate,onPage}: {project:Project;members:Member[];onUpdate:(id:string,patch:Partial<Project>)=>void;onPage:(page:WorkspacePage)=>void}){
-  return <><WorkspacePageHeader title={project.name} description={project.id} eyebrow="PROJECT DETAIL" action={<Button variant="outline" onClick={()=>onPage('projects')}><Icon name="arrow-left"/>프로젝트 목록</Button>}/>
+  return <><PageHeader className="layout-page-heading" title={project.name} description={project.id} eyebrow="PROJECT DETAIL" actions={<Button variant="outline" onClick={()=>onPage('projects')}><Icon name="arrow-left"/>프로젝트 목록</Button>}/>
     <ProjectDetailContent project={project} members={members} onUpdate={onUpdate}/>
   </>;
 }
@@ -162,7 +158,7 @@ export function ProjectDetailContent({project,members,onUpdate}: {project:Projec
 export function MembersPage({members,onInvite,onRole,roleOptions}: {members:Member[];onInvite:()=>void;onRole:(id:string,roles:string[])=>void;roleOptions:readonly SelectOption[]}){
   const [query,setQuery]=React.useState(''),[team,setTeam]=React.useState('all');
   const visible=members.filter(member=>`${member.name} ${member.email}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())&&(team==='all'||member.team===team));
-  return <><WorkspacePageHeader title="멤버 관리" description="함께 일하는 팀원을 찾고 역할을 관리하세요." eyebrow="TEAM MEMBERS" action={<Button onClick={onInvite} disabled={!roleOptions.length}><Icon name="add"/>멤버 초대</Button>}/>{!roleOptions.length&&<p className="component-helper">멤버를 초대하려면 역할을 먼저 추가하세요.</p>}<div className="layout-member-filters"><TextField label="멤버 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="이름 또는 이메일 검색"/><Select label="소속 팀 필터" value={team} options={[{value:'all',label:'전체 팀'},...teams]} onValueChange={setTeam}/></div>
+  return <><PageHeader className="layout-page-heading" title="멤버 관리" description="함께 일하는 팀원을 찾고 역할을 관리하세요." eyebrow="TEAM MEMBERS" actions={<Button onClick={onInvite} disabled={!roleOptions.length}><Icon name="add"/>멤버 초대</Button>}/>{!roleOptions.length&&<p className="component-helper">멤버를 초대하려면 역할을 먼저 추가하세요.</p>}<div className="layout-member-filters"><TextField label="멤버 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="이름 또는 이메일 검색"/><Select label="소속 팀 필터" value={team} options={[{value:'all',label:'전체 팀'},...teams]} onValueChange={setTeam}/></div>
     <TableContainer label="워크스페이스 멤버 목록" className="layout-members-table"><Table><thead><tr><th scope="col">멤버</th><th scope="col">소속 팀</th><th scope="col">역할</th><th scope="col">상태</th></tr></thead><tbody>{visible.map(member=><tr key={member.id}><td><span className="layout-person"><Avatar shape="circle" variant="neutral">{member.name.slice(0,1)}</Avatar><span><strong>{member.name}</strong><small>{member.email}</small></span></span></td><td>{member.team}</td><td><div className="layout-inline-select"><MultiSelect hideLabel label={`${member.name} 역할`} value={member.roles} options={roleOptions} presentation="inline" popupStrategy="fixed" placeholder="역할 선택" onValueChange={selected=>onRole(member.id,selected)}/></div></td><td><Badge variant="success">활성</Badge></td></tr>)}</tbody></Table></TableContainer>{!visible.length&&<p role="status" className="layout-empty">검색 결과가 없습니다.</p>}<p className="layout-content-caption">전체 {members.length}명 중 {visible.length}명을 표시합니다.</p>
   </>;
 }
@@ -193,15 +189,15 @@ function NotificationSettingsContent({settings,onChange}:NotificationSettingsPro
 }
 
 export function SettingsPage(props:SettingsProps){
-  return <><WorkspacePageHeader title="워크스페이스 설정" description="워크스페이스의 기본 정보와 표시 기준을 설정하세요." eyebrow="WORKSPACE SETTINGS"/><WorkspaceSettingsForm {...props}/></>;
+  return <><PageHeader className="layout-page-heading" title="워크스페이스 설정" description="워크스페이스의 기본 정보와 표시 기준을 설정하세요." eyebrow="WORKSPACE SETTINGS"/><WorkspaceSettingsForm {...props}/></>;
 }
 
 export function NotificationSettingsPage(props:NotificationSettingsProps){
-  return <><WorkspacePageHeader title="알림 설정" description="필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다." eyebrow="NOTIFICATION PREFERENCES"/><NotificationSettingsContent {...props}/></>;
+  return <><PageHeader className="layout-page-heading" title="알림 설정" description="필요한 업무 알림을 선택하세요. 변경 즉시 적용됩니다." eyebrow="NOTIFICATION PREFERENCES"/><NotificationSettingsContent {...props}/></>;
 }
 
 export function VerticalSettingsPage({settings,onSave,onChange}:SettingsProps&NotificationSettingsProps){
-  return <><WorkspacePageHeader title="버티컬 탭 설정" description="워크스페이스의 기본 정보와 알림을 관리하세요." eyebrow="WORKSPACE SETTINGS"/><Tabs className="layout-settings-tabs" label="워크스페이스 설정 분류" orientation="vertical" items={[
+  return <><PageHeader className="layout-page-heading" title="버티컬 탭 설정" description="워크스페이스의 기본 정보와 알림을 관리하세요." eyebrow="WORKSPACE SETTINGS"/><Tabs className="layout-settings-tabs" label="워크스페이스 설정 분류" orientation="vertical" items={[
     {value:'general',label:'기본 정보',content:<WorkspaceSettingsForm settings={settings} onSave={onSave}/>},
     {value:'notifications',label:'알림',content:<NotificationSettingsContent settings={settings} onChange={onChange}/>},
   ]}/></>;
@@ -209,7 +205,7 @@ export function VerticalSettingsPage({settings,onSave,onChange}:SettingsProps&No
 
 export function NotFoundPage({path,projectId,onPage}: {path:string;projectId?:string;onPage:(page:WorkspacePage)=>void}){
   const project=!!projectId;
-  return <><WorkspacePageHeader eyebrow="NOT FOUND" title={project?'프로젝트를 찾을 수 없습니다':'화면을 찾을 수 없습니다'} description={project?`${projectId} 프로젝트가 삭제되었거나 주소가 잘못되었습니다.`:'요청한 주소에 해당하는 화면이 없습니다.'}/>
+  return <><PageHeader className="layout-page-heading" eyebrow="NOT FOUND" title={project?'프로젝트를 찾을 수 없습니다':'화면을 찾을 수 없습니다'} description={project?`${projectId} 프로젝트가 삭제되었거나 주소가 잘못되었습니다.`:'요청한 주소에 해당하는 화면이 없습니다.'}/>
     <section className="layout-panel layout-not-found" aria-label="찾을 수 없는 주소">
       <p>요청한 주소</p><code>#/{path}</code>
       <ul><li>주소에 오타나 빠진 부분이 없는지 확인해주세요.</li><li>{project?'삭제된 프로젝트는 전체 프로젝트 목록에 더 이상 표시되지 않습니다.':'메뉴 검색이나 빠른 검색(⌘ K)으로 화면을 찾을 수 있습니다.'}</li></ul>

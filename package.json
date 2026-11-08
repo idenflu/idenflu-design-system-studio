@@ -10,8 +10,13 @@
     "check:changelog": "node scripts/check-release-changelog.mjs",
     "docs:tokens": "node scripts/sync-token-docs.mjs",
     "check:tokens": "node scripts/sync-token-docs.mjs --check",
+    "docs:api": "node packages/react/scripts/check-api-docs.mjs --write",
+    "check:api": "node packages/react/scripts/check-api-docs.mjs",
     "test": "node --test tests/tooling.test.mjs tests/preferences.test.mjs tests/dev.test.mjs tests/release-changelog.test.mjs tests/token-docs.test.mjs",
     "test:browser": "playwright test",
+    "test:compat": "playwright test --config playwright.compat.config.cjs",
+    "test:visual": "playwright test --config playwright.visual.config.cjs",
+    "test:react-compat": "node scripts/test-react-compat.mjs",
     "build": "node scripts/build.mjs"
   },
   "engines": {

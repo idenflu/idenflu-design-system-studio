@@ -30,6 +30,7 @@ jobs:
         working-directory: packages/react
       - run: npm run studio:check
         working-directory: packages/react
+      - run: npm run check:api
   verify:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -98,3 +99,51 @@ jobs:
             packages/react/test-results/
             systems/idenflu-mono/studio/test-results/
           retention-days: 14
+  browser-engines:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            packages/react/package-lock.json
+      - run: npm ci
+      - run: npm ci
+        working-directory: packages/react
+      - run: npm run build
+      - run: node packages/react/scripts/build-studio.mjs
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:compat -- --workers=2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-browser-engines
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+  react-compatibility:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        react: ['18.3.1', '19.2.0']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: packages/react/package-lock.json
+      - run: npm ci
+        working-directory: packages/react
+      - run: npm run build
+        working-directory: packages/react
+      - run: npm run test:react-compat -- --react=${{ matrix.react }}

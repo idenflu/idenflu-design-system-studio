@@ -9,6 +9,7 @@ type BaseProps = {
   label: React.ReactNode; id?: string; name?: string; size?: 'sm' | 'md' | 'lg';
   disabled?: boolean; readOnly?: boolean; required?: boolean; helperText?: React.ReactNode;
   error?: string; className?: string; min?: string; max?: string; minuteStep?: number;
+  'aria-describedby'?: string; 'aria-invalid'?: React.AriaAttributes['aria-invalid'];
 };
 export interface DateTimePickerProps extends BaseProps {
   value?: DateTimeValue; defaultValue?: DateTimeValue; onValueChange?: (value: DateTimeValue) => void;
@@ -16,6 +17,8 @@ export interface DateTimePickerProps extends BaseProps {
 export interface DateTimeRangePickerProps extends BaseProps {
   value?: DateTimeRangeValue; defaultValue?: DateTimeRangeValue; onValueChange?: (value: DateTimeRangeValue) => void;
   startLabel?: string; endLabel?: string;
+  /** Ref to the end input; the standard ref points to the start input. */
+  endInputRef?: React.Ref<HTMLInputElement>;
 }
 
 const pad = (number: number) => String(number).padStart(2, '0');
@@ -53,10 +56,11 @@ function summary(value: string, empty: string) {
 type WidgetProps = BaseProps & {
   range: boolean; values?: DateTimeRangeValue; initial: DateTimeRangeValue;
   onValuesChange?: (values: DateTimeRangeValue) => void; startLabel?: string; endLabel?: string;
+  inputRef?: React.Ref<HTMLInputElement>; endInputRef?: React.Ref<HTMLInputElement>;
 };
 
-function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, helperText, error: externalError, className,
-  min, max, minuteStep = 1, range, values, initial, onValuesChange, startLabel = '시작 일시', endLabel = '종료 일시' }: WidgetProps) {
+function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, helperText, error: externalError, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid,
+  min, max, minuteStep = 1, range, values, initial, onValuesChange, startLabel = '시작 일시', endLabel = '종료 일시', inputRef, endInputRef }: WidgetProps) {
   if (!Number.isInteger(minuteStep) || minuteStep < 1 || minuteStep > 60 || 60 % minuteStep !== 0) throw new RangeError('minuteStep은 60을 나누어떨어지게 하는 양의 정수여야 합니다.');
   const minimum = min ? parse(min) : null, maximum = max ? parse(max) : null;
   if ((min && minimum?.key !== min) || (max && maximum?.key !== max) || (min && max && min > max)) throw new RangeError('유효한 날짜·시간 범위를 YYYY-MM-DDTHH:mm 형식으로 지정해주세요.');
@@ -70,6 +74,7 @@ function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, h
   const [internalError, setError] = React.useState('');
   const [selectionError, setSelectionError] = React.useState('');
   const error = externalError || internalError;
+  const invalid = !!error || ariaInvalid === true || ariaInvalid === 'true';
   const [open, setOpen] = React.useState(false);
   const [active, setActive] = React.useState<Endpoint>(0);
   const [preview, setPreview] = React.useState<string | null>(null);
@@ -83,6 +88,8 @@ function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, h
   const [position, setPosition] = React.useState({ top: 'calc(100% + 6px)', bottom: 'auto', left: 0, maxHeight: 600, maxWidth: 560 });
   const pickerRef = React.useRef<HTMLDivElement>(null), popupRef = React.useRef<HTMLDivElement>(null), triggerRef = React.useRef<HTMLButtonElement>(null);
   const startRef = React.useRef<HTMLInputElement>(null), endRef = React.useRef<HTMLInputElement>(null);
+  React.useImperativeHandle(inputRef, () => startRef.current!);
+  React.useImperativeHandle(endInputRef, () => endRef.current!);
   const composing = React.useRef(false);
   const previous = React.useRef(values);
   const previousControlled = React.useRef(controlled);
@@ -260,10 +267,10 @@ function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, h
     if (publish(panel)) close(true);
   };
 
-  const described = [helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
+  const described = [describedBy, helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
   const input = (endpoint: Endpoint) => <input ref={endpoint ? endRef : startRef} id={range ? `${base}-${endpoint ? 'end' : 'start'}` : base}
     className={`date-text datetime-input${range ? ' date-range-input datetime-range-input' : ''}`} type="text" inputMode="numeric" autoComplete="off" placeholder="YYYY-MM-DD HH:mm"
-    value={draft[endpoint]} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={!!error || undefined} aria-describedby={described}
+    value={draft[endpoint]} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={invalid || ariaInvalid} aria-describedby={described}
     onChange={event => { const next: Pair = [...draft]; next[endpoint] = event.target.value; setDraft(next); if (internalError) setError(''); }}
     onFocus={() => { if (open) close(); setActive(endpoint); }} onBlur={event => { const target = event.relatedTarget; if (!open && !(target && (target === startRef.current || target === endRef.current))) publish(draft); }}
     onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }}
@@ -279,9 +286,9 @@ function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, h
   return <div className={className} data-size={size}>
     {range ? <span className="field-label" id={`${base}-label`}>{label}</span> : <label className="field-label" htmlFor={base}>{label}</label>}
     <div className="date-picker datetime-picker" ref={pickerRef} onBlur={event => { if (open && !event.currentTarget.contains(event.relatedTarget as Node | null)) queueMicrotask(() => { const picker = pickerRef.current; if (picker && !picker.contains(picker.ownerDocument.activeElement)) close(); }); }}>
-      {range ? <div className={`date-range-fields datetime-range-fields${error ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}>
+      {range ? <div className={`date-range-fields datetime-range-fields${invalid ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}>
         <label className="sr-only" htmlFor={`${base}-start`}>{startLabel}</label>{input(0)}<span className="date-range-separator" aria-hidden="true">–</span><label className="sr-only" htmlFor={`${base}-end`}>{endLabel}</label>{input(1)}{trigger}
-      </div> : <div className={`date-field datetime-field${error ? ' has-error' : ''}`}>{input(0)}{trigger}</div>}
+      </div> : <div className={`date-field datetime-field${invalid ? ' has-error' : ''}`}>{input(0)}{trigger}</div>}
       {name && <input type="hidden" name={range ? `${name}-start` : name} value={submitted[0] ?? ''} disabled={disabled} />}
       {name && range && <input type="hidden" name={`${name}-end`} value={submitted[1] ?? ''} disabled={disabled} />}
       {/* Keep native scrollbar and panel-background clicks focused inside the popup. */}
@@ -327,9 +334,9 @@ function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, h
   </div>;
 }
 
-export function DateTimePicker({ value, defaultValue = null, onValueChange, ...props }: DateTimePickerProps) {
-  return <DateTimeWidget {...props} range={false} values={value === undefined ? undefined : [value, null]} initial={[defaultValue, null]} onValuesChange={pair => onValueChange?.(pair[0])} />;
-}
-export function DateTimeRangePicker({ value, defaultValue = [null, null], onValueChange, ...props }: DateTimeRangePickerProps) {
-  return <DateTimeWidget {...props} range values={value} initial={defaultValue} onValuesChange={onValueChange} />;
-}
+export const DateTimePicker = React.forwardRef<HTMLInputElement, DateTimePickerProps>(function DateTimePicker({ value, defaultValue = null, onValueChange, ...props }, ref) {
+  return <DateTimeWidget {...props} inputRef={ref} range={false} values={value === undefined ? undefined : [value, null]} initial={[defaultValue, null]} onValuesChange={pair => onValueChange?.(pair[0])} />;
+});
+export const DateTimeRangePicker = React.forwardRef<HTMLInputElement, DateTimeRangePickerProps>(function DateTimeRangePicker({ value, defaultValue = [null, null], onValueChange, ...props }, ref) {
+  return <DateTimeWidget {...props} inputRef={ref} range values={value} initial={defaultValue} onValuesChange={onValueChange} />;
+});

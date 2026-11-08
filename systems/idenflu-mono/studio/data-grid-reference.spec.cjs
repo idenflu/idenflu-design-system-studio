@@ -5,8 +5,8 @@ const route = '/systems/idenflu-mono/index.html#/components/data-grid';
 test('API shortcuts keep the data-grid route and move keyboard focus to each section', async ({page}) => {
   await page.goto(route);
   for (const id of ['data-grid-props','data-grid-toolbar','data-grid-columns','data-grid-events','data-grid-styles','data-grid-behavior']) {
-    await page.locator(`.studio-grid-reference-links a[href="#${id}"]`).click();
-    await expect(page).toHaveURL(/#\/components\/data-grid$/);
+    await page.locator(`.docs-toc a[href="#/components/data-grid?section=${id}-title"]`).click();
+    await expect(page).toHaveURL(new RegExp(`#/components/data-grid\\?section=${id}-title$`));
     await expect(page.locator(`#${id}-title`)).toBeFocused();
     await expect(page.locator(`#${id}`)).toBeVisible();
   }

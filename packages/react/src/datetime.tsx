@@ -4,7 +4,7 @@ import { useEscapeLayer } from './escape-layer';
 const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
 type Size = 'sm' | 'md' | 'lg';
-type BaseField = { label: React.ReactNode; id?: string; name?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; size?: Size; helperText?: React.ReactNode; error?: string; className?: string };
+type BaseField = { label: React.ReactNode; id?: string; name?: string; disabled?: boolean; readOnly?: boolean; required?: boolean; size?: Size; helperText?: React.ReactNode; error?: string; className?: string; 'aria-describedby'?: string; 'aria-invalid'?: React.AriaAttributes['aria-invalid'] };
 
 type Parsed = { value?: bigint; error?: string; empty?: boolean; digits?: number };
 function parseNumber(text: string, decimals: number, grouping: boolean): Parsed {
@@ -53,7 +53,7 @@ export interface NumberFieldProps extends BaseField {
   selectOnFocus?: boolean;
 }
 
-export function NumberField({ label, id, name, disabled, readOnly, required, size, helperText, error: externalError, className, value, defaultValue = null, onValueChange, min, max, step = '1', decimals = 0, grouping = false, unit, prefixIcon, selectOnFocus = false }: NumberFieldProps) {
+export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(function NumberField({ label, id, name, disabled, readOnly, required, size, helperText, error: externalError, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid, value, defaultValue = null, onValueChange, min, max, step = '1', decimals = 0, grouping = false, unit, prefixIcon, selectOnFocus = false }, ref) {
   const uid = React.useId();
   const inputId = id || `number-${uid}`;
   const places = Number.isInteger(decimals) ? Math.max(0, Math.min(6, decimals)) : 0;
@@ -65,8 +65,10 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
   const [draft, setDraft] = React.useState(() => formatNumberDraft(initial, places, grouping));
   const [internalError, setError] = React.useState('');
   const error = externalError || internalError;
+  const invalid = !!error || ariaInvalid === true || ariaInvalid === 'true';
   const composing = React.useRef(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  React.useImperativeHandle(ref, () => inputRef.current!);
   const focusPointer = React.useRef<{ x: number; y: number; dragged: boolean } | null>(null);
   const previousFormat = React.useRef({ value, places, grouping });
   React.useEffect(() => {
@@ -118,13 +120,13 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
     if (maxParsed.value != null && next > maxParsed.value) next = maxParsed.value;
     setDraft(value !== undefined ? formatNumberDraft(value ?? '', places, grouping) : formatNumber(next, places, grouping, result.digits)); setError(''); onValueChange?.(formatNumber(next, places));
   };
-  const described = [helperText != null && `${inputId}-help`, unit && `${inputId}-unit`, error && `${inputId}-error`].filter(Boolean).join(' ') || undefined;
+  const described = [describedBy, helperText != null && `${inputId}-help`, unit && `${inputId}-unit`, error && `${inputId}-error`].filter(Boolean).join(' ') || undefined;
   return <div className={className}>
     <label htmlFor={inputId} className="field-label">{label}</label>
-    <div className={`number-field${error ? ' is-invalid' : ''}`} data-size={size}>
+    <div className={`number-field${invalid ? ' is-invalid' : ''}`} data-size={size}>
       {prefixIcon != null && <span className="number-field-prefix" aria-hidden="true" onClick={() => { if (!disabled) inputRef.current?.focus(); }}>{prefixIcon}</span>}
       <input ref={inputRef} id={inputId} name={name} type="text" role="spinbutton" inputMode={places ? 'decimal' : 'numeric'} className="number-field-input" value={draft} disabled={disabled} readOnly={readOnly} required={required}
-        aria-invalid={error ? true : undefined} aria-describedby={described} aria-valuemin={minParsed.value == null ? undefined : ariaNumber(minParsed.value, places)} aria-valuemax={maxParsed.value == null ? undefined : ariaNumber(maxParsed.value, places)} aria-valuenow={parsed.value == null || parsed.error || boundsError(parsed) ? undefined : ariaNumber(parsed.value, places)} aria-valuetext={parsed.value == null || parsed.error || boundsError(parsed) ? undefined : `${formatNumber(parsed.value, places, grouping, parsed.digits)}${unit ? ` ${unit}` : ''}`}
+        aria-invalid={invalid || ariaInvalid} aria-describedby={described} aria-valuemin={minParsed.value == null ? undefined : ariaNumber(minParsed.value, places)} aria-valuemax={maxParsed.value == null ? undefined : ariaNumber(maxParsed.value, places)} aria-valuenow={parsed.value == null || parsed.error || boundsError(parsed) ? undefined : ariaNumber(parsed.value, places)} aria-valuetext={parsed.value == null || parsed.error || boundsError(parsed) ? undefined : `${formatNumber(parsed.value, places, grouping, parsed.digits)}${unit ? ` ${unit}` : ''}`}
         onChange={event => { setDraft(event.target.value); if (error) setError(''); }} onBlur={() => { focusPointer.current = null; commit(); }} onFocus={event => { if (selectOnFocus && !disabled) event.currentTarget.select(); }}
         onMouseDown={event => { focusPointer.current = event.button === 0 && document.activeElement !== event.currentTarget && selectOnFocus && !disabled ? { x: event.clientX, y: event.clientY, dragged: false } : null; }}
         onMouseMove={event => { const pointer = focusPointer.current; if (pointer && Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) > 3) pointer.dragged = true; }}
@@ -140,12 +142,12 @@ export function NumberField({ label, id, name, disabled, readOnly, required, siz
     {helperText != null && <p className="number-field-meta" id={`${inputId}-help`}>{helperText}</p>}
     <p className="number-field-feedback is-error" id={`${inputId}-error`} role="status" hidden={!error}>{error}</p>
   </div>;
-}
+});
 
 export type DateValue = string | null;
 export type DateRangeValue = readonly [DateValue, DateValue];
 export interface DatePickerProps extends BaseField { value?: DateValue; defaultValue?: DateValue; onValueChange?: (value: DateValue) => void; min?: string; max?: string }
-export interface DateRangePickerProps extends BaseField { value?: DateRangeValue; defaultValue?: DateRangeValue; onValueChange?: (value: DateRangeValue) => void; min?: string; max?: string; startLabel?: string; endLabel?: string }
+export interface DateRangePickerProps extends BaseField { value?: DateRangeValue; defaultValue?: DateRangeValue; onValueChange?: (value: DateRangeValue) => void; min?: string; max?: string; startLabel?: string; endLabel?: string; /** Ref to the end input; the standard ref points to the start input. */ endInputRef?: React.Ref<HTMLInputElement> }
 
 function makeDate(year: number, month: number, day: number) { const d = new Date(2000, 0, 1, 12); d.setFullYear(year, month, day); return d; }
 function dateKey(date: Date) { return `${String(date.getFullYear()).padStart(4, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
@@ -162,8 +164,8 @@ function moveMonth(date: Date, offset: number) {
   if (first.getFullYear() < 1 || first.getFullYear() > 9999) return date;
   return makeDate(first.getFullYear(), first.getMonth(), Math.min(date.getDate(), makeDate(first.getFullYear(), first.getMonth() + 1, 0).getDate()));
 }
-type DateWidgetProps = BaseField & { range: boolean; values?: DateRangeValue; initial: DateRangeValue; onValuesChange?: (value: DateRangeValue) => void; min?: string; max?: string; startLabel?: string; endLabel?: string };
-function DateWidget({ label, id, name, disabled, readOnly, required, size, helperText, error: externalError, className, range, values, initial, onValuesChange, min, max, startLabel = '시작일', endLabel = '종료일' }: DateWidgetProps) {
+type DateWidgetProps = BaseField & { range: boolean; values?: DateRangeValue; initial: DateRangeValue; onValuesChange?: (value: DateRangeValue) => void; min?: string; max?: string; startLabel?: string; endLabel?: string; inputRef?: React.Ref<HTMLInputElement>; endInputRef?: React.Ref<HTMLInputElement> };
+function DateWidget({ label, id, name, disabled, readOnly, required, size, helperText, error: externalError, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid, range, values, initial, onValuesChange, min, max, startLabel = '시작일', endLabel = '종료일', inputRef, endInputRef }: DateWidgetProps) {
   const uid = React.useId(), base = id || `date-${uid}`;
   if ((min && (!parseDate(min) || dateKey(parseDate(min)!) !== min)) || (max && (!parseDate(max) || dateKey(parseDate(max)!) !== max)) || (min && max && min > max)) throw new RangeError('유효한 날짜 범위를 YYYY-MM-DD 형식으로 지정해주세요.');
   const clampCursor = (date: Date) => {
@@ -176,12 +178,15 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
   const [draft, setDraft] = React.useState<[string, string]>([startingValues[0] ?? '', startingValues[1] ?? '']);
   const [internalError, setError] = React.useState('');
   const error = externalError || internalError;
+  const invalid = !!error || ariaInvalid === true || ariaInvalid === 'true';
   const [open, setOpen] = React.useState(false);
   const [preview, setPreview] = React.useState<string | null>(null);
   const [cursor, setCursor] = React.useState(() => clampCursor(parseDate(startingValues[0] ?? '') || new Date()));
   const [position, setPosition] = React.useState<{ top: number; left: number; maxWidth: number; maxHeight: number } | null>(null);
   const pickerRef = React.useRef<HTMLDivElement>(null), popupRef = React.useRef<HTMLDivElement>(null), triggerRef = React.useRef<HTMLButtonElement>(null);
   const startRef = React.useRef<HTMLInputElement>(null), endRef = React.useRef<HTMLInputElement>(null);
+  React.useImperativeHandle(inputRef, () => startRef.current!);
+  React.useImperativeHandle(endInputRef, () => endRef.current!);
   const previous = React.useRef<DateRangeValue | undefined>(values);
   React.useEffect(() => { setCursor(previousCursor => clampCursor(previousCursor)); }, [min, max]);
   React.useEffect(() => {
@@ -277,13 +282,13 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
   const previewStart = range && parsed[0] && !parsed[1] && preview && preview !== dateKey(parsed[0]) ? dateKey(parsed[0]) : null;
   const previewFirst = previewStart && preview ? [previewStart, preview].sort()[0] : null;
   const previewLast = previewStart && preview ? [previewStart, preview].sort()[1] : null;
-  const described = [helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
-  const input = (index: 0 | 1) => <input ref={index ? endRef : startRef} id={range ? `${base}-${index ? 'end' : 'start'}` : base} className={`date-text${range ? ' date-range-input' : ''}`} type="text" inputMode="numeric" placeholder="YYYY-MM-DD" name={name ? range ? `${name}-${index ? 'end' : 'start'}` : name : undefined} value={draft[index]} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={!!error || undefined} aria-describedby={described} onChange={event => { const next: [string, string] = [...draft]; next[index] = event.target.value; setDraft(next); if (error) setError(''); }} onBlur={() => publish(draft)} onKeyDown={event => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) { event.preventDefault(); publish(draft); } }} />;
+  const described = [describedBy, helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
+  const input = (index: 0 | 1) => <input ref={index ? endRef : startRef} id={range ? `${base}-${index ? 'end' : 'start'}` : base} className={`date-text${range ? ' date-range-input' : ''}`} type="text" inputMode="numeric" placeholder="YYYY-MM-DD" name={name ? range ? `${name}-${index ? 'end' : 'start'}` : name : undefined} value={draft[index]} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={invalid || ariaInvalid} aria-describedby={described} onChange={event => { const next: [string, string] = [...draft]; next[index] = event.target.value; setDraft(next); if (error) setError(''); }} onBlur={() => publish(draft)} onKeyDown={event => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) { event.preventDefault(); publish(draft); } }} />;
   const trigger = <button ref={triggerRef} className="date-trigger" type="button" disabled={disabled || readOnly} aria-label="달력 열기" aria-haspopup="dialog" aria-expanded={open} aria-controls={`${base}-calendar`} onClick={() => { if (open) close(true); else { setCursor(clampCursor(parsed[0] || parsed[1] || new Date())); setOpen(true); } }}><span className="ui-icon icon-calendar" aria-hidden="true" /></button>;
   return <div className={className} data-size={size}>
     {range ? <span className="field-label" id={`${base}-label`}>{label}</span> : <label className="field-label" htmlFor={base}>{label}</label>}
     <div className="date-picker" ref={pickerRef}>
-      {range ? <div className={`date-range-fields${error ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}><label className="sr-only" htmlFor={`${base}-start`}>{startLabel}</label>{input(0)}<span className="date-range-separator" aria-hidden="true">–</span><label className="sr-only" htmlFor={`${base}-end`}>{endLabel}</label>{input(1)}{trigger}</div> : <div className={`date-field${error ? ' has-error' : ''}`}>{input(0)}{trigger}</div>}
+      {range ? <div className={`date-range-fields${invalid ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}><label className="sr-only" htmlFor={`${base}-start`}>{startLabel}</label>{input(0)}<span className="date-range-separator" aria-hidden="true">–</span><label className="sr-only" htmlFor={`${base}-end`}>{endLabel}</label>{input(1)}{trigger}</div> : <div className={`date-field${invalid ? ' has-error' : ''}`}>{input(0)}{trigger}</div>}
       {open && <div className="date-popup" ref={popupRef} id={`${base}-calendar`} role="dialog" popover="manual" aria-label={range ? '기간 선택 달력' : '날짜 선택 달력'} style={{ position: 'fixed', margin: 0, top: position?.top ?? 0, bottom: 'auto', left: position?.left ?? 0, right: 'auto', maxWidth: position?.maxWidth, maxHeight: position?.maxHeight, visibility: position ? 'visible' : 'hidden' }}>
         {range && <p className="calendar-instruction">{parsed[0] && !parsed[1] ? '종료일을 선택하세요.' : '시작일을 선택하세요.'}</p>}
         <div className="calendar-header"><button type="button" className="calendar-nav" aria-label="이전 달" onClick={() => setCursor(clampCursor(moveMonth(cursor, -1)))}><span className="ui-icon icon-caret" style={{ transform: 'rotate(90deg)' }} aria-hidden="true" /></button><strong id={`${base}-month`} aria-live="polite">{year}년 {month + 1}월</strong><button type="button" className="calendar-nav" aria-label="다음 달" onClick={() => setCursor(clampCursor(moveMonth(cursor, 1)))}><span className="ui-icon icon-caret" style={{ transform: 'rotate(-90deg)' }} aria-hidden="true" /></button></div>
@@ -315,9 +320,9 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
     <p className="field-error date-field-error" id={`${base}-error`} role="status" hidden={!error}>{error}</p>
   </div>;
 }
-export function DatePicker({ value, defaultValue = null, onValueChange, ...props }: DatePickerProps) {
-  return <DateWidget {...props} range={false} values={value === undefined ? undefined : [value, null]} initial={[defaultValue, null]} onValuesChange={pair => onValueChange?.(pair[0])} />;
-}
-export function DateRangePicker({ value, defaultValue = [null, null], onValueChange, ...props }: DateRangePickerProps) {
-  return <DateWidget {...props} range values={value} initial={defaultValue} onValuesChange={onValueChange} />;
-}
+export const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(function DatePicker({ value, defaultValue = null, onValueChange, ...props }, ref) {
+  return <DateWidget {...props} inputRef={ref} range={false} values={value === undefined ? undefined : [value, null]} initial={[defaultValue, null]} onValuesChange={pair => onValueChange?.(pair[0])} />;
+});
+export const DateRangePicker = React.forwardRef<HTMLInputElement, DateRangePickerProps>(function DateRangePicker({ value, defaultValue = [null, null], onValueChange, ...props }, ref) {
+  return <DateWidget {...props} inputRef={ref} range values={value} initial={defaultValue} onValuesChange={onValueChange} />;
+});

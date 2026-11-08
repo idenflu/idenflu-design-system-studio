@@ -1,25 +1,30 @@
 import * as React from 'react';
 import { Grid, Button, Table, TableContainer, TimePicker, type TimeValue } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
+import {publicAPIType, publicAPINote, type APIContracts} from './public-api';
+import {TemporalFieldFormExample} from './temporal-field-form-example';
 
 const props = [
-  ['label', 'ReactNode · 필수', '입력 필드의 라벨입니다. 팝업과 선택 버튼의 접근 가능한 이름에도 사용합니다.'],
-  ['value / defaultValue', 'TimeValue · 기본: null', '24시간 형식의 HH:mm 문자열 또는 null입니다. value가 있으면 부모가 상태를 관리하고 defaultValue는 처음에만 적용합니다.'],
-  ['min / max', 'string · 기본: 제한 없음', 'HH:mm 형식의 시작·종료 시각입니다. 경계를 포함하고 같은 날의 범위만 지원합니다.'],
-  ['minuteStep', 'number = 1', '분 선택과 직접 입력의 단위입니다. 1·5·10·15·20·30·60처럼 60을 나누어떨어지게 하는 양의 정수를 지정합니다.'],
-  ['id / name', 'string · 선택', '입력 ID와 폼 제출 키입니다. 폼에는 확정된 HH:mm 값을 제출하며 빈 값은 빈 문자열입니다.'],
-  ['required', 'boolean = false', '빈 값의 확정을 막고 폼 검증에서 입력을 요구합니다.'],
-  ['disabled / readOnly', 'boolean = false', '입력과 팝업 조작을 막습니다. disabled 값은 폼 제출에서도 제외합니다.'],
-  ['size', '"sm" | "md" | "lg" · 기본: md', '기존 텍스트필드와 같은 높이·간격 기준을 적용합니다.'],
-  ['helperText / error', 'ReactNode / string · 선택', '보조 설명 또는 부모 폼의 오류 메시지입니다. 오류는 입력 설명과 네이티브 폼 검증에 연결합니다.'],
-  ['className', 'string · 선택', '외곽 래퍼에 추가할 CSS 클래스입니다. 공유 토큰이나 하위 요소 스타일을 이 클래스 아래에서 조정합니다.'],
+  ['label', '필수', '입력 필드의 라벨입니다. 팝업과 선택 버튼의 접근 가능한 이름에도 사용합니다.'],
+  ['value / defaultValue', 'null', 'TimeValue는 24시간 형식의 HH:mm 문자열 또는 null입니다. value가 있으면 부모가 상태를 관리하고 defaultValue는 처음에만 적용합니다.'],
+  ['onValueChange', 'undefined', '직접 입력의 Enter·포커스 이탈 또는 팝업 확인에서 검증을 통과한 HH:mm 문자열이나 null을 전달합니다.'],
+  ['min / max', '제한 없음', 'HH:mm 형식의 시작·종료 시각입니다. 경계를 포함하고 같은 날의 범위만 지원합니다.'],
+  ['minuteStep', '1', '분 선택과 직접 입력의 단위입니다. 1·5·10·15·20·30·60처럼 60을 나누어떨어지게 하는 양의 정수를 지정합니다.'],
+  ['id / name', '자동 ID / undefined', '입력 ID와 폼 제출 키입니다. 폼에는 확정된 HH:mm 값을 제출하며 빈 값은 빈 문자열입니다.'],
+  ['required', 'false', '빈 값의 확정을 막고 폼 검증에서 입력을 요구합니다.'],
+  ['disabled / readOnly', 'false', '입력과 팝업 조작을 막습니다. disabled 값은 폼 제출에서도 제외합니다.'],
+  ['size', 'md', '기존 텍스트필드와 같은 높이·간격 기준을 적용합니다.'],
+  ['helperText / error', 'undefined', '보조 설명 또는 부모 폼의 오류 메시지입니다. 오류는 입력 설명과 네이티브 폼 검증에 연결합니다.'],
+  ['ref', 'undefined', '실제 input을 가리킵니다. ref.current?.focus()로 오류가 있는 입력이나 원하는 필드로 이동할 수 있습니다.'],
+  ['aria-describedby / aria-invalid', 'undefined', '외부 설명 ID와 도움말·오류 ID를 함께 연결합니다. 내부 오류가 있으면 aria-invalid=true가 우선하며 오류가 없을 때는 외부 값을 유지합니다.'],
+  ['className', 'undefined', '외곽 래퍼에 추가할 CSS 클래스입니다. 공유 토큰이나 하위 요소 스타일을 이 클래스 아래에서 조정합니다.'],
 ] as const;
 
-function ReferenceTable({label, rows}: {label:string; rows:readonly (readonly [string,string,string])[]}) {
+function ReferenceTable({label, rows, contracts}: {label:string; rows:readonly (readonly [string,string,string])[]; contracts?:APIContracts}) {
   return <TableContainer label={label} className="studio-time-reference-table"><Table>
     <caption className="sr-only">{label}</caption>
-    <thead><tr><th scope="col">항목</th><th scope="col">타입 · 기본값</th><th scope="col">설명</th></tr></thead>
-    <tbody>{rows.map(([name,type,description])=><tr key={name}><th scope="row"><code>{name}</code></th><td><code>{type}</code></td><td>{description}</td></tr>)}</tbody>
+    <thead><tr><th scope="col">항목</th><th scope="col">{contracts ? '타입' : '타입 · 기본값'}</th>{contracts && <th scope="col">기본값</th>}<th scope="col">설명</th></tr></thead>
+    <tbody>{rows.map(([name,typeOrInitial,description])=><tr key={name}><th scope="row"><code>{name}</code></th><td><code>{contracts ? publicAPIType(contracts,name) : typeOrInitial}</code></td>{contracts && <td><code>{typeOrInitial}</code></td>}<td>{description}</td></tr>)}</tbody>
   </Table></TableContainer>;
 }
 
@@ -60,8 +65,10 @@ export function TimePickerDemos() {
     <Section title="사이즈" description="SM·MD·LG 필드에 같은 시간 선택 동작을 제공합니다.">
       <Grid columns={{base:1,sm:3}} gap={6} alignItems="start" className="react-studio-size-grid">{(['sm','md','lg'] as const).map(size=><TimePicker key={size} label={`${size.toUpperCase()} 시간`} size={size} defaultValue="14:30" minuteStep={15} />)}</Grid>
     </Section>
+    <TemporalFieldFormExample kind="time" />
     <Section title="속성" description="시간은 날짜·시간대 변환 없이 HH:mm 문자열로 주고받습니다. 빈 값은 null입니다.">
-      <ReferenceTable label="Time picker 속성" rows={props} />
+      <p className="react-studio-caption">{publicAPINote}</p>
+      <ReferenceTable label="Time picker 속성" contracts="TimePicker" rows={props} />
       <p className="react-studio-caption">min은 max보다 늦을 수 없습니다. 자정을 넘는 기간은 날짜를 포함하는 Datetime picker를 사용하세요. minuteStep이 범위와 맞지 않아 선택할 시간이 없으면 확인을 비활성으로 표시합니다.</p>
     </Section>
     <Section title="이벤트와 키보드" description="제어형 value를 사용하면 onValueChange에서 부모 상태를 갱신하세요.">

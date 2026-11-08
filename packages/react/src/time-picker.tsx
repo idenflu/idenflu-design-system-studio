@@ -19,6 +19,8 @@ export interface TimePickerProps {
   helperText?: React.ReactNode;
   error?: string;
   className?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: React.AriaAttributes['aria-invalid'];
 }
 
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -33,8 +35,8 @@ const normalized = (value: TimeValue) => parseTime(value ?? '')?.key ?? null;
 const display = (value: TimeValue) => normalized(value) ?? value ?? '';
 
 /** Local 24-hour time. Popup choices are pending until explicit confirmation. */
-export function TimePicker({label, id, name, value, defaultValue = null, onValueChange, min, max, minuteStep = 1,
-  size, disabled, readOnly, required, helperText, error: externalError, className}: TimePickerProps) {
+export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(function TimePicker({label, id, name, value, defaultValue = null, onValueChange, min, max, minuteStep = 1,
+  size, disabled, readOnly, required, helperText, error: externalError, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid}, ref) {
   if (!Number.isInteger(minuteStep) || minuteStep < 1 || minuteStep > 60 || 60 % minuteStep !== 0) throw new RangeError('minuteStep은 60을 나누어떨어지게 하는 양의 정수여야 합니다.');
   if ((min !== undefined && parseTime(min)?.key !== min) || (max !== undefined && parseTime(max)?.key !== max) || (min && max && min > max)) throw new RangeError('유효한 시간 범위를 HH:mm 형식으로 지정해주세요.');
   const uid = React.useId(), base = id || `time-${uid}`;
@@ -45,11 +47,13 @@ export function TimePicker({label, id, name, value, defaultValue = null, onValue
   const [draft, setDraft] = React.useState(() => display(controlled ? value : defaultValue));
   const [internalError, setError] = React.useState('');
   const error = externalError || internalError;
+  const invalid = !!error || ariaInvalid === true || ariaInvalid === 'true';
   const [open, setOpen] = React.useState(false);
   const [panel, setPanel] = React.useState<TimeValue>(null);
   const [position, setPosition] = React.useState({top:'calc(100% + 6px)', bottom:'auto', left:0, maxWidth:280, maxHeight:480});
   const root = React.useRef<HTMLDivElement>(null), popup = React.useRef<HTMLDivElement>(null);
   const input = React.useRef<HTMLInputElement>(null), trigger = React.useRef<HTMLButtonElement>(null);
+  React.useImperativeHandle(ref, () => input.current!);
   const composing = React.useRef(false);
   const previous = React.useRef({value, controlled});
   const title = typeof label === 'string' ? `${label} 선택` : '시간 선택';
@@ -165,16 +169,16 @@ export function TimePicker({label, id, name, value, defaultValue = null, onValue
     choose(kind, next);
     event.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`[data-time-value="${next}"]`)?.focus();
   };
-  const described = [helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
+  const described = [describedBy, helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
 
   return <div className={className} data-size={size}>
     <label className="field-label" htmlFor={base}>{label}</label>
     <div className="date-picker time-picker" ref={root} onBlur={event => {
       if (open && event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close();
     }}>
-      <div className={`date-field time-field${error ? ' has-error' : ''}`}>
+      <div className={`date-field time-field${invalid ? ' has-error' : ''}`}>
         <input ref={input} id={base} className="date-text time-input" type="text" inputMode="numeric" autoComplete="off" placeholder="HH:mm"
-          value={draft} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={!!error || undefined} aria-describedby={described}
+          value={draft} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={invalid || ariaInvalid} aria-describedby={described}
           onChange={event => { setDraft(event.target.value); setError(''); }}
           onBlur={event => { if (!open && event.relatedTarget !== trigger.current) publish(draft); }}
           onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; }}
@@ -218,4 +222,4 @@ export function TimePicker({label, id, name, value, defaultValue = null, onValue
     {helperText != null && <p className="component-helper" id={`${base}-help`}>{helperText}</p>}
     {error && <p className="field-error" id={`${base}-error`} role="status">{error}</p>}
   </div>;
-}
+});

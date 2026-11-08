@@ -81,12 +81,14 @@ test('mobile menu traps focus, dismisses on Escape and restores focus', { tag: [
   await expect(page.locator('.sidebar')).toHaveJSProperty('inert', true);
 });
 
-test('TOC and document pagination move focus and use the visible menu order', { tag: '@mobile' }, async ({ page }) => {
+test('TOC and document pagination move focus and use the visible menu order', { tag: '@mobile' }, async ({ page, isMobile }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
+  if (isMobile) await page.locator('.docs-toc > summary').click();
   const link = page.getByRole('navigation', {name:'이 페이지 목차'}).getByRole('link', {name:'아이콘과 입력 보조'});
+  const target = await link.getAttribute('href');
   await link.click();
   await expect(page.getByRole('heading', {name:'아이콘과 입력 보조', exact:true})).toBeFocused();
-  await expect(page).toHaveURL(/#\/components\/text-fields$/);
+  await expect(page).toHaveURL(new RegExp(target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
   await page.locator('#next-doc').click();
   await expect(page).toHaveURL(/#\/components\/number-fields$/);
   await expect(page.getByRole('heading', {level:1})).toBeFocused();

@@ -448,7 +448,7 @@ test('project search finds names and IDs on submit with compact headers and cons
     const team=await results.first().locator('td').nth(3).innerText();
     const status=await results.first().locator('td').nth(2).innerText();
     const clear=search.getByRole('button',{name:'프로젝트 상태 모두 지우기',exact:true});
-    await expect(panel(page).locator('.layout-page-heading .layout-eyebrow')).toHaveCount(0);
+    await expect(panel(page).locator('.layout-page-heading .page-header-eyebrow')).toHaveCount(0);
     await expect(search.locator('.field-label')).toHaveText(['프로젝트명 / ID','담당 팀','프로젝트 상태']);
     await expect(clear).toHaveCount(0);
     const textColor=await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).evaluate(element=>getComputedStyle(element).color);

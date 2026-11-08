@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, Checkbox, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Select, Tabs, TextArea, TextField } from '@idenflu/mono-react';
-import { WorkspacePageHeader } from './layout-workspace-pages';
+import { PageHeader, Avatar, Badge, Button, Checkbox, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Select, Tabs, TextArea, TextField } from '@idenflu/mono-react';
 import { roleNotificationChannels, roleNotifications, rolePermissions, type RoleConnections, type RoleNotificationChannel, type WorkspaceRole } from './layout-role-data';
 import { type Member } from './layout-workspace-data';
 
@@ -114,7 +113,7 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
   };
 
   return <>
-    <WorkspacePageHeader title="역할 관리" eyebrow="ORGANIZATION MANAGEMENT" description="역할별 사용 권한과 수신할 알림을 설정하세요."/>
+    <PageHeader className="layout-page-heading" title="역할 관리" eyebrow="ORGANIZATION MANAGEMENT" description="역할별 사용 권한과 수신할 알림을 설정하세요."/>
     <div className="layout-master-detail layout-role-management">
       <section className="layout-master-panel" aria-label="역할 목록 영역">
         <div className="layout-master-toolbar">

@@ -5,6 +5,7 @@ import ts from 'typescript';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 export const completeExampleEntries = {
+  'components/page-header':['page-header-demos.tsx','PageHeaderExample','PageHeaderUsageExample'],
   'components/table':['table-demos.tsx','TableDemos','TableExample'],
   'components/chips':['structure-demos.tsx','ChipDemos','ChipsExample'],
   'patterns/form/basic':['pattern-forms.tsx','BasicFormPattern','BasicFormExample'],

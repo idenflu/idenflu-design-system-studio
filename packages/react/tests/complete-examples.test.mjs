@@ -40,7 +40,7 @@ function button(node,text) {return [...node.querySelectorAll('button')].find(ite
 async function submit(node) {await React.act(async()=>node.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));}
 
 test('all complete examples typecheck against public package declarations and have no private imports',()=>{
-  assert.equal(checkCompleteExamples(examples),13);
+  assert.equal(checkCompleteExamples(examples),14);
   for(const code of Object.values(examples)) {
     assert.doesNotMatch(code,/from\s+['"]\./);
     assert.match(code,/import '@idenflu\/mono-react\/styles.css'/);

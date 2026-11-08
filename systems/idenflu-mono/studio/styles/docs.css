@@ -148,8 +148,23 @@
 .docs-search { flex-shrink:0; padding:var(--space-4) var(--space-5) 0; }
 .docs-search input { width:100%; }
 .docs-search p { margin-top:var(--space-2); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
-.docs-toc { display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-4); margin-bottom:var(--space-8); padding-block:var(--space-3); border-block:1px solid var(--divider); }
+.docs-toc { margin-bottom:var(--space-8); padding-block:var(--space-3); border-block:1px solid var(--divider); }
+.docs-toc > summary { display:none; }
+.docs-toc nav { display:grid; gap:var(--space-2); }
+.docs-toc-group { display:grid; grid-template-columns:64px minmax(0,1fr); gap:var(--space-3); align-items:baseline; }
+.docs-toc-group > span { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.docs-toc-group > div, .docs-toc-links { display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-4); }
 .docs-toc a { color:var(--primary); font-size:var(--font-size-caption); text-decoration:underline; text-underline-offset:3px; }
+.docs-toc a[aria-current="location"] { font-weight:var(--font-weight-semibold); }
+@media(max-width:900px) {
+  .docs-toc { margin-bottom:var(--space-6); padding-block:0; }
+  .docs-toc > summary { display:flex; align-items:center; justify-content:space-between; min-height:var(--control-height); gap:var(--space-3); color:var(--text-secondary); font-size:var(--font-size-caption); cursor:pointer; list-style:none; }
+  .docs-toc > summary::-webkit-details-marker { display:none; }
+  .docs-toc[open] > summary .icon { transform:rotate(180deg); }
+  .docs-toc nav { padding-bottom:var(--space-3); }
+  .docs-toc-group { grid-template-columns:1fr; gap:var(--space-1); }
+  .docs-toc a { padding-block:var(--space-1); }
+}
 .component-guide { margin-top:var(--space-10); padding-top:var(--space-6); border-top:1px solid var(--divider); min-width:0; }
 .component-guide h2 { font-size:var(--font-size-heading); line-height:var(--line-height-heading); margin-bottom:var(--space-4); }
 .component-guide h3 { margin-block:var(--space-6) var(--space-3); font-size:var(--font-size-title); line-height:var(--line-height-title); }

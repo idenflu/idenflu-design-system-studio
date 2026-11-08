@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Table, TableContainer } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
+import {publicAPIType, publicAPINote, type APIContracts, type APIPropertyRow} from './public-api';
 
-type PropertyRow = readonly [name: string, type: string, initial: string, description: string];
+type PropertyRow = APIPropertyRow;
 type DetailRow = readonly [name: string, description: string];
-type EventRow = readonly [signature: string, timing: string, connection: string];
+type EventRow = readonly [name: string, timing: string, connection: string];
 
-function PropertyTable({ title, rows }: { title: string; rows: readonly PropertyRow[] }) {
+function PropertyTable({ title, rows, contracts }: { title: string; rows: readonly PropertyRow[]; contracts: APIContracts }) {
   return <div className="studio-grid-reference-group">
     <h3>{title}</h3>
     <TableContainer label={title} className="studio-grid-reference-table">
@@ -14,8 +15,8 @@ function PropertyTable({ title, rows }: { title: string; rows: readonly Property
         <colgroup><col style={{width:'23%'}} /><col style={{width:'27%'}} /><col style={{width:'15%'}} /><col style={{width:'35%'}} /></colgroup>
         <caption className="sr-only">{title}의 타입, 기본값과 사용 방법</caption>
         <thead><tr><th scope="col">속성</th><th scope="col">타입</th><th scope="col">기본값</th><th scope="col">설명</th></tr></thead>
-        <tbody>{rows.map(([name, type, initial, description]) => <tr key={name}>
-          <th scope="row"><code>{name}</code></th><td><code>{type}</code></td><td><code>{initial}</code></td><td>{description}</td>
+        <tbody>{rows.map(([name, initial, description]) => <tr key={name}>
+          <th scope="row"><code>{name}</code></th><td><code>{publicAPIType(contracts,name)}</code></td><td><code>{initial}</code></td><td>{description}</td>
         </tr>)}</tbody>
       </Table>
     </TableContainer>
@@ -32,6 +33,16 @@ function DetailTable({ title, rows }: { title: string; rows: readonly DetailRow[
   </TableContainer>;
 }
 
+function EventTable({contracts,rows}:{contracts:APIContracts;rows:readonly EventRow[]}) {
+  return <TableContainer label="데이터그리드 이벤트 콜백" className="studio-grid-reference-table">
+    <Table density="compact">
+      <caption className="sr-only">콜백 타입, 발생 시점과 부모 상태 연결 방법</caption>
+      <thead><tr><th scope="col">콜백 · 타입</th><th scope="col">발생 시점</th><th scope="col">부모에서 연결할 동작</th></tr></thead>
+      <tbody>{rows.map(([name,timing,connection])=><tr key={name}><th scope="row"><code>{name}: {publicAPIType(contracts,name)}</code></th><td>{timing}</td><td>{connection}</td></tr>)}</tbody>
+    </Table>
+  </TableContainer>;
+}
+
 function CodeExample({ title, children }: { title: string; children: string }) {
   return <div className="studio-grid-reference-group"><h3>{title}</h3>
     <div className="react-studio-code studio-grid-reference-code" role="region" aria-label={title} tabIndex={0}><pre><code>{children}</code></pre></div>
@@ -39,95 +50,95 @@ function CodeExample({ title, children }: { title: string; children: string }) {
 }
 
 const dataProps: readonly PropertyRow[] = [
-  ['label', 'string', '필수', '툴바 제목, 그리드 그룹, 표와 페이지 탐색의 접근 가능한 이름입니다.'],
-  ['rows', 'readonly T[]', '필수', '검색·필터·정렬·페이지 이동을 처리할 전체 데이터입니다. 그리드는 원본 배열을 수정하지 않습니다.'],
-  ['columns', 'readonly DataGridColumn<T>[]', '필수', '열의 값, 표시, 정렬, 필터, 너비와 편집 규칙을 정의합니다.'],
-  ['getRowId', '(row: T) => string', '필수', '고유하고 안정적인 행 ID입니다. 선택·편집·가상 행 추적에 사용하므로 배열 인덱스 대신 데이터의 ID를 반환하세요.'],
-  ['getRowLabel', '(row: T) => string', 'undefined', '행 선택과 편집 버튼에 읽어 줄 이름입니다. 생략하면 getRowId의 값을 사용합니다.'],
-  ['loading', 'boolean', 'false', '로딩 안내를 표시합니다. 데이터 행과 페이지 버튼을 숨기고 정렬·내보내기·밀도 변경 등을 비활성화합니다.'],
-  ['error', 'ReactNode', 'undefined', '오류 안내 내용입니다. undefined·null·false는 오류가 없는 상태이며, loading과 함께 지정하면 로딩이 먼저 표시됩니다.'],
-  ['emptyMessage', 'ReactNode', "'등록된 데이터가 없습니다.'", '데이터가 비었을 때의 내용입니다. 검색·필터 결과가 없을 때는 별도의 결과 없음 안내와 조건 초기화 버튼이 표시됩니다.'],
+  ['label','필수','툴바 제목, 그리드 그룹, 표와 페이지 탐색의 접근 가능한 이름입니다.'],
+  ['rows','필수','검색·필터·정렬·페이지 이동을 처리할 전체 데이터입니다. 그리드는 원본 배열을 수정하지 않습니다.'],
+  ['columns','필수','열의 값, 표시, 정렬, 필터, 너비와 편집 규칙을 정의합니다.'],
+  ['getRowId','필수','고유하고 안정적인 행 ID입니다. 선택·편집·가상 행 추적에 사용하므로 배열 인덱스 대신 데이터의 ID를 반환하세요.'],
+  ['getRowLabel','undefined','행 선택과 편집 버튼에 읽어 줄 이름입니다. 생략하면 getRowId의 값을 사용합니다.'],
+  ['loading','false','로딩 안내를 표시합니다. 데이터 행과 페이지 버튼을 숨기고 정렬·내보내기·밀도 변경 등을 비활성화합니다.'],
+  ['error','undefined','오류 안내 내용입니다. undefined·null·false는 오류가 없는 상태이며, loading과 함께 지정하면 로딩이 먼저 표시됩니다.'],
+  ['emptyMessage',"'등록된 데이터가 없습니다.'",'데이터가 비었을 때의 내용입니다. 검색·필터 결과가 없을 때는 별도의 결과 없음 안내와 조건 초기화 버튼이 표시됩니다.'],
 ];
 
 const stateProps: readonly PropertyRow[] = [
-  ['searchable', 'boolean', 'true', '검색 입력을 표시하고 전체 검색을 적용합니다. false이면 query를 보관하더라도 검색에는 적용하지 않으며 열별 필터와는 별개입니다. showColumnFilterToggle로 컬럼 필터를 끄면 열별 조건도 적용하지 않습니다.'],
-  ['searchLabel', 'string', "'검색'", '검색 입력의 접근 가능한 이름입니다.'],
-  ['query', 'string', 'undefined', '부모가 제어하는 검색어입니다. 입력을 반영하려면 onQueryChange에서 갱신하세요.'],
-  ['defaultQuery', 'string', "''", '비제어 검색어의 최초 값입니다. query가 있으면 사용하지 않습니다.'],
-  ['filters', 'DataGridFilters', 'undefined', '부모가 제어하는 열별 필터입니다. text·select는 문자열, multi-select는 string[], number는 min/max 객체를 사용합니다. 열 ID를 키로 사용하며 해당 열에 filter가 설정되어야 적용됩니다. 컬럼 필터를 끈 동안은 적용하지 않고, 다시 켜면 현재 filters를 적용합니다.'],
-  ['defaultFilters', 'DataGridFilters', '{}', '비제어 필터의 최초 값입니다.'],
-  ['sort', 'DataGridSort | null', 'undefined', '단일 정렬을 제어하는 기존 API입니다. null은 정렬 해제이며 sortModel이 있으면 sortModel을 우선합니다.'],
-  ['defaultSort', 'DataGridSort | null', 'null', '최초 단일 정렬입니다. defaultSortModel이 없을 때만 초기 정렬에 사용합니다.'],
-  ['sortModel', 'DataGridSortModel', 'undefined', '배열 순서대로 다중 정렬을 제어합니다. 빈 배열은 정렬 해제입니다. onSortModelChange에서 다음 배열을 반영하세요.'],
-  ['defaultSortModel', 'DataGridSortModel', 'undefined', '비제어 다중 정렬의 최초 값입니다. 생략하면 defaultSort 또는 정렬 없는 상태로 시작합니다.'],
-  ['selectable', 'boolean', 'false', '선택 체크박스와 선택 도구를 표시합니다.'],
-  ['selectOnRowClick', 'boolean', 'true', '선택 가능한 행의 일반 영역을 클릭하면 선택을 전환합니다. false여도 체크박스 선택은 유지합니다.'],
-  ['isRowSelectable', '(row: T) => boolean', 'undefined', 'false를 반환한 행은 선택할 수 없으며 선택 개수·전체 선택에서도 제외합니다. 생략하면 모든 행을 선택할 수 있습니다.'],
-  ['selectedRowIds', 'readonly string[]', 'undefined', '부모가 제어하는 선택 ID입니다. 현재 rows에 존재하고 선택 가능한 ID만 그리드의 유효 선택으로 계산합니다.'],
-  ['defaultSelectedRowIds', 'readonly string[]', '[]', '비제어 선택의 최초 값입니다. 페이지나 검색 조건이 바뀌어도 유효한 ID의 선택을 유지합니다.'],
-  ['selectionActions', 'ReactNode', 'undefined', '호출 측에서 직접 구현한 선택 작업의 UI입니다. selectable이며 유효한 선택이 있을 때 툴바에 표시합니다. 선택 ID는 전달되지 않으므로 부모의 selectedRowIds 상태를 사용하세요.'],
+  ['searchable','true','검색 입력을 표시하고 전체 검색을 적용합니다. false이면 query를 보관하더라도 검색에는 적용하지 않으며 열별 필터와는 별개입니다. showColumnFilterToggle로 컬럼 필터를 끄면 열별 조건도 적용하지 않습니다.'],
+  ['searchLabel',"'검색'",'검색 입력의 접근 가능한 이름입니다.'],
+  ['query','undefined','부모가 제어하는 검색어입니다. 입력을 반영하려면 onQueryChange에서 갱신하세요.'],
+  ['defaultQuery',"''",'비제어 검색어의 최초 값입니다. query가 있으면 사용하지 않습니다.'],
+  ['filters','undefined','부모가 제어하는 열별 필터입니다. text·select는 문자열, multi-select는 string[], number는 min/max 객체를 사용합니다. 열 ID를 키로 사용하며 해당 열에 filter가 설정되어야 적용됩니다. 컬럼 필터를 끈 동안은 적용하지 않고, 다시 켜면 현재 filters를 적용합니다.'],
+  ['defaultFilters','{}','비제어 필터의 최초 값입니다.'],
+  ['sort','undefined','단일 정렬을 제어하는 기존 API입니다. null은 정렬 해제이며 sortModel이 있으면 sortModel을 우선합니다.'],
+  ['defaultSort','null','최초 단일 정렬입니다. defaultSortModel이 없을 때만 초기 정렬에 사용합니다.'],
+  ['sortModel','undefined','배열 순서대로 다중 정렬을 제어합니다. 빈 배열은 정렬 해제입니다. onSortModelChange에서 다음 배열을 반영하세요.'],
+  ['defaultSortModel','undefined','비제어 다중 정렬의 최초 값입니다. 생략하면 defaultSort 또는 정렬 없는 상태로 시작합니다.'],
+  ['selectable','false','선택 체크박스와 선택 도구를 표시합니다.'],
+  ['selectOnRowClick','true','선택 가능한 행의 일반 영역을 클릭하면 선택을 전환합니다. false여도 체크박스 선택은 유지합니다.'],
+  ['isRowSelectable','undefined','false를 반환한 행은 선택할 수 없으며 선택 개수·전체 선택에서도 제외합니다. 생략하면 모든 행을 선택할 수 있습니다.'],
+  ['selectedRowIds','undefined','부모가 제어하는 선택 ID입니다. 현재 rows에 존재하고 선택 가능한 ID만 그리드의 유효 선택으로 계산합니다.'],
+  ['defaultSelectedRowIds','[]','비제어 선택의 최초 값입니다. 페이지나 검색 조건이 바뀌어도 유효한 ID의 선택을 유지합니다.'],
+  ['selectionActions','undefined','호출 측에서 직접 구현한 선택 작업의 UI입니다. selectable이며 유효한 선택이 있을 때 툴바에 표시합니다. 선택 ID는 전달되지 않으므로 부모의 selectedRowIds 상태를 사용하세요.'],
 ];
 
 const displayProps: readonly PropertyRow[] = [
-  ['scrollResetKey', 'string | number', 'undefined', '값을 변경하면 가로·세로 스크롤을 처음으로 돌립니다. 최초 렌더와 동일 값의 재렌더에서는 이동하지 않으며 밀도·열 너비·필터 등 상태를 유지합니다.'],
-  ['page', 'number', 'undefined', '부모가 제어하는 1부터 시작하는 페이지입니다. 표시 범위를 벗어나면 유효 범위로 표시하고 onPageChange로 보정을 요청합니다.'],
-  ['defaultPage', 'number', '1', '비제어 페이지의 최초 값입니다. 유효하지 않은 값은 1로 처리합니다.'],
-  ['pageSize', 'number', 'undefined', '부모가 제어하는 페이지당 행 수입니다. 1 이상의 유한한 수를 내림하며 유효하지 않으면 10을 사용합니다.'],
-  ['defaultPageSize', 'number', '10', '비제어 페이지 크기의 최초 값입니다.'],
-  ['pageSizeOptions', 'readonly number[]', '[5, 10, 20, 50]', '페이지 크기 선택지입니다. 양의 정수만 남기고 현재 크기를 포함한 뒤 중복 제거·오름차순으로 표시합니다.'],
-  ['density', "'default' | 'compact'", 'undefined', '부모가 제어하는 행 밀도입니다. 변경 콜백이 없으면 이 값을 유지하며 내장 밀도 토글도 숨깁니다.'],
-  ['defaultDensity', "'default' | 'compact'", "'default'", '비제어 밀도의 최초 값입니다. density가 있으면 사용하지 않습니다.'],
-  ['showDensityToggle', 'boolean', 'true', '밀도 전환 아이콘의 표시 여부입니다. true여도 density만 제어하고 onDensityChange가 없으면 표시하지 않습니다.'],
-  ['showColumnFilterToggle', 'boolean', 'false', 'true이고 filter가 설정된 열이 있으면 툴바에 컬럼 필터 토글을 표시합니다. 토글은 초기에는 꺼져 있으며, 켜면 필터 행과 현재 필터 값을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. 비제어 필터는 비워지고, 제어 필터는 부모가 유지한 값이 있다면 다시 켤 때 적용됩니다. false이면 토글 없이 기존처럼 필터 행과 필터 조건을 항상 적용합니다.'],
-  ['showColumnVisibility', 'boolean', 'true', '열이 둘 이상이면 표시 열 메뉴를 제공합니다. 마지막으로 보이는 열은 숨길 수 없습니다.'],
-  ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 모든 열을 숨기도록 설정해도 첫 열 하나는 표시합니다. 이후 표시 상태는 내부에서 관리합니다.'],
-  ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '상단 검색·내장 도구·추가 도구와 컬럼 필터(text·number·select·multi-select)의 공통 크기입니다. 기본 토큰에서 sm은 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식의 명시적인 size가 우선하고 본문 행 밀도·푸터와 열 선택 팝업의 크기는 바꾸지 않습니다.'],
-  ['toolbarOrder', 'readonly DataGridToolbarItem[]', '기본 순서', '지정한 도구를 먼저 배치하고 누락한 도구는 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 표시 조건은 각 도구의 속성을 따르며 DOM과 Tab 순서도 함께 바뀝니다.'],
-  ['toolbarActions', 'ReactNode', 'undefined', '호출 측에서 직접 구현한 상시 작업의 UI입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음을 이동합니다. loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
-  ['maxHeight', 'number | string', 'undefined', '툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
-  ['virtualized', 'boolean | DataGridVirtualizationOptions', 'false', 'true 또는 옵션 객체로 세로 행 가상화를 켭니다. 화면 근처 행을 렌더링하고 실제 행 높이를 측정합니다.'],
-  ['pagination', 'boolean', '!virtualized', '일반 표는 기본 true, 가상화는 기본 false입니다. 가상화와 함께 true를 지정하면 현재 페이지 안에서 가상화합니다.'],
-  ['footer', 'ReactNode | ((context: DataGridFooterContext<T>) => ReactNode)', 'undefined', '기본 하단 전체(페이지 이동 포함)를 교체합니다. null·false 또는 이를 반환하는 콜백은 하단을 숨깁니다. 생략하면 기존 하단을 유지하며 조회·선택 상태의 스크린 리더 안내는 항상 제공합니다.'],
-  ['className', 'string', 'undefined', '최상위 .data-grid에 추가할 클래스입니다. 스타일 범위를 이 클래스 아래로 제한할 수 있습니다.'],
+  ['scrollResetKey','undefined','값을 변경하면 가로·세로 스크롤을 처음으로 돌립니다. 최초 렌더와 동일 값의 재렌더에서는 이동하지 않으며 밀도·열 너비·필터 등 상태를 유지합니다.'],
+  ['page','undefined','부모가 제어하는 1부터 시작하는 페이지입니다. 표시 범위를 벗어나면 유효 범위로 표시하고 onPageChange로 보정을 요청합니다.'],
+  ['defaultPage','1','비제어 페이지의 최초 값입니다. 유효하지 않은 값은 1로 처리합니다.'],
+  ['pageSize','undefined','부모가 제어하는 페이지당 행 수입니다. 1 이상의 유한한 수를 내림하며 유효하지 않으면 10을 사용합니다.'],
+  ['defaultPageSize','10','비제어 페이지 크기의 최초 값입니다.'],
+  ['pageSizeOptions','[5, 10, 20, 50]','페이지 크기 선택지입니다. 양의 정수만 남기고 현재 크기를 포함한 뒤 중복 제거·오름차순으로 표시합니다.'],
+  ['density','undefined','부모가 제어하는 행 밀도입니다. 변경 콜백이 없으면 이 값을 유지하며 내장 밀도 토글도 숨깁니다.'],
+  ['defaultDensity',"'default'",'비제어 밀도의 최초 값입니다. density가 있으면 사용하지 않습니다.'],
+  ['showDensityToggle','true','밀도 전환 아이콘의 표시 여부입니다. true여도 density만 제어하고 onDensityChange가 없으면 표시하지 않습니다.'],
+  ['showColumnFilterToggle','false','true이고 filter가 설정된 열이 있으면 툴바에 컬럼 필터 토글을 표시합니다. 토글은 초기에는 꺼져 있으며, 켜면 필터 행과 현재 필터 값을 적용합니다. 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. 비제어 필터는 비워지고, 제어 필터는 부모가 유지한 값이 있다면 다시 켤 때 적용됩니다. false이면 토글 없이 기존처럼 필터 행과 필터 조건을 항상 적용합니다.'],
+  ['showColumnVisibility','true','열이 둘 이상이면 표시 열 메뉴를 제공합니다. 마지막으로 보이는 열은 숨길 수 없습니다.'],
+  ['defaultHiddenColumnIds','[]','최초에 숨길 열 ID입니다. 모든 열을 숨기도록 설정해도 첫 열 하나는 표시합니다. 이후 표시 상태는 내부에서 관리합니다.'],
+  ['toolbarSize',"'sm'",'상단 검색·내장 도구·추가 도구와 컬럼 필터(text·number·select·multi-select)의 공통 크기입니다. 기본 토큰에서 sm은 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식의 명시적인 size가 우선하고 본문 행 밀도·푸터와 열 선택 팝업의 크기는 바꾸지 않습니다.'],
+  ['toolbarOrder','기본 순서','지정한 도구를 먼저 배치하고 누락한 도구는 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 표시 조건은 각 도구의 속성을 따르며 DOM과 Tab 순서도 함께 바뀝니다.'],
+  ['toolbarActions','undefined','호출 측에서 직접 구현한 상시 작업의 UI입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음을 이동합니다. loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
+  ['maxHeight','undefined','툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
+  ['virtualized','false','true 또는 옵션 객체로 세로 행 가상화를 켭니다. 화면 근처 행을 렌더링하고 실제 행 높이를 측정합니다.'],
+  ['pagination','!virtualized','일반 표는 기본 true, 가상화는 기본 false입니다. 가상화와 함께 true를 지정하면 현재 페이지 안에서 가상화합니다.'],
+  ['footer','undefined','기본 하단 전체(페이지 이동 포함)를 교체합니다. null·false 또는 이를 반환하는 콜백은 하단을 숨깁니다. 생략하면 기존 하단을 유지하며 조회·선택 상태의 스크린 리더 안내는 항상 제공합니다.'],
+  ['className','undefined','최상위 .data-grid에 추가할 클래스입니다. 스타일 범위를 이 클래스 아래로 제한할 수 있습니다.'],
 ];
 
 const exportProps: readonly PropertyRow[] = [
-  ['exportable', 'boolean', 'false', 'exportFormats에 지정한 형식의 전체 내보내기 버튼을 표시합니다. 선택이 있으면 같은 형식의 선택 행 내보내기도 표시합니다. 현재 페이지나 렌더링된 가상 행만 내보내는 기능이 아닙니다.'],
-  ['exportFormats', 'readonly DataGridExportFormat[]', "['csv']", 'csv와 xlsx 중 제공할 형식을 지정합니다. 두 형식을 지정하면 CSV와 Excel 버튼을 함께 표시하며, Excel 버튼에는 microsoft-excel 아이콘을 사용합니다. exportable이 true여야 표시됩니다.'],
-  ['exportFileName', 'string', "'data-grid.csv'", '저장 시 제안할 파일명입니다. CSV·XLSX에 맞게 확장자를 바꾸며 선택 행은 -selected.csv 또는 -selected.xlsx를 붙입니다. 최종 파일명과 저장 위치는 저장 대화상자 또는 브라우저 설정을 따릅니다.'],
+  ['exportable','false','exportFormats에 지정한 형식의 전체 내보내기 버튼을 표시합니다. 선택이 있으면 같은 형식의 선택 행 내보내기도 표시합니다. 현재 페이지나 렌더링된 가상 행만 내보내는 기능이 아닙니다.'],
+  ['exportFormats',"['csv']",'csv와 xlsx 중 제공할 형식을 지정합니다. 두 형식을 지정하면 CSV와 Excel 버튼을 함께 표시하며, Excel 버튼에는 microsoft-excel 아이콘을 사용합니다. exportable이 true여야 표시됩니다.'],
+  ['exportFileName',"'data-grid.csv'",'저장 시 제안할 파일명입니다. CSV·XLSX에 맞게 확장자를 바꾸며 선택 행은 -selected.csv 또는 -selected.xlsx를 붙입니다. 최종 파일명과 저장 위치는 저장 대화상자 또는 브라우저 설정을 따릅니다.'],
 ];
 
 const columnProps: readonly PropertyRow[] = [
-  ['id', 'string', '필수', '열의 고유 ID입니다. 정렬·필터·숨김·편집·사용자 너비를 연결하는 키입니다.'],
-  ['header', 'string', '필수', '헤더, 필터·편집 컨트롤의 이름과 CSV·XLSX 제목으로 사용합니다.'],
-  ['accessor', '(row: T) => string | number | null | undefined', '필수', '검색·필터·정렬·편집 초깃값·CSV·XLSX에 사용하는 원시 값입니다. 숫자 정렬과 XLSX 숫자 셀에는 number를 반환하세요.'],
-  ['cell', '(row: T) => ReactNode', 'undefined', '화면에 표시할 셀만 바꿉니다. 생략하면 accessor의 값을 표시하고 null·undefined는 대시로 표시합니다.'],
-  ['sortable', 'boolean', 'true', 'false이면 정렬 버튼을 표시하지 않고 이 열의 정렬 모델도 적용하지 않습니다.'],
-  ['align', "'start' | 'center' | 'end'", "'start'", '헤더와 셀의 텍스트 정렬입니다. 금액·수량에는 end를 사용합니다.'],
-  ['width', 'number | string', '160px', '숫자, 숫자 문자열, px, %를 지원합니다. 비율은 선택 열 52px을 제외한 뷰포트 폭 기준입니다. auto·fr·calc() 등은 160px로 대체하고 min/max 범위를 적용합니다.'],
-  ['flex', 'number', 'undefined', '유한한 양수이면 width보다 우선하며 고정·비율 열을 제외한 남은 폭을 가중치로 나눕니다. 뷰포트 폭을 아직 측정하지 못한 때에는 width 또는 160px을 사용합니다.'],
-  ['minWidth', 'number', '96', '열의 최소 px 너비입니다. 1 이상의 유한한 수를 내림하며 유효하지 않으면 96을 사용합니다.'],
-  ['maxWidth', 'number', '600', '열의 최대 px 너비입니다. 1 이상의 유한한 수를 내림하며 최소 너비보다 작으면 최소 너비로 보정합니다.'],
-  ['resizable', 'boolean', 'true', 'false이면 해당 열의 드래그·키보드 너비 조절 핸들을 숨깁니다. width와 flex 계산은 그대로 적용합니다.'],
-  ['pinned', "'start'", 'undefined', '보이는 열의 시작 부분으로 이동해 가로 스크롤에서 고정합니다. 여러 고정 열은 입력 순서를 유지합니다. 600px 이하 화면에서는 고정을 해제합니다.'],
-  ['filter', "'text' | 'number' | 'select' | 'multi-select'", 'undefined', 'text는 부분 일치, number는 최소·최대 포함 범위, select는 문자열 완전 일치입니다. multi-select는 문자열 배열 중 하나와 일치하면 통과(OR)하며 다른 열·전체 검색과는 AND로 결합합니다. 빈 배열은 전체 조회입니다.'],
-  ['filterOptions', 'readonly { value: string; label: string }[]', '[]', 'select·multi-select 공통 선택지입니다. value는 accessor 결과를 문자열로 바꾼 값과 비교합니다. select는 빈 문자열이 전체 조회이며 multi-select는 빈 배열 또는 키 생략이 전체 조회입니다. multi-select의 빈 문자열 선택지는 미지정(null·undefined·빈 문자열) 값과 일치합니다.'],
-  ['editable', 'boolean | ((row: T) => boolean)', 'false', 'true인 셀에서 편집 버튼을 표시합니다. 그리드의 onCellEdit도 함께 있어야 편집할 수 있습니다.'],
-  ['editor', "'text' | 'number'", "'text'", '내장 입력의 타입입니다. number여도 저장 콜백의 value는 문자열입니다. 빈 값 허용 여부·범위는 validate로 정하세요.'],
-  ['validate', '(value: string, row: T) => string | undefined', 'undefined', '저장 직전에 검사합니다. 오류 문자열을 반환하면 저장하지 않고 입력에 오류를 표시합니다. undefined 또는 빈 문자열이면 통과합니다.'],
+  ['id','필수','열의 고유 ID입니다. 정렬·필터·숨김·편집·사용자 너비를 연결하는 키입니다.'],
+  ['header','필수','헤더, 필터·편집 컨트롤의 이름과 CSV·XLSX 제목으로 사용합니다.'],
+  ['accessor','필수','검색·필터·정렬·편집 초깃값·CSV·XLSX에 사용하는 원시 값입니다. 숫자 정렬과 XLSX 숫자 셀에는 number를 반환하세요.'],
+  ['cell','undefined','화면에 표시할 셀만 바꿉니다. 생략하면 accessor의 값을 표시하고 null·undefined는 대시로 표시합니다.'],
+  ['sortable','true','false이면 정렬 버튼을 표시하지 않고 이 열의 정렬 모델도 적용하지 않습니다.'],
+  ['align',"'start'",'헤더와 셀의 텍스트 정렬입니다. 금액·수량에는 end를 사용합니다.'],
+  ['width','160px','숫자, 숫자 문자열, px, %를 지원합니다. 비율은 선택 열 52px을 제외한 뷰포트 폭 기준입니다. auto·fr·calc() 등은 160px로 대체하고 min/max 범위를 적용합니다.'],
+  ['flex','undefined','유한한 양수이면 width보다 우선하며 고정·비율 열을 제외한 남은 폭을 가중치로 나눕니다. 뷰포트 폭을 아직 측정하지 못한 때에는 width 또는 160px을 사용합니다.'],
+  ['minWidth','96','열의 최소 px 너비입니다. 1 이상의 유한한 수를 내림하며 유효하지 않으면 96을 사용합니다.'],
+  ['maxWidth','600','열의 최대 px 너비입니다. 1 이상의 유한한 수를 내림하며 최소 너비보다 작으면 최소 너비로 보정합니다.'],
+  ['resizable','true','false이면 해당 열의 드래그·키보드 너비 조절 핸들을 숨깁니다. width와 flex 계산은 그대로 적용합니다.'],
+  ['pinned','undefined','보이는 열의 시작 부분으로 이동해 가로 스크롤에서 고정합니다. 여러 고정 열은 입력 순서를 유지합니다. 600px 이하 화면에서는 고정을 해제합니다.'],
+  ['filter','undefined','text는 부분 일치, number는 최소·최대 포함 범위, select는 문자열 완전 일치입니다. multi-select는 문자열 배열 중 하나와 일치하면 통과(OR)하며 다른 열·전체 검색과는 AND로 결합합니다. 빈 배열은 전체 조회입니다.'],
+  ['filterOptions','[]','select·multi-select 공통 선택지입니다. value는 accessor 결과를 문자열로 바꾼 값과 비교합니다. select는 빈 문자열이 전체 조회이며 multi-select는 빈 배열 또는 키 생략이 전체 조회입니다. multi-select의 빈 문자열 선택지는 미지정(null·undefined·빈 문자열) 값과 일치합니다.'],
+  ['editable','false','true인 셀에서 편집 버튼을 표시합니다. 그리드의 onCellEdit도 함께 있어야 편집할 수 있습니다.'],
+  ['editor',"'text'",'내장 입력의 타입입니다. number여도 저장 콜백의 value는 문자열입니다. 빈 값 허용 여부·범위는 validate로 정하세요.'],
+  ['validate','undefined','저장 직전에 검사합니다. 오류 문자열을 반환하면 저장하지 않고 입력에 오류를 표시합니다. undefined 또는 빈 문자열이면 통과합니다.'],
 ];
 
 const events: readonly EventRow[] = [
-  ['onQueryChange(query: string): void', '검색 입력·검색 초기화·결과 없음의 조건 초기화 때 호출합니다.', 'query를 제어한다면 받은 문자열로 부모 상태를 갱신합니다.'],
-  ['onFiltersChange(filters: DataGridFilters): void', '열별 필터 변경, 필터 초기화, 조건 초기화, 컬럼 필터 토글을 끌 때 다음 필터 객체를 전달합니다.', 'filters 상태를 받은 객체로 교체합니다. 초기화와 토글 끄기 시 {}를 받습니다.'],
-  ['onSortModelChange(sortModel: DataGridSort[]): void', '헤더 클릭·Shift+클릭으로 정렬 조건을 바꿀 때 다음 전체 배열을 전달합니다.', 'sortModel 상태를 배열 전체로 교체합니다. 배열 순서가 정렬 우선순위입니다.'],
-  ['onSortChange(sort: DataGridSort | null): void', '헤더 조작으로 첫 번째 정렬 조건이 바뀔 때만 호출합니다. 보조 조건만 바뀌면 호출하지 않습니다.', 'sort를 사용하는 경우 다음 첫 정렬을 반영합니다. 다중 정렬에는 onSortModelChange를 사용합니다.'],
-  ['onSelectedRowIdsChange(ids: string[]): void', '행·체크박스·전체 선택·선택 해제 조작으로 선택을 바꿀 때 유효한 전체 ID 목록을 전달합니다.', 'selectedRowIds를 갱신합니다. rows 또는 isRowSelectable 변경만으로 선택 정리 콜백이 자동 발생하지는 않습니다.'],
-  ['onPageChange(page: number): void', '페이지 탐색, 검색·필터·정렬·페이지 크기 변경에 따른 1페이지 요청, 범위를 벗어난 페이지 보정 때 호출합니다.', 'page를 제어한다면 요청한 페이지로 갱신합니다. pagination=false에서는 페이지 이동 UI와 조건 변경의 페이지 초기화가 없습니다.'],
-  ['onPageSizeChange(pageSize: number): void', '페이지당 행 수 선택을 바꾸면 숫자로 전달합니다.', 'pageSize를 갱신합니다. 페이지 초기화 요청인 onPageChange(1)가 호출되면 함께 반영하세요.'],
-  ["onDensityChange(density: 'default' | 'compact'): void", '내장 밀도 토글을 누르면 다음 밀도를 전달합니다.', 'density 상태를 갱신합니다. density 없이 콜백만 전달하면 내부 상태 변경을 알림으로 받을 수 있습니다.'],
-  ['onCellEdit(change: DataGridCellEdit<T>): void', '편집 입력에서 Enter 또는 저장 버튼을 누르고 숫자 검사·validate를 통과했을 때 호출합니다.', 'rowId와 columnId로 rows를 갱신합니다. value는 항상 문자열이므로 숫자 필드는 부모에서 Number(value)로 변환합니다. 서버 저장도 이곳에서 연결합니다.'],
-  ['onRetry(): void', 'error 안내의 다시 시도 버튼을 클릭할 때 호출합니다.', '부모의 데이터 조회 함수를 연결해 loading·error·rows를 갱신합니다. 생략하면 버튼을 표시하지 않습니다.'],
+  ["onQueryChange", '검색 입력·검색 초기화·결과 없음의 조건 초기화 때 호출합니다.', 'query를 제어한다면 받은 문자열로 부모 상태를 갱신합니다.'],
+  ["onFiltersChange", '열별 필터 변경, 필터 초기화, 조건 초기화, 컬럼 필터 토글을 끌 때 다음 필터 객체를 전달합니다.', 'filters 상태를 받은 객체로 교체합니다. 초기화와 토글 끄기 시 {}를 받습니다.'],
+  ["onSortModelChange", '헤더 클릭·Shift+클릭으로 정렬 조건을 바꿀 때 다음 전체 배열을 전달합니다.', 'sortModel 상태를 배열 전체로 교체합니다. 배열 순서가 정렬 우선순위입니다.'],
+  ["onSortChange", '헤더 조작으로 첫 번째 정렬 조건이 바뀔 때만 호출합니다. 보조 조건만 바뀌면 호출하지 않습니다.', 'sort를 사용하는 경우 다음 첫 정렬을 반영합니다. 다중 정렬에는 onSortModelChange를 사용합니다.'],
+  ["onSelectedRowIdsChange", '행·체크박스·전체 선택·선택 해제 조작으로 선택을 바꿀 때 유효한 전체 ID 목록을 전달합니다.', 'selectedRowIds를 갱신합니다. rows 또는 isRowSelectable 변경만으로 선택 정리 콜백이 자동 발생하지는 않습니다.'],
+  ["onPageChange", '페이지 탐색, 검색·필터·정렬·페이지 크기 변경에 따른 1페이지 요청, 범위를 벗어난 페이지 보정 때 호출합니다.', 'page를 제어한다면 요청한 페이지로 갱신합니다. pagination=false에서는 페이지 이동 UI와 조건 변경의 페이지 초기화가 없습니다.'],
+  ["onPageSizeChange", '페이지당 행 수 선택을 바꾸면 숫자로 전달합니다.', 'pageSize를 갱신합니다. 페이지 초기화 요청인 onPageChange(1)가 호출되면 함께 반영하세요.'],
+  ["onDensityChange", '내장 밀도 토글을 누르면 다음 밀도를 전달합니다.', 'density 상태를 갱신합니다. density 없이 콜백만 전달하면 내부 상태 변경을 알림으로 받을 수 있습니다.'],
+  ["onCellEdit", '편집 입력에서 Enter 또는 저장 버튼을 누르고 숫자 검사·validate를 통과했을 때 호출합니다.', 'rowId와 columnId로 rows를 갱신합니다. value는 항상 문자열이므로 숫자 필드는 부모에서 Number(value)로 변환합니다. 서버 저장도 이곳에서 연결합니다.'],
+  ["onRetry", 'error 안내의 다시 시도 버튼을 클릭할 때 호출합니다.', '부모의 데이터 조회 함수를 연결해 loading·error·rows를 갱신합니다. 생략하면 버튼을 표시하지 않습니다.'],
 ];
 
 const controlledExample = `import { useState } from 'react';
@@ -299,31 +310,15 @@ export function FilterGrid() {
     filters={filters} onFiltersChange={setFilters} />;
 }`;
 
-export function DataGridReferenceLinks() {
-  const links = [
-    ['data-grid-multi-filter-demo', '복수 필터'], ['data-grid-footer-demo', '사용자 지정 하단'], ['data-grid-extensions', '확장 예제'], ['data-grid-props', '속성'], ['data-grid-toolbar', '상단 도구 모음'],
-    ['data-grid-columns', '열·타입'],
-    ['data-grid-events', '이벤트·상태 연결'], ['data-grid-styles', '스타일'],
-    ['data-grid-behavior', '동작·내보내기'],
-  ] as const;
-  return <nav className="studio-grid-reference-links" aria-label="데이터그리드 문서 바로가기">
-    {links.map(([id, label]) => <a key={id} href={`#${id}`} onClick={event => {
-      event.preventDefault();
-      const section = document.getElementById(id);
-      section?.scrollIntoView({ block: 'start' });
-      section?.querySelector('h2')?.focus({ preventScroll: true });
-    }}>{label}</a>)}
-  </nav>;
-}
-
 export function DataGridReference() {
   return <>
     <Section id="data-grid-props" title="속성 · DataGridProps<T>" className="studio-grid-reference" description="필수 데이터부터 상태·표시·내보내기까지 실제 지원하는 속성입니다. 이벤트 콜백의 타입과 연결 방법은 아래 이벤트 표에서 확인하세요.">
       <p className="studio-grid-reference-notes">기본값이 undefined인 선택 속성은 생략할 수 있습니다. 제어 속성은 부모 값이 우선하고, default 속성은 최초 비제어 상태에만 적용됩니다.</p>
-      <PropertyTable title="데이터와 조회 상태" rows={dataProps} />
-      <PropertyTable title="검색·정렬·선택 상태" rows={stateProps} />
-      <PropertyTable title="페이지·밀도·가상화와 표시" rows={displayProps} />
-      <PropertyTable title="CSV·Excel 내보내기" rows={exportProps} />
+      <p className="studio-grid-reference-notes">{publicAPINote}</p>
+      <PropertyTable title="데이터와 조회 상태" contracts="DataGrid<T>" rows={dataProps} />
+      <PropertyTable title="검색·정렬·선택 상태" contracts="DataGrid<T>" rows={stateProps} />
+      <PropertyTable title="페이지·밀도·가상화와 표시" contracts="DataGrid<T>" rows={displayProps} />
+      <PropertyTable title="CSV·Excel 내보내기" contracts="DataGrid<T>" rows={exportProps} />
     </Section>
 
     <Section id="data-grid-toolbar" title="상단 도구 모음" className="studio-grid-reference" description="toolbarSize로 상단 도구와 컬럼 필터의 공통 크기를, toolbarOrder로 도구의 배치와 Tab 순서를 설정합니다. 내장 도구는 표시 속성으로 설정하고, 업무 버튼은 toolbarActions 또는 selectionActions로 추가합니다.">
@@ -336,20 +331,20 @@ export function DataGridReference() {
         ['선택 도구', 'selectable이며 선택 가능한 행을 선택하면 selection 묶음을 표시합니다. 선택 해제와 exportable일 때의 형식별 선택 행 내보내기가 포함됩니다. CSV·Excel 모두 검색 결과 밖의 선택도 포함합니다. selectionActions로 직접 구현한 선택 작업을 추가할 수 있습니다.'],
         ['필터 초기화', '적용 중인 열별 필터 값이 있을 때 resetFilters 위치에 표시합니다. 클릭하면 필터를 비우고 onFiltersChange({})를 호출합니다.'],
       ]} />
-      <PropertyTable title="상단 도구의 표시와 제어" rows={[
-        ['toolbarSize', "'sm' | 'md' | 'lg'", "'sm'", '검색 입력과 내장 도구, size를 생략한 자식 도구 및 컬럼 필터(text·number·select·multi-select)에 함께 적용합니다. 기본 토큰의 높이는 sm 30px·md 36px·lg 42px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식에 명시한 size가 우선합니다.'],
-        ['toolbarOrder', 'readonly DataGridToolbarItem[]', '기본 순서', '배열에 지정한 키부터 배치하고, 누락한 키는 아래 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 각 도구의 표시 조건은 유지하며 화면·DOM·Tab 순서가 함께 바뀝니다.'],
-        ['showColumnFilterToggle', 'boolean', 'false', 'true이고 필터 가능한 열이 있으면 컬럼 필터 토글을 표시하고 필터 행을 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하고 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. false이면 토글 없이 필터 가능한 열의 필터 행과 조건을 항상 적용합니다.'],
-        ['showDensityToggle', 'boolean', 'true', '밀도 버튼을 표시합니다. false로 숨겨도 지정한 밀도는 유지합니다.'],
-        ['density / defaultDensity', "'default' | 'compact'", "undefined / 'default'", '현재 밀도를 제어하거나 최초 밀도를 지정합니다. density만 전달하면 읽기 전용이며 내장 토글을 숨깁니다.'],
-        ['onDensityChange', "(density: 'default' | 'compact') => void", 'undefined', '내장 토글이 전달한 다음 밀도를 부모 상태에 반영합니다.'],
-        ['showColumnVisibility', 'boolean', 'true', '표시 열 메뉴를 숨기려면 false로 지정합니다.'],
-        ['defaultHiddenColumnIds', 'readonly string[]', '[]', '최초에 숨길 열 ID입니다. 이후 열 표시 상태는 그리드가 관리합니다.'],
-        ['searchable / searchLabel', 'boolean / string', "true / '검색'", '검색 입력의 표시 여부와 접근 가능한 이름을 지정합니다. searchable=false이면 전체 검색도 적용하지 않습니다.'],
-        ['exportable / exportFormats', 'boolean / readonly DataGridExportFormat[]', "false / ['csv']", "전체·선택 내보내기를 켜고 csv·xlsx 형식을 지정합니다. exportFormats={['csv', 'xlsx']}이면 두 형식의 버튼을 표시합니다."],
-        ['exportFileName', 'string', "'data-grid.csv'", '형식에 맞는 제안 파일명을 지정합니다. 선택 행 파일명에는 -selected.csv 또는 -selected.xlsx를 붙입니다.'],
-        ['toolbarActions', 'ReactNode', 'undefined', '직접 구현한 상시 작업의 UI를 전달하는 확장 슬롯입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음 전체를 이동합니다. 묶음 안의 버튼 순서는 전달한 JSX로 정합니다.'],
-        ['selectionActions', 'ReactNode', 'undefined', '직접 구현한 선택 작업의 UI를 전달하는 확장 슬롯입니다. selectable이며 유효한 선택이 있을 때 표시하고 toolbarOrder의 selection으로 선택 내보내기·해제와 함께 이동합니다. 부모에서 선택 상태를 연결합니다.'],
+      <PropertyTable title="상단 도구의 표시와 제어" contracts="DataGrid<T>" rows={[
+        ['toolbarSize',"'sm'",'검색 입력과 내장 도구, size를 생략한 자식 도구 및 컬럼 필터(text·number·select·multi-select)에 함께 적용합니다. 기본 토큰의 높이는 sm 30px·md 36px·lg 42px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식에 명시한 size가 우선합니다.'],
+        ['toolbarOrder','기본 순서','배열에 지정한 키부터 배치하고, 누락한 키는 아래 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 각 도구의 표시 조건은 유지하며 화면·DOM·Tab 순서가 함께 바뀝니다.'],
+        ['showColumnFilterToggle','false','true이고 필터 가능한 열이 있으면 컬럼 필터 토글을 표시하고 필터 행을 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하고 끄면 필터 행을 숨기고 조건을 적용하지 않으며 onFiltersChange({})로 초기화를 요청합니다. false이면 토글 없이 필터 가능한 열의 필터 행과 조건을 항상 적용합니다.'],
+        ['showDensityToggle','true','밀도 버튼을 표시합니다. false로 숨겨도 지정한 밀도는 유지합니다.'],
+        ['density / defaultDensity',"undefined / 'default'",'현재 밀도를 제어하거나 최초 밀도를 지정합니다. density만 전달하면 읽기 전용이며 내장 토글을 숨깁니다.'],
+        ['onDensityChange','undefined','내장 토글이 전달한 다음 밀도를 부모 상태에 반영합니다.'],
+        ['showColumnVisibility','true','표시 열 메뉴를 숨기려면 false로 지정합니다.'],
+        ['defaultHiddenColumnIds','[]','최초에 숨길 열 ID입니다. 이후 열 표시 상태는 그리드가 관리합니다.'],
+        ['searchable / searchLabel',"true / '검색'",'검색 입력의 표시 여부와 접근 가능한 이름을 지정합니다. searchable=false이면 전체 검색도 적용하지 않습니다.'],
+        ['exportable / exportFormats',"false / ['csv']","전체·선택 내보내기를 켜고 csv·xlsx 형식을 지정합니다. exportFormats={['csv', 'xlsx']}이면 두 형식의 버튼을 표시합니다."],
+        ['exportFileName',"'data-grid.csv'",'형식에 맞는 제안 파일명을 지정합니다. 선택 행 파일명에는 -selected.csv 또는 -selected.xlsx를 붙입니다.'],
+        ['toolbarActions','undefined','직접 구현한 상시 작업의 UI를 전달하는 확장 슬롯입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음 전체를 이동합니다. 묶음 안의 버튼 순서는 전달한 JSX로 정합니다.'],
+        ['selectionActions','undefined','직접 구현한 선택 작업의 UI를 전달하는 확장 슬롯입니다. selectable이며 유효한 선택이 있을 때 표시하고 toolbarOrder의 selection으로 선택 내보내기·해제와 함께 이동합니다. 부모에서 선택 상태를 연결합니다.'],
       ]} />
       <DetailTable title="DataGridToolbarItem 순서 키" rows={[
         ['기본 순서', 'search → selection → columnFilters → density → columns → export → resetFilters → actions'],
@@ -369,7 +364,7 @@ export function DataGridReference() {
     </Section>
 
     <Section id="data-grid-columns" title="열과 관련 타입" className="studio-grid-reference" description="화면의 표현은 cell로, 검색·정렬·필터·편집·파일 내보내기의 원시 값은 accessor로 구분합니다.">
-      <PropertyTable title="DataGridColumn<T>" rows={columnProps} />
+      <PropertyTable title="DataGridColumn<T>" contracts="DataGridColumn<T>" rows={columnProps} />
       <CodeExample title="상태·편집 타입">{`type DataGridSort = { columnId: string; direction: 'asc' | 'desc' };
 type DataGridSortModel = readonly DataGridSort[];
 type DataGridFilters = Record<string, string | string[] | { min?: string; max?: string }>;
@@ -382,17 +377,17 @@ type DataGridCellEdit<T> = {
 const filters: DataGridFilters = {
   name: '문서', status: ['진행 중', '검토 중'], hours: { min: '0', max: '40' },
 };`}</CodeExample>
-      <PropertyTable title="DataGridVirtualizationOptions" rows={[
-        ['estimateRowHeight', 'number', '56 / compact: 40', '최초 행 높이 추정치(px)입니다. 유한한 양수는 16~1000으로 제한하며 실제로 렌더링된 행은 측정한 높이를 사용합니다.'],
-        ['overscan', 'number', '8', '뷰포트 앞뒤에 여유로 렌더링할 행 수입니다. 유한한 0 이상의 수를 내림해 0~100으로 제한합니다. 편집·포커스 유지용 행은 별도로 남을 수 있습니다.'],
+      <PropertyTable title="DataGridVirtualizationOptions" contracts="DataGridVirtualizationOptions" rows={[
+        ['estimateRowHeight','56 / compact: 40','최초 행 높이 추정치(px)입니다. 유한한 양수는 16~1000으로 제한하며 실제로 렌더링된 행은 측정한 높이를 사용합니다.'],
+        ['overscan','8','뷰포트 앞뒤에 여유로 렌더링할 행 수입니다. 유한한 0 이상의 수를 내림해 0~100으로 제한합니다. 편집·포커스 유지용 행은 별도로 남을 수 있습니다.'],
       ]} />
-      <PropertyTable title="DataGridFooterContext<T>" rows={[
-        ['totalCount', 'number', 'rows.length', '원본 전체 건수입니다. 검색·필터·페이지 이동으로 바뀌지 않습니다.'],
-        ['filteredCount / filteredRows', 'number / readonly T[]', '조회 결과', '검색·필터·정렬 후 모든 페이지의 결과입니다. 로딩·오류에서는 0과 빈 배열입니다.'],
-        ['selectedCount / selectedRows', 'number / readonly T[]', '유효한 선택', '검색·페이지 밖의 선택도 포함하며 원본 순서로 제공합니다. 삭제되거나 선택 불가능한 행은 제외하고 selectable=false에서는 비웁니다.'],
-        ['pageRows', 'readonly T[]', '현재 페이지', '가상 렌더링 범위와 무관하게 현재 페이지 전체를 제공합니다. pagination=false이면 filteredRows와 같고 로딩·오류에서는 빈 배열입니다.'],
-        ['page / pageCount / pageSize / pagination', 'number / number / number / boolean', '현재 페이지 상태', '페이지네이션을 끄면 page·pageCount는 1이며 pageSize는 설정값을 유지합니다.'],
-        ['loading / hasError', 'boolean / boolean', '조회 상태', '합계 대신 조회 중·실패 안내를 표시할 때 사용합니다.'],
+      <PropertyTable title="DataGridFooterContext<T>" contracts="DataGridFooterContext<T>" rows={[
+        ['totalCount','rows.length','원본 전체 건수입니다. 검색·필터·페이지 이동으로 바뀌지 않습니다.'],
+        ['filteredCount / filteredRows','조회 결과','검색·필터·정렬 후 모든 페이지의 결과입니다. 로딩·오류에서는 0과 빈 배열입니다.'],
+        ['selectedCount / selectedRows','유효한 선택','검색·페이지 밖의 선택도 포함하며 원본 순서로 제공합니다. 삭제되거나 선택 불가능한 행은 제외하고 selectable=false에서는 비웁니다.'],
+        ['pageRows','현재 페이지','가상 렌더링 범위와 무관하게 현재 페이지 전체를 제공합니다. pagination=false이면 filteredRows와 같고 로딩·오류에서는 빈 배열입니다.'],
+        ['page / pageCount / pageSize / pagination','현재 페이지 상태','페이지네이션을 끄면 page·pageCount는 1이며 pageSize는 설정값을 유지합니다.'],
+        ['loading / hasError','조회 상태','합계 대신 조회 중·실패 안내를 표시할 때 사용합니다.'],
       ]} />
       <CodeExample title="복수 선택 필터와 상태 연결">{multiFilterExample}</CodeExample>
       <p className="studio-grid-reference-notes">복수 필터는 팝업 검색을 제공하며 선택값을 첫 항목과 나머지 개수로 요약합니다. 검색은 선택값을 바꾸지 않고, 마지막 항목을 해제하면 빈 배열을 전달해 전체 조회로 돌아갑니다. 필터 초기화·조건 초기화·컬럼 필터 끄기도 배열 조건을 함께 비웁니다.</p>
@@ -401,13 +396,7 @@ const filters: DataGridFilters = {
     </Section>
 
     <Section id="data-grid-events" title="이벤트와 부모 상태 연결" className="studio-grid-reference" description="콜백은 모두 선택 속성이며 기본값은 undefined입니다. 상태를 제어하면 콜백에서 다음 값을 부모 상태에 반영하세요.">
-      <TableContainer label="데이터그리드 이벤트 콜백" className="studio-grid-reference-table">
-        <Table density="compact">
-          <caption className="sr-only">콜백 시그니처, 발생 시점과 부모 상태 연결 방법</caption>
-          <thead><tr><th scope="col">시그니처</th><th scope="col">발생 시점</th><th scope="col">부모에서 연결할 동작</th></tr></thead>
-          <tbody>{events.map(([signature, timing, connection]) => <tr key={signature}><th scope="row"><code>{signature}</code></th><td>{timing}</td><td>{connection}</td></tr>)}</tbody>
-        </Table>
-      </TableContainer>
+      <EventTable contracts="DataGrid<T>" rows={events} />
       <p className="studio-grid-reference-notes">query·filters·선택·page·pageSize를 제어하면 콜백에서 부모 상태를 갱신해야 사용자 변경을 반영합니다. 밀도는 density만 넘겨도 읽기 전용 표시가 가능하며 토글을 숨깁니다. 정렬의 제어 우선순위는 sortModel → sort → 내부 상태입니다.</p>
       <CodeExample title="제어 상태와 숫자 셀 편집">{controlledExample}</CodeExample>
     </Section>

@@ -9,11 +9,16 @@ npm run check
 npm test
 npm --prefix packages/react run typecheck
 npm --prefix packages/react test
+npm run check:api
 npm --prefix packages/react run studio:check
 npm run build
 npx playwright install chromium
 npm run test:browser
 npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs
+npx playwright install firefox webkit
+npm run test:compat
+npm run test:react-compat -- --react=18.3.1
+npm run test:react-compat -- --react=19.2.0
 ```
 
 정적 검사, 설정 계약·결정적 빌드, React 단위 테스트와 라이트·다크·320px 브라우저 회귀를 실행합니다.
@@ -22,15 +27,39 @@ npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs
 
 `npm run check`에는 코어 색상 토큰과 React 참조 문서의 기본값 표가 일치하는지 확인하는 검사도 포함됩니다. `core/tokens.css`의 기본 색상을 변경한 뒤에는 `npm run docs:tokens`로 문서 표를 갱신합니다. `npm run check:tokens`로 이 항목만 확인할 수 있습니다.
 
+공개 API 문서는 빌드한 `packages/react/dist/index.d.ts`에서 추출한 타입과 실제 Studio 속성 표를 비교합니다. 현재 PageHeader, 선택·숫자·날짜·시간·일시 입력과 DataGrid 관련 15개 타입을 검사합니다. PageHeader의 표준 HTML 속성은 대표 공통 속성만 선별합니다. API 변경 후에는 React 패키지를 빌드하고 `npm run docs:api`로 생성 자료를 갱신한 뒤 문서 표의 설명·기본값과 변경 내용을 검토합니다. `npm run check:api`는 소스와 공개 선언의 일치, 생성 자료의 최신 여부와 문서 속성·타입·필수 여부·누락을 검사합니다. 기본값·동작 설명은 수기로 관리하며 자동 검증 대상이 아닙니다. 문서 전체 타입 검사는 별도 `studio:check`로 실행합니다.
+
 ## 브라우저 환경 선택
 
 브라우저 동작 검사는 기본적으로 데스크톱 라이트에서 한 번 실행합니다. 테스트 선언의 `tag`에 `@theme`을 지정하면 다크에서도, `@mobile`을 지정하면 320px 터치 환경에서도 실행합니다. 모바일 전용 검사는 `@mobile`과 `@mobile-only`를 함께 지정해 라이트 중복을 제외합니다. 새 색상·대비 회귀에는 `@theme`을, 반응형·팝업 위치·포커스·스크롤 회귀에는 필요한 환경 태그를 추가합니다. 테스트 안에서 두 테마를 직접 순회하는 검사는 라이트에서 한 번만 실행합니다.
 
 전체 경로·제목·넘침 검사는 기본 브라우저 검사에, 설정 저장·초기화는 `preferences.spec.js`에 모읍니다. 입력 경계값과 정렬·필터의 조합은 단위 테스트에서 자세히 검사하고, 브라우저에서는 대표 사용자 흐름과 실제 레이아웃·키보드 동작을 확인합니다.
 
+문서 탐색은 `#/components/data-grid?section=data-grid-props-title`처럼 문서와 섹션이 함께 있는 주소를 검사합니다. 목차 클릭·새 탭·직접 열기·새로고침·뒤로/앞으로 이동에서 제목 포커스와 문서 상태를 확인하고, 모바일에서는 기본 접힘과 키보드 탐색을 확인합니다. 없는 문서는 요청 주소에서 안내하고, 없는 섹션은 해당 문서를 계속 사용할 수 있어야 합니다.
+
+## 브라우저 엔진과 React 호환성
+
+`npm run test:compat`는 Chromium·Firefox·WebKit에서 핵심 시나리오 4개씩, 총 12개를 실행합니다. 범위는 네이티브 Dialog 안의 선택·달력·중첩 팝업 닫기와 포커스 복원, Select 폼 초기화, 일시 선택 확정·취소, 역전된 일시 범위 검증입니다. 전체 Studio 검사는 Chromium에서 계속 실행합니다.
+
+macOS 27에서 번들 Firefox가 `Could not find profile folder`로 시작하지 못하면 [Playwright의 Firefox 앱 데이터 경로 이슈](https://github.com/microsoft/playwright/issues/42768)를 확인합니다. 로컬 재현 환경에서는 새 임시 디렉터리를 `CFFIXED_USER_HOME`으로 지정하는 우회를 검토할 수 있습니다. 기존 사용자 프로필을 변경하지 않고 실행 OS·Playwright 버전·우회 적용 여부를 검증 기록에 함께 남깁니다.
+
+`npm run test:react-compat -- --react=18.3.1`과 `--react=19.2.0`은 임시 소비 앱에 해당 React·React DOM 버전을 설치합니다. 빌드한 공개 ESM·CJS 진입점으로 서버 렌더링한 뒤 별도 프로세스에서 hydration하고, 경고·입력 ref·ARIA 연결·FormData·폼 초기화를 확인합니다. 임시 앱은 종료 시 제거하며 최초 의존성 설치에는 npm 레지스트리 접근이 필요합니다.
+
+## 시각 회귀
+
+`npm run test:visual`은 공개 패키지의 버튼·반전 배지·입력·선택기·데이터그리드 대표 화면을 라이트와 다크에서 비교합니다. 실행 전 패키지와 문서를 빌드합니다. 현재 검토한 기준 이미지는 macOS(`darwin`)의 Chromium 2개이며, Linux CI 시각 검사는 아직 연결하지 않습니다.
+
+```sh
+npm run test:visual
+# 의도한 스타일 변경을 검토한 뒤 기준 이미지를 갱신할 때만 실행
+npm run test:visual -- --update-snapshots
+```
+
+기준 이미지 비교는 같은 OS와 저장소에 고정된 Playwright·브라우저 버전에서 실행합니다. 다른 환경에서 기준 이미지가 없으면 검사가 실패합니다. 자동으로 승인하거나 기존 기준을 덮어쓰지 않고, 새 이미지의 변경 이유와 라이트·다크 결과를 먼저 검토합니다. Linux 기준은 해당 환경에서 별도로 검토한 뒤 추가합니다.
+
 ## 품질 CI
 
-품질 CI는 기본 브라우저 검사와 Studio 검사를 독립 작업으로 실행합니다. Studio의 전체 테스트를 4개 shard로 나누어 동시에 검사하고 각 shard는 worker 2개를 사용합니다. CI에서는 문서를 미리 빌드한 뒤 파일 감시가 없는 정적 서버를 사용합니다. 같은 브랜치에 새 커밋을 푸시하면 이전 품질 검사를 취소합니다.
+품질 CI는 패키지·기본 브라우저·Studio·브라우저 엔진·React 호환성 검사를 독립 작업으로 실행합니다. 패키지 작업은 공개 API 문서 검사도 실행합니다. Studio의 전체 테스트를 4개 shard로 나누어 동시에 검사하고 각 shard는 worker 2개를 사용합니다. 브라우저 엔진 작업은 3개 엔진의 핵심 계약을, React 작업은 18.3.1·19.2.0 matrix의 SSR·hydration을 확인합니다. CI에서는 문서를 미리 빌드한 뒤 파일 감시가 없는 정적 서버를 사용합니다. 같은 브랜치에 새 커밋을 푸시하면 이전 품질 검사를 취소합니다.
 
 로컬에서 Studio 분할 실행을 확인하려면 아래 명령의 `1`을 `1`~`4`로 바꿔 각 shard를 실행합니다.
 

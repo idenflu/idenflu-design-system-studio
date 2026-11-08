@@ -1,0 +1,1196 @@
+{
+  "schemaVersion": 1,
+  "source": "@idenflu/mono-react public declarations",
+  "contracts": {
+    "PageHeader": {
+      "actions": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "aria-label": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-labelledby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "description": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "eyebrow": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "headingLevel": {
+        "type": "1 | 2 | 3 | 4 | 5 | 6 | undefined",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLElement> | undefined",
+        "optional": true
+      },
+      "style": {
+        "type": "React.CSSProperties | undefined",
+        "optional": true
+      },
+      "title": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "titleId": {
+        "type": "string | undefined",
+        "optional": true
+      }
+    },
+    "Select": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "hideLabel": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "optional": false
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: string) => void) | undefined",
+        "optional": true
+      },
+      "options": {
+        "type": "readonly SelectOption[]",
+        "optional": false
+      },
+      "placeholder": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "popupStrategy": {
+        "type": "\"absolute\" | \"fixed\" | undefined",
+        "optional": true
+      },
+      "prefixIcon": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLButtonElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "(\"lg\" | \"md\" | \"sm\") | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "string | undefined",
+        "optional": true
+      }
+    },
+    "SearchSelect": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "hideLabel": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "optional": false
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: string) => void) | undefined",
+        "optional": true
+      },
+      "options": {
+        "type": "readonly SelectOption[]",
+        "optional": false
+      },
+      "placeholder": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "popupStrategy": {
+        "type": "\"absolute\" | \"fixed\" | undefined",
+        "optional": true
+      },
+      "prefixIcon": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "(\"lg\" | \"md\" | \"sm\") | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "string | undefined",
+        "optional": true
+      }
+    },
+    "MultiSelect": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "clearable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "readonly string[] | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "hideLabel": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "optional": false
+      },
+      "maxVisibleLabels": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "maxVisibleTags": {
+        "type": "\"responsive\" | number | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: string[]) => void) | undefined",
+        "optional": true
+      },
+      "options": {
+        "type": "readonly SelectOption[]",
+        "optional": false
+      },
+      "placeholder": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "popupStrategy": {
+        "type": "\"absolute\" | \"fixed\" | undefined",
+        "optional": true
+      },
+      "prefixIcon": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "presentation": {
+        "type": "\"default\" | \"inline\" | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLButtonElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "searchable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "(\"lg\" | \"md\" | \"sm\") | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "readonly string[] | undefined",
+        "optional": true
+      }
+    },
+    "SelectOption": {
+      "description": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "icon": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "optional": false
+      },
+      "value": {
+        "type": "string",
+        "optional": false
+      }
+    },
+    "NumberField": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"grammar\" | \"spelling\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "decimals": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "null | string | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "grouping": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "max": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "min": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: null | string) => void) | undefined",
+        "optional": true
+      },
+      "prefixIcon": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "selectOnFocus": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "(\"lg\" | \"md\" | \"sm\") | undefined",
+        "optional": true
+      },
+      "step": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "unit": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "null | string | undefined",
+        "optional": true
+      }
+    },
+    "DatePicker": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"grammar\" | \"spelling\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "DateValue | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "max": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "min": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: DateValue) => void) | undefined",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "(\"lg\" | \"md\" | \"sm\") | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "DateValue | undefined",
+        "optional": true
+      }
+    },
+    "DateRangePicker": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"grammar\" | \"spelling\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "DateRangeValue | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "endInputRef": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "endLabel": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "max": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "min": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: DateRangeValue) => void) | undefined",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "(\"lg\" | \"md\" | \"sm\") | undefined",
+        "optional": true
+      },
+      "startLabel": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "DateRangeValue | undefined",
+        "optional": true
+      }
+    },
+    "TimePicker": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"grammar\" | \"spelling\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "TimeValue | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "max": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "min": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "minuteStep": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: TimeValue) => void) | undefined",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "\"lg\" | \"md\" | \"sm\" | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "TimeValue | undefined",
+        "optional": true
+      }
+    },
+    "DateTimePicker": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"grammar\" | \"spelling\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "DateTimeValue | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "max": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "min": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "minuteStep": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: DateTimeValue) => void) | undefined",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "\"lg\" | \"md\" | \"sm\" | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "DateTimeValue | undefined",
+        "optional": true
+      }
+    },
+    "DateTimeRangePicker": {
+      "aria-describedby": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "aria-invalid": {
+        "type": "\"false\" | \"grammar\" | \"spelling\" | \"true\" | boolean | undefined",
+        "optional": true
+      },
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultValue": {
+        "type": "DateTimeRangeValue | undefined",
+        "optional": true
+      },
+      "disabled": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "endInputRef": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "endLabel": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "error": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "helperText": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "id": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "React.ReactNode",
+        "optional": false
+      },
+      "max": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "min": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "minuteStep": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "name": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "onValueChange": {
+        "type": "((value: DateTimeRangeValue) => void) | undefined",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "ref": {
+        "type": "React.Ref<HTMLInputElement> | undefined",
+        "optional": true
+      },
+      "required": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "size": {
+        "type": "\"lg\" | \"md\" | \"sm\" | undefined",
+        "optional": true
+      },
+      "startLabel": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "value": {
+        "type": "DateTimeRangeValue | undefined",
+        "optional": true
+      }
+    },
+    "DataGrid<T>": {
+      "className": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "columns": {
+        "type": "readonly DataGridColumn<T>[]",
+        "optional": false
+      },
+      "defaultDensity": {
+        "type": "\"compact\" | \"default\" | undefined",
+        "optional": true
+      },
+      "defaultFilters": {
+        "type": "DataGridFilters | undefined",
+        "optional": true
+      },
+      "defaultHiddenColumnIds": {
+        "type": "readonly string[] | undefined",
+        "optional": true
+      },
+      "defaultPage": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "defaultPageSize": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "defaultQuery": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "defaultSelectedRowIds": {
+        "type": "readonly string[] | undefined",
+        "optional": true
+      },
+      "defaultSort": {
+        "type": "DataGridSort | null | undefined",
+        "optional": true
+      },
+      "defaultSortModel": {
+        "type": "DataGridSortModel | undefined",
+        "optional": true
+      },
+      "density": {
+        "type": "\"compact\" | \"default\" | undefined",
+        "optional": true
+      },
+      "emptyMessage": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "error": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "exportable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "exportFileName": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "exportFormats": {
+        "type": "readonly DataGridExportFormat[] | undefined",
+        "optional": true
+      },
+      "filters": {
+        "type": "DataGridFilters | undefined",
+        "optional": true
+      },
+      "footer": {
+        "type": "((context: DataGridFooterContext<T>) => React.ReactNode) | React.ReactNode",
+        "optional": true
+      },
+      "getRowId": {
+        "type": "(row: T) => string",
+        "optional": false
+      },
+      "getRowLabel": {
+        "type": "((row: T) => string) | undefined",
+        "optional": true
+      },
+      "isRowSelectable": {
+        "type": "((row: T) => boolean) | undefined",
+        "optional": true
+      },
+      "label": {
+        "type": "string",
+        "optional": false
+      },
+      "loading": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "maxHeight": {
+        "type": "number | string | undefined",
+        "optional": true
+      },
+      "onCellEdit": {
+        "type": "((change: DataGridCellEdit<T>) => void) | undefined",
+        "optional": true
+      },
+      "onDensityChange": {
+        "type": "((density: \"compact\" | \"default\") => void) | undefined",
+        "optional": true
+      },
+      "onFiltersChange": {
+        "type": "((filters: DataGridFilters) => void) | undefined",
+        "optional": true
+      },
+      "onPageChange": {
+        "type": "((page: number) => void) | undefined",
+        "optional": true
+      },
+      "onPageSizeChange": {
+        "type": "((pageSize: number) => void) | undefined",
+        "optional": true
+      },
+      "onQueryChange": {
+        "type": "((query: string) => void) | undefined",
+        "optional": true
+      },
+      "onRetry": {
+        "type": "(() => void) | undefined",
+        "optional": true
+      },
+      "onSelectedRowIdsChange": {
+        "type": "((ids: string[]) => void) | undefined",
+        "optional": true
+      },
+      "onSortChange": {
+        "type": "((sort: DataGridSort | null) => void) | undefined",
+        "optional": true
+      },
+      "onSortModelChange": {
+        "type": "((sortModel: DataGridSort[]) => void) | undefined",
+        "optional": true
+      },
+      "page": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "pageSize": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "pageSizeOptions": {
+        "type": "readonly number[] | undefined",
+        "optional": true
+      },
+      "pagination": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "query": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "rows": {
+        "type": "readonly T[]",
+        "optional": false
+      },
+      "scrollResetKey": {
+        "type": "number | string | undefined",
+        "optional": true
+      },
+      "searchable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "searchLabel": {
+        "type": "string | undefined",
+        "optional": true
+      },
+      "selectable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "selectedRowIds": {
+        "type": "readonly string[] | undefined",
+        "optional": true
+      },
+      "selectionActions": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "selectOnRowClick": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "showColumnFilterToggle": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "showColumnVisibility": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "showDensityToggle": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "sort": {
+        "type": "DataGridSort | null | undefined",
+        "optional": true
+      },
+      "sortModel": {
+        "type": "DataGridSortModel | undefined",
+        "optional": true
+      },
+      "toolbarActions": {
+        "type": "React.ReactNode",
+        "optional": true
+      },
+      "toolbarOrder": {
+        "type": "readonly DataGridToolbarItem[] | undefined",
+        "optional": true
+      },
+      "toolbarSize": {
+        "type": "\"lg\" | \"md\" | \"sm\" | undefined",
+        "optional": true
+      },
+      "virtualized": {
+        "type": "boolean | DataGridVirtualizationOptions | undefined",
+        "optional": true
+      }
+    },
+    "DataGridColumn<T>": {
+      "accessor": {
+        "type": "(row: T) => null | number | string | undefined",
+        "optional": false
+      },
+      "align": {
+        "type": "\"center\" | \"end\" | \"start\" | undefined",
+        "optional": true
+      },
+      "cell": {
+        "type": "((row: T) => React.ReactNode) | undefined",
+        "optional": true
+      },
+      "editable": {
+        "type": "((row: T) => boolean) | boolean | undefined",
+        "optional": true
+      },
+      "editor": {
+        "type": "\"number\" | \"text\" | undefined",
+        "optional": true
+      },
+      "filter": {
+        "type": "\"multi-select\" | \"number\" | \"select\" | \"text\" | undefined",
+        "optional": true
+      },
+      "filterOptions": {
+        "type": "readonly { value: string; label: string; }[] | undefined",
+        "optional": true
+      },
+      "flex": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "header": {
+        "type": "string",
+        "optional": false
+      },
+      "id": {
+        "type": "string",
+        "optional": false
+      },
+      "maxWidth": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "minWidth": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "pinned": {
+        "type": "\"start\" | undefined",
+        "optional": true
+      },
+      "resizable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "sortable": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
+      "validate": {
+        "type": "((value: string, row: T) => string | undefined) | undefined",
+        "optional": true
+      },
+      "width": {
+        "type": "number | string | undefined",
+        "optional": true
+      }
+    },
+    "DataGridVirtualizationOptions": {
+      "estimateRowHeight": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "overscan": {
+        "type": "number | undefined",
+        "optional": true
+      }
+    },
+    "DataGridFooterContext<T>": {
+      "filteredCount": {
+        "type": "number",
+        "optional": false
+      },
+      "filteredRows": {
+        "type": "readonly T[]",
+        "optional": false
+      },
+      "hasError": {
+        "type": "boolean",
+        "optional": false
+      },
+      "loading": {
+        "type": "boolean",
+        "optional": false
+      },
+      "page": {
+        "type": "number",
+        "optional": false
+      },
+      "pageCount": {
+        "type": "number",
+        "optional": false
+      },
+      "pageRows": {
+        "type": "readonly T[]",
+        "optional": false
+      },
+      "pageSize": {
+        "type": "number",
+        "optional": false
+      },
+      "pagination": {
+        "type": "boolean",
+        "optional": false
+      },
+      "selectedCount": {
+        "type": "number",
+        "optional": false
+      },
+      "selectedRows": {
+        "type": "readonly T[]",
+        "optional": false
+      },
+      "totalCount": {
+        "type": "number",
+        "optional": false
+      }
+    }
+  }
+}
