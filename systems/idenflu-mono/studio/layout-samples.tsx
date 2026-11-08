@@ -5,7 +5,27 @@ import { StudioSettings, ThemeControl } from './controls';
 import { initialWorkspaceRoles, type WorkspaceRole } from './layout-role-data';
 import { RoleManagementPage } from './layout-role-management';
 import { defaultExpanded, filterWorkspaceTree, initialMembers, initialProjects, initialSettings, pageInfo, workspacePagePath, workspaceTree, type Member, type Project, type ProjectDraft, type WorkspacePage, type WorkspaceSettings, type WorkspaceTab } from './layout-workspace-data';
-import { HomePage, InviteMemberForm, MasterDetailPage, MembersPage, NotificationSettingsPage, ProfileForm, ProjectDetailContent, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage, VerticalSettingsPage } from './layout-workspace-pages';
+import { HomePage, InviteMemberForm, MasterDetailPage, MembersPage, NotFoundPage, NotificationSettingsPage, ProfileForm, ProjectDetailContent, ProjectDetailPage, ProjectForm, ProjectsPage, SettingsPage, VerticalSettingsPage } from './layout-workspace-pages';
+import { defaultWorkspaceTabKey, defaultWorkspaceTabs, notFoundWorkspaceTab, parseWorkspaceHash, readStoredWorkspaceTabs, storeWorkspaceTabs, workspaceTabHash, type WorkspaceRoute } from './layout-workspace-routes';
+
+const projectsTab:WorkspaceTab={key:'projects',page:'projects'};
+const withTab=(tabs:WorkspaceTab[],tab:WorkspaceTab)=>tabs.some(item=>item.key===tab.key)?tabs:[...tabs,tab];
+// Resolves a route against the open tabs: unknown screens and missing projects open a not-found tab at the requested address.
+function resolveWorkspaceRoute(route:WorkspaceRoute,tabs:WorkspaceTab[],projects:readonly Project[]):{tabs:WorkspaceTab[];active:string}{
+  if(route.kind==='default')return {tabs:withTab(tabs,projectsTab),active:defaultWorkspaceTabKey};
+  const tab=route.kind==='unknown'?notFoundWorkspaceTab(route.path)
+    :route.tab.page==='project-detail'&&!projects.some(project=>project.id===route.tab.projectId)?notFoundWorkspaceTab(`projects/${route.tab.projectId}`,route.tab.projectId)
+    :route.tab;
+  return {tabs:withTab(tabs,tab),active:tab.key};
+}
+// The parent menu group to expand for a tab, if it belongs to one.
+const tabMenuPage=(tab:WorkspaceTab|undefined):WorkspacePage|null=>!tab||tab.page==='not-found'?null:tab.page==='project-detail'?'projects':tab.page;
+function initialWorkspaceState(){
+  const stored=readStoredWorkspaceTabs()??{tabs:defaultWorkspaceTabs,active:defaultWorkspaceTabKey};
+  const hash=typeof location==='undefined'?'':location.hash;
+  if(!hash)return {active:stored.tabs.some(tab=>tab.key===stored.active)?stored.active:defaultWorkspaceTabKey,tabs:withTab(stored.tabs,projectsTab)};
+  return resolveWorkspaceRoute(parseWorkspaceHash(hash),stored.tabs,initialProjects);
+}
 
 function notificationAge(timestamp:number,now:number){
   const minutes=Math.max(0,Math.floor((now-timestamp)/60_000));
@@ -56,8 +76,9 @@ export function SidebarLayoutSample() {
   const roleOptions=workspaceRoles.map(role=>({value:role.name,label:role.name}));
   const defaultInviteRole=workspaceRoles.find(role=>role.id==='role-editor')?.name??workspaceRoles.find(role=>role.id==='role-viewer')?.name??'';
   const profileRoleOptions=workspaceRoles.map(role=>({value:role.name,label:role.id==='role-admin'&&role.name==='관리자'?'워크스페이스 관리자':role.name}));
-  const [tabs,setTabs]=React.useState<WorkspaceTab[]>([{key:'home',page:'home'},{key:'projects',page:'projects'}]);
-  const [active,setActive]=React.useState('projects'),[expanded,setExpanded]=React.useState(defaultExpanded),[searchExpanded,setSearchExpanded]=React.useState(defaultExpanded),[menuQuery,setMenuQuery]=React.useState('');
+  const [initialWorkspace]=React.useState(initialWorkspaceState);
+  const [tabs,setTabs]=React.useState<WorkspaceTab[]>(initialWorkspace.tabs);
+  const [active,setActive]=React.useState(initialWorkspace.active),[expanded,setExpanded]=React.useState(defaultExpanded),[searchExpanded,setSearchExpanded]=React.useState(defaultExpanded),[menuQuery,setMenuQuery]=React.useState('');
   const [mobileOpen,setMobileOpen]=React.useState(false),[searchOpen,setSearchOpen]=React.useState(false),[search,setSearch]=React.useState('');
   const [createOpen,setCreateOpen]=React.useState(false),[inviteOpen,setInviteOpen]=React.useState(false),[accountOpen,setAccountOpen]=React.useState(false);
   const [detailProjectId,setDetailProjectId]=React.useState<string|null>(null);
@@ -75,12 +96,15 @@ export function SidebarLayoutSample() {
   const currentMember=members.find(member=>member.id==='member-1')??initialMembers[0];
   const detailProject=projects.find(project=>project.id===detailProjectId);
   const deleteProjects=projects.filter(project=>deleteProjectIds?.includes(project.id));
-  const selected=activeTab.page==='project-detail'?'projects':activeTab.page;
-  const tabTitle=(tab:WorkspaceTab)=>tab.page==='project-detail'?projects.find(project=>project.id===tab.projectId)?.name??'프로젝트 상세':pageInfo[tab.page].title;
-  const breadcrumbs=workspacePagePath(selected);
+  const selectedPage=tabMenuPage(activeTab);
+  const selected=selectedPage??'';
+  const tabTitle=(tab:WorkspaceTab)=>tab.page==='not-found'?'찾을 수 없음':tab.page==='project-detail'?projects.find(project=>project.id===tab.projectId)?.name??'프로젝트 상세':pageInfo[tab.page].title;
+  const breadcrumbs=selectedPage?workspacePagePath(selectedPage):[tabTitle(activeTab)];
   if(activeTab.page==='project-detail')breadcrumbs.push(tabTitle(activeTab));
-  const activate=(key:string)=>{setActive(key);const tab=tabs.find(item=>item.key===key);const page=tab?.page==='project-detail'?'projects':tab?.page;if(page)setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));};
-  const openTab=(tab:WorkspaceTab)=>{setTabs(values=>values.some(item=>item.key===tab.key)?values:[...values,tab]);setActive(tab.key);const page=tab.page==='project-detail'?'projects':tab.page;setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));setMobileOpen(false);setSearchOpen(false);setMenuQuery('');};
+  const expandFor=(tab:WorkspaceTab|undefined)=>{const page=tabMenuPage(tab);if(page)setExpanded(values=>Array.from(new Set([...values,'work',pageInfo[page].parent])));};
+  const activate=(key:string)=>{setActive(key);expandFor(tabs.find(item=>item.key===key));};
+  // Opening a new screen adds a history entry; switching between open tabs only rewrites the current one.
+  const openTab=(tab:WorkspaceTab)=>{if(!tabs.some(item=>item.key===tab.key)){const hash=workspaceTabHash(tab);if(location.hash!==hash)history.pushState(null,'',`${location.pathname}${location.search}${hash}`);}setTabs(values=>withTab(values,tab));setActive(tab.key);expandFor(tab);setMobileOpen(false);setSearchOpen(false);setMenuQuery('');};
   const openPage=(page:WorkspacePage)=>openTab({key:page,page});
   const openProject=(id:string)=>openTab({key:`project:${id}`,page:'project-detail',projectId:id});
   const closeTab=(key:string)=>setTabs(values=>values.filter(tab=>tab.key!==key||tab.page==='home'));
@@ -98,6 +122,22 @@ export function SidebarLayoutSample() {
     setNotice(`${ids.size}개 프로젝트를 삭제했습니다.`);
   };
   React.useEffect(()=>{document.title=`${tabTitle(activeTab)} · ${settings.name} | NOVA Workspace`;},[activeTab,projects,settings.name]);
+  // The URL hash follows the active tab; the plain sample URL stays untouched while the default screen is showing.
+  React.useEffect(()=>{
+    const hash=workspaceTabHash(activeTab);
+    if(location.hash===hash||(!location.hash&&activeTab.key===defaultWorkspaceTabKey))return;
+    history.replaceState(null,'',`${location.pathname}${location.search}${hash}`);
+  },[activeTab]);
+  React.useEffect(()=>{storeWorkspaceTabs(tabs,active);},[tabs,active]);
+  React.useEffect(()=>{
+    const restore=()=>{
+      const next=resolveWorkspaceRoute(parseWorkspaceHash(location.hash),tabs,projects);
+      setTabs(next.tabs);setActive(next.active);
+      expandFor(next.tabs.find(tab=>tab.key===next.active));
+    };
+    window.addEventListener('popstate',restore);
+    return()=>window.removeEventListener('popstate',restore);
+  },[tabs,projects]);
   React.useEffect(()=>{const shortcut=(event:KeyboardEvent)=>{if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'&&!document.querySelector('dialog[open]')){event.preventDefault();setSearch('');setSearchOpen(true);}};document.addEventListener('keydown',shortcut);return()=>document.removeEventListener('keydown',shortcut);},[]);
   React.useEffect(()=>{if(searchOpen)searchInput.current?.focus();},[searchOpen]);
   React.useEffect(()=>{if(deleteProjectIds)deleteCancel.current?.focus();else if(deleteConfirmed.current){deleteConfirmed.current=false;workspaceRef.current?.querySelector<HTMLElement>('.tab-panel:not([hidden]) .data-grid-scroll')?.focus();}},[deleteProjectIds]);
@@ -133,6 +173,7 @@ export function SidebarLayoutSample() {
     setNotice(`“${current.name}” 역할을 삭제했습니다.`);
   };
   const renderPage=(tab:WorkspaceTab)=>{
+    if(tab.page==='not-found')return <NotFoundPage path={tab.path??''} projectId={tab.projectId} onPage={openPage}/>;
     if(tab.page==='project-detail'){const project=projects.find(item=>item.id===tab.projectId);return project?<ProjectDetailPage project={project} members={members} onUpdate={updateProject} onPage={openPage}/>:null;}
     if(tab.page==='home')return <HomePage projects={projects} members={members} onOpen={openProject} onPage={openPage}/>;
     if(tab.page==='master-detail')return <MasterDetailPage projects={projects} members={members} onUpdate={updateProject} onOpen={openProject}/>;

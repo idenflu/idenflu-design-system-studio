@@ -209,3 +209,14 @@ export function VerticalSettingsPage({settings,onSave,onChange}:SettingsProps&No
     {value:'notifications',label:'알림',content:<NotificationSettingsContent settings={settings} onChange={onChange}/>},
   ]}/></>;
 }
+
+export function NotFoundPage({path,projectId,onPage}: {path:string;projectId?:string;onPage:(page:WorkspacePage)=>void}){
+  const project=!!projectId;
+  return <><WorkspacePageHeader eyebrow="NOT FOUND" title={project?'프로젝트를 찾을 수 없습니다':'화면을 찾을 수 없습니다'} description={project?`${projectId} 프로젝트가 삭제되었거나 주소가 잘못되었습니다.`:'요청한 주소에 해당하는 화면이 없습니다.'}/>
+    <section className="layout-panel layout-not-found" aria-label="찾을 수 없는 주소">
+      <p>요청한 주소</p><code>#/{path}</code>
+      <ul><li>주소에 오타나 빠진 부분이 없는지 확인해주세요.</li><li>{project?'삭제된 프로젝트는 전체 프로젝트 목록에 더 이상 표시되지 않습니다.':'메뉴 검색이나 빠른 검색(⌘ K)으로 화면을 찾을 수 있습니다.'}</li></ul>
+      <div className="layout-not-found-actions"><Button onClick={()=>onPage('projects')}><Icon name="grid"/>전체 프로젝트</Button><Button variant="outline" onClick={()=>onPage('home')}><Icon name="home"/>대시보드</Button></div>
+    </section>
+  </>;
+}

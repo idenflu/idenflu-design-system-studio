@@ -126,6 +126,12 @@
 .layout-page-content > .data-grid > :is(.data-grid-toolbar,.data-grid-footer) { flex:none; }
 .layout-page-content > .data-grid > .data-grid-viewport { flex:1; min-height:0; }
 .layout-floating-settings { position:fixed; right:var(--space-6); bottom:var(--space-6); z-index:20; }
+/* Not-found tab: shows the requested address so the reader can correct it. */
+.layout-not-found { max-width:640px; }
+.layout-not-found > p { color:var(--text-secondary); font-size:var(--font-size-caption); }
+.layout-not-found > code { display:inline-block; margin-top:var(--space-1); padding:var(--space-1) var(--space-2); background:var(--surface); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:var(--font-size-caption); overflow-wrap:anywhere; }
+.layout-not-found > ul { display:grid; gap:var(--space-2); margin-top:var(--space-4); padding-left:var(--space-5); color:var(--text-secondary); list-style:disc; }
+.layout-not-found-actions { display:flex; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-5); }
 .layout-floating-settings .studio-settings-open { width:48px; height:48px; padding:14px; border-radius:50%; background:var(--primary-control); color:var(--text-on-primary); box-shadow:var(--shadow-popup); }
 .layout-floating-settings .studio-settings-open:hover { background:var(--primary-control-hover); }
 .layout-floating-settings .studio-settings-open:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:3px; }
