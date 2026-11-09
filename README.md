@@ -12,7 +12,7 @@ Node.js 20 이상에서 저장소 루트의 명령을 실행합니다.
 
 ```sh
 npm ci
-npm --prefix packages/react ci
+npm --prefix packages/mono-react ci
 npm run dev
 ```
 
@@ -27,7 +27,7 @@ npm run dev
 
 | 목적 | 문서 |
 | --- | --- |
-| React 패키지 설치와 빠른 사용 | [패키지 README](packages/react/README.md) |
+| React 패키지 설치와 빠른 사용 | [패키지 README](packages/mono-react/README.md) |
 | 앱에 적용·테마 설정·이전 HTML API 전환 | [프로젝트 적용 가이드](docs/guides/consumer-guide.md) |
 | 검색·테마·화면 조정 사용 | [스튜디오 가이드](docs/guides/studio-guide.md) |
 | 컴포넌트 속성·값·이벤트·예제 | [컴포넌트 참조](docs/reference/react-components.md) |
@@ -50,12 +50,15 @@ npm run dev
 
 ## 파일 구성
 
-- `packages/react/src/`: 재사용 React 컴포넌트와 스타일
-- `systems/idenflu-mono/core/`: 공유 CSS·선택적 초기화·폰트·아이콘 원본
+`packages/`는 디자인 시스템과 프레임워크가 드러나는 패키지 이름으로 구분합니다. 현재 mono의 React 구현은 `packages/mono-react/`에서 관리하며 공개 패키지명과 import는 `@idenflu/mono-react`를 유지합니다. 다른 디자인 시스템은 별도 패키지 폴더로 추가합니다. 문서 소스는 `systems/idenflu-mono/studio/`에서 관리하며 패키지 안에는 두지 않습니다.
+
+- `packages/mono-react/src/components/`: 컴포넌트별 React 구현과 CSS
+- `packages/mono-react/src/styles/`: 공통 토큰·폰트·기본 스타일과 선택적 `reset.css`
+- `packages/mono-react/src/shared/`: 내부 공통 타입·훅·유틸리티
+- `packages/mono-react/assets/`: 공유 폰트·아이콘·출처·라이선스 원본
 - `systems/idenflu-mono/studio/`: 문서 셸·샘플·화면 조정 UI·문서 스타일·브라우저 검사
 - `systems/idenflu-mono/index.html`: 정식 React 문서 진입점
 - `systems/idenflu-mono/docs-dist/`, `systems/idenflu-mono/assets/`: 빌드로 생성하는 문서 번들과 공개 에셋
-- `packages/react/studio/index.html`: 이전 주소의 리다이렉트
 - `scripts/`, `tests/`: 개발·검사·빌드 도구와 회귀 검사
 - `docs/`: 사용·참조·개발·QA·리서치·전환 문서
 

@@ -1,0 +1,11 @@
+.segmented-control { display: inline-grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: fit-content; max-width: 100%; height: var(--control-height); padding: 0; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--field-background); }
+.segmented-control > button { display: inline-flex; align-items: center; justify-content: center; gap: var(--control-gap); min-width: 0; height: calc(var(--control-height) - 2px); margin: 0; padding: 0 var(--control-px); border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font: inherit; font-size: var(--font-size-body); line-height: var(--line-height-control); font-weight: var(--font-weight-medium); white-space: nowrap; transition: background-color var(--motion-fast) var(--motion-easing), color var(--motion-fast) var(--motion-easing); }
+.segmented-control > button + button { border-inline-start: 1px solid var(--divider); }
+.segmented-control > button:hover:not(:disabled) { background: var(--surface-hover); color: var(--text); }
+.segmented-control > button:active:not(:disabled) { background: var(--surface-pressed); }
+.segmented-control > button[aria-pressed="true"], .segmented-control > button[aria-pressed="true"]:hover:not(:disabled) { background: var(--info-surface); color: var(--primary); }
+.segmented-control > button:focus-visible { position: relative; outline: none; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
+.segmented-control > button:disabled { background: var(--surface); color: var(--disabled-text); cursor: not-allowed; }
+.segmented-control > button[aria-pressed="true"]:disabled { background: var(--info-surface); color: var(--disabled-text); }
+.segmented-control > button:first-of-type { border-start-start-radius: var(--radius-control); border-end-start-radius: var(--radius-control); }
+.segmented-control > button:last-of-type { border-start-end-radius: var(--radius-control); border-end-end-radius: var(--radius-control); }

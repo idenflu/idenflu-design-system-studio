@@ -1,0 +1,11 @@
+.stepper { display:flex; list-style:none; padding:0; margin:var(--space-6) 0 0; }
+.stepper li { position:relative; display:flex; align-items:center; gap:var(--space-2); flex:1; min-width:0; color:var(--text-secondary); }
+.stepper li:not(:last-child)::after { content:""; flex:1; min-width:12px; height:1px; margin:0 var(--space-3) 0 var(--space-1); background:var(--divider); }
+.stepper li.is-current { color:var(--primary); font-weight:var(--font-weight-semibold); }
+.step-number { display:inline-grid; place-items:center; flex:0 0 32px; width:32px; height:32px; border:1px solid var(--border); font-size:var(--font-size-caption); font-weight:var(--font-weight-medium); }
+.is-current .step-number { border-color:var(--primary-control); background:var(--primary-control); color:var(--text-on-primary); }
+.is-complete .step-number { border-color:var(--primary); color:var(--primary); }
+@media (max-width:600px) {
+.stepper { flex-direction:column; gap:var(--space-3); }
+.stepper li:not(:last-child)::after { display:none; }
+}

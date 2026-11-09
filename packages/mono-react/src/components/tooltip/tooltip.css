@@ -1,0 +1,6 @@
+.tooltip-wrap { position:relative; display:inline-flex; }
+.tooltip-content { position:absolute; z-index:var(--z-tooltip); bottom:calc(100% + var(--space-2)); left:0; width:max-content; max-width:min(260px, calc(100vw - 48px)); padding:var(--space-2) calc(var(--space-unit) * 2.5); background:var(--inverse-canvas); color:var(--inverse-text); font-size:var(--font-size-caption); line-height:var(--line-height-caption); opacity:0; visibility:hidden; pointer-events:auto; }
+.tooltip-content::after { content:""; position:absolute; inset:100% 0 auto; height:var(--space-2); }
+.tooltip-wrap:has(:is(.icon-button, .button--icon)) .tooltip-content { left:auto; right:0; }
+.tooltip-wrap:hover .tooltip-content, .tooltip-wrap:focus-within .tooltip-content { opacity:1; visibility:visible; }
+.tooltip-wrap.tooltip-dismissed .tooltip-content { opacity:0; visibility:hidden; }

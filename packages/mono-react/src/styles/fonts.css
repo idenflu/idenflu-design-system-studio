@@ -1,0 +1,6 @@
+@font-face { font-family: Pretendard; font-style: normal; font-weight: 400; font-display: swap; src: url("./assets/fonts/Pretendard-Regular.woff2") format("woff2"); }
+@font-face { font-family: Pretendard; font-style: normal; font-weight: 500; font-display: swap; src: url("./assets/fonts/Pretendard-Medium.woff2") format("woff2"); }
+@font-face { font-family: Pretendard; font-style: normal; font-weight: 600; font-display: swap; src: url("./assets/fonts/Pretendard-SemiBold.woff2") format("woff2"); }
+@font-face { font-family: Pretendard; font-style: normal; font-weight: 700; font-display: swap; src: url("./assets/fonts/Pretendard-Bold.woff2") format("woff2"); }
+/* Wanted Sans v1.0.3, SIL Open Font License 1.1. */
+@font-face { font-family: "Wanted Sans Variable"; font-style: normal; font-weight: 400 1000; font-display: swap; src: url("./assets/fonts/wanted-sans/WantedSansVariable.woff2") format("woff2"); }

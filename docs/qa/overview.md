@@ -7,10 +7,10 @@
 | 범위 | 검사 위치 |
 | --- | --- |
 | 설정 값·저장·복원·색상 파생과 결정적 빌드 | [루트 Node 검사](../../tests/) |
-| 컴포넌트 값·이벤트·폼 초기화·다중 인스턴스·정리 | [React 단위 검사](../../packages/react/tests/) |
+| 컴포넌트 값·이벤트·폼 초기화·다중 인스턴스·정리 | [React 단위 검사](../../packages/mono-react/tests/) |
 | 전체 경로·제목·넘침·배포본·리다이렉트·소비 앱 CSS 격리 | [기본 브라우저 검사](../../tests/browser.spec.js), [CSS 격리 검사](../../tests/css-isolation.spec.js) |
 | 실제 포커스·키보드·팝업 배치·네이티브 모달·스크롤·반응형 | [Studio 브라우저 검사](../../systems/idenflu-mono/studio/) |
-| 공개 선언과 문서 속성·타입·필수 여부의 일치 | [API 문서 검사](../../packages/react/scripts/check-api-docs.mjs), `npm run check:api` |
+| 공개 선언과 문서 속성·타입·필수 여부의 일치 | [API 문서 검사](../../packages/mono-react/scripts/check-api-docs.mjs), `npm run check:api` |
 | Chromium·Firefox·WebKit 핵심 입력·팝업 계약 | [브라우저 엔진 구성](../../playwright.compat.config.cjs), `npm run test:compat` |
 | React 18.3.1·19.2.0, 공개 ESM·CJS SSR와 hydration | [React 호환성 검사](../../scripts/test-react-compat.mjs), `npm run test:react-compat -- --react=버전` |
 | 대표 컴포넌트의 라이트·다크 이미지 비교 | [시각 회귀](../../tests/visual/components.spec.cjs), `npm run test:visual` |

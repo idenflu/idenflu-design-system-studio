@@ -26,6 +26,10 @@
 
 ### 변경
 
+- 패키지 소스 경로를 `packages/mono-react/`로 정리해 디자인 시스템과 프레임워크를 구분. 공개 `@idenflu/mono-react` 이름과 import 유지. 이전 `packages/react` 디렉터리와 구 미리보기 출력, 불필요한 패키지 `studio/` 리다이렉트 폴더를 제거하고 문서 소스를 `systems/idenflu-mono/studio/`로 일원화
+- React 구현과 CSS를 컴포넌트별 폴더로 정리하고 공통 토큰·폰트·기본 스타일을 패키지 소스로 통합. 공개 import·클래스·토큰과 선택적 초기화 방식 유지. SVG·폰트·라이선스 원본을 패키지 assets로 이관하고 스튜디오는 같은 원본 사용
+- 패키지 CSS 입력 누락·독립 토큰·에셋 검사와 실제 tarball 설치 검증 추가. ESM·CJS·TypeScript·CSS 번들·React 18/19 SSR·hydration을 설치한 배포물로 검사
+
 - 기본 테마 색상을 NOVA 로고 블루(`#1062D3`)에 맞춰 조정. 중립색을 같은 청회색 계열로 통일하고 Success·Warning·Danger 채도를 보정하며, 다크 Control Primary는 `#336ABB`로 설정
 - 화면 조정의 기본값·내보내기, 갤러리 미리보기와 스튜디오 가이드의 색상 값을 새 기본 테마에 맞춤
 - 선택 행 배경을 `--selected-surface`로 분리하고 Primary 배지에 `--badge-primary-background`·`--badge-primary-text`를 추가. 선택한 행 위에서도 `진행 중` 같은 Primary 배지가 구분됨

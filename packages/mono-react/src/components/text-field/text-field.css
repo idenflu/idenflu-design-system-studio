@@ -1,0 +1,38 @@
+.text-input { display: block; width: 100%; height: var(--control-height); padding: calc((var(--control-height) - var(--line-height-control) - 2px) / 2) var(--control-px, var(--space-3)); border: 1px solid var(--border-control); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); font-size:var(--font-size-body); line-height:var(--line-height-control); font-weight:var(--font-weight-regular); appearance: none; transition: border-color var(--motion-fast) var(--motion-easing); }
+.text-input::placeholder { color: var(--text-muted); opacity: 1; }
+.text-input:hover:not(:disabled):not([readonly]):not(:focus):not(.is-focused):not([aria-invalid="true"]) { border-color: var(--border-control-hover); }
+.text-input:focus { outline: none; }
+.text-input:focus, .text-input.is-focused { border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
+.text-input:disabled { background: var(--surface); color: var(--disabled-text); border-color: var(--border); box-shadow: none; cursor: not-allowed; }
+.text-input[aria-invalid="true"] { border-color: var(--error); box-shadow: none; }
+.text-input[aria-invalid="true"]:focus { border-color: transparent; box-shadow: inset 0 0 0 2px var(--error); }
+.field-horizontal { display:grid; grid-template-columns:minmax(0, var(--field-label-width, 120px)) minmax(0, 1fr); align-items:start; gap:var(--space-4); }
+.field-horizontal__label { margin:0; padding-top:max(0px, calc((var(--control-height) - var(--line-height-control)) / 2)); }
+.field-horizontal__body { min-width:0; }
+.field-horizontal__body > .component-helper { margin-top:calc(var(--space-unit) * 1.5); }
+@media (max-width:600px) {
+.field-horizontal { grid-template-columns:minmax(0, 1fr); gap:var(--space-2); }
+.field-horizontal__label { padding-top:0; }
+}
+.input-group { position: relative; display: flex; align-items: stretch; min-width: 0; height: var(--control-height); border: 1px solid var(--border-control); border-radius: var(--radius-control); background: var(--field-background); transition: border-color var(--motion-fast) var(--motion-easing); }
+.input-group:hover:not(:focus-within):not(.is-invalid):not(:has(input:disabled, input[readonly], input[aria-invalid="true"])) { border-color: var(--border-control-hover); }
+.input-group:focus-within { border-color: transparent; box-shadow: none; }
+.input-group:focus-within::after { content: ""; position: absolute; inset: -1px; z-index: var(--z-focus); box-shadow: inset 0 0 0 2px var(--focus-on-light); pointer-events: none; }
+.input-group input { flex: 1 1 auto; width: 100%; min-width: 0; height: 100%; padding: calc((var(--control-height) - var(--line-height-control) - 2px) / 2) var(--control-px); border: 0; outline: none; background: transparent; color: var(--text); font-size:var(--font-size-body); line-height:var(--line-height-control); }
+.input-prefix, .input-suffix { display: flex; align-items: center; flex: 0 0 auto; color: var(--text-secondary); white-space: nowrap; }
+.input-prefix { padding-inline-start: var(--control-px); }
+.input-suffix { padding-inline-end: var(--control-px); }
+.input-prefix + input { padding-inline-start: var(--control-gap); }
+.input-group input:has(+ .input-suffix) { padding-inline-end: var(--control-gap); }
+.input-action { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 calc(var(--control-height) - 2px); width: calc(var(--control-height) - 2px); height: calc(var(--control-height) - 2px); margin: 0; padding: 0; border: 0; background: transparent; color: var(--text-secondary); }
+.input-action:hover:not(:disabled) { background: var(--surface); color: var(--text); }
+.input-action:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
+.input-action:disabled { opacity: .35; cursor: default; }
+.input-status { display: inline-flex; align-items: center; padding-inline: calc(var(--space-unit) * 2.5); color: var(--success); }
+.input-group:is(.is-invalid, :has(input[aria-invalid="true"])) { border-color: var(--danger); }
+.input-group:is(.is-invalid, :has(input[aria-invalid="true"])):focus-within { border-color: transparent; box-shadow: none; }
+.input-group:is(.is-invalid, :has(input[aria-invalid="true"])):focus-within::after { box-shadow: inset 0 0 0 2px var(--focus-on-danger); }
+.input-group:has(input:disabled) { background: var(--surface); }
+.input-group:has(input:disabled) :is(input, .input-prefix, .input-suffix, .input-status) { color: var(--disabled-text); }
+.input-group input:disabled { cursor: not-allowed; }
+.text-field-search::-webkit-search-cancel-button { appearance:none; display:none; }

@@ -1,0 +1,8 @@
+.popover-wrap { position:relative; display:inline-flex; }
+.popover-content { border-radius:var(--radius-control); position:absolute; z-index:var(--z-popover); top:calc(100% + 6px); left:0; width:240px; max-width:calc(100vw - 48px); padding:calc(var(--space-unit) * 1.5); border:1px solid var(--border); background:var(--field-background); box-shadow:var(--shadow-popup); }
+.popover-content { width:288px; padding:calc(var(--space-unit) * 4.5); }
+.popover-content strong { display:block; font-weight:var(--font-weight-semibold); }
+.popover-content p { margin-top:calc(var(--space-unit) * 1.5); color:var(--text-secondary); }
+.popover-choice { display:flex; align-items:center; gap:var(--space-2); margin-top:calc(var(--space-unit) * 3.5); }
+.popover-choice input { accent-color:var(--primary); width:16px; height:16px; }
+.popover-content .button { margin-top:calc(var(--space-unit) * 4.5); }

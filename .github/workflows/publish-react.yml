@@ -23,16 +23,17 @@ jobs:
         run: npm run check:changelog
       - run: npm ci
       - run: npm ci
-        working-directory: packages/react
+        working-directory: packages/mono-react
       - run: npm run check
       - run: npm test
       - run: npm run typecheck
-        working-directory: packages/react
+        working-directory: packages/mono-react
       - run: npm test
-        working-directory: packages/react
+        working-directory: packages/mono-react
       - run: npm pack --dry-run
-        working-directory: packages/react
+        working-directory: packages/mono-react
+      - run: npm run test:package -- --skip-build
       - run: npm publish
-        working-directory: packages/react
+        working-directory: packages/mono-react
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

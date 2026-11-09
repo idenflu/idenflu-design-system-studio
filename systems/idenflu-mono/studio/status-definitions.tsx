@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Badge,Icon,type BadgeProps} from '@idenflu/mono-react';
-import {feedbackIconNames,emphasizedFeedbackIconNames} from '../../../packages/react/src/status-icons';
+import {feedbackIconNames,emphasizedFeedbackIconNames} from '../../../packages/mono-react/src/status-icons';
 
 export const statusDefinitions = {
   pending:{label:'대기',icon:'circle-dashed',solidIcon:'circle-dashed',variant:'neutral',description:'시작하지 않은 작업이나 준비 중인 상태'},

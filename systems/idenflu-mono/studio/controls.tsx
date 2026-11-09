@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { Button, Icon, Segmented, Select, Slider, Tooltip } from '@idenflu/mono-react';
-import { useEscapeLayer } from '../../../packages/react/src/escape-layer';
+import { useEscapeLayer } from '../../../packages/mono-react/src/escape-layer';
 
 type PreferenceKey = 'fontSize' | 'lineHeight' | 'spacing' | 'controlHeight' | 'radius';
 type PreferenceFont = 'pretendard' | 'wanted-sans';

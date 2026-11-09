@@ -1,0 +1,6 @@
+.inline-alert { padding: calc(var(--space-unit) * 3.5) var(--space-4); border-left: 2px solid var(--primary); background: var(--info-surface); }
+.inline-alert strong { font-size:var(--font-size-body); line-height:var(--line-height-body); font-weight:var(--font-weight-medium); }
+.inline-alert p { margin-top: calc(var(--space-unit) * 0.5); color: var(--text-secondary); }
+.inline-alert--success { border-left-color: var(--success); background: var(--success-surface); }
+.inline-alert--warning { border-left-color: var(--warning); background: var(--warning-surface); }
+.inline-alert--danger { border-left-color: var(--danger); background: var(--danger-surface); }

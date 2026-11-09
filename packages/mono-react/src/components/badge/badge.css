@@ -1,0 +1,10 @@
+.badge { --icon-size:var(--badge-icon-size); border-radius:var(--radius-control); display:inline-flex; align-items:center; gap:var(--badge-gap); height:var(--badge-height); min-height:var(--badge-height); padding:0 var(--badge-padding-inline); background:var(--surface-hover); color:var(--text-secondary); font-size:var(--badge-font-size); line-height:var(--badge-line-height); font-weight:var(--font-weight-medium); white-space:nowrap; }
+.badge--primary { background: var(--badge-primary-background); color: var(--badge-primary-text); }
+.badge--success { background: var(--success-surface); color: var(--success); }
+.badge--warning { background: var(--warning-surface); color: var(--warning); }
+.badge--danger { background: var(--danger-surface); color:var(--danger-text); }
+.badge--solid { background:var(--badge-solid-neutral-background); color:var(--inverse-text); }
+.badge--solid.badge--primary { background:var(--badge-solid-primary-background); }
+.badge--solid.badge--success { background:var(--badge-solid-success-background); }
+.badge--solid.badge--warning { background:var(--badge-solid-warning-background); color:var(--badge-solid-warning-text); }
+.badge--solid.badge--danger { background:var(--badge-solid-danger-background); }

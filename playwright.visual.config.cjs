@@ -10,6 +10,6 @@ module.exports = defineConfig({
   expect: { toHaveScreenshot: { animations: 'disabled', caret: 'hide', scale: 'css', maxDiffPixelRatio: 0.002 } },
   projects: ['light', 'dark'].map(theme => ({
     name: theme,
-    use: { browserName: 'chromium', viewport: { width: 1080, height: 1000 }, colorScheme: theme, deviceScaleFactor: 1, launchOptions: {} },
+    use: { browserName: 'chromium', viewport: { width: 1080, height: 1000 }, colorScheme: theme, deviceScaleFactor: 1, launchOptions: base.use.launchOptions ?? {} },
   })),
 });

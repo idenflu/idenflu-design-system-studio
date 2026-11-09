@@ -1,6 +1,6 @@
 # React 문서 전환 현황
 
-정식 모노 주소 `/systems/idenflu-mono/index.html`에서 React 문서를 제공합니다. 이전 `/packages/react/studio/index.html` 주소는 쿼리·해시를 유지해 정식 주소로 이동합니다.
+React 문서는 `/systems/idenflu-mono/index.html`에서 제공하며, 문서 소스는 `systems/idenflu-mono/studio/` 한 곳에서 관리합니다.
 
 ## 현재 제공 범위
 
@@ -20,7 +20,7 @@ Layout 개요의 링크는 `?layout=sidebar`의 별도 워크스페이스 샘플
 
 기존 정적 문서 본문과 문서 전용 내비게이션·데모·검색·설정 UI 스크립트를 React 문서로 대체했습니다. 공유 CSS·폰트·아이콘과 초기 테마·설정 엔진은 계속 사용합니다. 초기 전환에서 제거한 Layout·Page 전용 구현과 현재 React 워크스페이스 샘플은 별개입니다.
 
-기존 HTML 소비자용 `IdenfluMono` 런타임과 8개 바닐라 어댑터, 독립 HTML fixture·회귀 페이지·이전 HTML 생성 스크립트를 제거했습니다. 컴포넌트는 React의 상태와 콜백으로 동작하며, [적용 가이드](../guides/consumer-guide.md)에 전환 방법을 안내합니다. 최소 React 호스트 HTML과 이전 미리보기 주소의 리다이렉트는 유지합니다.
+기존 HTML 소비자용 `IdenfluMono` 런타임과 8개 바닐라 어댑터, 독립 HTML fixture·회귀 페이지·이전 HTML 생성 스크립트를 제거했습니다. 컴포넌트는 React의 상태와 콜백으로 동작하며, [적용 가이드](../guides/consumer-guide.md)에 전환 방법을 안내합니다. 최소 React 호스트 HTML은 `systems/idenflu-mono/index.html`에 유지하며, 패키지에는 별도 문서 진입점을 두지 않습니다.
 
 ## 개발과 배포
 
@@ -30,4 +30,4 @@ Layout 개요의 링크는 `?layout=sidebar`의 별도 워크스페이스 샘플
 
 폼 예시의 검증·초기화·파일 선택과 데이터 상태는 로컬 동작이며 서버 저장·파일 전송·실제 예약은 앱에서 연결합니다. 워크스페이스의 프로젝트·멤버·역할 예시도 로컬 샘플 데이터로 동작합니다.
 
-React 문서 컴포넌트 회귀는 `systems/idenflu-mono/studio/*.spec.cjs`, 정식 주소·배포·리다이렉트·환경설정 회귀는 루트 `tests/*.spec.js`에서 검증합니다. 컴포넌트의 단독 사용과 정리는 `packages/react/tests/`에서 검증합니다. 환경별 실행 기준은 [검사 안내](../development/testing.md)를 따릅니다.
+React 문서 컴포넌트 회귀는 `systems/idenflu-mono/studio/*.spec.cjs`, 정식 주소·배포·리다이렉트·환경설정 회귀는 루트 `tests/*.spec.js`에서 검증합니다. 컴포넌트의 단독 사용과 정리는 `packages/mono-react/tests/`에서 검증합니다. 환경별 실행 기준은 [검사 안내](../development/testing.md)를 따릅니다.

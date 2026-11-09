@@ -1,0 +1,11 @@
+.divider { display:flex; align-items:center; gap:var(--space-3); width:100%; min-width:0; color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
+.divider::before, .divider::after { content:""; flex:1; min-width:0; border-top:1px solid var(--divider); }
+.divider:not(.divider--labeled)::after { display:none; }
+.divider--dashed::before, .divider--dashed::after { border-top-style:dashed; }
+.divider-label { flex:none; max-width:calc(100% - var(--space-3) - var(--space-3) - var(--space-4)); overflow-wrap:anywhere; text-align:center; }
+.divider--labeled.divider--start::before, .divider--labeled.divider--end::after { flex:0 0 var(--space-4); }
+.divider--vertical { align-self:stretch; flex:none; flex-direction:column; width:1px; min-height:var(--line-height-control); }
+.divider--vertical.divider--labeled { width:auto; }
+.divider--vertical .divider-label { max-width:100%; }
+.divider--vertical::before, .divider--vertical::after { border:0; border-inline-start:1px solid var(--divider); }
+.divider--vertical.divider--dashed::before, .divider--vertical.divider--dashed::after { border-inline-start-style:dashed; }

@@ -1,6 +1,6 @@
 # React 컴포넌트 참조
 
-설치와 스타일 설정은 [React 패키지 README](../../packages/react/README.md), 앱 적용과 HTML 마이그레이션은 [프로젝트 적용 가이드](../guides/consumer-guide.md)를 확인합니다.
+설치와 스타일 설정은 [React 패키지 README](../../packages/mono-react/README.md), 앱 적용과 HTML 마이그레이션은 [프로젝트 적용 가이드](../guides/consumer-guide.md)를 확인합니다.
 
 ## 목차
 
@@ -33,7 +33,7 @@
 
 텍스트·배경·일반 보더는 라이트·다크 모두 중립 회색을 사용합니다. 블루는 주요 동작·링크·선택·포커스·Info에 사용합니다.
 
-아래 기본값은 `core/tokens.css`에서 생성합니다. 토큰 변경 후 `npm run docs:tokens`로 갱신하며 `npm run check`가 최신 여부를 확인합니다.
+아래 기본값은 `packages/mono-react/src/styles/tokens.css`에서 생성합니다. 토큰 변경 후 `npm run docs:tokens`로 갱신하며 `npm run check`가 최신 여부를 확인합니다.
 
 <!-- generated:token-colors:start -->
 | 토큰 | Light | Dark | 용도 |

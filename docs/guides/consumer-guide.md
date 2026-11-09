@@ -1,6 +1,6 @@
 # React 프로젝트에 적용하기
 
-컴포넌트는 `@idenflu/mono-react` 패키지로 제공합니다. [패키지 설치](../../packages/react/README.md)와 [컴포넌트 API](../reference/react-components.md)를 확인하고 앱 진입점에서 스타일을 한 번 불러옵니다.
+컴포넌트는 `@idenflu/mono-react` 패키지로 제공합니다. [패키지 설치](../../packages/mono-react/README.md)와 [컴포넌트 API](../reference/react-components.md)를 확인하고 앱 진입점에서 스타일을 한 번 불러옵니다.
 
 ```tsx
 import { useState } from 'react';

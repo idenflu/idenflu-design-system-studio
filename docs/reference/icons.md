@@ -1,6 +1,6 @@
 # React 아이콘 참조
 
-설치와 스타일 설정은 [React 패키지 README](../../packages/react/README.md)를 확인합니다.
+설치와 스타일 설정은 [React 패키지 README](../../packages/mono-react/README.md)를 확인합니다.
 
 ## 목차
 
@@ -29,7 +29,7 @@ import { PlusIcon, BookmarkIcon } from '@idenflu/mono-react/icons';
 <BookmarkIcon size={20} label="저장됨" />
 ```
 
-0.5.0 예정 컴포넌트는 Outline만 제공합니다. 기본 크기는 16px이며, `label`이 없으면 장식으로 숨깁니다. 아이콘 자체가 의미를 전달할 때는 `label`을 지정합니다. 원본은 `systems/idenflu-mono/core/assets/icons/icons.svg`이며 React 패키지 폴더에서 `npm run generate:icons`로 생성하고 `npm run check:icons`로 최신 상태를 확인합니다. 생성 파일은 직접 수정하지 않습니다.
+0.5.0 예정 컴포넌트는 Outline만 제공합니다. 기본 크기는 16px이며, `label`이 없으면 장식으로 숨깁니다. 아이콘 자체가 의미를 전달할 때는 `label`을 지정합니다. 원본은 `packages/mono-react/assets/icons/icons.svg`이며 React 패키지 폴더에서 `npm run generate:icons`로 생성하고 `npm run check:icons`로 최신 상태를 확인합니다. 생성 파일은 직접 수정하지 않습니다.
 
 기존 `<Icon name="…">`과 CSS 마스크는 보존된 개별 SVG를 계속 사용하며 Filled도 유지합니다. 스프라이트 수정은 이 기존 자산에 자동 반영되지 않으므로 버전별 도형이 다를 수 있습니다. 새 아이콘을 기존 API에서도 제공하려면 개별 자산과 CSS·이름 등록을 별도로 갱신해야 합니다.
 

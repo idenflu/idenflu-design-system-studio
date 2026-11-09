@@ -1,8 +1,8 @@
 {
-  "extends": "../../../packages/react/tsconfig.json",
+  "extends": "../../../packages/mono-react/tsconfig.json",
   "compilerOptions": {
     "resolveJsonModule": true,
-    "baseUrl": "../../../packages/react",
+    "baseUrl": "../../../packages/mono-react",
     "paths": {
       "@idenflu/mono-react": ["dist/index.d.ts"],
       "@idenflu/mono-react/icons": ["dist/icons/index.d.ts"],
@@ -11,7 +11,7 @@
       "react-dom": ["node_modules/@types/react-dom"],
       "react-dom/*": ["node_modules/@types/react-dom/*"]
     },
-    "typeRoots": ["../../../packages/react/node_modules/@types"]
+    "typeRoots": ["../../../packages/mono-react/node_modules/@types"]
   },
   "include": ["./app.tsx", "./dist/*.json"]
 }

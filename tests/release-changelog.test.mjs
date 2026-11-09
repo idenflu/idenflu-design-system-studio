@@ -39,9 +39,9 @@ test('the release command reads the package version and fails before publishing 
   const root = await mkdtemp(resolve(tmpdir(), 'idenflu-release-'));
   try {
     await mkdir(resolve(root, 'scripts'), { recursive: true });
-    await mkdir(resolve(root, 'packages/react'), { recursive: true });
+    await mkdir(resolve(root, 'packages/mono-react'), { recursive: true });
     await copyFile(new URL('../scripts/check-release-changelog.mjs', import.meta.url), resolve(root, 'scripts/check-release-changelog.mjs'));
-    await writeFile(resolve(root, 'packages/react/package.json'), JSON.stringify({ version: '0.4.2' }));
+    await writeFile(resolve(root, 'packages/mono-react/package.json'), JSON.stringify({ version: '0.4.2' }));
     await writeFile(resolve(root, 'CHANGELOG.md'), '## 0.4.1\n- 이전 변경\n');
     const run = () => spawnSync(process.execPath, [resolve(root, 'scripts/check-release-changelog.mjs')], { encoding: 'utf8' });
     const missing = run();

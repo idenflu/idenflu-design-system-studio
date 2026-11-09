@@ -39,7 +39,7 @@ export function checkReleaseChangelog(version, changelog) {
 }
 
 async function main() {
-  const pkg = JSON.parse(await readFile(resolve(root, 'packages/react/package.json'), 'utf8'));
+  const pkg = JSON.parse(await readFile(resolve(root, 'packages/mono-react/package.json'), 'utf8'));
   const changelog = await readFile(resolve(root, 'CHANGELOG.md'), 'utf8');
   checkReleaseChangelog(pkg.version, changelog);
   console.log(`CHANGELOG.md의 ${pkg.version} 버전 항목을 확인했습니다.`);

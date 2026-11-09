@@ -1,0 +1,18 @@
+.demo-tree { max-width:560px; }
+.tree-category + .tree-category { margin-block-start:var(--space-4); }
+.tree-category-label { margin:0; padding:var(--space-2) var(--space-3); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); font-weight:var(--font-weight-semibold); }
+.demo-tree details { margin:0; }
+.demo-tree summary, .tree-item { display:flex; align-items:center; width:100%; min-height:var(--control-height); padding:var(--space-2) var(--space-3); border:0; background:transparent; color:var(--text-secondary); font:inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); text-align:left; cursor:pointer; list-style:none; }
+.demo-tree summary { justify-content:space-between; gap:var(--space-3); }
+.demo-tree summary::-webkit-details-marker { display:none; }
+.demo-tree summary::marker { content:""; }
+.demo-tree summary::after { content:""; flex:0 0 16px; width:16px; height:16px; background:currentColor; mask:url('./assets/icons/idenflu/keyboard-arrow-down.svg') no-repeat center / contain; transition:transform var(--motion-fast) var(--motion-easing); }
+.demo-tree details[open] > summary::after { transform:rotate(180deg); }
+.demo-tree summary:hover, .tree-item:hover:not(:disabled) { background:var(--surface); color:var(--text); }
+.demo-tree summary:focus-visible, .tree-item:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
+.tree-children { margin-left:calc(var(--space-unit) * 4.5); border-left:1px solid var(--divider); }
+.tree-item { border-left:2px solid transparent; }
+.tree-children > .tree-item, .tree-children > details > summary { padding-left:var(--space-4); }
+.tree-children > details > summary { border-left:2px solid transparent; }
+.tree-item.is-selected, .tree-item.is-selected:hover { border-left-color:var(--primary); color:var(--primary); font-weight:var(--font-weight-medium); }
+.tree-item:disabled { color:var(--disabled-text); cursor:not-allowed; }

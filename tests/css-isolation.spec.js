@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
-const React = require('../packages/react/node_modules/react');
-const { renderToStaticMarkup } = require('../packages/react/node_modules/react-dom/server');
+const React = require('../packages/mono-react/node_modules/react');
+const { renderToStaticMarkup } = require('../packages/mono-react/node_modules/react-dom/server');
 
 const host = `<style>
   body { font-family:Georgia,serif; font-size:18px; line-height:1.6; color:#353535; background:#fff4e5; }
@@ -10,7 +10,7 @@ const host = `<style>
   <button type="button">기존 버튼</button><input placeholder="기존 입력" />
 </main>`;
 async function setup(page) {
-  await page.goto('/packages/react/examples/index.html');
+  await page.goto('/packages/mono-react/examples/index.html');
   await page.setContent(`<!doctype html><html lang="ko"><body>${host}<div id="components" style="width:240px"></div></body></html>`);
 }
 async function hostMetrics(page) {
@@ -26,14 +26,14 @@ async function hostMetrics(page) {
 test('component CSS preserves the host page and native controls in both themes', async ({ page }) => {
   await setup(page);
   const before = await hostMetrics(page);
-  await page.addStyleTag({ url: '/packages/react/dist/styles.css' });
+  await page.addStyleTag({ url: '/packages/mono-react/dist/styles.css' });
   expect(await hostMetrics(page)).toEqual(before);
   await page.locator('html').evaluate(element => { element.dataset.theme = 'dark'; });
   expect(await hostMetrics(page)).toEqual(before);
 });
 
 test('React components keep their geometry without the optional document reset', async ({ page }) => {
-  const { Button, TextField, Chip, Card, Tabs } = require('../packages/react/dist/index.cjs');
+  const { Button, TextField, Chip, Card, Tabs } = require('../packages/mono-react/dist/index.cjs');
   await setup(page);
   const before = await hostMetrics(page);
   const markup = renderToStaticMarkup(React.createElement(React.Fragment, null,
@@ -44,7 +44,7 @@ test('React components keep their geometry without the optional document reset',
     React.createElement(Tabs, { label: '컴포넌트 탭', items: [{ value: 'one', label: '첫 탭', content: '탭 내용' }, { value: 'two', label: '둘째 탭', content: '둘째 내용' }] }),
   ));
   await page.locator('#components').evaluate((element, html) => { element.innerHTML = html; }, markup);
-  await page.addStyleTag({ url: '/packages/react/dist/styles.css' });
+  await page.addStyleTag({ url: '/packages/mono-react/dist/styles.css' });
   await expect(page.locator('#components .button')).toHaveCSS('font-size', '14px');
   await expect(page.locator('#components .button')).toHaveCSS('box-sizing', 'border-box');
   await expect(page.locator('#components .text-input')).toHaveCSS('height', '36px');
@@ -56,8 +56,8 @@ test('React components keep their geometry without the optional document reset',
 
 test('document reset is an explicit opt-in for applications adopting the whole system', async ({ page }) => {
   await setup(page);
-  await page.addStyleTag({ url: '/packages/react/dist/reset.css' });
-  await page.addStyleTag({ url: '/packages/react/dist/styles.css' });
+  await page.addStyleTag({ url: '/packages/mono-react/dist/reset.css' });
+  await page.addStyleTag({ url: '/packages/mono-react/dist/styles.css' });
   await expect(page.locator('html')).toHaveCSS('font-size', '14px');
   await expect(page.locator('#host a')).toHaveCSS('text-decoration-line', 'none');
   await expect(page.locator('#host h1')).toHaveCSS('margin-top', '0px');

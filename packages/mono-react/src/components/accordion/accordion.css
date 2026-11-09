@@ -1,0 +1,10 @@
+.accordion { border-top: 1px solid var(--border); }
+.accordion details { border-bottom: 1px solid var(--border); }
+.accordion summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 50px; padding-block: calc(var(--space-unit) * 3.5); list-style: none; font-weight:var(--font-weight-medium); cursor: pointer; }
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary img { width: 16px; height: 16px; flex-shrink: 0; transition: transform var(--motion-fast) var(--motion-easing); }
+.accordion details[open] summary img { transform: rotate(180deg); }
+.accordion summary:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
+.accordion details > p { padding: 0 var(--space-6) var(--space-4) 0; color: var(--text-secondary); word-break: keep-all; }
+.accordion summary .ui-icon { width:16px; height:16px; flex:0 0 16px; transition:transform var(--motion-fast) var(--motion-easing); }
+.accordion details[open] summary .ui-icon { transform:rotate(180deg); }

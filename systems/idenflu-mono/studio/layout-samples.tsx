@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { version as packageVersion } from '../../../packages/react/package.json';
+import { version as packageVersion } from '../../../packages/mono-react/package.json';
 import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DropdownMenu, Icon, IconButton, Popover, Tabs, TextField, Tree, type TreeNode } from '@idenflu/mono-react';
 import { StudioSettings, ThemeControl } from './controls';
 import { initialWorkspaceRoles, type WorkspaceRole } from './layout-role-data';

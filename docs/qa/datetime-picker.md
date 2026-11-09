@@ -11,16 +11,16 @@
 - 좁은 화면의 팝업 위치·내부 스크롤·확인 버튼 접근, 마우스 스크롤바 조작 중 팝업 유지
 - 문서 사용 예시의 값 바인딩·FormData·UTC 변환과 표시 코드의 타입 검사
 
-단위 검사는 [일시 선택기 계약](../../packages/react/tests/datetime-picker.test.mjs)에 있습니다. 실제 브라우저의 팝업·포커스·스크롤 검사는 [일시 선택기](../../systems/idenflu-mono/studio/datetime-picker.spec.cjs), [스크롤바](../../systems/idenflu-mono/studio/datetime-scrollbar.spec.cjs), [사용 예시](../../systems/idenflu-mono/studio/datetime-usage.spec.cjs)에서 확인합니다.
+단위 검사는 [일시 선택기 계약](../../packages/mono-react/tests/datetime-picker.test.mjs)에 있습니다. 실제 브라우저의 팝업·포커스·스크롤 검사는 [일시 선택기](../../systems/idenflu-mono/studio/datetime-picker.spec.cjs), [스크롤바](../../systems/idenflu-mono/studio/datetime-scrollbar.spec.cjs), [사용 예시](../../systems/idenflu-mono/studio/datetime-usage.spec.cjs)에서 확인합니다.
 
 ## 재현 방법
 
 [로컬 개발 안내](../development/local-development.md)에 따라 의존성을 설치한 뒤 저장소 루트에서 실행합니다.
 
 ```sh
-npm --prefix packages/react run build
-npm --prefix packages/react run studio:build
-node --test packages/react/tests/datetime-picker.test.mjs
+npm --prefix packages/mono-react run build
+npm --prefix packages/mono-react run studio:build
+node --test packages/mono-react/tests/datetime-picker.test.mjs
 npx playwright install chromium
 npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs datetime-picker.spec.cjs datetime-scrollbar.spec.cjs datetime-usage.spec.cjs --workers=2
 ```
