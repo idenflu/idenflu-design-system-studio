@@ -6,12 +6,15 @@
 
 ```sh
 npm run check
-npm test
-npm --prefix packages/mono-react run typecheck
-npm --prefix packages/mono-react test
+npm --prefix packages/idenflu-mono-react run typecheck
+npm --prefix packages/idenflu-mono-react test
+npm run test:package-isolation
 npm run test:package
+npm test
+npm run studio:build
+npm run studio:check
+npm run test:studio
 npm run check:api
-npm --prefix packages/mono-react run studio:check
 npm run build
 npx playwright install chromium
 npm run test:browser
@@ -22,15 +25,19 @@ npm run test:react-compat -- --react=18.3.1
 npm run test:react-compat -- --react=19.2.0
 ```
 
-정적 검사, 설정 계약·결정적 빌드, React 단위 테스트와 라이트·다크·320px 브라우저 회귀를 실행합니다.
+패키지의 `typecheck`·`test`는 라이브러리의 값·이벤트·폼·접근성·다중 인스턴스 계약을 검사합니다. 문서 전용 Node 검사는 `npm run test:studio`, 문서 타입 검사는 `npm run studio:check`로 나눕니다. 문서 경로·API 표·복사 예제와 컨베이어·점검 캘린더 샘플 검사는 `systems/idenflu-mono/studio/tests/`에 있습니다. 저장소 루트의 `npm test`는 설정·개발 서버·결정적 사이트 빌드 등 저장소 전체 도구를 검사하므로 문서 소스를 사용합니다.
+
+`npm run test:package-isolation`은 `systems/`와 `docs/`가 없는 임시 폴더에 패키지 소스를 복사해 `npm test`를 실행합니다. 이미 설치한 개발 도구는 `node_modules` 심볼릭 링크로 재사용하며 새로 설치하지 않습니다. 문서 파일을 읽는 역방향 의존이 생기면 이 검사가 실패합니다. 실제 배포물 설치 검증은 아래 `test:package`에서 별도로 수행합니다.
+
+정적 검사, 라이브러리·문서 검사와 라이트·다크·320px 브라우저 회귀를 각각 실행합니다.
 
 `npm run test:package`는 패키지를 빌드하고 실제 `npm pack` 결과를 저장소 밖 임시 프로젝트에 설치합니다. 공개 ESM·CJS와 아이콘 import, TypeScript의 ESM·CJS 선언, CSS·폰트·SVG 번들, SSR·hydration을 검사합니다. 런타임 의존성은 npm으로 설치하며 워크스페이스 소스를 복사하거나 alias로 연결하지 않습니다. 임시 프로젝트는 종료 후 제거합니다. 이미 빌드했다면 `npm run test:package -- --skip-build`로 실행합니다. 최초 설치에는 npm 레지스트리 접근이 필요합니다.
 
-패키지 배포 파일의 목록만 확인하려면 `npm pack ./packages/mono-react --dry-run`을 사용합니다.
+패키지 배포 파일의 목록만 확인하려면 `npm pack ./packages/idenflu-mono-react --dry-run`을 사용합니다.
 
-`npm run check`에는 패키지 CSS 입력 누락·중복, 스튜디오 없이 사용하는 토큰·에셋 경로 검사와 색상 토큰·참조 문서 기본값 표의 일치 검사가 포함됩니다. `packages/mono-react/src/styles/tokens.css`의 기본 색상을 변경한 뒤에는 `npm run docs:tokens`로 문서 표를 갱신합니다. `npm run check:tokens`로 이 항목만 확인할 수 있습니다.
+`npm run check`에는 패키지 CSS 입력 누락·중복, 스튜디오 없이 사용하는 토큰·에셋 경로 검사와 색상 토큰·참조 문서 기본값 표의 일치 검사가 포함됩니다. `packages/idenflu-mono-react/src/styles/tokens.css`의 기본 색상을 변경한 뒤에는 `npm run docs:tokens`로 문서 표를 갱신합니다. `npm run check:tokens`로 이 항목만 확인할 수 있습니다.
 
-공개 API 문서는 빌드한 `packages/mono-react/dist/index.d.ts`에서 추출한 타입과 실제 Studio 속성 표를 비교합니다. 현재 PageHeader, 선택·숫자·날짜·시간·일시 입력과 DataGrid 관련 15개 타입을 검사합니다. PageHeader의 표준 HTML 속성은 대표 공통 속성만 선별합니다. API 변경 후에는 React 패키지를 빌드하고 `npm run docs:api`로 생성 자료를 갱신한 뒤 문서 표의 설명·기본값과 변경 내용을 검토합니다. `npm run check:api`는 소스와 공개 선언의 일치, 생성 자료의 최신 여부와 문서 속성·타입·필수 여부·누락을 검사합니다. 기본값·동작 설명은 수기로 관리하며 자동 검증 대상이 아닙니다. 문서 전체 타입 검사는 별도 `studio:check`로 실행합니다.
+공개 API 문서는 빌드한 `packages/idenflu-mono-react/dist/index.d.ts`에서 추출한 타입과 실제 Studio 속성 표를 비교합니다. 현재 PageHeader, 선택·숫자·날짜·시간·일시 입력과 DataGrid 관련 15개 타입을 검사합니다. PageHeader의 표준 HTML 속성은 대표 공통 속성만 선별합니다. API 변경 후에는 React 패키지를 빌드하고 `npm run docs:api`로 생성 자료를 갱신한 뒤 문서 표의 설명·기본값과 변경 내용을 검토합니다. `npm run check:api`는 소스와 공개 선언의 일치, 생성 자료의 최신 여부와 문서 속성·타입·필수 여부·누락을 검사합니다. 기본값·동작 설명은 수기로 관리하며 자동 검증 대상이 아닙니다. 문서 전체 타입 검사는 루트의 `npm run studio:check`로 실행합니다. 문서 검사 도구와 복사 예제 생성기는 `systems/idenflu-mono/studio/scripts/`에서 관리합니다.
 
 ## 브라우저 환경 선택
 
@@ -62,7 +69,7 @@ npm run test:visual -- --update-snapshots
 
 ## 품질 CI
 
-품질 CI는 패키지·기본 브라우저·Studio·브라우저 엔진·React 호환성 검사를 독립 작업으로 실행합니다. 패키지 작업은 공개 API 문서 검사와 실제 tarball 설치 검사도 실행합니다. Studio의 전체 테스트를 4개 shard로 나누어 동시에 검사하고 각 shard는 worker 2개를 사용합니다. 브라우저 엔진 작업은 3개 엔진의 핵심 계약을, React 작업은 18.3.1·19.2.0 matrix의 SSR·hydration을 확인합니다. CI에서는 문서를 미리 빌드한 뒤 파일 감시가 없는 정적 서버를 사용합니다. 같은 브랜치에 새 커밋을 푸시하면 이전 품질 검사를 취소합니다.
+품질 CI는 패키지·기본 브라우저·Studio·브라우저 엔진·React 호환성 검사를 독립 작업으로 실행합니다. 패키지 검사는 문서 없는 격리 실행과 실제 tarball 설치를 확인합니다. 문서 검사는 공개 API 표·복사 예제·문서 타입·업무 샘플을 별도로 확인합니다. Studio의 전체 테스트를 4개 shard로 나누어 동시에 검사하고 각 shard는 worker 2개를 사용합니다. 브라우저 엔진 작업은 3개 엔진의 핵심 계약을, React 작업은 18.3.1·19.2.0 matrix의 SSR·hydration을 확인합니다. CI에서는 문서를 미리 빌드한 뒤 파일 감시가 없는 정적 서버를 사용합니다. 같은 브랜치에 새 커밋을 푸시하면 이전 품질 검사를 취소합니다.
 
 로컬에서 Studio 분할 실행을 확인하려면 아래 명령의 `1`을 `1`~`4`로 바꿔 각 shard를 실행합니다.
 

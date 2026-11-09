@@ -1,12 +1,12 @@
 const { test, expect } = require('@playwright/test');
 const { createRequire } = require('node:module');
 const { resolve } = require('node:path');
-const requirePackage = createRequire(resolve(__dirname, '../../packages/mono-react/package.json'));
+const requirePackage = createRequire(resolve(__dirname, '../../packages/idenflu-mono-react/package.json'));
 let script;
 
 test.beforeAll(async () => {
   ({ outputFiles: [{ text: script }] } = await requirePackage('esbuild').build({
-    stdin: { loader: 'tsx', resolveDir: resolve(__dirname, '../../packages/mono-react'), contents: `
+    stdin: { loader: 'tsx', resolveDir: resolve(__dirname, '../../packages/idenflu-mono-react'), contents: `
       import * as React from 'react';
       import { createRoot } from 'react-dom/client';
       import { Button, Badge, PageHeader, TextField, Select, NumberField, DatePicker, TimePicker, DataGrid } from './dist/index.js';
@@ -42,8 +42,8 @@ test('representative components retain their reviewed appearance', async ({ page
   await page.setContent(`<!doctype html><html lang="ko" data-theme="${testInfo.project.name}"><head><meta charset="utf-8">
     <link rel="stylesheet" href="/systems/idenflu-mono/docs-dist/components.css">
     <style>
-      @font-face {font-family:VisualPretendard;src:url('/packages/mono-react/assets/fonts/Pretendard-Regular.woff2')}
-      @font-face {font-family:VisualPretendard;src:url('/packages/mono-react/assets/fonts/Pretendard-SemiBold.woff2');font-weight:600}
+      @font-face {font-family:VisualPretendard;src:url('/packages/idenflu-mono-react/assets/fonts/Pretendard-Regular.woff2')}
+      @font-face {font-family:VisualPretendard;src:url('/packages/idenflu-mono-react/assets/fonts/Pretendard-SemiBold.woff2');font-weight:600}
       :root {--font-family-body:VisualPretendard,sans-serif}
       #sheet {width:1000px;padding:28px;background:var(--canvas);color:var(--text)}
       h1 {font-size:24px;line-height:32px;margin:0 0 24px} h2 {font-size:16px;line-height:24px;margin:0 0 16px}

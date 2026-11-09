@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { createRequire } = require('node:module');
 const { resolve } = require('node:path');
-const packageRoot = resolve(__dirname, '../../../packages/mono-react');
+const packageRoot = resolve(__dirname, '../../../packages/idenflu-mono-react');
 const requireReact = createRequire(resolve(packageRoot, 'package.json'));
 const { build } = requireReact('esbuild');
 

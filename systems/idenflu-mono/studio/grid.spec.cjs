@@ -1,7 +1,7 @@
 const {test, expect} = require('@playwright/test');
 const { createRequire } = require('node:module');
 const { resolve } = require('node:path');
-const packageRoot = resolve(__dirname, '../../../packages/mono-react');
+const packageRoot = resolve(__dirname, '../../../packages/idenflu-mono-react');
 const requireReact = createRequire(resolve(packageRoot, 'package.json'));
 const { build } = requireReact('esbuild');
 let fixtureScript;
@@ -42,7 +42,7 @@ test.beforeAll(async () => {
 async function mount(page) {
   await page.goto('/');
   await page.setContent(`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="/packages/mono-react/dist/styles.css">
+    <link rel="stylesheet" href="/packages/idenflu-mono-react/dist/styles.css">
     <style>body{margin:0}#fixture{padding:16px}#fixture>div+div{margin-top:24px}</style>
     </head><body><div id="fixture"></div></body></html>`);
   await page.addScriptTag({content:fixtureScript});

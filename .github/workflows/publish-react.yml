@@ -22,18 +22,16 @@ jobs:
       - name: Check release changelog
         run: npm run check:changelog
       - run: npm ci
-      - run: npm ci
-        working-directory: packages/mono-react
-      - run: npm run check
-      - run: npm test
+        working-directory: packages/idenflu-mono-react
       - run: npm run typecheck
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm test
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
+      - run: npm run test:package-isolation
       - run: npm pack --dry-run
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run test:package -- --skip-build
       - run: npm publish
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

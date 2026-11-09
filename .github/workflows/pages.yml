@@ -25,19 +25,18 @@ jobs:
           cache: npm
           cache-dependency-path: |
             package-lock.json
-            packages/mono-react/package-lock.json
+            packages/idenflu-mono-react/package-lock.json
       - name: Install studio dependencies
         run: npm ci
       - name: Install React dependencies
         run: npm ci
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - name: Check source files
         run: npm run check
       - name: Build static site
         run: npm run build
       - name: Check studio types
         run: npm run studio:check
-        working-directory: packages/mono-react
       - name: Upload built site
         uses: actions/upload-pages-artifact@v4
         with:

@@ -167,7 +167,7 @@ test('exported colors apply to consumers without a theme attribute', async ({ pa
   const consumer = await page.evaluate(async () => {
     const frame = document.createElement('iframe');
     const loaded = new Promise(resolve => frame.addEventListener('load', resolve, { once: true }));
-    frame.srcdoc = `<link rel="stylesheet" href="/packages/mono-react/dist/styles.css"><style>${window.copiedConsumerCss}</style><a id="consumer-link" href="#" style="color:var(--primary)">자세히 보기</a>`;
+    frame.srcdoc = `<link rel="stylesheet" href="/packages/idenflu-mono-react/dist/styles.css"><style>${window.copiedConsumerCss}</style><a id="consumer-link" href="#" style="color:var(--primary)">자세히 보기</a>`;
     document.body.append(frame);
     await loaded;
     const root = frame.contentDocument.documentElement;
@@ -201,7 +201,7 @@ async function exportedButtonColors(page) {
     const frame = document.createElement('iframe');
     const loaded = new Promise(resolve => frame.addEventListener('load', resolve, { once: true }));
     const theme = document.documentElement.dataset.theme;
-    frame.srcdoc = `<html data-theme="${theme}"><head><link rel="stylesheet" href="/packages/mono-react/dist/styles.css"><style>${window.IdenfluPreferences.cssText()} button { transition: none !important; }</style></head><body><button class="button" id="primary">확인</button><button class="button button--danger" id="danger">삭제</button></body></html>`;
+    frame.srcdoc = `<html data-theme="${theme}"><head><link rel="stylesheet" href="/packages/idenflu-mono-react/dist/styles.css"><style>${window.IdenfluPreferences.cssText()} button { transition: none !important; }</style></head><body><button class="button" id="primary">확인</button><button class="button button--danger" id="danger">삭제</button></body></html>`;
     document.body.append(frame);
     await loaded;
     const samples = [];
@@ -271,7 +271,7 @@ test('danger text consumers and inverse spinners retain contrast after a bright 
         <span data-kind="dots" class="spinner-dots spinner--inverse"><span></span><span></span><span></span></span>
         <span data-kind="bars" class="spinner-bars spinner--inverse"><span></span><span></span><span></span></span>
         <svg data-kind="nova" class="nova-spinner nova-spinner--inverse" viewBox="0 0 24 24"><path class="nova-spinner__facet" d="M2 2H22V22Z" /></svg>`;
-      frame.srcdoc = `<html data-theme="${theme}"><head><link rel="stylesheet" href="/packages/mono-react/dist/styles.css"><style>${window.IdenfluPreferences.cssText()} * { animation:none !important; transition:none !important; }</style></head><body>
+      frame.srcdoc = `<html data-theme="${theme}"><head><link rel="stylesheet" href="/packages/idenflu-mono-react/dist/styles.css"><style>${window.IdenfluPreferences.cssText()} * { animation:none !important; transition:none !important; }</style></head><body>
         <div id="canvas" style="background:var(--canvas)"><span id="badge" class="badge badge--danger">오류</span><p id="helper" class="component-helper is-error">입력 오류</p><p id="field" class="field-error">필수 항목</p></div>
         <div id="inverse" style="background:var(--inverse-canvas)">${spinners}</div>
         <button id="button" class="button">처리 중 ${spinners}</button>

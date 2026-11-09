@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { createRequire } = require('node:module');
 const { resolve } = require('node:path');
-const requireReact = createRequire(resolve(__dirname, '../../../packages/mono-react/package.json'));
+const requireReact = createRequire(resolve(__dirname, '../../../packages/idenflu-mono-react/package.json'));
 const React = requireReact('react');
 const { renderToStaticMarkup } = requireReact('react-dom/server');
 const { Badge, Icon, Table } = requireReact('./dist/index.cjs');
@@ -98,7 +98,7 @@ function standaloneMarkup() {
 async function mountStandalone(page, theme) {
   await page.setContent(`<!doctype html><html lang="ko"${theme ? ` data-theme="${theme}"` : ''}><head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="/packages/mono-react/dist/styles.css">
+    <link rel="stylesheet" href="/packages/idenflu-mono-react/dist/styles.css">
     <style>body { margin:0; }</style>
     </head><body>${standaloneMarkup()}</body></html>`);
 }

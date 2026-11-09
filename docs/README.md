@@ -1,6 +1,6 @@
 # 문서 안내
 
-프로젝트 시작은 [저장소 README](../README.md), 패키지 설치는 [React 패키지 README](../packages/mono-react/README.md)를 확인합니다. 이 폴더는 상세 문서를 용도별로 모읍니다.
+프로젝트 시작은 [저장소 README](../README.md), 패키지 설치는 [React 패키지 README](../packages/idenflu-mono-react/README.md)를 확인합니다. 이 폴더는 상세 문서를 용도별로 모읍니다.
 
 ## 사용 가이드 · `guides/`
 
@@ -47,5 +47,5 @@
 - 패키지 `README.md`는 설치·빠른 사용 안내로 유지합니다. 패키지는 `dist/`만 배포하므로 상세 문서 링크는 GitHub 절대 주소를 사용합니다.
 - 가이드는 작업 방법, 참조는 공개 API 계약, QA는 검사 범위와 근거, 리서치는 선정 이유, 전환 기록은 이전 구현과 호환 관계를 다룹니다.
 - 같은 절차를 여러 문서에 복사하지 않고 담당 문서를 링크합니다. 파일을 옮기면 상대 링크·목차 앵커와 GitHub 절대 링크를 함께 갱신합니다.
-- 에셋 출처·라이선스는 에셋 폴더에 유지합니다. [아이콘 SOURCE.md](../packages/mono-react/assets/icons/idenflu/SOURCE.md)는 에셋과 함께 배포됩니다.
+- 에셋 출처·라이선스는 에셋 폴더에 유지합니다. [아이콘 SOURCE.md](../packages/idenflu-mono-react/assets/icons/idenflu/SOURCE.md)는 에셋과 함께 배포됩니다.
 - 문서 사이트의 실제 페이지·제목·메뉴 순서는 [routes.json](../systems/idenflu-mono/studio/routes.json)을 기준으로 합니다.

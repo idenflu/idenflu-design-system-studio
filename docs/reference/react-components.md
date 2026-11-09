@@ -1,6 +1,6 @@
 # React 컴포넌트 참조
 
-설치와 스타일 설정은 [React 패키지 README](../../packages/mono-react/README.md), 앱 적용과 HTML 마이그레이션은 [프로젝트 적용 가이드](../guides/consumer-guide.md)를 확인합니다.
+설치와 스타일 설정은 [React 패키지 README](../../packages/idenflu-mono-react/README.md), 앱 적용과 HTML 마이그레이션은 [프로젝트 적용 가이드](../guides/consumer-guide.md)를 확인합니다.
 
 ## 목차
 
@@ -33,7 +33,7 @@
 
 텍스트·배경·일반 보더는 라이트·다크 모두 중립 회색을 사용합니다. 블루는 주요 동작·링크·선택·포커스·Info에 사용합니다.
 
-아래 기본값은 `packages/mono-react/src/styles/tokens.css`에서 생성합니다. 토큰 변경 후 `npm run docs:tokens`로 갱신하며 `npm run check`가 최신 여부를 확인합니다.
+아래 기본값은 `packages/idenflu-mono-react/src/styles/tokens.css`에서 생성합니다. 토큰 변경 후 `npm run docs:tokens`로 갱신하며 `npm run check`가 최신 여부를 확인합니다.
 
 <!-- generated:token-colors:start -->
 | 토큰 | Light | Dark | 용도 |
@@ -572,7 +572,9 @@ import { Icon, Select } from '@idenflu/mono-react';
 
 `Dialog`는 `open`과 `onOpenChange`로 제어하며, 제목과 설명을 `aria-labelledby`·`aria-describedby`로 연결합니다. `closeOnBackdrop`은 배경 클릭으로 닫을지 정하며 기본값은 `false`입니다. Escape는 취소로 처리합니다. `initialFocusRef`에 내부 요소의 ref를 전달하면 모달이 열린 직후 해당 요소에 포커스를 줍니다. 생략하면 브라우저의 기본 포커스를 사용하며, 이 속성은 Drawer에서도 사용할 수 있습니다.
 
-열려 있는 동안 문서 루트와 본문의 배경 스크롤을 잠그고, 기존 스크롤바의 공간을 유지해 가로 밀림을 방지합니다. 중첩 모달은 마지막 창이 닫힐 때 해제하며 닫기·언마운트 시 기존 인라인 스크롤 스타일과 원래 스크롤 위치를 복원합니다. `Drawer`와 처리 중 다이얼로그에도 동일하게 적용하고 모달 내부 스크롤은 유지합니다.
+`modal`의 기본값은 `true`이며 배경 스크롤을 잠그고 키보드 포커스를 창 안에서 순환합니다. 모드는 창이 열릴 때 결정되며, 열려 있는 동안 바꾼 `modal` 값은 닫았다가 다시 열 때 적용합니다. `modal={false}`는 배경 조작·스크롤·Tab 이동을 허용하는 비모달 창으로 열고 `aria-modal="false"`를 제공합니다. 비모달 창도 Escape로 닫으며, 내부 선택 목록·팝업을 먼저 닫는 순서를 유지합니다. 닫힌 뒤 원하는 위치로 포커스를 돌리는 동작은 `onOpenChange`에서 연결할 수 있습니다.
+
+모달이 열려 있는 동안 문서 루트와 본문의 배경 스크롤을 잠그고, 기존 스크롤바의 공간을 유지해 가로 밀림을 방지합니다. 중첩 모달은 마지막 창이 닫힐 때 해제하며 닫기·언마운트 시 기존 인라인 스크롤 스타일과 원래 스크롤 위치를 복원합니다. `Drawer`와 처리 중 다이얼로그에도 동일하게 적용하고 모달 내부 스크롤은 유지합니다.
 
 처리 중인 작업은 `Dialog` 안에 `NovaSpinner` 또는 `Progress`를 조합합니다. 진행률을 모르면 스피너와 상태 메시지를, 알면 `value`·`max`가 있는 진행률과 처리 건수를 표시합니다. 메시지를 `role="status"`로 알릴 때 장식용 스피너는 `aria-hidden="true"`로 중복 안내를 피합니다. 문서의 처리 예시는 완료·취소·재시작을 지원하며, 취소하거나 화면을 벗어나면 타이머를 정리합니다. 실제 비동기 작업의 취소는 앱에서 연결해야 합니다.
 

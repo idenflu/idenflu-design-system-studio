@@ -4,7 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { buildStudio } from '../packages/mono-react/scripts/build-studio.mjs';
+import { buildStudio } from '../systems/idenflu-mono/studio/scripts/build-studio.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -17,7 +17,7 @@ export async function build(destination = resolve(project, 'dist')) {
   const output = resolve(destination, 'systems/idenflu-mono');
   const pkg = JSON.parse(await readFile(resolve(project, 'package.json'), 'utf8'));
   const html = await readFile(resolve(source, 'index.html'), 'utf8');
-  const reactRoot = resolve(project, 'packages/mono-react');
+  const reactRoot = resolve(project, 'packages/idenflu-mono-react');
   await execFileAsync(process.execPath, [resolve(reactRoot, 'scripts/build.mjs')], { cwd: reactRoot });
   await rm(destination, { recursive: true, force: true });
   await mkdir(output, { recursive: true });

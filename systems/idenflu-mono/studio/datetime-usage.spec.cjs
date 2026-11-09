@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { createRequire } = require('node:module');
 const path = require('node:path');
-const packageRoot = path.resolve(__dirname, '../../../packages/mono-react');
+const packageRoot = path.resolve(__dirname, '../../../packages/idenflu-mono-react');
 const requireReact = createRequire(path.join(packageRoot, 'package.json'));
 const ts = requireReact('typescript');
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { checkTokenDocumentation, renderTokenColorTable, syncTokenDocumentation } from '../scripts/sync-token-docs.mjs';
 
-const css = await readFile(new URL('../packages/mono-react/src/styles/tokens.css', import.meta.url), 'utf8');
+const css = await readFile(new URL('../packages/idenflu-mono-react/src/styles/tokens.css', import.meta.url), 'utf8');
 const markdown = await readFile(new URL('../docs/reference/react-components.md', import.meta.url), 'utf8');
 
 test('published color defaults match the authoritative light and dark CSS aliases', () => {

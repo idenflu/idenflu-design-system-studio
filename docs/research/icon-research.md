@@ -76,11 +76,11 @@ user-settings, 접근 허용은 기존 shield-check, 거부는 shield-off로 표
 
 상태 4종과 권한 6종의 원본은 [Lucide 0.468.0](https://github.com/lucide-icons/lucide/tree/0.468.0/icons)이다.
 선 두께·끝·연결을 조정하고 인물·프레임·점의 크기는 기존 시스템에 맞췄다.
-나머지는 기존 도형의 조합·반전이며 출처와 변경 내역은 자산의 [SOURCE.md](../../packages/mono-react/assets/icons/idenflu/SOURCE.md)에 기록한다.
+나머지는 기존 도형의 조합·반전이며 출처와 변경 내역은 자산의 [SOURCE.md](../../packages/idenflu-mono-react/assets/icons/idenflu/SOURCE.md)에 기록한다.
 
 ## 사용 기준
 
 - 일반 동작·보조 정보는 Outline을 기본으로 고려한다. 선택·즐겨찾기·저장 상태나 강조가 필요한 곳은 대응 Filled를 사용할 수 있다. 이는 이 스튜디오의 적용 기준이다.
 - 화살표·편집·정렬처럼 채워도 상태 구분의 이점이 적은 개념은 Outline으로 유지한다. 모든 아이콘의 Filled를 기계적으로 만들지 않는다.
 - 상태는 아이콘 형태 외에 `aria-pressed`·선택 속성·텍스트로도 전달한다. 아이콘만 있는 버튼의 이름은 버튼에 지정한다. [Lucide 접근성 안내](https://lucide.dev/how-to/accessibility)와 [MUI 접근성 안내](https://mui.com/material-ui/icons/#accessibility)를 참고했다.
-- 신규 도형은 기존의 24×24·1.5px·butt·miter 규칙에 맞춰 이 스튜디오용으로 작성했다. 외부 라이브러리를 런타임 의존성으로 추가하거나 원본 47종을 교체하지 않는다. 출처 구분은 [SOURCE.md](../../packages/mono-react/assets/icons/idenflu/SOURCE.md)에 기록한다.
+- 신규 도형은 기존의 24×24·1.5px·butt·miter 규칙에 맞춰 이 스튜디오용으로 작성했다. 외부 라이브러리를 런타임 의존성으로 추가하거나 원본 47종을 교체하지 않는다. 출처 구분은 [SOURCE.md](../../packages/idenflu-mono-react/assets/icons/idenflu/SOURCE.md)에 기록한다.

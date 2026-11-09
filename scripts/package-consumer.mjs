@@ -7,7 +7,7 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const packageRoot = join(root, 'packages/mono-react');
+const packageRoot = join(root, 'packages/idenflu-mono-react');
 const packageRequire = createRequire(join(packageRoot, 'package.json'));
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
@@ -84,7 +84,7 @@ const icon: SvgIconProps = {size: 20, label: '검색'};
 React.createElement(Select, select);
 React.createElement(Grid, grid, React.createElement(GridItem, {colSpan: 'full'}));
 React.createElement(SearchIcon, icon);
-React.createElement(Dialog, {open: false, onOpenChange: () => {}});
+React.createElement(Dialog, {open: false, modal: false, onOpenChange: () => {}});
 // @ts-expect-error Select forwards its button, not an input element.
 const invalid: React.ComponentProps<typeof Select> = {label: '오류', options: [], ref: React.createRef<HTMLInputElement>()};
 // @ts-expect-error Grid accepts only named breakpoints.

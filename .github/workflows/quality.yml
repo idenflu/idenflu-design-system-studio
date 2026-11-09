@@ -19,19 +19,15 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: packages/mono-react/package-lock.json
+          cache-dependency-path: packages/idenflu-mono-react/package-lock.json
       - run: npm ci
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run typecheck
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm test
-        working-directory: packages/mono-react
-      - run: npm run studio:build
-        working-directory: packages/mono-react
-      - run: npm run studio:check
-        working-directory: packages/mono-react
-      - run: npm run check:api
-      - run: npm run test:package
+        working-directory: packages/idenflu-mono-react
+      - run: npm run test:package-isolation
+      - run: npm run test:package -- --skip-build
   verify:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -44,14 +40,17 @@ jobs:
           cache: npm
           cache-dependency-path: |
             package-lock.json
-            packages/mono-react/package-lock.json
+            packages/idenflu-mono-react/package-lock.json
       - run: npm ci
       - run: npm ci
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run check
       - run: npm test
       - run: npm run build
-      - run: node packages/mono-react/scripts/build-studio.mjs
+      - run: node systems/idenflu-mono/studio/scripts/build-studio.mjs
+      - run: npm run studio:check
+      - run: npm run check:api
+      - run: npm run test:studio
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - uses: actions/upload-artifact@v4
@@ -61,7 +60,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
-            packages/mono-react/test-results/
+            packages/idenflu-mono-react/test-results/
             dist/
           retention-days: 14
   studio-browser:
@@ -83,12 +82,12 @@ jobs:
           cache: npm
           cache-dependency-path: |
             package-lock.json
-            packages/mono-react/package-lock.json
+            packages/idenflu-mono-react/package-lock.json
       - run: npm ci
       - run: npm ci
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run build
-      - run: node packages/mono-react/scripts/build-studio.mjs
+      - run: node systems/idenflu-mono/studio/scripts/build-studio.mjs
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test --config systems/idenflu-mono/studio/playwright.config.cjs --shard=${{ matrix.shard }}/4 --workers=2 --reporter=line,html
       - uses: actions/upload-artifact@v4
@@ -97,7 +96,7 @@ jobs:
           name: quality-studio-${{ matrix.shard }}
           path: |
             playwright-report/
-            packages/mono-react/test-results/
+            packages/idenflu-mono-react/test-results/
             systems/idenflu-mono/studio/test-results/
           retention-days: 14
   browser-engines:
@@ -112,12 +111,12 @@ jobs:
           cache: npm
           cache-dependency-path: |
             package-lock.json
-            packages/mono-react/package-lock.json
+            packages/idenflu-mono-react/package-lock.json
       - run: npm ci
       - run: npm ci
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run build
-      - run: node packages/mono-react/scripts/build-studio.mjs
+      - run: node systems/idenflu-mono/studio/scripts/build-studio.mjs
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:compat -- --workers=2
       - uses: actions/upload-artifact@v4
@@ -142,9 +141,9 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: packages/mono-react/package-lock.json
+          cache-dependency-path: packages/idenflu-mono-react/package-lock.json
       - run: npm ci
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run build
-        working-directory: packages/mono-react
+        working-directory: packages/idenflu-mono-react
       - run: npm run test:react-compat -- --react=${{ matrix.react }}

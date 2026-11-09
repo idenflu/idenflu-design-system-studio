@@ -67,7 +67,7 @@ export function checkTokenDocumentation(css, markdown) {
 }
 
 async function main() {
-  const css = await readFile(resolve(root, 'packages/mono-react/src/styles/tokens.css'), 'utf8');
+  const css = await readFile(resolve(root, 'packages/idenflu-mono-react/src/styles/tokens.css'), 'utf8');
   const path = resolve(root, 'docs/reference/react-components.md');
   const markdown = await readFile(path, 'utf8');
   if (process.argv.includes('--check')) checkTokenDocumentation(css, markdown);

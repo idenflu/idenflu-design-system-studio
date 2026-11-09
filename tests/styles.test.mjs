@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { checkPackageStyles, checkStyleTokens } from '../packages/mono-react/scripts/check-styles.mjs';
+import { checkPackageStyles, checkStyleTokens } from '../packages/idenflu-mono-react/scripts/check-styles.mjs';
 
 test('the standalone package cannot rely on document-only tokens', () => {
   const component = { file: 'button.css', text: '.button { color: var(--studio-color); }' };

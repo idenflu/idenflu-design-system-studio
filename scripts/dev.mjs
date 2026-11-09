@@ -3,7 +3,7 @@ import { resolve, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
-import { buildStudio } from '../packages/mono-react/scripts/build-studio.mjs';
+import { buildStudio } from '../systems/idenflu-mono/studio/scripts/build-studio.mjs';
 
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const execFileAsync = promisify(execFile);
@@ -35,12 +35,12 @@ export function watchStudio({ root = project, rebuild, onError = console.error, 
   }
   function close() { closed = true; clearTimeout(timer); for (const watcher of watchers) watcher.close(); }
   const inputs = [
-    ['packages/mono-react/src', true],
-    ['packages/mono-react/scripts', true],
-    ['packages/mono-react/assets', true],
+    ['packages/idenflu-mono-react/src', true],
+    ['packages/idenflu-mono-react/scripts', true],
+    ['packages/idenflu-mono-react/assets', true],
     ['systems/idenflu-mono/studio', true],
     ['systems/idenflu-mono', false, new Set(['index.html'])],
-    ['packages/mono-react', false, new Set(['package.json', 'package-lock.json'])],
+    ['packages/idenflu-mono-react', false, new Set(['package.json', 'package-lock.json'])],
     ['scripts', false, new Set(['styles.mjs'])],
   ];
   try {
@@ -67,7 +67,7 @@ export function watchStudio({ root = project, rebuild, onError = console.error, 
 }
 
 async function dev() {
-  const reactRoot = resolve(project, 'packages/mono-react');
+  const reactRoot = resolve(project, 'packages/idenflu-mono-react');
   const report = error => console.error('[dev] 문서 빌드 실패\n' + (error.stderr || error.stack || error));
   let watcher, server, watchFailed = false;
   const failWatch = error => {

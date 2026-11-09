@@ -30,4 +30,4 @@ Layout 개요의 링크는 `?layout=sidebar`의 별도 워크스페이스 샘플
 
 폼 예시의 검증·초기화·파일 선택과 데이터 상태는 로컬 동작이며 서버 저장·파일 전송·실제 예약은 앱에서 연결합니다. 워크스페이스의 프로젝트·멤버·역할 예시도 로컬 샘플 데이터로 동작합니다.
 
-React 문서 컴포넌트 회귀는 `systems/idenflu-mono/studio/*.spec.cjs`, 정식 주소·배포·리다이렉트·환경설정 회귀는 루트 `tests/*.spec.js`에서 검증합니다. 컴포넌트의 단독 사용과 정리는 `packages/mono-react/tests/`에서 검증합니다. 환경별 실행 기준은 [검사 안내](../development/testing.md)를 따릅니다.
+React 문서 컴포넌트 회귀는 `systems/idenflu-mono/studio/*.spec.cjs`, 정식 주소·배포·리다이렉트·환경설정 회귀는 루트 `tests/*.spec.js`에서 검증합니다. 컴포넌트의 단독 사용과 정리는 `packages/idenflu-mono-react/tests/`에서, 문서 경로·API·복사 예제와 업무 샘플은 `systems/idenflu-mono/studio/tests/`에서 검증합니다. 환경별 실행 기준은 [검사 안내](../development/testing.md)를 따릅니다.

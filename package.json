@@ -10,15 +10,20 @@
     "check:changelog": "node scripts/check-release-changelog.mjs",
     "docs:tokens": "node scripts/sync-token-docs.mjs",
     "check:tokens": "node scripts/sync-token-docs.mjs --check",
-    "docs:api": "node packages/mono-react/scripts/check-api-docs.mjs --write",
-    "check:api": "node packages/mono-react/scripts/check-api-docs.mjs",
+    "docs:api": "node systems/idenflu-mono/studio/scripts/check-api-docs.mjs --write",
+    "check:api": "node systems/idenflu-mono/studio/scripts/check-api-docs.mjs",
     "test": "node --test tests/tooling.test.mjs tests/preferences.test.mjs tests/dev.test.mjs tests/release-changelog.test.mjs tests/token-docs.test.mjs tests/styles.test.mjs",
     "test:browser": "playwright test",
     "test:compat": "playwright test --config playwright.compat.config.cjs",
     "test:visual": "playwright test --config playwright.visual.config.cjs",
     "test:react-compat": "node scripts/test-react-compat.mjs",
     "test:package": "node scripts/test-package.mjs",
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "studio:build": "npm --prefix packages/idenflu-mono-react run build && node systems/idenflu-mono/studio/scripts/build-studio.mjs",
+    "studio:check": "node systems/idenflu-mono/studio/scripts/typecheck.mjs",
+    "test:studio": "node --test systems/idenflu-mono/studio/tests/*.test.mjs",
+    "example:build": "npm --prefix packages/idenflu-mono-react run build && node systems/idenflu-mono/studio/scripts/build-examples.mjs",
+    "test:package-isolation": "node scripts/test-package-isolation.mjs"
   },
   "engines": {
     "node": ">=20"
