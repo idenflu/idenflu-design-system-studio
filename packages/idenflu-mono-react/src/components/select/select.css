@@ -3,6 +3,8 @@
 .select-input:hover:not(:disabled):not(:focus):not([aria-invalid="true"]) { border-color: var(--border-control-hover); }
 .select-input:focus { outline: none; border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .select-input:disabled { background-color: var(--surface); color: var(--disabled-text); cursor: not-allowed; }
+.select-input[aria-invalid="true"] { border-color:var(--danger); box-shadow:none; }
+.select-input[aria-invalid="true"]:focus { border-color:transparent; box-shadow:inset 0 0 0 2px var(--focus-on-danger); }
 .custom-select { position: relative; min-width: 0; }
 .select-trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; height: var(--control-height); padding: 0 var(--control-px); border: 1px solid var(--border-control); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); font: inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); text-align: left; }
 .select-trigger > [data-select-label] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -51,6 +53,9 @@
 .search-select-control:focus-within::after, .search-select.is-open > .search-select-control::after { content:""; position:absolute; inset:-1px; z-index:var(--z-focus); box-shadow:inset 0 0 0 2px var(--focus-on-light); pointer-events:none; }
 .search-select-input { display:block; flex:1 1 auto; min-width:0; width:100%; height:100%; margin:0; padding:0 var(--control-px); border:0; border-radius:var(--radius-control); outline:none; background:transparent; color:var(--text); font:inherit; font-size:var(--font-size-body); line-height:var(--line-height-control); }
 .search-select-input::placeholder { color:var(--text-muted); opacity:1; }
+.search-select-control:has(.search-select-input:disabled), .multi-inline-control:has(.multi-inline-trigger:disabled) { background:var(--surface); cursor:not-allowed; }
+.search-select-input:disabled { color:var(--disabled-text); cursor:not-allowed; }
+.multi-inline-control:has(.multi-inline-trigger:disabled) :is(.multi-inline-placeholder,.multi-inline-chip,.multi-inline-more) { color:var(--disabled-text); }
 .search-select .search-select-clear, .search-select .search-select-toggle { flex:0 0 calc(var(--control-height) - 2px); }
 .search-select.is-open .search-select-toggle .icon-caret { transform:rotate(180deg); }
 .search-select > .select-popup { top:calc(var(--control-height) + 6px); }

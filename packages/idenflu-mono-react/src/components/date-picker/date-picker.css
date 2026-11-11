@@ -5,6 +5,8 @@
 .date-picker { position:relative; }
 .date-field { border-radius:var(--radius-control); position:relative; display:flex; align-items:center; height:var(--control-height); border:1px solid var(--border-control); background:var(--field-background); }
 .date-field.has-error { border-color:var(--danger); }
+.date-field:has(input:disabled), .date-range-fields:has(input:disabled), .date-field:has(input[readonly]), .date-range-fields:has(input[readonly]) { background:var(--surface); }
+.date-field input:disabled, .date-range-fields input:disabled { color:var(--disabled-text); cursor:not-allowed; }
 .date-text { display:block; min-width:0; width:100%; height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--border-control); background:var(--field-background); color:var(--text); font:inherit; line-height:var(--line-height-control); font-variant-numeric:tabular-nums; }
 .date-text::placeholder { color:var(--text-muted); opacity:1; }
 .date-text:focus { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
@@ -34,7 +36,8 @@
 .calendar-weekdays, .calendar-row { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
 .calendar-weekdays { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-heading); text-align:center; }
 .calendar-day { width:100%; height:var(--control-height); border:0; background:var(--field-background); color:var(--text); font:inherit; line-height:var(--line-height-control); }
-.calendar-day:hover { background:var(--surface); }
+.calendar-day:hover:not(:disabled) { background:var(--surface); }
+.calendar-day:disabled { color:var(--disabled-text); cursor:not-allowed; }
 .calendar-day.is-in-range, .calendar-day.is-preview-range { background:var(--info-surface); color:var(--text); }
 .calendar-day[aria-pressed="true"] { background:var(--primary-control); color:var(--text-on-primary); }
 .calendar-day.is-today:not([aria-pressed="true"]) { box-shadow:inset 0 0 0 1px var(--border-control); }

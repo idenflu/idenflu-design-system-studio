@@ -5,4 +5,4 @@
 .popover-content p { margin-top:calc(var(--space-unit) * 1.5); color:var(--text-secondary); }
 .popover-choice { display:flex; align-items:center; gap:var(--space-2); margin-top:calc(var(--space-unit) * 3.5); }
 .popover-choice input { accent-color:var(--primary); width:16px; height:16px; }
-.popover-content .button { margin-top:calc(var(--space-unit) * 4.5); }
+.popover-content > .button { margin-top:calc(var(--space-unit) * 4.5); }

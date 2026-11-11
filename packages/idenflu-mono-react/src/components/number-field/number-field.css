@@ -32,3 +32,7 @@
 .number-field-step:last-child { border-end-end-radius:var(--radius-control); }
 .number-field--horizontal .number-field-step:first-child { border-start-end-radius:0; }
 .number-field--horizontal .number-field-step:last-child { border-start-end-radius:var(--radius-control); }
+.number-field-meta { display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--space-1) var(--space-3); margin:calc(var(--space-unit) * 1.5) 0 0; }
+.number-field-feedback { margin:calc(var(--space-unit) * 1.5) 0 0; }
+.number-field-feedback.is-error, .number-field-feedback[data-state="error"] { color:var(--danger-text); }
+.number-field-feedback:empty { display:none; }

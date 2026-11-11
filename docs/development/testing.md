@@ -29,6 +29,8 @@ npm run test:react-compat -- --react=19.2.0
 
 `npm run test:package-isolation`은 `systems/`와 `docs/`가 없는 임시 폴더에 패키지 소스를 복사해 `npm test`를 실행합니다. 이미 설치한 개발 도구는 `node_modules` 심볼릭 링크로 재사용하며 새로 설치하지 않습니다. 문서 파일을 읽는 역방향 의존이 생기면 이 검사가 실패합니다. 실제 배포물 설치 검증은 아래 `test:package`에서 별도로 수행합니다.
 
+`tests/css-isolation.spec.js`와 `tests/package-style-contracts.spec.js`는 문서 CSS와 선택적 `reset.css` 없이 공개 패키지 CSS만 불러옵니다. 외부 앱의 글꼴·기본 여백이 있는 환경에서 컴포넌트별 글꼴·크기, 도움말·오류·비활성 상태, Dialog·Drawer 영역, 팝업 안의 컨트롤과 Spinner 크기를 라이트·다크·모바일에서 검사합니다. 패키지 스타일 토큰 검사도 `reset.css`의 선언에 의존할 수 없도록 분리합니다.
+
 정적 검사, 라이브러리·문서 검사와 라이트·다크·320px 브라우저 회귀를 각각 실행합니다.
 
 `npm run test:package`는 패키지를 빌드하고 실제 `npm pack` 결과를 저장소 밖 임시 프로젝트에 설치합니다. 공개 ESM·CJS와 아이콘 import, TypeScript의 ESM·CJS 선언, CSS·폰트·SVG 번들, SSR·hydration을 검사합니다. 런타임 의존성은 npm으로 설치하며 워크스페이스 소스를 복사하거나 alias로 연결하지 않습니다. 임시 프로젝트는 종료 후 제거합니다. 이미 빌드했다면 `npm run test:package -- --skip-build`로 실행합니다. 최초 설치에는 npm 레지스트리 접근이 필요합니다.

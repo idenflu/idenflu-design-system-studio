@@ -6,6 +6,20 @@
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-7); }
 .dialog-actions .button { min-width: 84px; }
 .dialog-close { position: absolute; top: 12px; right: 12px; }
+/* Section components also work in default Dialog and Drawer without Studio styles. */
+.dialog:not(.dialog--divided) > .dialog-header { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-4); }
+.dialog:not(.dialog--divided) > .dialog-header > div { min-width:0; }
+.dialog:not(.dialog--divided) > .dialog-header h2 { padding-right:0; }
+.dialog:not(.dialog--divided) > .dialog-header p { margin-top:var(--space-1); color:var(--text-secondary); }
+.dialog:not(.dialog--divided) > .dialog-body { min-width:0; overflow-wrap:anywhere; }
+.dialog:not(.dialog--divided) > .dialog-body:not(:first-child) { margin-top:var(--space-2); }
+.dialog:not(.dialog--divided) > .dialog-body:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }
+.dialog:not(.dialog--divided) > .dialog-body > p { color:var(--text-secondary); }
+.dialog:not(.dialog--divided) > .dialog-body > p + p { margin-top:var(--space-3); }
+.dialog:not(.dialog--divided) > .dialog-body > form:first-child { margin-top:0; }
+.dialog:not(.dialog--divided) > .dialog-footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:var(--space-2); margin-top:var(--space-7); }
+.dialog:not(.dialog--divided) > .dialog-footer > .button { width:auto; max-width:100%; }
+.dialog:not(.dialog--divided) > .dialog-footer > .button:not(.button--icon) { min-width:min(84px, 100%); }
 .dialog.dialog--divided { --dialog-section-padding: var(--space-6); max-height: calc(100dvh - 48px); padding: 0; overflow: hidden; }
 .dialog--divided[open] { display: flex; flex-direction: column; }
 .dialog--divided > .dialog-header { display: flex; flex: 0 0 auto; align-items: flex-start; justify-content: space-between; gap: var(--space-4); padding: var(--space-5) var(--dialog-section-padding); border-bottom: 1px solid var(--divider); }

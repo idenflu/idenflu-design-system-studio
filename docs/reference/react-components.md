@@ -580,12 +580,16 @@ import { Icon, Select } from '@idenflu/mono-react';
 
 버튼 없는 처리형은 취소·닫기 버튼을 생략하고 `onOpenChange`의 닫기 요청을 무시해 Escape·배경 클릭으로 닫히지 않게 합니다. 작업이 완료되면 앱에서 `open`을 `false`로 바꿔 자동으로 닫으며 완료 안내와 실행 버튼 포커스를 복원합니다. 문서의 React 예시는 `<ProcessingDialogExample blocking />`으로 이 유형을 재현합니다.
 
-`variant="divided"`는 `DialogHeader`·`DialogBody`·`DialogFooter` 사이에 구분선을 표시합니다. 세 영역을 `Dialog`의 직접 자식으로 배치하면 긴 내용은 본문에서만 스크롤되고 헤더와 하단 버튼은 유지됩니다. `DialogBody`는 키보드 스크롤을 위해 기본 `tabIndex={0}`을 제공하며 필요한 경우 재정의할 수 있습니다. 하단에서 본문의 폼을 제출할 때는 버튼의 `form` 속성을 본문 폼의 `id`에 연결합니다.
+기본형과 `variant="divided"` 모두 `DialogHeader`·`DialogBody`·`DialogFooter`를 `Dialog`의 직접 자식으로 사용합니다. `@idenflu/mono-react/styles.css`에 본문 간격·하단 버튼의 간격과 우측 정렬이 포함되므로 문서용 CSS나 `reset.css`는 필요하지 않습니다. 기본형은 구분선 없이 창 전체가 스크롤되고, 구분선형은 영역 사이에 구분선을 표시하며 본문만 스크롤됩니다. 기존의 직접 작성한 제목·본문과 `dialog-actions` 구조도 사용할 수 있습니다.
+
+`DialogBody`는 키보드 스크롤을 위해 기본 `tabIndex={0}`을 제공합니다. `tabIndex={-1}`로 Tab 순서에서 제외할 수 있으며, 처음 포커스를 받을 버튼이나 입력은 `initialFocusRef`로 지정합니다. 하단에서 본문의 폼을 제출할 때는 버튼의 `form` 속성을 본문 폼의 `id`에 연결합니다.
 
 ```tsx
 import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
 
-<Dialog variant="divided" open={open} onOpenChange={setOpen}
+// 구분선형은 variant="divided"를 추가합니다.
+<Dialog open={open} onOpenChange={setOpen}
         aria-labelledby="project-title">
   <DialogHeader><h2 id="project-title">프로젝트 안내</h2></DialogHeader>
   <DialogBody><p>프로젝트의 공유 범위를 확인해주세요.</p></DialogBody>
@@ -596,7 +600,7 @@ import { Dialog, DialogHeader, DialogBody, DialogFooter, Button } from '@idenflu
 </Dialog>
 ```
 
-`Drawer`는 `Dialog`의 모달 동작과 속성을 공유하며 배경 클릭 닫기의 기본값은 `true`입니다. 기존 기본형은 본문 전체를 스크롤합니다. 고정된 헤더·하단이 필요하면 `variant="divided"`와 `DrawerHeader`·`DrawerBody`·`DrawerFooter`를 직접 자식으로 배치합니다. 본문의 기본 `tabIndex`는 `0`이며 각 구성 요소는 HTML 속성과 ref를 전달합니다. 기존 `DialogHeader`·`DialogBody`·`DialogFooter`도 함께 사용할 수 있습니다.
+`Drawer`는 `Dialog`의 모달 동작과 속성을 공유하며 배경 클릭 닫기의 기본값은 `true`입니다. 기본형도 `DrawerHeader`·`DrawerBody`·`DrawerFooter`를 직접 자식으로 사용하며 창 전체를 스크롤합니다. 고정된 헤더·하단이 필요하면 같은 구조에 `variant="divided"`를 추가합니다. 본문의 기본 `tabIndex`는 `0`이며 각 구성 요소는 HTML 속성과 ref를 전달합니다. 기존 `DialogHeader`·`DialogBody`·`DialogFooter`도 함께 사용할 수 있습니다.
 
 | Drawer 속성 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |

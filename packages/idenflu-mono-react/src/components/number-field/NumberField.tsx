@@ -138,7 +138,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         <button type="button" className="number-field-step" aria-label={`${typeof label === 'string' ? label : '값'} 감소`} aria-controls={inputId} disabled={disabled || readOnly || (parsed.value != null && minParsed.value != null && parsed.value <= minParsed.value)} onMouseDown={e => e.preventDefault()} onClick={() => adjust(-1)}><span className="ui-icon icon-caret" aria-hidden="true" /></button>
       </div>
     </div>
-    {helperText != null && <p className="number-field-meta" id={`${inputId}-help`}>{helperText}</p>}
-    <p className="number-field-feedback is-error" id={`${inputId}-error`} role="status" hidden={!error}>{error}</p>
+    {helperText != null && <p className="component-helper number-field-meta" id={`${inputId}-help`}>{helperText}</p>}
+    <p className="field-error number-field-feedback is-error" id={`${inputId}-error`} role="status" hidden={!error}>{error}</p>
   </div>;
 });

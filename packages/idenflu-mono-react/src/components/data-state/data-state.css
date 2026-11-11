@@ -1,4 +1,5 @@
-[data-data-state] { display: grid; gap: var(--space-4); min-width: 0; }
+.data-state, [data-data-state] { display: grid; gap: var(--space-4); min-width: 0; }
+.data-state > .button { justify-self:start; }
 [data-data-status] { margin: 0; color: var(--text-secondary); font-size: var(--font-size-caption); line-height: var(--line-height-caption); }
 [data-data-status]:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
 [data-data-loading] { color: var(--text-secondary); }

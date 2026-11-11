@@ -185,7 +185,7 @@ export function OverlayExample() {
   const [notice, setNotice] = useState(false);
   return <>
     <Button onClick={() => setOpen(true)}>안내 열기</Button>
-    <Dialog variant="divided" open={open} onOpenChange={setOpen} closeOnBackdrop
+    <Dialog open={open} onOpenChange={setOpen} closeOnBackdrop
             aria-labelledby="notice-title" aria-describedby="notice-description">
       <DialogHeader><h2 id="notice-title">공유 범위 안내</h2></DialogHeader>
       <DialogBody>

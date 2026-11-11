@@ -49,8 +49,8 @@ export async function checkPackageStyles({ root = packageRoot, assets = assetRoo
   for (const path of actual) if (!expected.has(path)) throw new Error(`CSS source missing from bundle inputs: ${path}`);
   for (const path of expected) if (!actual.has(path)) throw new Error(`Missing CSS source: ${path}`);
   const sheets = await Promise.all([...expected].map(async path => ({ file: resolve(root, path), text: await readFile(resolve(root, path), 'utf8') })));
-  // Validate without Studio CSS: document-only variables must never mask package dependencies.
-  checkStyleTokens(sheets);
+  // Neither Studio nor the optional document reset may supply default package tokens.
+  checkStyleTokens(sheets.filter(sheet => sheet.file !== resolve(root, 'src/styles/reset.css')));
   await checkStyleAssets(sheets, assets);
   return sheets;
 }

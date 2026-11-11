@@ -62,3 +62,54 @@ test('document reset is an explicit opt-in for applications adopting the whole s
   await expect(page.locator('#host a')).toHaveCSS('text-decoration-line', 'none');
   await expect(page.locator('#host h1')).toHaveCSS('margin-top', '0px');
 });
+
+for (const variant of ['default', 'divided']) {
+  test(`${variant} dialog sections keep spacing and aligned actions with only package CSS`, {tag:['@theme','@mobile']}, async ({ page }, testInfo) => {
+    const { Dialog, DialogHeader, DialogBody, DialogFooter, Button } = require('../packages/idenflu-mono-react/dist/index.cjs');
+    await setup(page);
+    const before = await hostMetrics(page);
+    const markup = renderToStaticMarkup(React.createElement(Dialog, {
+      open: false, onOpenChange() {}, variant,
+      'aria-labelledby': 'package-dialog-title', 'aria-describedby': 'package-dialog-description',
+    },
+    React.createElement(DialogHeader, null, React.createElement('h2', {id:'package-dialog-title'}, '스케줄 관리 닫기')),
+    React.createElement(DialogBody, null, React.createElement('p', {id:'package-dialog-description'}, '저장하지 않은 작업 내용이 사라질 수 있습니다.')),
+    React.createElement(DialogFooter, null,
+      React.createElement(Button, {variant:'ghost'}, '취소'),
+      React.createElement(Button, {variant:'danger'}, '탭 닫기'),
+    )));
+    await page.locator('#components').evaluate((element, html) => { element.innerHTML = html; }, markup);
+    await page.addStyleTag({url:'/packages/idenflu-mono-react/dist/styles.css'});
+    await page.locator('html').evaluate((element, theme) => { element.dataset.theme = theme; }, testInfo.project.use.colorScheme);
+    expect(await hostMetrics(page)).toEqual(before);
+    await page.locator('dialog').evaluate(element => element.showModal());
+    const dialog = page.getByRole('dialog', {name:'스케줄 관리 닫기'});
+    const footer = dialog.locator('.dialog-footer');
+    await expect(footer).toHaveCSS('display', 'flex');
+    await expect(footer).toHaveCSS('justify-content', 'flex-end');
+    const geometry = await dialog.evaluate(element => {
+      const header = element.querySelector('.dialog-header').getBoundingClientRect();
+      const text = element.querySelector('.dialog-body p').getBoundingClientRect();
+      const footer = element.querySelector('.dialog-footer');
+      const buttons = [...footer.querySelectorAll('button')].map(button => button.getBoundingClientRect());
+      const style = getComputedStyle(footer), bounds = footer.getBoundingClientRect();
+      return {
+        descriptionGap: text.top - header.bottom,
+        actionsGap: buttons[0].top - text.bottom,
+        buttonGap: buttons[1].left - buttons[0].right,
+        alignedRight: bounds.right - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth) - buttons[1].right,
+        headerBorder: getComputedStyle(element.querySelector('.dialog-header')).borderBottomWidth,
+        footerBorder: style.borderTopWidth,
+        overflows: element.scrollWidth > element.clientWidth,
+      };
+    });
+    expect(geometry.descriptionGap).toBeGreaterThanOrEqual(8);
+    expect(geometry.actionsGap).toBeGreaterThanOrEqual(16);
+    expect(geometry.buttonGap).toBeGreaterThanOrEqual(8);
+    expect(Math.abs(geometry.alignedRight)).toBeLessThan(1);
+    expect(geometry.headerBorder).toBe(variant === 'divided' ? '1px' : '0px');
+    expect(geometry.footerBorder).toBe(variant === 'divided' ? '1px' : '0px');
+    expect(geometry.overflows).toBe(false);
+    await expect(footer.getByRole('button', {name:'탭 닫기'})).toBeInViewport();
+  });
+}

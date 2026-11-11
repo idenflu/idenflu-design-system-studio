@@ -97,6 +97,7 @@ export function OverlayDemos() {
   const infoConfirm = React.useRef<HTMLButtonElement>(null);
   const deleteCancel = React.useRef<HTMLButtonElement>(null);
   const formTrigger = React.useRef<HTMLButtonElement>(null);
+  const projectFormId = React.useId();
   const deleteReset = React.useRef<HTMLButtonElement>(null);
   const toastOrigin = React.useRef<HTMLButtonElement | null>(null);
   const restoreToastFocus = React.useRef(false);
@@ -122,18 +123,22 @@ export function OverlayDemos() {
       <p role="status" className="component-helper">{feedback}</p>
       <Dialog open={dialog === 'info'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-info-dialog-title" aria-describedby="studio-info-dialog-description">
         <button className="icon-button dialog-close" type="button" aria-label="안내 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
-        <h2 id="studio-info-dialog-title">공유 범위 안내</h2><p id="studio-info-dialog-description">초대한 팀원만 프로젝트를 볼 수 있습니다. 공유 범위는 프로젝트 설정에서 변경할 수 있습니다.</p>
-        <div className="dialog-actions"><Button ref={infoConfirm} onClick={() => setDialog(null)}>확인</Button></div>
+        <DialogHeader><h2 id="studio-info-dialog-title">공유 범위 안내</h2></DialogHeader>
+        <DialogBody tabIndex={-1}><p id="studio-info-dialog-description">초대한 팀원만 프로젝트를 볼 수 있습니다. 공유 범위는 프로젝트 설정에서 변경할 수 있습니다.</p></DialogBody>
+        <DialogFooter><Button ref={infoConfirm} onClick={() => setDialog(null)}>확인</Button></DialogFooter>
       </Dialog>
       <Dialog open={dialog === 'delete'} onOpenChange={closeDialog} aria-labelledby="studio-delete-dialog-title" aria-describedby="studio-delete-dialog-description">
-        <h2 id="studio-delete-dialog-title">프로젝트를 삭제할까요?</h2><p id="studio-delete-dialog-description">샘플 프로젝트를 목록에서 삭제합니다. 이 예시에서는 삭제 후 다시 추가할 수 있습니다.</p>
-        <div className="react-studio-dialog-detail"><strong>샘플 프로젝트</strong><span className="react-studio-caption">디자인 팀 · 문서 3개</span></div>
-        <div className="dialog-actions"><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button variant="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></div>
+        <DialogHeader><h2 id="studio-delete-dialog-title">프로젝트를 삭제할까요?</h2></DialogHeader>
+        <DialogBody tabIndex={-1}><p id="studio-delete-dialog-description">샘플 프로젝트를 목록에서 삭제합니다. 이 예시에서는 삭제 후 다시 추가할 수 있습니다.</p>
+          <div className="react-studio-dialog-detail"><strong>샘플 프로젝트</strong><span className="react-studio-caption">디자인 팀 · 문서 3개</span></div>
+        </DialogBody>
+        <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button variant="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></DialogFooter>
       </Dialog>
       <Dialog open={dialog === 'form'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-project-dialog-title" aria-describedby="studio-project-dialog-description">
         <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
-        <h2 id="studio-project-dialog-title">새 프로젝트</h2><p id="studio-project-dialog-description">함께 시작할 프로젝트의 이름을 정해주세요.</p>
-        <form noValidate onSubmit={event => {
+        <DialogHeader><h2 id="studio-project-dialog-title">새 프로젝트</h2></DialogHeader>
+        <DialogBody tabIndex={-1}><p id="studio-project-dialog-description">함께 시작할 프로젝트의 이름을 정해주세요.</p>
+        <form id={projectFormId} noValidate onSubmit={event => {
           event.preventDefault();
           const value = name.trim();
           if (!value) { setError('프로젝트 이름을 입력해주세요.'); nameRef.current?.focus(); return; }
@@ -143,8 +148,9 @@ export function OverlayDemos() {
           setDialog(null);
         }}>
           <TextField ref={nameRef} label="프로젝트 이름" name="project" value={name} onChange={event => { setName(event.target.value); setError(''); }} placeholder="예: 앱 리디자인" maxLength={40} required error={error || undefined} />
-          <div className="dialog-actions"><Button variant="outline" onClick={() => setDialog(null)}>취소</Button><Button type="submit">만들기</Button></div>
         </form>
+        </DialogBody>
+        <DialogFooter><Button variant="outline" onClick={() => setDialog(null)}>취소</Button><Button type="submit" form={projectFormId}>만들기</Button></DialogFooter>
       </Dialog>
       <p className="react-studio-caption">다이얼로그 안에서는 Tab으로 이동하고 Escape로 취소할 수 있습니다. 취소하면 실행 버튼으로 돌아갑니다.</p>
     </Section>

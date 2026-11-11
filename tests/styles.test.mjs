@@ -35,5 +35,8 @@ test('unlisted component CSS and missing published assets fail before packaging'
     await mkdir(join(folder, 'assets'));
     await writeFile(join(folder, 'assets/missing.svg'), '<svg/>');
     assert.equal((await check()).length, 3);
+    await writeFile(join(styles, 'reset.css'), ':root { --document-only: blue; }');
+    await writeFile(join(component, 'button.css'), '.button { color: var(--document-only); }');
+    await assert.rejects(check(), /Undefined token.*--document-only/);
   } finally { await rm(folder, { recursive: true, force: true }); }
 });
