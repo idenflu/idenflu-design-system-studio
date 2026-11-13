@@ -170,7 +170,7 @@ export function ConveyorRegistrationPage({active=true,existingCodes,onCreate,onC
     <Dialog open={active&&cancelOpen} onOpenChange={setCancelOpen} variant="divided" aria-labelledby={`${id}-cancel-title`}>
       <DialogHeader><h2 id={`${id}-cancel-title`}>등록을 취소할까요?</h2><Button variant="ghost" iconOnly aria-label="확인 창 닫기" onClick={()=>setCancelOpen(false)}><Icon name="close"/></Button></DialogHeader>
       <DialogBody><p>입력한 기본정보와 유닛 구성이 저장되지 않습니다. 계속 작성하거나 등록을 취소할 수 있습니다.</p></DialogBody>
-      <DialogFooter><Button variant="outline" onClick={()=>setCancelOpen(false)}>계속 작성</Button><Button variant="danger" appearance="outline" onClick={()=>{setCancelOpen(false);onCancel();}}>등록 취소</Button></DialogFooter>
+      <DialogFooter><Button variant="outline" onClick={()=>setCancelOpen(false)}>계속 작성</Button><Button variant="outline" color="danger" onClick={()=>{setCancelOpen(false);onCancel();}}>등록 취소</Button></DialogFooter>
     </Dialog>
   </>;
 }

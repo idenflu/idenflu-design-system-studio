@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useClientLayoutEffect } from '../../shared/use-client-layout-effect';
 
 /** Tooltip content is exposed as the trigger's accessible description. */
-export function Tooltip({ content, children }: { content: React.ReactNode; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
+export function Tooltip({ content, children, position: placement = 'top' }: { content: React.ReactNode; position?: 'top' | 'bottom' | 'left' | 'right'; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
   const id = React.useId();
   const [dismissed, setDismissed] = React.useState(false);
   const wrap = React.useRef<HTMLSpanElement>(null);
@@ -36,7 +36,7 @@ export function Tooltip({ content, children }: { content: React.ReactNode; child
     return () => document.removeEventListener('keydown', escape, true);
   }, [dismissed]);
   const existing = children.props['aria-describedby'];
-  return <span ref={wrap} className={`tooltip-wrap${dismissed ? ' tooltip-dismissed' : ''}`}
+  return <span ref={wrap} data-position={placement} className={`tooltip-wrap${dismissed ? ' tooltip-dismissed' : ''}`}
     onMouseEnter={() => { position(); setDismissed(false); }}
     onFocus={event => { position(); if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}
     onClickCapture={() => setDismissed(true)}>

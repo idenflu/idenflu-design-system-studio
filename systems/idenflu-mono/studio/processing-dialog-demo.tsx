@@ -75,7 +75,7 @@ export function ProcessingDialogDemo() {
           <Progress value={processed} max={total} variant={complete ? 'success' : 'primary'} aria-label="프로젝트 처리 진행률" aria-valuetext={`${total}개 중 ${processed}개 처리`} />
         </div>}
       </div>
-      {!blocking && <div className="dialog-actions"><Button ref={action} variant={complete ? 'primary' : 'outline'} onClick={close}>{complete ? '확인' : '작업 취소'}</Button></div>}
+      {!blocking && <div className="dialog-actions"><Button ref={action} variant={complete ? 'default' : 'outline'} onClick={close}>{complete ? '확인' : '작업 취소'}</Button></div>}
     </Dialog>
     <p className="react-studio-caption">스피너형·진행률형은 작업 취소 버튼이나 Escape로 취소합니다. 버튼 없는 처리형은 Escape·배경 클릭으로 닫히지 않으며, 완료 후 자동으로 닫히고 실행 버튼으로 돌아갑니다.</p>
   </Section>;

@@ -1,6 +1,6 @@
 'use client';
 
-export * from './components/button/Button';
+export * from './components/button';
 export * from './components/text-field/TextField';
 export * from './components/text-area/TextArea';
 export * from './components/select/NativeSelect';

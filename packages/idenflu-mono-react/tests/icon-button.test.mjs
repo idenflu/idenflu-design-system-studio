@@ -86,7 +86,7 @@ test('IconButton shares Button variants, sizes and explicit native button types'
   const f = fixture();
   try {
     for (const size of ['sm', 'md', 'lg']) {
-      await f.render(h(IconButton, { label: '저장', variant: 'primary', size, type: 'submit', tooltip: false }, icon()));
+      await f.render(h(IconButton, { label: '저장', variant: 'default', color: 'primary', size, type: 'submit', tooltip: false }, icon()));
       const button = f.container.querySelector('button');
       assert.equal(button.type, 'submit');
       assert.equal(button.getAttribute('data-size'), size);

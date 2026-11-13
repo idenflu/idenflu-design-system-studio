@@ -452,13 +452,13 @@ export function DataGrid<T>({
       </div>
     </div>,
     columnFilters: showColumnFilterToggle && anyFilters && <Tooltip content={filtersEnabled ? '컬럼 필터 끄기' : '컬럼 필터 켜기'}>
-      <Button variant={filtersEnabled ? 'primary' : 'outline'} iconOnly aria-label="컬럼 필터" aria-pressed={filtersEnabled} aria-controls={filterRowVisible ? `${id}-filters` : undefined} disabled={blocked} onClick={() => {
+      <Button variant={filtersEnabled ? 'default' : 'outline'} iconOnly aria-label="컬럼 필터" aria-pressed={filtersEnabled} aria-controls={filterRowVisible ? `${id}-filters` : undefined} disabled={blocked} onClick={() => {
         setColumnFiltersEnabled(!filtersEnabled);
         if (filtersEnabled) { setFilters({}); resetPageFor(query, sorting, {}); }
       }}><Icon name="filter" /></Button>
     </Tooltip>,
     density: showDensityToggle && (controlledDensity === undefined || !!onDensityChange) && <Tooltip content={density === 'compact' ? '기본 행 간격으로 전환' : '촘촘한 행 간격으로 전환'}>
-      <Button variant={density === 'compact' ? 'primary' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
+      <Button variant={density === 'compact' ? 'default' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
         <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
       </Button>
     </Tooltip>,

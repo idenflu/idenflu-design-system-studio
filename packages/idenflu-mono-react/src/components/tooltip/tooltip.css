@@ -4,3 +4,10 @@
 .tooltip-wrap:has(:is(.icon-button, .button--icon)) .tooltip-content { left:auto; right:0; }
 .tooltip-wrap:hover .tooltip-content, .tooltip-wrap:focus-within .tooltip-content { opacity:1; visibility:visible; }
 .tooltip-wrap.tooltip-dismissed .tooltip-content { opacity:0; visibility:hidden; }
+
+.tooltip-wrap.tooltip-wrap[data-position="bottom"] .tooltip-content { top:calc(100% + var(--space-2)); bottom:auto; }
+.tooltip-wrap.tooltip-wrap[data-position="left"] .tooltip-content { right:calc(100% + var(--space-2)); left:auto; top:50%; bottom:auto; translate:0 -50%; }
+.tooltip-wrap.tooltip-wrap[data-position="right"] .tooltip-content { left:calc(100% + var(--space-2)); right:auto; top:50%; bottom:auto; translate:0 -50%; }
+.tooltip-wrap.tooltip-wrap[data-position="bottom"] .tooltip-content::after { inset:auto 0 100%; }
+.tooltip-wrap.tooltip-wrap[data-position="left"] .tooltip-content::after { inset:0 auto 0 100%; width:var(--space-2); height:auto; }
+.tooltip-wrap.tooltip-wrap[data-position="right"] .tooltip-content::after { inset:0 100% 0 auto; width:var(--space-2); height:auto; }

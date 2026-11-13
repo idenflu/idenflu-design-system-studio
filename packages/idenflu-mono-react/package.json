@@ -70,6 +70,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
-    "@tanstack/react-virtual": "3.14.25"
+    "@tanstack/react-virtual": "3.14.25",
+    "class-variance-authority": "^0.7.1"
   }
 }

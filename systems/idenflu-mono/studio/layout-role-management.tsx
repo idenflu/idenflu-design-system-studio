@@ -136,7 +136,7 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
           <header className="layout-role-header">
             <Avatar variant="neutral"><Icon name="shield-check"/></Avatar>
             <div><div className="layout-role-title"><h2>{selected.name}</h2><Badge variant="warning" style={{visibility:dirty?'visible':'hidden'}} aria-hidden={!dirty}>변경 중</Badge></div><p>{selected.description||'역할 설명이 없습니다.'}</p><span className="layout-role-members"><Icon name="users"/>이 역할을 사용하는 멤버 {memberCount(selected)}명</span></div>
-            <div className="layout-role-header-actions"><Button variant="outline" size="sm" onClick={()=>openEditor(selected)}><Icon name="edit"/>역할 수정</Button><Button variant="danger" appearance="outline" size="sm" className="layout-role-delete" onClick={()=>{setReplacementId('');setDeleteId(selected.id);}}><Icon name="trash"/>역할 삭제</Button></div>
+            <div className="layout-role-header-actions"><Button variant="outline" size="sm" onClick={()=>openEditor(selected)}><Icon name="edit"/>역할 수정</Button><Button variant="outline" color="danger" size="sm" className="layout-role-delete" onClick={()=>{setReplacementId('');setDeleteId(selected.id);}}><Icon name="trash"/>역할 삭제</Button></div>
           </header>
           <Tabs className="layout-role-tabs" label="역할 연결 정보" items={[
             {value:'permissions',label:`권한 ${draft.permissions.length}`,content:<>
@@ -190,7 +190,7 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
     <Dialog open={deleteId!==null} onOpenChange={open=>{if(!open)setDeleteId(null);}} variant="divided" className="layout-role-dialog" aria-labelledby={`${dialogId}-delete-title`} aria-describedby={`${dialogId}-delete-description`}>
       <DialogHeader><h2 id={`${dialogId}-delete-title`}>역할 삭제</h2><Button variant="ghost" size="sm" aria-label="닫기" onClick={()=>setDeleteId(null)}><Icon name="close"/></Button></DialogHeader>
       <DialogBody><div className="layout-role-form"><p id={`${dialogId}-delete-description`}><strong>{deleting?.name}</strong> 역할을 삭제할까요? 연결된 권한과 알림 설정도 함께 삭제됩니다.</p>{deletingMemberCount>0?<>{replacements.length?<Select label="대체 역할" value={replacementId} onValueChange={setReplacementId} options={replacements.map(role=>({value:role.id,label:role.name}))} placeholder="대체 역할 선택" required popupStrategy="fixed" helperText={`이 역할을 사용하는 멤버 ${deletingMemberCount}명에게 적용할 대체 역할을 선택하세요.`}/>:<p className="field-error">사용 중인 마지막 역할은 삭제할 수 없습니다. 다른 역할을 먼저 추가해주세요.</p>}</>:<p className="component-helper">현재 이 역할을 사용하는 멤버가 없습니다.</p>}</div></DialogBody>
-      <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={()=>setDeleteId(null)}>취소</Button><Button variant="danger" disabled={!canDelete} onClick={deleteRole}><Icon name="trash"/>삭제</Button></DialogFooter>
+      <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={()=>setDeleteId(null)}>취소</Button><Button color="danger" disabled={!canDelete} onClick={deleteRole}><Icon name="trash"/>삭제</Button></DialogFooter>
     </Dialog>
   </>;
 }

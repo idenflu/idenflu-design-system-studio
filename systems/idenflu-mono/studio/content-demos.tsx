@@ -132,7 +132,7 @@ export function OverlayDemos() {
         <DialogBody tabIndex={-1}><p id="studio-delete-dialog-description">샘플 프로젝트를 목록에서 삭제합니다. 이 예시에서는 삭제 후 다시 추가할 수 있습니다.</p>
           <div className="react-studio-dialog-detail"><strong>샘플 프로젝트</strong><span className="react-studio-caption">디자인 팀 · 문서 3개</span></div>
         </DialogBody>
-        <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button variant="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></DialogFooter>
+        <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button color="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></DialogFooter>
       </Dialog>
       <Dialog open={dialog === 'form'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-project-dialog-title" aria-describedby="studio-project-dialog-description">
         <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
@@ -185,7 +185,7 @@ export function OverlayDemos() {
     </Section>
     <Section title="토스트" description="작업 결과를 짧게 알립니다. 아래 예시는 화면 오른쪽 아래에 하나씩 표시되며, 직접 닫을 때까지 유지됩니다.">
       <div className="react-studio-sample-grid">
-        <div className="react-studio-example"><h3 className="react-studio-example-title">완료 안내</h3><p className="react-studio-caption">작업을 방해하거나 포커스를 이동하지 않고 결과를 알립니다.</p><div className="react-studio-row"><Button variant="secondary" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'변경사항이 저장되었습니다.', variant:'success'}); }}>알림 표시</Button></div></div>
+        <div className="react-studio-example"><h3 className="react-studio-example-title">완료 안내</h3><p className="react-studio-caption">작업을 방해하거나 포커스를 이동하지 않고 결과를 알립니다.</p><div className="react-studio-row"><Button color="secondary" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'변경사항이 저장되었습니다.', variant:'success'}); }}>알림 표시</Button></div></div>
         <div className="react-studio-example"><h3 className="react-studio-example-title">오류와 재시도</h3><p className="react-studio-caption">저장 실패를 재현합니다. 다시 시도하면 완료 안내로 바뀝니다.</p><div className="react-studio-row"><Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setToast({message:'저장하지 못했습니다. 다시 시도해주세요.', variant:'danger', action:'retry'}); }}>오류 알림 표시</Button></div></div>
         <div className="react-studio-example"><h3 className="react-studio-example-title">실행 취소</h3><p className="react-studio-caption">초안 문서를 보관한 뒤 알림에서 실행 취소할 수 있습니다.</p><div className="react-studio-row"><Button variant="outline" onClick={event => { toastOrigin.current = event.currentTarget; setArchived(true); setToast({message:'초안 문서를 보관했습니다.', variant:'info', action:'undo'}); }}>항목 보관</Button></div><p role="status" className="component-helper">{archived ? '초안 문서 · 보관됨' : '초안 문서 · 목록에 표시 중'}</p></div>
       </div>
