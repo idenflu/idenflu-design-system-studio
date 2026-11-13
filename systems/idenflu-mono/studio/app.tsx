@@ -10,7 +10,9 @@ import { TimePickerDemos, timePickerUsage } from './time-picker-demos';
 import { DateTimeUsageExamples } from './datetime-usage-examples';
 import { IconDemos, TypographyDemos, SizeDemos, StateDemos } from './foundation-demos';
 import { TabsDemos, FeedbackDemos, AccordionDemos, OverlayDemos, TooltipDemos, CardDemos } from './content-demos';
-import { ButtonDemos, SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemos, StepperDemos, MenuDemos, PopoverDemos, DrawerDemos } from './structure-demos';
+import { ButtonDemos } from './buttons/button-demos';
+import { buttonUsage } from './buttons/button-usage';
+import { SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemos, StepperDemos, MenuDemos, PopoverDemos, DrawerDemos } from './structure-demos';
 import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from './media-demos';
 import { DocumentShell, Overview, notFoundRouteId, useDocumentRoute } from './shell';
 import { DocumentNotFound, LayoutNotFound } from './not-found';
@@ -124,18 +126,7 @@ export function IconExample() {
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
   </>;
 }`,
-  'components/buttons':`import { Button, Icon, IconButton, Segmented } from '@idenflu/mono-react';
-
-<Button variant="outline">저장</Button>
-<Button variant="danger" appearance="outline"><Icon name="trash" />선택 삭제</Button>
-<IconButton label="설정 열기"><Icon name="settings" /></IconButton>
-<Segmented label="보기 방식" size="md" defaultValue="list"
-  options={[
-    { value: 'list', label: <><Icon name="list" />목록</> },
-    { value: 'grid', label: <><Icon name="grid" />격자</> },
-    { value: 'calendar', label: <><Icon name="calendar" />캘린더</> },
-  ]}
-/>`,
+  'components/buttons': buttonUsage,
   'components/text-fields':`import { Icon, TextField } from '@idenflu/mono-react';
 
 <TextField

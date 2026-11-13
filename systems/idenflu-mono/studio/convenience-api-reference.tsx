@@ -2,9 +2,9 @@ import * as React from 'react';
 import { Table, TableContainer } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 
-type PropertyRow = readonly [name: string, type: string, initial: string, description: string];
+export type PropertyRow = readonly [name: string, type: string, initial: string, description: string];
 
-function ApiTable({ title, rows }: { title: string; rows: readonly PropertyRow[] }) {
+export function ApiTable({ title, rows }: { title: string; rows: readonly PropertyRow[] }) {
   return <TableContainer label={title} className="studio-convenience-api-table">
     <Table density="compact">
       <caption className="sr-only">{title}: 속성, 타입, 기본값과 설명</caption>
@@ -16,7 +16,7 @@ function ApiTable({ title, rows }: { title: string; rows: readonly PropertyRow[]
   </TableContainer>;
 }
 
-function CodeExample({ title, children }: { title: string; children: string }) {
+export function CodeExample({ title, children }: { title: string; children: string }) {
   return <div className="studio-convenience-reference-group">
     <h3 className="react-studio-example-title">{title}</h3>
     <div className="react-studio-code" role="region" aria-label={title} tabIndex={0}><pre><code>{children}</code></pre></div>
@@ -89,61 +89,6 @@ export function MultiSelectTagReference() {
       ['maxVisibleLabels', 'number', 'undefined', '기본 문자열 표시에서 보이는 라벨 수를 제한하고 나머지는 외 N개로 요약합니다. 태그형에는 maxVisibleTags를 사용합니다.'],
     ]} />
     <p className="component-helper">입력 높이와 너비는 선택 수에 따라 바뀌지 않습니다. 창 너비·크기 토큰·글자 크기가 바뀌면 표시 태그 수를 다시 계산합니다. 남은 개수는 선택된 라벨의 원래 순서를 따릅니다.</p>
-  </Section>;
-}
-
-const iconButtonProps: readonly PropertyRow[] = [
-  ['label', 'string', '필수', '버튼의 접근 가능한 이름이자 기본 툴팁입니다. 동작이 드러나는 짧은 이름을 지정합니다.'],
-  ['children', 'ReactNode', '필수', '버튼 안에 표시할 아이콘입니다. Icon은 장식으로 처리하고 의미는 label로 전달합니다.'],
-  ['tooltip', 'ReactNode | false', 'label', '기본 툴팁을 다른 내용으로 바꿉니다. false이면 툴팁을 제거하며 버튼 이름은 유지합니다.'],
-  ['variant', "'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'", "'ghost'", 'Button과 같은 스타일을 사용합니다. 아이콘 전용 형태는 고정입니다.'],
-  ['appearance', "'default' | 'outline'", "'default'", 'outline은 variant의 색상을 유지하면서 배경 대신 테두리로 표시합니다.'],
-  ['size', "'sm' | 'md' | 'lg'", '기본 컨트롤 크기', 'Button과 같은 크기 체계를 따릅니다.'],
-  ['disabled', 'boolean', 'false', '동작을 비활성화하고 키보드 탐색에서 제외합니다.'],
-  ['aria-pressed', 'boolean', 'undefined', '북마크처럼 두 상태를 전환할 때 현재 선택 상태를 전달합니다.'],
-  ['onClick / ref', 'MouseEventHandler / Ref<HTMLButtonElement>', 'undefined', 'Button의 네이티브 이벤트와 ref를 지원합니다. ref는 실제 button 요소를 가리킵니다.'],
-];
-
-const iconButtonCode = `import { useRef, useState } from 'react';
-import { Button, Icon, IconButton } from '@idenflu/mono-react';
-import '@idenflu/mono-react/styles.css';
-
-export function BookmarkActions() {
-  const [bookmarked, setBookmarked] = useState(false);
-  const [details, setDetails] = useState(false);
-  const bookmarkRef = useRef<HTMLButtonElement>(null);
-
-  return <div>
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-      <IconButton ref={bookmarkRef} label="북마크"
-        variant="outline" size="md" aria-pressed={bookmarked}
-        onClick={() => setBookmarked(value => !value)}>
-        <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
-      </IconButton>
-      <IconButton label="북마크 초기화" tooltip="저장한 북마크를 해제합니다."
-        onClick={() => setBookmarked(false)}>
-        <Icon name="refresh" />
-      </IconButton>
-      <IconButton label="자세히 보기" tooltip={false}
-        aria-expanded={details} aria-controls="bookmark-details"
-        onClick={() => setDetails(value => !value)}>
-        <Icon name="info" />
-      </IconButton>
-      <IconButton label="삭제할 항목 없음" disabled>
-        <Icon name="trash" />
-      </IconButton>
-      <Button variant="outline"
-        onClick={() => bookmarkRef.current?.focus()}>북마크로 포커스</Button>
-    </div>
-    <p role="status">{bookmarked ? '북마크 저장됨' : '북마크 해제됨'}</p>
-    <p id="bookmark-details" hidden={!details}>북마크로 자주 찾는 항목을 저장합니다.</p>
-  </div>;
-}`;
-
-export function IconButtonReference() {
-  return <Section id="icon-button-api" title="IconButton API" description="label 하나로 접근 가능한 이름과 기본 툴팁을 함께 제공합니다. 텍스트가 함께 보이는 버튼은 Button을 사용합니다.">
-    <ApiTable title="아이콘 버튼 속성" rows={iconButtonProps} />
-    <CodeExample title="접근 가능한 북마크와 도구 버튼">{iconButtonCode}</CodeExample>
   </Section>;
 }
 
