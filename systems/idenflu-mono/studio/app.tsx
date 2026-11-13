@@ -235,7 +235,7 @@ export function ProcessingDialogExample({ blocking = false }: { blocking?: boole
   'components/tooltip':'<Tooltip content="도움말"><Button>정보</Button></Tooltip>',
   'components/popover':'<Popover trigger={<Button variant="outline">표시 설정</Button>} label="표시 설정" align="end">내용</Popover>',
   'components/stepper':'<Stepper aria-label="프로젝트 생성" steps={["기본 정보", "확인"]} currentStep={0} />',
-  'components/card':'<Card><h3>프로젝트</h3><p>상세 내용</p></Card>',
+  'components/card':'<Card radius={8}><CardTitle>프로젝트</CardTitle><CardDescription>상세 내용</CardDescription></Card>',
   ...patternSnippets,
   ...componentUsage,
   ...completeExamples,

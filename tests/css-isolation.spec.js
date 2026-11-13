@@ -33,14 +33,14 @@ test('component CSS preserves the host page and native controls in both themes',
 });
 
 test('React components keep their geometry without the optional document reset', async ({ page }) => {
-  const { Button, TextField, Chip, Card, Tabs } = require('../packages/idenflu-mono-react/dist/index.cjs');
+  const { Button, TextField, Chip, Card, CardTitle, CardDescription, Tabs } = require('../packages/idenflu-mono-react/dist/index.cjs');
   await setup(page);
   const before = await hostMetrics(page);
   const markup = renderToStaticMarkup(React.createElement(React.Fragment, null,
     React.createElement(Button, null, '컴포넌트 버튼'),
     React.createElement(TextField, { label: '컴포넌트 입력', defaultValue: '입력값' }),
     React.createElement(Chip, { interactive: false }, '표시 칩'),
-    React.createElement(Card, null, React.createElement('h3', null, '카드 제목'), React.createElement('p', null, '카드 본문')),
+    React.createElement(Card, null, React.createElement(CardTitle, null, '카드 제목'), React.createElement(CardDescription, null, '카드 본문')),
     React.createElement(Tabs, { label: '컴포넌트 탭', items: [{ value: 'one', label: '첫 탭', content: '탭 내용' }, { value: 'two', label: '둘째 탭', content: '둘째 내용' }] }),
   ));
   await page.locator('#components').evaluate((element, html) => { element.innerHTML = html; }, markup);

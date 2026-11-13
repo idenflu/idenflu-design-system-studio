@@ -28,7 +28,7 @@ function createCases() {
     ['nova-spinner', '.nova-spinner', h(C.NovaSpinner, {size:32,label:'처리 중'})],
     ['skeleton', '.skeleton', h(C.Skeleton, {style:{width:120,height:16}})],
     ['avatar', '.avatar', h(C.Avatar, null, '김')],
-    ['card', '.demo-card', h(C.Card, null, h('h3',null,'프로젝트'), h('p',null,'작업 설명'))],
+    ['card', '.demo-card', h(C.Card, null, h(C.CardTitle,null,'프로젝트'), h(C.CardDescription,null,'작업 설명'))],
     ['table', '.table-scroll', h(C.TableContainer, {label:'작업 목록'}, h(C.Table,null,h('thead',null,h('tr',null,h('th',null,'이름'))),h('tbody',null,h('tr',null,h('td',null,'디자인 시스템')))))],
     ['accordion', '.accordion', h(C.Accordion,null,h(C.AccordionItem,{title:'공유 범위',open:true},h('p',null,'팀원에게만 공유됩니다.')))],
     ['list', '.simple-list', h(C.List,null,h(C.ListItem,null,'디자인 시스템'))],

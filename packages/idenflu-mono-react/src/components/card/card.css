@@ -1,7 +1,7 @@
 .card-label { color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); letter-spacing:.6px; }
 .demo-card { border-radius:var(--radius-control); padding:var(--space-6); border:1px solid var(--border); background:var(--field-background); }
-.demo-card h3 { margin-top:var(--space-3); font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); }
-.demo-card p { margin-top:var(--space-2); color:var(--text-secondary); }
+.card-title { margin-top:var(--space-3); font-size:var(--font-size-title); line-height:var(--line-height-title); font-weight:var(--font-weight-semibold); }
+.card-description { margin-top:var(--space-2); color:var(--text-secondary); }
 .card-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-7); color:var(--text-secondary); font-size:var(--font-size-caption); }
 .card-action { margin-top:var(--space-6); }
 .card-action .button { margin-top:var(--space-5); }

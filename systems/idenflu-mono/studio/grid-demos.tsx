@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Badge, Button, Card, Grid, GridItem, Icon, Progress, Select, TextArea, TextField } from '@idenflu/mono-react';
+import { Alert, Badge, Button, Card, CardTitle, CardDescription, Grid, GridItem, Icon, Progress, Select, TextArea, TextField } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 
 const projects = [
@@ -13,7 +13,7 @@ function ResponsiveCards() {
     <Grid id="grid-responsive-cards" columns={{base:1, sm:2, lg:3}} gap={4}>
       {projects.map(project => <Card key={project.name} className="react-studio-stack">
         <div className="react-studio-row"><Icon name="folder" /><Badge variant={project.progress === 100 ? 'success' : 'primary'}>{project.status}</Badge></div>
-        <div><h3 style={{margin:0}}>{project.name}</h3><p className="react-studio-caption">{project.team}</p></div>
+        <div><CardTitle style={{margin:0}}>{project.name}</CardTitle><CardDescription className="react-studio-caption">{project.team}</CardDescription></div>
         <div className="react-studio-stack"><Progress value={project.progress} max={100} aria-label={`${project.name} 진행률`} /><span className="react-studio-caption">진행률 {project.progress}%</span></div>
       </Card>)}
     </Grid>
@@ -67,15 +67,15 @@ function DashboardGrid() {
   return <Section id="grid-dashboard" title="중첩 그리드와 행 병합" description="프로젝트 영역은 넓은 화면에서 두 열과 두 행을 사용합니다. 영역 내부에는 별도의 Grid를 배치하고, 모바일에서는 문서 순서대로 한 열에 표시합니다.">
     <Grid id="grid-dashboard-layout" columns={{base:1, sm:2, lg:3}} gap={4}>
       <GridItem colSpan={{base:1, sm:2}} rowSpan={{base:1, lg:2}}><Card className="react-studio-stack" style={{height:'100%'}}>
-        <div><h3 style={{margin:0}}>프로젝트 현황</h3><p className="react-studio-caption">이번 주 작업 진행 상황</p></div>
+        <div><CardTitle style={{margin:0}}>프로젝트 현황</CardTitle><CardDescription className="react-studio-caption">이번 주 작업 진행 상황</CardDescription></div>
         <Grid columns={{base:1, sm:2}} gap={4}>
           <div className="react-studio-example"><span className="react-studio-caption">전체 작업</span><strong style={{fontSize:'var(--font-size-heading)'}}>48</strong></div>
           <div className="react-studio-example"><span className="react-studio-caption">완료한 작업</span><strong style={{fontSize:'var(--font-size-heading)'}}>32</strong></div>
         </Grid>
         {projects.map(project => <div key={project.name} className="react-studio-stack"><div className="react-studio-row" style={{justifyContent:'space-between'}}><span>{project.name}</span><span className="react-studio-caption">{project.progress}%</span></div><Progress value={project.progress} max={100} aria-label={`대시보드 ${project.name} 진행률`} /></div>)}
       </Card></GridItem>
-      <Card className="react-studio-stack"><h3 style={{margin:0}}>팀원</h3><strong style={{fontSize:'var(--font-size-heading)'}}>8명</strong><p className="react-studio-caption">디자인·개발·기획이 함께 참여합니다.</p></Card>
-      <Card className="react-studio-stack"><h3 style={{margin:0}}>다음 리뷰</h3><p>11월 12일 · 오후 2시</p><div><Badge variant="primary">예정됨</Badge></div></Card>
+      <Card className="react-studio-stack"><CardTitle style={{margin:0}}>팀원</CardTitle><strong style={{fontSize:'var(--font-size-heading)'}}>8명</strong><CardDescription className="react-studio-caption">디자인·개발·기획이 함께 참여합니다.</CardDescription></Card>
+      <Card className="react-studio-stack"><CardTitle style={{margin:0}}>다음 리뷰</CardTitle><CardDescription>11월 12일 · 오후 2시</CardDescription><div><Badge variant="primary">예정됨</Badge></div></Card>
     </Grid>
   </Section>;
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Accordion, AccordionItem, Alert, Badge, Button, Card, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip, type ToastProps } from '@idenflu/mono-react';
+import { Grid, Accordion, AccordionItem, Alert, Badge, Button, Card, CardTitle, CardDescription, CardLabel, CardFooter, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Tabs, TextField, Toast, Tooltip, type ToastProps } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import {StatusBadge} from './status-definitions';
 import { ProcessingDialogDemo } from './processing-dialog-demo';
@@ -219,11 +219,11 @@ export function TooltipDemos() {
 export function CardDemos() {
   return <>
     <Section title="기본 카드" description="제목, 요약, 상태와 보조 정보를 같은 순서로 배치합니다.">
-      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Card><span className="card-label">PROJECT</span><h3>디자인 시스템</h3><p>일관된 제품 경험을 위한 공통 기준을 만듭니다.</p><div className="card-footer"><Badge variant="primary">진행 중</Badge><span>최근 수정 · 오늘</span></div></Card><Card><span className="card-label">GUIDE</span><h3>브랜드 가이드</h3><p>브랜드의 시각 언어와 사용 원칙을 정리합니다.</p><div className="card-footer"><Badge>검토 중</Badge><span>최근 수정 · 어제</span></div></Card></Grid>
+      <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Card><CardLabel>PROJECT</CardLabel><CardTitle>디자인 시스템</CardTitle><CardDescription>일관된 제품 경험을 위한 공통 기준을 만듭니다.</CardDescription><CardFooter><Badge variant="primary">진행 중</Badge><span>최근 수정 · 오늘</span></CardFooter></Card><Card><CardLabel>GUIDE</CardLabel><CardTitle>브랜드 가이드</CardTitle><CardDescription>브랜드의 시각 언어와 사용 원칙을 정리합니다.</CardDescription><CardFooter><Badge>검토 중</Badge><span>최근 수정 · 어제</span></CardFooter></Card></Grid>
     </Section>
-    <Section title="동작이 있는 카드" description="카드 전체를 누르게 만들기보다 이동할 곳을 설명하는 링크를 제공합니다.">
-      <Card className="react-studio-card-sample"><span className="card-label">RESOURCE</span><h3>컴포넌트 살펴보기</h3><p>자주 쓰는 UI 요소와 사용 예시를 확인합니다.</p><div className="card-footer"><a className="button button--outline button-inline" href="#/components/buttons">컴포넌트 보기 <Icon name="arrow-right" /></a></div></Card>
+    <Section title="동작이 있는 카드" description="radius={8}로 모서리를 조절하고 이동할 곳을 설명하는 링크를 제공합니다.">
+      <Card radius={8} className="react-studio-card-sample"><CardLabel>RESOURCE</CardLabel><CardTitle>컴포넌트 살펴보기</CardTitle><CardDescription>자주 쓰는 UI 요소와 사용 예시를 확인합니다.</CardDescription><CardFooter><a className="button button--outline button-inline" href="#/components/buttons">컴포넌트 보기 <Icon name="arrow-right" /></a></CardFooter></Card>
     </Section>
-    <Section title="아이콘이 있는 카드" description="아이콘으로 콘텐츠 종류를 보조하고 제목과 설명을 함께 표시합니다."><Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Card><h3 className="react-studio-icon-label"><Icon name="grid" />컴포넌트</h3><p>공통 요소와 사용 예시를 확인합니다.</p></Card><Card><h3 className="react-studio-icon-label"><Icon name="calendar" />일정</h3><p>프로젝트 일정을 확인합니다.</p></Card></Grid></Section>
+    <Section title="아이콘이 있는 카드" description="아이콘으로 콘텐츠 종류를 보조하고 제목과 설명을 함께 표시합니다."><Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Card><CardTitle className="react-studio-icon-label"><Icon name="grid" />컴포넌트</CardTitle><CardDescription>공통 요소와 사용 예시를 확인합니다.</CardDescription></Card><Card><CardTitle className="react-studio-icon-label"><Icon name="calendar" />일정</CardTitle><CardDescription>프로젝트 일정을 확인합니다.</CardDescription></Card></Grid></Section>
   </>;
 }

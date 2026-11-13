@@ -698,6 +698,22 @@ import { Divider } from '@idenflu/mono-react';
 <Divider variant="dashed" decorative />
 ```
 
+
+## Card
+
+`Card`는 `article`을 렌더링하며 `CardLabel`, `CardTitle`, `CardDescription`, `CardFooter`를 조합할 수 있습니다. 각 하위 컴포넌트는 일반 HTML 속성과 `className`을 받습니다. 제목은 기본 `h3`이며 `as="h2"`처럼 문서 계층에 맞게 변경할 수 있습니다.
+
+```tsx
+<Card radius={8}>
+  <CardLabel>PROJECT</CardLabel>
+  <CardTitle as="h2">디자인 시스템</CardTitle>
+  <CardDescription>공통 기준을 만듭니다.</CardDescription>
+  <CardFooter>진행 중</CardFooter>
+</Card>
+```
+
+`radius`는 숫자(px) 또는 CSS 값 문자열을 받으며 생략하면 `--radius-control`을 사용합니다. `style.borderRadius`를 함께 지정하면 `style`이 우선합니다. 제목과 설명 스타일은 `card-title`, `card-description` 클래스에 적용됩니다. 기존 카드의 일반 `h3`와 `p`는 더 이상 이 전용 스타일을 자동으로 받지 않으므로 하위 컴포넌트나 클래스로 전환하세요.
+
 ## Grid·GridItem
 
 `Grid`는 CSS Grid를 기반으로 카드·폼·대시보드의 열 수, 간격과 정렬을 지정합니다. `GridItem`은 직접 자식 항목의 열·행 병합과 개별 정렬을 지정합니다. 두 컴포넌트는 `div`의 일반 HTML 속성·이벤트·`className`·`style`·`ref`를 전달하며 별도의 ARIA 역할을 부여하지 않습니다. 데이터 표의 검색·정렬·선택 기능은 `DataGrid`에서 제공합니다.

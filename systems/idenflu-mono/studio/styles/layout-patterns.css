@@ -138,8 +138,8 @@
 .layout-page-heading { margin-bottom:var(--space-6); }
 .layout-pattern-example { display:flex; flex-direction:column; align-items:flex-start; gap:var(--space-4); padding:var(--space-6); }
 .layout-pattern-example > .ui-icon { color:var(--primary); }
-.layout-pattern-example > h3 { font-size:var(--font-size-title); font-weight:var(--font-weight-semibold); }
-.layout-pattern-example > p { color:var(--text-secondary); line-height:var(--line-height-body); }
+.layout-pattern-example > .card-title { font-size:var(--font-size-title); font-weight:var(--font-weight-semibold); }
+.layout-pattern-example > .card-description { color:var(--text-secondary); line-height:var(--line-height-body); }
 .layout-pattern-example > .button { margin-top:auto; }
 .layout-filter-panel { display:flex; align-items:end; flex-wrap:wrap; gap:var(--space-3); padding:var(--space-4); margin-bottom:var(--space-5); border:1px solid var(--border); background:var(--field-background); }
 .layout-page-content:has(> .data-grid) > .layout-filter-panel.layout-filter-panel--borderless { border-color:transparent; border-inline-width:0; padding-inline:0; }
