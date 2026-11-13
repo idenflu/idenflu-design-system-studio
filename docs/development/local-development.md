@@ -4,7 +4,7 @@
 
 ## 의존성과 개발 서버
 
-Node.js 20 이상에서 루트와 React 패키지의 의존성을 설치합니다.
+Node.js 20.19.x 또는 22.12 이상에서 루트와 React 패키지의 의존성을 설치합니다.
 
 ```sh
 npm ci
@@ -15,7 +15,7 @@ npm run dev
 - 갤러리: `http://127.0.0.1:4173/`
 - 모노 문서: `http://127.0.0.1:4173/systems/idenflu-mono/index.html#/overview`
 
-`npm run dev`는 React 패키지와 문서를 먼저 빌드한 뒤, 컴포넌트·문서·CSS·아이콘 변경을 감지해 자동으로 다시 빌드합니다. 갱신 완료 후 브라우저를 새로고침합니다. WebStorm 미리보기도 같은 문서 번들을 사용하므로 개발 중에는 이 명령을 실행해 둡니다.
+`npm run dev`는 Vite 개발 서버에서 React 패키지와 문서 소스를 직접 제공합니다. 컴포넌트·문서·CSS 변경은 브라우저에 자동 반영되며, 일부 변경은 페이지 전체가 자동 새로고침됩니다. 경로·아이콘 목록과 복사 예제 데이터도 갱신됩니다. 아이콘 SVG를 수정한 경우 기존과 같이 패키지에서 `npm run generate:icons`를 실행해 React 아이콘과 CSS를 생성합니다. `npm run dev`는 패키지와 스튜디오의 타입 검사도 감시 모드로 실행하며 오류를 터미널에 표시합니다. 스튜디오 개발 검사는 패키지 소스를 직접 참조하므로 패키지 오류가 양쪽에 표시될 수 있습니다. 타입 오류가 있어도 개발 서버는 계속 실행됩니다.
 
 의존성이 변경된 브랜치를 받았다면 `npm --prefix packages/idenflu-mono-react ci`를 먼저 실행합니다. 별도 서버로 미리보기만 열 때는 `npm run studio:build`로 문서를 직접 갱신합니다. 배포 폴더 `dist/`는 `npm run build`로 별도 갱신합니다.
 
@@ -46,7 +46,7 @@ npm run example:build
 - `systems/idenflu-mono/studio/styles/`: 문서 전용 레이아웃·예시 CSS
 - `systems/idenflu-mono/studio/assets/`: 워크스페이스 로고 등 문서 샘플 에셋 원본
 - `systems/idenflu-mono/studio/theme.js`, `preferences.js`: 초기 테마·설정 적용
-- `systems/idenflu-mono/studio/tsconfig.json`, `playwright.config.cjs`: 문서 타입·브라우저 검사 설정
+- `systems/idenflu-mono/studio/tsconfig.json`, `tsconfig.dev.json`, `playwright.config.cjs`: 공개 선언·개발용 문서 타입 검사와 브라우저 검사 설정
 - `systems/idenflu-mono/studio/scripts/build-studio.mjs`: 문서와 공유 스타일 번들
 - `systems/idenflu-mono/docs-dist/`: 생성되는 로컬 문서 번들, Git 제외
 - `systems/idenflu-mono/assets/`: 패키지의 `dist/assets/`와 `studio/assets/`를 합친 공개 에셋, 빌드 생성·Git 제외
@@ -57,6 +57,6 @@ npm run example:build
 
 원본은 `packages/idenflu-mono-react/src/`, `packages/idenflu-mono-react/assets/`, `studio/`에서 수정하고 생성된 `docs-dist/`·`assets/`는 직접 수정하지 않습니다. 패키지 빌드는 `packages/idenflu-mono-react/assets/`만 복사하므로 스튜디오 샘플 에셋이 소비 앱에 포함되지 않습니다. 공개 문서 주소와 `/systems/idenflu-mono/assets/` 경로는 유지합니다.
 
-스튜디오의 컴포넌트 import는 공개 `@idenflu/mono-react` 경로를 사용합니다. 화면과 예제는 빌드한 공개 JS·타입·에셋을 사용하며 컴포넌트 내부 helper를 직접 가져오지 않습니다. 문서 빌드·타입 검사·Node 검사는 루트의 `npm run studio:build`, `npm run studio:check`, `npm run test:studio`로 실행합니다. 패키지 폴더의 `build`·`typecheck`·`test`는 라이브러리만 검사합니다.
+스튜디오의 컴포넌트 import는 공개 `@idenflu/mono-react` 경로를 사용합니다. 개발 서버의 화면은 패키지 소스를 직접 사용하고 배포 빌드와 검사는 빌드한 공개 JS·타입·에셋을 사용하며 컴포넌트 내부 helper를 직접 가져오지 않습니다. 문서 빌드·타입 검사·Node 검사는 루트의 `npm run studio:build`, `npm run studio:check`, `npm run test:studio`로 실행합니다. 패키지 폴더의 `build`·`typecheck`·`test`는 라이브러리만 검사합니다.
 
 기존 HTML 문서와 독립 바닐라 런타임·어댑터는 제거했습니다. React 진입점의 최소 HTML과 React에서 사용하는 공유 스타일·에셋·초기 설정 엔진을 유지합니다.
