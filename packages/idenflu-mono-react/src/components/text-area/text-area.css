@@ -3,5 +3,6 @@
 .text-area:hover:not(:disabled):not([readonly]):not(:focus):not([aria-invalid="true"]) { border-color: var(--border-control-hover); }
 .text-area:focus { outline: none; border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .text-area:disabled { background:var(--surface); color:var(--disabled-text); box-shadow:none; cursor:not-allowed; }
+.text-area[readonly]:not(:disabled), .text-area[readonly]:not(:disabled)::placeholder { color:var(--disabled-text); }
 .text-area[aria-invalid="true"] { border-color:var(--danger); box-shadow:none; }
 .text-area[aria-invalid="true"]:focus { border-color:transparent; box-shadow:inset 0 0 0 2px var(--focus-on-danger); }

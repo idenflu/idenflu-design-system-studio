@@ -4,6 +4,7 @@
 .text-input:focus { outline: none; }
 .text-input:focus, .text-input.is-focused { border-color: transparent; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
 .text-input:disabled { background: var(--surface); color: var(--disabled-text); border-color: var(--border); box-shadow: none; cursor: not-allowed; }
+.text-input[readonly]:not(:disabled), .text-input[readonly]:not(:disabled)::placeholder { color:var(--disabled-text); }
 .text-input[aria-invalid="true"] { border-color: var(--error); box-shadow: none; }
 .text-input[aria-invalid="true"]:focus { border-color: transparent; box-shadow: inset 0 0 0 2px var(--error); }
 .field-horizontal { display:grid; grid-template-columns:minmax(0, var(--field-label-width, 120px)) minmax(0, 1fr); align-items:start; gap:var(--space-4); }
@@ -34,5 +35,7 @@
 .input-group:is(.is-invalid, :has(input[aria-invalid="true"])):focus-within::after { box-shadow: inset 0 0 0 2px var(--focus-on-danger); }
 .input-group:has(input:disabled) { background: var(--surface); }
 .input-group:has(input:disabled) :is(input, .input-prefix, .input-suffix, .input-status) { color: var(--disabled-text); }
+.input-group:has(input[readonly]:not(:disabled)) :is(input, .input-prefix, .input-suffix, .input-status, .input-action), .input-group input[readonly]:not(:disabled)::placeholder { color:var(--disabled-text); }
+.input-group:has(input[readonly]:not(:disabled)) .input-action:hover { background:transparent; color:var(--disabled-text); }
 .input-group input:disabled { cursor: not-allowed; }
 .text-field-search::-webkit-search-cancel-button { appearance:none; display:none; }

@@ -5,8 +5,9 @@
 .date-picker { position:relative; }
 .date-field { border-radius:var(--radius-control); position:relative; display:flex; align-items:center; height:var(--control-height); border:1px solid var(--border-control); background:var(--field-background); }
 .date-field.has-error { border-color:var(--danger); }
-.date-field:has(input:disabled), .date-range-fields:has(input:disabled), .date-field:has(input[readonly]), .date-range-fields:has(input[readonly]) { background:var(--surface); }
+.date-field:has(input:disabled), .date-range-fields:has(input:disabled) { background:var(--surface); }
 .date-field input:disabled, .date-range-fields input:disabled { color:var(--disabled-text); cursor:not-allowed; }
+.date-field input[readonly]:not(:disabled), .date-range-fields input[readonly]:not(:disabled), .date-field input[readonly]:not(:disabled)::placeholder, .date-range-fields input[readonly]:not(:disabled)::placeholder, .date-range-fields:has(input[readonly]:not(:disabled)) .date-range-separator { color:var(--disabled-text); }
 .date-text { display:block; min-width:0; width:100%; height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--border-control); background:var(--field-background); color:var(--text); font:inherit; line-height:var(--line-height-control); font-variant-numeric:tabular-nums; }
 .date-text::placeholder { color:var(--text-muted); opacity:1; }
 .date-text:focus { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }

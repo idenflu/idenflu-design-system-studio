@@ -104,7 +104,7 @@
 .select-popup[data-popup-strategy="fixed"] .select-options { flex:1 1 auto; min-height:0; }
 .select-popup[data-popup-strategy="fixed"] .multi-search-field { flex:none; }
 
-.custom-select[data-readonly] > .select-trigger, .custom-select[data-readonly] > .search-select-control, .custom-select[data-readonly] > .multi-inline-control { background:var(--surface); }
 .custom-select[data-readonly] > .select-trigger, .custom-select[data-readonly] .multi-inline-control { cursor:default; }
 .custom-select[data-readonly] :is(.multi-inline-chip,.multi-inline-more):hover { background:var(--surface); }
-.custom-select[data-readonly] .multi-inline-more:hover { color:var(--text-secondary); }
+.custom-select[data-readonly] :is(.select-trigger, .select-trigger .ui-icon, .select-prefix-icon, .select-option-icon, .search-select-input, .multi-inline-placeholder, .multi-inline-chip, .multi-inline-more, .multi-inline-trigger), .custom-select[data-readonly] .search-select-input::placeholder { color:var(--disabled-text); }
+.custom-select[data-readonly] .multi-inline-trigger:hover { background:transparent; color:var(--disabled-text); }

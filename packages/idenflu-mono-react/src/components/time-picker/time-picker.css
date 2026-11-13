@@ -1,7 +1,6 @@
 .time-input { font-variant-numeric:tabular-nums; }
 .time-field:has(input:disabled) { background:var(--disabled); }
 .time-field input:disabled { color:var(--disabled-text); cursor:not-allowed; }
-.time-field:has(input[readonly]) { background:var(--surface); }
 .time-picker .time-popup { width:280px; padding:0; }
 .time-popup-heading { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-3) var(--space-4); border-bottom:1px solid var(--divider); color:var(--text-secondary); }
 .time-popup-heading strong { color:var(--text); font-size:var(--font-size-title); font-weight:var(--font-weight-semibold); font-variant-numeric:tabular-nums; }

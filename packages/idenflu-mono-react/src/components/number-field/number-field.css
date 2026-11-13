@@ -13,9 +13,10 @@
 .number-field-step:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .number-field-step .ui-icon, .number-field-step svg { flex:0 0 12px; width:12px; height:12px; pointer-events:none; }
 .number-field-step:disabled { color:var(--disabled-text); cursor:not-allowed; }
-.number-field:has(.number-field-input:disabled), .number-field:has(.number-field-input[readonly]) { background:var(--surface); }
+.number-field:has(.number-field-input:disabled) { background:var(--surface); }
 .number-field-input:disabled { color:var(--disabled-text); cursor:not-allowed; }
 .number-field-input[readonly] { cursor:text; }
+.number-field-input[readonly]:not(:disabled), .number-field-input[readonly]:not(:disabled)::placeholder, .number-field:has(.number-field-input[readonly]:not(:disabled)) :is(.number-field-unit, .number-field-prefix) { color:var(--disabled-text); }
 .number-field:has(.number-field-input:disabled) .number-field-unit { color:var(--disabled-text); }
 .number-field:has(.number-field-input[aria-invalid="true"]), .number-field.is-invalid { border-color:var(--danger); }
 .number-field:has(.number-field-input[aria-invalid="true"]):focus-within, .number-field.is-invalid:focus-within { border-color:transparent; }
