@@ -4,9 +4,30 @@
 
 ## 미배포
 
-### 변경
+## 0.6.0 — 게시 예정
 
-- 공개 `PageHeader`와 전용 스타일을 제거하고 프로젝트에서 구성할 수 있는 Page header 패턴 문서로 이동. 기존 사용자는 제목 영역 구현과 스타일을 직접 정의해야 합니다.
+### 추가
+
+- `Button`에 색상과 로딩 상태를 추가하고, 로딩 중 버튼을 비활성화하며 진행 상태를 표시
+- `Select`·`SearchSelect`·`MultiSelect`에 읽기 전용 상태 추가
+- `TimePicker`·`DateTimePicker`와 일시 범위 선택기에 초 선택과 초 단위 설정을 추가하고 시간 선택 패널 개선
+- `Tooltip`의 표시·숨김 지연과 `Spinner`의 밀리초 단위 속도 설정 추가
+- `Card`의 하위 구성 요소와 모서리 크기 설정 추가
+
+### 변경과 수정
+
+- 아이콘 원본을 SVG 스프라이트로 통합하고 `Icon` 이름과 CSS 마스크를 최종 아이콘 목록에 맞춤
+- 공통 컨트롤 크기, 필드 레이블·읽기 전용 필드, Chip·Slider·TabPanel의 스타일 조정
+- DataGrid 높이 레이아웃과 행 경계선 수정
+- Spinner 기본 속도와 회전 애니메이션 조정
+
+### 호환성
+
+- `Button`의 기존 색상 `variant`는 `color`로 옮기고, `variant`는 `default`·`outline`·`ghost`를 사용합니다. 기존 `appearance`는 제거되었습니다.
+- `NativeSelect`와 공개 `PageHeader`를 제거했습니다. 선택 UI와 페이지 제목 영역은 프로젝트에서 직접 구성하며 Page header 패턴 문서를 참고할 수 있습니다.
+- `Tree`의 `rootStyle`을 `variant`로 변경하고 DOM의 `data-root-style`을 `data-variant`로 변경했습니다.
+- `DropdownMenu`와 `Popover`의 `trigger`에 버튼 요소를 직접 전달합니다. `DropdownMenu`의 `items`는 `DropdownMenuItem` 자식으로 교체하고, 아이콘 전용 트리거의 접근성 이름과 툴팁은 버튼에서 지정합니다.
+- `Icon`의 이름이 스프라이트 기준으로 변경되었으며 기존 개별 SVG 에셋이 제거되었습니다. 기존 이름과 에셋 경로를 사용하는 코드를 확인해야 합니다.
 
 ## 0.5.2 — 2026-11-12
 
