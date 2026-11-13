@@ -9,6 +9,7 @@
 .datetime-calendar { min-width:0; padding:var(--space-4); }
 .datetime-popup .calendar-day:disabled { background:var(--field-background); color:var(--disabled-text); cursor:not-allowed; }
 .datetime-time-panel { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-2); min-width:0; padding:var(--space-4) var(--space-2); border-left:1px solid var(--divider); }
+.datetime-popup .datetime-time-panel-seconds { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .datetime-time-column { min-width:0; }
 .datetime-time-label { display:grid; place-items:center; min-height:var(--control-height); background:var(--surface); color:var(--text-secondary); font-weight:var(--font-weight-medium); }
 .datetime-time-list { height:calc(var(--control-height) * 6); min-height:0; margin-top:var(--space-2); padding:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-gutter:stable; }
@@ -27,7 +28,7 @@
 .datetime-range-tab > strong { max-width:100%; font-size:var(--font-size-body); font-weight:var(--font-weight-medium); overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
 .datetime-range-tab > small { font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .datetime-footer { display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); padding:var(--space-3) var(--space-4); border-top:1px solid var(--divider); }
-.datetime-summary { min-width:0; color:var(--text); font-size:calc(var(--font-size-base) + 2px); line-height:calc(var(--line-height-body) + 2px); font-weight:var(--font-weight-semibold); font-variant-numeric:tabular-nums; white-space:pre-line; overflow-wrap:anywhere; }
+.datetime-summary { min-width:0; color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); font-variant-numeric:tabular-nums; white-space:pre-line; overflow-wrap:anywhere; }
 .datetime-summary > span { display:block; }
 .datetime-actions { display:flex; flex:0 0 auto; gap:var(--space-2); }
 .datetime-actions .button { flex:0 0 auto; white-space:nowrap; }

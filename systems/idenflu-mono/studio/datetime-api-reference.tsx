@@ -12,15 +12,17 @@ function ReferenceTable({label, contracts, rows}: {label:string; contracts:APICo
 }
 
 export function DateTimeAPIReference() {
-  return <Section id="datetime-props" title="속성 · DateTimePicker / DateTimeRangePicker" description="DateTimeValue는 시간대 없는 YYYY-MM-DDTHH:mm 문자열 또는 null입니다. DateTimeRangeValue는 readonly [DateTimeValue, DateTimeValue]입니다.">
+  return <Section id="datetime-props" title="속성 · DateTimePicker / DateTimeRangePicker" description="DateTimeValue는 시간대 없는 YYYY-MM-DDTHH:mm[:ss] 문자열 또는 null입니다. DateTimeRangeValue는 readonly [DateTimeValue, DateTimeValue]입니다.">
     <p className="react-studio-caption">{publicAPINote}</p>
     <ReferenceTable label="Datetime picker 공통 속성" contracts={['DateTimePicker','DateTimeRangePicker']} rows={[
       ['label','필수','입력 이름입니다. 문자열이나 React 노드를 전달하며 입력·팝업의 접근 가능한 이름으로 사용합니다.'],
-      ['value / defaultValue','null / [null, null]','단일 값 또는 시작·종료 배열입니다. value는 부모가 제어하고 defaultValue는 최초 비제어 값입니다.'],
+      ['value / defaultValue','null / [null, null]','단일 값 또는 시작·종료 배열입니다. showSeconds를 켜면 초가 00이어도 초를 포함합니다. value는 부모가 제어하고 defaultValue는 최초 비제어 값입니다.'],
       ['onValueChange','undefined','직접 입력의 Enter·포커스 이탈 또는 팝업 확인에서 검증을 통과한 값만 전달합니다. 범위는 두 값을 함께 전달합니다. 팝업에서 선택 중인 값과 취소한 값은 전달하지 않습니다.'],
       ['id / name','자동 ID / undefined','단일 입력의 폼 제출 키는 name입니다. 범위는 name-start와 name-end로 제출합니다. 입력 중인 문자열과 구분되는 확정 값을 제출합니다.'],
-      ['min / max','제한 없음','YYYY-MM-DDTHH:mm 형식의 포함 경계입니다. 형식이 잘못되거나 min이 max보다 크면 RangeError가 발생합니다.'],
+      ['min / max','제한 없음','YYYY-MM-DDTHH:mm[:ss] 형식의 포함 경계입니다. 형식이 잘못되거나 min이 max보다 크면 RangeError가 발생합니다.'],
       ['minuteStep','1','1·5·10·15·20·30·60처럼 60을 나누어떨어지게 하는 양의 정수를 사용합니다. 직접 입력과 팝업 모두 같은 단위로 검증합니다.'],
+      ['showSeconds','false','초 선택을 켜면 일시를 YYYY-MM-DDTHH:mm:ss 형식으로 표시·제출합니다. 분 단위 값의 초는 00으로 보완합니다.'],
+      ['secondStep','1','초 선택과 직접 입력의 단위입니다. 60을 나누어떨어지게 하는 양의 정수를 지정합니다.'],
       ['required / disabled / readOnly','false','필수값, 비활성, 읽기 전용 상태입니다. 비활성 값은 FormData에서 제외하며 읽기 전용 값은 포함합니다.'],
       ['size','md','텍스트 필드와 같은 높이·간격·아이콘 크기 토큰을 사용합니다.'],
       ['helperText / error','undefined','보조 설명과 외부 오류 메시지입니다. error는 문자열이며 내부 오류보다 우선합니다. 실제 입력의 설명과 네이티브 폼 검증에 연결됩니다.'],

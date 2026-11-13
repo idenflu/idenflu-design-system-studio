@@ -20,6 +20,10 @@ export function DateTimeDemos() {
       <p role="status" className="react-studio-caption">확정된 일시: {displayValue(value)}</p>
     </Section>
 
+    <Section title="초 선택" description="초 선택을 켜면 같은 너비의 패널에서 시·분·초를 선택합니다.">
+      <DateTimePicker id="datetime-seconds" label="초 단위 일시" showSeconds secondStep={5} defaultValue="2026-11-12T14:30:15" helperText="5초 단위로 선택하거나 YYYY-MM-DD HH:mm:ss 형식으로 입력하세요." />
+    </Section>
+
     <Section title="날짜·시간 범위" description="시작 날짜와 시간을 고른 뒤 다음을 눌러 종료 일시를 선택합니다. 확인하면 전체 기간이 반영됩니다.">
       <div className="react-studio-stack" style={{ maxWidth: 720 }}>
         <DateTimeRangePicker id="datetime-range" name="booking" label="이용 기간" startLabel="이용 시작 일시" endLabel="이용 종료 일시" value={range} onValueChange={setRange} minuteStep={15} helperText="시작 일시 선택 → 다음 → 종료 일시 선택 → 확인 순서로 진행하세요. 종료는 시작보다 빠를 수 없습니다." />

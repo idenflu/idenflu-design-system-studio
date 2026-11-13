@@ -435,13 +435,13 @@ const columns: DataGridColumn<Project>[] = [
 
 ## DateTimePicker·DateTimeRangePicker
 
-`DateTimePicker`와 `DateTimeRangePicker`는 하나의 패널에서 달력과 시·분을 선택합니다. 패널에서 고른 값은 `확인`을 눌렀을 때 반영되며 `취소`·Escape·바깥 클릭은 패널의 변경을 취소합니다. 직접 입력은 포커스를 옮기거나 Enter를 누르면 검증합니다. 단일·범위 입력 모두 `size="sm | md | lg"`, `required`, `readOnly`, `disabled`, `helperText`, `error`를 지원합니다.
+`DateTimePicker`와 `DateTimeRangePicker`는 하나의 패널에서 달력과 시·분을 선택하며 `showSeconds`로 초 선택을 켤 수 있습니다. 패널에서 고른 값은 `확인`을 눌렀을 때 반영되며 `취소`·Escape·바깥 클릭은 패널의 변경을 취소합니다. 직접 입력은 포커스를 옮기거나 Enter를 누르면 검증합니다. 단일·범위 입력 모두 `size="sm | md | lg"`, `required`, `readOnly`, `disabled`, `helperText`, `error`를 지원합니다.
 
 `DateTimeRangePicker`의 패널은 시작 날짜·시간 선택 → `다음` → 종료 날짜·시간 선택 → `확인` 순서로 진행합니다. `다음`은 시작 일시를 임시로 유지하고 종료 선택 단계로 이동하며, `확인`을 누르기 전까지 범위 값은 변경되지 않습니다. `defaultValue`를 생략하면 빈 기간에서 시작할 수 있습니다.
 
-`value`·`defaultValue`·`onValueChange`·`min`·`max`에는 시간대가 없는 로컬 일시 `YYYY-MM-DDTHH:mm`을 사용합니다. 화면에는 `YYYY-MM-DD HH:mm`으로 표시하며, 숫자 12자리 입력도 지원합니다. UTC 변환이나 시간대 변환은 수행하지 않으므로 서버에 절대 시각을 저장할 때 시간대 처리는 애플리케이션에서 결정합니다. 범위 값은 `[시작 일시, 종료 일시]`이며 빈 값은 `null`입니다. 종료 일시가 시작보다 빠른 값은 자동으로 순서를 바꾸지 않고 오류로 안내합니다.
+`value`·`defaultValue`·`onValueChange`·`min`·`max`에는 시간대가 없는 로컬 일시 `YYYY-MM-DDTHH:mm`을 사용합니다. `showSeconds`를 켜면 `YYYY-MM-DDTHH:mm:ss`로 표시·반환하고, 분 단위 값은 초를 `00`으로 보완합니다. 직접 입력은 숫자 12자리, 초 선택 시 14자리도 지원합니다. UTC 변환이나 시간대 변환은 수행하지 않으므로 서버에 절대 시각을 저장할 때 시간대 처리는 애플리케이션에서 결정합니다. 범위 값은 `[시작 일시, 종료 일시]`이며 빈 값은 `null`입니다. 종료 일시가 시작보다 빠른 값은 자동으로 순서를 바꾸지 않고 오류로 안내합니다.
 
-`minuteStep`의 기본값은 1입니다. 60을 나누어떨어지게 하는 1~60 사이의 정수를 지정하며, 목록과 직접 입력 모두 이 분 간격을 따릅니다. `min`·`max`는 같은 날짜 안의 시간까지 제한합니다. `name="booking"`인 범위 입력은 `booking-start`와 `booking-end` 이름으로 확정된 로컬 일시를 제출합니다.
+`showSeconds`의 기본값은 `false`입니다. `secondStep`의 기본값은 1이며 초 선택과 직접 입력에 적용합니다. `minuteStep`의 기본값은 1입니다. 두 간격에는 60을 나누어떨어지게 하는 1~60 사이의 정수를 지정하며, 목록과 직접 입력에 적용합니다. `min`·`max`는 같은 날짜 안의 시간까지 제한합니다. `name="booking"`인 범위 입력은 `booking-start`와 `booking-end` 이름으로 확정된 로컬 일시를 제출합니다.
 
 ```tsx
 import { DateTimePicker, DateTimeRangePicker } from '@idenflu/mono-react';

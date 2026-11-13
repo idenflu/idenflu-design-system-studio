@@ -320,3 +320,66 @@ test('keyboard opens the datetime calendar, moves dates and escapes without publ
     assert.equal(inputs(f.container)[0].value, '2026-11-12 14:30');
   } finally { await f.dispose(); }
 });
+
+
+test('seconds are selectable, submitted, normalized and constrained at second precision', async () => {
+  const f = fixture(), changes = [];
+  try {
+    await f.render(h('form', null, h(DateTimePicker, { label: '예약', name: 'booking', showSeconds: true, defaultValue: '2026-11-12T14:30:15', min: '2026-11-12T14:30:10', max: '2026-11-12T14:31:05', onValueChange: value => changes.push(value) })));
+    const form = f.container.querySelector('form'), input = inputs(f.container)[0];
+    await click(trigger(f.container));
+    assert.equal(timeOption(f.container, '초', '09').disabled, true);
+    assert.equal(timeOption(f.container, '초', '10').disabled, false);
+    await click(timeOption(f.container, '초', '20'));
+    await key(timeOption(f.container, '초', '20'), 'ArrowDown');
+    await click(button(popup(f.container), '확인'));
+    assert.equal(changes.at(-1), '2026-11-12T14:30:21');
+    assert.equal(values(form).get('booking'), '2026-11-12T14:30:21');
+    await edit(input, '20261112143100'); await key(input, 'Enter');
+    assert.equal(input.value, '2026-11-12 14:31:00');
+    assert.equal(values(form).get('booking'), '2026-11-12T14:31:00');
+    await edit(input, '2026-11-12 14:31:06'); await key(input, 'Enter');
+    assert.equal(await validity(input), false);
+    assert.equal(values(form).get('booking'), '2026-11-12T14:31:00');
+  } finally { await f.dispose(); }
+});
+
+test('datetime range compares seconds and retains each endpoint selection', async () => {
+  const f = fixture(), changes = [];
+  try {
+    await f.render(h(DateTimeRangePicker, { label: '기간', showSeconds: true, defaultValue: ['2026-11-12T14:30:10', '2026-11-12T14:30:20'], onValueChange: value => changes.push(value) }));
+    await click(trigger(f.container));
+    await click(timeOption(f.container, '초', '15'));
+    await click(button(popup(f.container), '다음'));
+    await click(timeOption(f.container, '초', '14'));
+    await click(button(popup(f.container), '확인'));
+    assert.match(popup(f.container).textContent, /종료 일시는 시작 일시보다 빠를 수 없습니다/);
+    await click(timeOption(f.container, '초', '25'));
+    await click(button(popup(f.container), '확인'));
+    assert.deepEqual(changes.at(-1), ['2026-11-12T14:30:15', '2026-11-12T14:30:25']);
+  } finally { await f.dispose(); }
+});
+
+
+test('seconds are opt-in and secondStep applies to inputs and bounded choices', async () => {
+  const f = fixture();
+  try {
+    await f.render(h(DateTimePicker, { label: '기본', defaultValue: '2026-11-12T14:30' }));
+    await click(trigger(f.container));
+    assert.equal(f.container.querySelector('[role="listbox"][aria-label="초"]'), null);
+    await click(button(popup(f.container), '취소'));
+    const input = inputs(f.container)[0];
+    await edit(input, '2026-11-12 14:30:00'); await key(input, 'Enter');
+    assert.equal(await validity(input), false);
+    await f.render(h(DateTimePicker, { key: 'seconds', label: '초', showSeconds: true, secondStep: 5, defaultValue: '2026-11-12T14:30', min: '2026-11-12T14:30:02', max: '2026-11-12T14:30:09' }));
+    await click(trigger(f.container));
+    assert.equal(timeOption(f.container, '초', '00').disabled, true);
+    assert.equal(timeOption(f.container, '초', '05').disabled, false);
+    assert.equal(timeOption(f.container, '초', '10').disabled, true);
+    await click(day(f.container, '2026년 11월 12일'));
+    await click(button(popup(f.container), '확인'));
+    assert.equal(inputs(f.container)[0].value, '2026-11-12 14:30:05');
+    await edit(inputs(f.container)[0], '2026-11-12 14:30:06'); await key(inputs(f.container)[0], 'Enter');
+    assert.equal(await validity(inputs(f.container)[0]), false);
+  } finally { await f.dispose(); }
+});

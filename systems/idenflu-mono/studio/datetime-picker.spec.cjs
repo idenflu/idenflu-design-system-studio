@@ -145,3 +145,30 @@ test('datetime still dismisses on keyboard exit, outside click and Escape after 
   await expect(trigger).toBeFocused();
   await expect(input).toHaveValue('2026-11-12 14:30');
 });
+
+test('seconds fit the existing panel and summary matches the date range typography', {tag:'@mobile'}, async ({ page }) => {
+  const typography = locator => locator.evaluate(element => {
+    const style = getComputedStyle(element);
+    return Object.fromEntries(['color', 'fontSize', 'fontWeight', 'lineHeight'].map(key => [key, style[key]]));
+  });
+  await page.goto('/systems/idenflu-mono/index.html#/components/date-picker');
+  await page.locator('.date-picker').filter({ has: page.getByRole('textbox', { name: '시작일', exact: true }).first() }).first().getByRole('button', { name: '달력 열기' }).click();
+  const expected = await typography(page.locator('.calendar-range-summary').first());
+  await page.goto('/systems/idenflu-mono/index.html#/components/datetime-picker');
+  const basic = page.locator('.datetime-picker').filter({ has: page.locator('#datetime-basic') });
+  await basic.getByRole('button', { name: '날짜 및 시간 선택 열기' }).click();
+  const basicDialog = page.getByRole('dialog', { name: '날짜 및 시간 선택', exact: true });
+  const basicWidth = (await basicDialog.boundingBox()).width;
+  await expect(basicDialog.getByRole('listbox', { name: '초', exact: true })).toHaveCount(0);
+  await basicDialog.getByRole('button', { name: '취소', exact: true }).click();
+  await page.locator('.datetime-picker').filter({ has: page.locator('#datetime-seconds') }).getByRole('button', { name: '날짜 및 시간 선택 열기' }).click();
+  const dialog = page.getByRole('dialog', { name: '날짜 및 시간 선택', exact: true });
+  expect(await typography(dialog.locator('.datetime-summary'))).toEqual(expected);
+  const width = (await dialog.boundingBox()).width;
+  expect(width).toBe(basicWidth);
+  expect(width).toBeLessThanOrEqual(Math.min(560, page.viewportSize().width - 24) + 1);
+  await dialog.getByRole('listbox', { name: '초', exact: true }).getByRole('option', { name: '20', exact: true }).click();
+  expect((await dialog.boundingBox()).width).toBe(width);
+  await dialog.getByRole('button', { name: '확인', exact: true }).click();
+  await expect(page.locator('#datetime-seconds')).toHaveValue('2026-11-12 14:30:20');
+});
