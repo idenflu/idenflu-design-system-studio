@@ -495,14 +495,14 @@ function pickerToUtc(value: string | null): string | null {
 
 ## NovaSpinner
 
-`NovaSpinner`는 NOVA Studio 로고를 사용한 로딩 표시입니다. `size`는 픽셀 단위이며 기본값은 48입니다. `appearance="orbit"`은 궤도 회전, `appearance="mark"`는 로고의 밝기 변화만 표시합니다. `variant`는 원본 색상의 `brand`와 `neutral`·`inverse`를 지원하며, 움직임 줄이기 설정에서는 애니메이션을 멈춥니다. `label`로 현재 작업을 설명하고, 버튼에 같은 설명이 있으면 `aria-hidden`으로 중복 안내를 피합니다.
+`NovaSpinner`는 NOVA Studio 로고를 사용한 로딩 표시입니다. `size`는 픽셀 단위이며 기본값은 48입니다. `appearance="orbit"`은 궤도 회전, `appearance="mark"`는 로고의 밝기 변화만 표시합니다. `variant`는 원본 색상의 `brand`와 `neutral`·`inverse`를 지원하며, 움직임 줄이기 설정에서는 애니메이션을 멈춥니다. `label`로 현재 작업을 설명하고, 버튼에 같은 설명이 있으면 `aria-hidden`으로 중복 안내를 피합니다. `Spinner`와 `NovaSpinner`의 `speed`는 한 애니메이션 주기의 밀리초 값이며 기본값은 1800입니다. 양의 유한수가 아니면 기본값을 사용합니다.
 
 ```tsx
 import { NovaSpinner, Spinner } from '@idenflu/mono-react';
 
 <NovaSpinner size={64} label="프로젝트를 준비하는 중" />
 <NovaSpinner size={24} appearance="mark" variant="neutral" />
-<Spinner kind="nova" size="small" />
+<Spinner kind="nova" size="small" speed={2400} />
 ```
 
 기존 `Spinner`의 `kind="nova"`도 같은 컴포넌트를 사용하며 기존 크기 규칙인 16·24·32px을 따릅니다. `inverse`는 밝은 단색이므로 진한 배경에 사용합니다.

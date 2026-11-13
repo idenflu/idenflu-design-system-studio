@@ -5,14 +5,16 @@ export interface NovaSpinnerProps extends Omit<React.HTMLAttributes<HTMLSpanElem
   appearance?: 'orbit' | 'mark';
   variant?: 'brand' | 'neutral' | 'inverse';
   label?: string;
+  speed?: number;
 }
 
 /** Animated NOVA Studio mark, using the original icon.svg geometry and palette. */
-export function NovaSpinner({ size = 48, appearance = 'orbit', variant = 'brand', label = '로딩 중', className = '', style, ...props }: NovaSpinnerProps) {
+export function NovaSpinner({ size = 48, appearance = 'orbit', variant = 'brand', label = '로딩 중', speed, className = '', style, ...props }: NovaSpinnerProps) {
   const dimension = Number.isFinite(size) && size > 0 ? size : 48;
+  const duration = speed !== undefined && Number.isFinite(speed) && speed > 0 ? `${speed}ms` : undefined;
   return <span role="status" aria-label={label} {...props}
     className={`nova-spinner nova-spinner--${appearance} nova-spinner--${variant} ${className}`}
-    style={{'--nova-spinner-size':`${dimension}px`, ...style} as React.CSSProperties}>
+    style={{'--nova-spinner-size':`${dimension}px`, '--spinner-duration':duration, ...style} as React.CSSProperties}>
     <svg viewBox="0 0 108 108" fill="none" aria-hidden="true" focusable="false">
       {appearance === 'orbit' && <>
         <circle className="nova-spinner__track" cx="54" cy="54" r="50" />

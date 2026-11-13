@@ -122,6 +122,43 @@ test('all Spinner kinds respect small, medium and large sizes', {tag:['@theme','
   }
 });
 
+test('spinner durations and staggered animations follow speed in milliseconds', async ({page},testInfo) => {
+  const kinds=['ring','dual','dots','bars','nova','nova-mark'];
+  const values=[undefined,900,0];
+  const markup=renderToStaticMarkup(h(React.Fragment,null,...kinds.flatMap(kind=>values.map((speed,index)=>
+    h('div',{'data-kind':kind,'data-speed':index,key:`${kind}-${index}`},
+      kind==='nova-mark' ? h(C.NovaSpinner,{appearance:'mark',speed}) : h(C.Spinner,{kind,speed}))
+  ))));
+  await mount(page,testInfo,markup);
+  for (const kind of kinds) {
+    for (const [index,duration] of [[0,'1.8s'],[1,'0.9s'],[2,'1.8s']]) {
+      const root=page.locator(`[data-kind="${kind}"][data-speed="${index}"] > span`);
+      const animated=kind==='nova' ? root.locator('.nova-spinner__orbit, .nova-spinner__facet') : kind==='nova-mark' ? root.locator('.nova-spinner__facet') : ['dots','bars'].includes(kind) ? root.locator('span') : root;
+      for (const element of await animated.all()) await expect(element).toHaveCSS('animation-duration',duration);
+      await expect(root).not.toHaveAttribute('speed',/./);
+    }
+  }
+  await expect(page.locator('[data-kind="dots"][data-speed="1"] span span:nth-child(2)')).toHaveCSS('animation-delay','0.1125s');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  for (const kind of kinds) {
+    const root=page.locator(`[data-kind="${kind}"][data-speed="1"] > span`);
+    const animated=kind==='nova' ? root.locator('.nova-spinner__orbit, .nova-spinner__facet') : kind==='nova-mark' ? root.locator('.nova-spinner__facet') : ['dots','bars'].includes(kind) ? root.locator('span') : root;
+    for (const element of await animated.all()) await expect(element).toHaveCSS('animation-name','none');
+  }
+});
+
+test('ring and dual spinners rotate with continuous easing', async ({page},testInfo) => {
+  const markup=renderToStaticMarkup(h(React.Fragment,null,...['ring','dual'].map(kind=>
+    h('div',{'data-kind':kind,key:kind},h(C.Spinner,{kind,speed:900}))
+  )));
+  await mount(page,testInfo,markup);
+  for (const kind of ['ring','dual']) {
+    const root=page.locator(`[data-kind="${kind}"] > span`);
+    await expect(root).toHaveCSS('animation-timing-function','cubic-bezier(0.25, 0.1, 0.75, 0.9)');
+    await expect(root).toHaveCSS('animation-duration','0.9s');
+  }
+});
+
 test('standalone calendar disabled days and controls inside Popover retain their styles', {tag:['@theme','@mobile']}, async ({page},testInfo) => {
   await mount(page,testInfo,'<div id="interactive"></div>');
   const bundle=buildSync({

@@ -1,11 +1,11 @@
 .nova-spinner { --nova-spinner-size:48px; display:inline-flex; flex:none; align-items:center; justify-content:center; inline-size:var(--nova-spinner-size); block-size:var(--nova-spinner-size); vertical-align:middle; color:#266ee1; line-height:1; }
 .nova-spinner > svg { display:block; inline-size:100%; block-size:100%; overflow:visible; }
 .nova-spinner__track { stroke:currentColor; stroke-width:1.5; opacity:.2; }
-.nova-spinner__orbit { stroke:currentColor; stroke-width:2.6; transform-origin:54px 54px; transform:rotate(-90deg); animation:nova-orbit-turn 1.8s linear infinite; }
-.nova-spinner__facet { animation:nova-facet-light 1.8s ease-in-out infinite; }
-.nova-spinner__facet--left { animation-delay:-1.2s; }
-.nova-spinner__facet--diagonal { animation-delay:-1s; }
-.nova-spinner__facet--right { animation-delay:-.8s; }
+.nova-spinner__orbit { stroke:currentColor; stroke-width:2.6; transform-origin:54px 54px; transform:rotate(-90deg); animation:nova-orbit-turn var(--spinner-duration, var(--motion-spinner)) linear infinite; }
+.nova-spinner__facet { animation:nova-facet-light var(--spinner-duration, var(--motion-spinner)) ease-in-out infinite; }
+.nova-spinner__facet--left { animation-delay:calc(var(--spinner-duration, var(--motion-spinner)) * -0.6666667); }
+.nova-spinner__facet--diagonal { animation-delay:calc(var(--spinner-duration, var(--motion-spinner)) * -0.5555556); }
+.nova-spinner__facet--right { animation-delay:calc(var(--spinner-duration, var(--motion-spinner)) * -0.4444444); }
 .nova-spinner--neutral { color:var(--text-secondary); }
 .nova-spinner--inverse { color:var(--spinner-inverse-color, var(--inverse-text)); }
 .nova-spinner--neutral .nova-spinner__facet, .nova-spinner--inverse .nova-spinner__facet { fill:currentColor; }

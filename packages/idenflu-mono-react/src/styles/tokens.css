@@ -215,7 +215,7 @@
   --motion-normal: 200ms;
   --motion-slow: 320ms;
   --motion-easing: ease;
-  --motion-spinner: 800ms;
+  --motion-spinner: 1200ms;
   --motion-pulse: 1600ms;
 }
 :root[data-theme="dark"] {
