@@ -181,6 +181,16 @@ export function ProjectFilters() {
 
 필요하면 버튼 범위에서 `--button-disabled-bg`, `--button-disabled-text`, `--button-disabled-shadow`를 재정의할 수 있습니다.
 
+## Tooltip
+
+`position`으로 `top`, `bottom`, `left`, `right` 위치를 지정합니다. `enterDelay`와 `leaveDelay`는 포인터가 진입하거나 이탈한 뒤 표시·숨김까지 기다리는 밀리초이며 기본값은 각각 `0`입니다. 키보드 포커스 시에는 즉시 표시되고 포커스가 벗어나면 `leaveDelay`가 적용됩니다. Escape 또는 클릭으로 닫을 때는 즉시 숨겨집니다.
+
+```tsx
+<Tooltip content="도움말" position="bottom" enterDelay={500} leaveDelay={200}>
+  <Button>정보</Button>
+</Tooltip>
+```
+
 ## IconButton
 
 `IconButton`은 아이콘 전용 `Button`이며 기본 스타일은 `ghost`입니다. 필수 `label`을 접근 가능한 이름과 기본 툴팁에 함께 사용합니다. `tooltip`을 전달하면 안내 내용만 바꾸고, `tooltip={false}`로 툴팁을 제거해도 버튼 이름은 유지합니다. `Button`의 `variant`, `size`, `disabled`, 네이티브 이벤트와 실제 버튼을 가리키는 `ref`를 지원합니다.

@@ -56,6 +56,27 @@ test('hover tooltip accepts pointer movement and Escape without trigger focus', 
   await expect(content).toBeHidden();
 });
 
+test('tooltip delays pointer enter and leave and cancels pending actions', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Touch devices have no persistent hover');
+  await page.goto('/systems/idenflu-mono/index.html#/components/tooltip');
+  const button = page.getByRole('button', {name: '지연 툴팁'});
+  const tooltip = button.locator('..').getByRole('tooltip', {includeHidden: true});
+  await button.hover();
+  await expect(tooltip).toBeHidden();
+  await expect(tooltip).toBeVisible();
+  await page.mouse.move(0, 0);
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toBeHidden();
+  await button.hover();
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(600);
+  await expect(tooltip).toBeHidden();
+  await button.focus();
+  await expect(tooltip).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(tooltip).toBeHidden();
+});
+
 test('built React documentation works without the legacy HTML runtime', async ({ page }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));

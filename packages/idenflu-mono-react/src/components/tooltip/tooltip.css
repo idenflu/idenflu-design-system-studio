@@ -2,8 +2,7 @@
 .tooltip-content { position:absolute; z-index:var(--z-tooltip); bottom:calc(100% + var(--space-2)); left:0; width:max-content; max-width:min(260px, calc(100vw - 48px)); padding:var(--space-2) calc(var(--space-unit) * 2.5); background:var(--inverse-canvas); color:var(--inverse-text); font-size:var(--font-size-caption); line-height:var(--line-height-caption); opacity:0; visibility:hidden; pointer-events:auto; }
 .tooltip-content::after { content:""; position:absolute; inset:100% 0 auto; height:var(--space-2); }
 .tooltip-wrap:has(:is(.icon-button, .button--icon)) .tooltip-content { left:auto; right:0; }
-.tooltip-wrap:hover .tooltip-content, .tooltip-wrap:focus-within .tooltip-content { opacity:1; visibility:visible; }
-.tooltip-wrap.tooltip-dismissed .tooltip-content { opacity:0; visibility:hidden; }
+.tooltip-wrap.tooltip-open .tooltip-content { opacity:1; visibility:visible; }
 
 .tooltip-wrap.tooltip-wrap[data-position="bottom"] .tooltip-content { top:calc(100% + var(--space-2)); bottom:auto; }
 .tooltip-wrap.tooltip-wrap[data-position="left"] .tooltip-content { right:calc(100% + var(--space-2)); left:auto; top:50%; bottom:auto; translate:0 -50%; }

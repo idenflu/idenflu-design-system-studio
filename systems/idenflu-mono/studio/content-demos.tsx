@@ -210,6 +210,7 @@ export function TooltipDemos() {
     <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
       <div className="react-studio-example"><h3 className="react-studio-example-title">텍스트 버튼</h3><div className="react-studio-row"><Tooltip content="프로젝트를 구분할 수 있는 이름입니다."><Button variant="outline">프로젝트 이름</Button></Tooltip></div></div>
       <div className="react-studio-example"><h3 className="react-studio-example-title">아이콘 버튼</h3><div className="react-studio-row"><Tooltip content="화면에 표시할 항목을 설정합니다."><button type="button" className="icon-button" aria-label="표시 설정 도움말"><Icon name="settings" /></button></Tooltip></div></div>
+      <div className="react-studio-example"><h3 className="react-studio-example-title">표시·숨김 지연</h3><div className="react-studio-row"><Tooltip content="잠시 후 표시되고 숨겨집니다." enterDelay={500} leaveDelay={500}><Button variant="outline">지연 툴팁</Button></Tooltip></div></div>
     </Grid>
     <p className="react-studio-caption">필수 설명과 오류 안내는 툴팁 안에만 넣지 않습니다.</p>
   </Section>;

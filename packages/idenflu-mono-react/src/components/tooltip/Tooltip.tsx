@@ -2,11 +2,21 @@ import * as React from 'react';
 import { useClientLayoutEffect } from '../../shared/use-client-layout-effect';
 
 /** Tooltip content is exposed as the trigger's accessible description. */
-export function Tooltip({ content, children, position: placement = 'top' }: { content: React.ReactNode; position?: 'top' | 'bottom' | 'left' | 'right'; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
+export function Tooltip({ content, children, position: placement = 'top', enterDelay = 0, leaveDelay = 0 }: { content: React.ReactNode; position?: 'top' | 'bottom' | 'left' | 'right'; enterDelay?: number; leaveDelay?: number; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
   const id = React.useId();
   const [dismissed, setDismissed] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const hovered = React.useRef(false);
+  const timer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const wrap = React.useRef<HTMLSpanElement>(null);
   const bubble = React.useRef<HTMLSpanElement>(null);
+  const cancelTimer = () => { clearTimeout(timer.current); timer.current = undefined; };
+  const schedule = (visible: boolean, delay: number) => {
+    cancelTimer();
+    if (delay > 0) timer.current = setTimeout(() => setOpen(visible), delay);
+    else setOpen(visible);
+  };
+  React.useEffect(() => () => clearTimeout(timer.current), []);
   const position = React.useCallback(() => {
     const element = bubble.current;
     if (!element?.getClientRects().length) return;
@@ -30,16 +40,18 @@ export function Tooltip({ content, children, position: placement = 'top' }: { co
       if (event.key !== 'Escape' || dismissed || !wrap.current || !(wrap.current.matches(':hover') || wrap.current.contains(document.activeElement))) return;
       const dialog = wrap.current.ownerDocument.querySelector('dialog[open]');
       if (dialog && !dialog.contains(wrap.current)) return;
-      setDismissed(true); event.preventDefault(); event.stopPropagation();
+      cancelTimer(); setOpen(false); setDismissed(true); event.preventDefault(); event.stopPropagation();
     };
     document.addEventListener('keydown', escape, true);
     return () => document.removeEventListener('keydown', escape, true);
   }, [dismissed]);
   const existing = children.props['aria-describedby'];
-  return <span ref={wrap} data-position={placement} className={`tooltip-wrap${dismissed ? ' tooltip-dismissed' : ''}`}
-    onMouseEnter={() => { position(); setDismissed(false); }}
-    onFocus={event => { position(); if (!event.currentTarget.contains(event.relatedTarget)) setDismissed(false); }}
-    onClickCapture={() => setDismissed(true)}>
+  return <span ref={wrap} data-position={placement} className={`tooltip-wrap${open && !dismissed ? ' tooltip-open' : ''}`}
+    onMouseEnter={() => { hovered.current = true; position(); setDismissed(false); if (!wrap.current?.contains(document.activeElement)) schedule(true, enterDelay); }}
+    onMouseLeave={() => { hovered.current = false; if (!wrap.current?.contains(document.activeElement)) schedule(false, leaveDelay); }}
+    onFocus={event => { position(); if (!event.currentTarget.contains(event.relatedTarget)) { setDismissed(false); schedule(true, 0); } }}
+    onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget) && !hovered.current) schedule(false, leaveDelay); }}
+    onClickCapture={() => { cancelTimer(); setOpen(false); setDismissed(true); }}>
     {React.cloneElement(children, { 'aria-describedby': [existing, id].filter(Boolean).join(' ') })}
     <span ref={bubble} id={id} role="tooltip" className="tooltip-content">{content}</span>
   </span>;
