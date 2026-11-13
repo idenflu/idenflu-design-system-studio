@@ -26,10 +26,12 @@ async function main() {
   assert.match(markup, /value="design"/);
   assert.match(markup, /aria-modal="false"/);
   let assetCount = 0;
+  let inlinedIconCss = false;
   for (const entry of ['styles.css', 'tokens.css', 'reset.css']) {
     const filename = require.resolve(`@idenflu/mono-react/${entry}`);
     const css = readFileSync(filename, 'utf8');
     assert.ok(css.length > 0, `${entry} is published`);
+    if (css.includes('data:image/svg+xml')) inlinedIconCss = true;
     for (const match of css.matchAll(/url\(\s*["']?([^"')\s]+)["']?\s*\)/g)) {
       const url = match[1];
       if (/^(?:data:|https?:|#)/.test(url)) continue;
@@ -40,7 +42,8 @@ async function main() {
       assetCount++;
     }
   }
-  assert.ok(assetCount > 0, 'checks the actual CSS font and SVG assets');
+  assert.ok(assetCount > 0, 'checks the actual CSS font assets');
+  assert.ok(inlinedIconCss, 'published CSS icons stay inlined as data URIs');
   assert.ok(readFileSync(require.resolve('@idenflu/mono-react/assets/icons/icons.svg')).length > 0, 'wildcard asset export resolves');
   const pkg = require('@idenflu/mono-react/package.json');
   assert.deepEqual(pkg.sideEffects, ['**/*.css'], 'CSS stays visible to consumer tree shaking');

@@ -107,16 +107,17 @@ import '@idenflu/mono-react/tokens.css';
 import '@idenflu/mono-react/reset.css';
 createRoot(document.getElementById('root')!).render(<Grid columns={{base:1,sm:2}}><Button><SearchIcon />검색</Button><Select label="팀" options={[{value:'design',label:'디자인'}]} /></Grid>);
 `);
-  const result = await build({ absWorkingDir: consumer, entryPoints: ['app.tsx'], bundle: true, format: 'esm', platform: 'browser', outdir: join(consumer, 'out'), metafile: true, loader: { '.woff2': 'file', '.svg': 'file' }, assetNames: 'assets/[name]-[hash]', logLevel: 'silent' });
+  const result = await build({ absWorkingDir: consumer, entryPoints: ['app.tsx'], bundle: true, format: 'esm', platform: 'browser', outdir: join(consumer, 'out'), metafile: true, loader: { '.woff2': 'file' }, assetNames: 'assets/[name]-[hash]', logLevel: 'silent' });
   const inputs = Object.keys(result.metafile.inputs);
   assert.ok(inputs.some(file => file.endsWith('@idenflu/mono-react/dist/styles.css')));
   assert.ok(inputs.some(file => file.endsWith('@idenflu/mono-react/dist/tokens.css')));
   assert.ok(inputs.some(file => file.endsWith('@idenflu/mono-react/dist/reset.css')));
   assert.ok(inputs.some(file => file.endsWith('.woff2')), 'published fonts resolve in a real CSS bundle');
-  assert.ok(inputs.some(file => file.endsWith('.svg')), 'published CSS icons resolve in a real CSS bundle');
+  const stylesCss = inputs.find(file => file.endsWith('@idenflu/mono-react/dist/styles.css'));
+  assert.ok((await readFile(resolve(consumer, stylesCss), 'utf8')).includes('data:image/svg+xml'), 'published CSS icons stay inlined as data URIs in a real CSS bundle');
   for (const file of inputs) {
     const path = relative(consumer, resolve(consumer, file));
     assert.ok(!path.startsWith('..') && !isAbsolute(path), `bundle input stays in the installed consumer: ${file}`);
   }
-  console.log('독립 소비자: ESM/CJS 타입과 브라우저 JS/CSS·폰트·아이콘 번들 통과');
+  console.log('독립 소비자: ESM/CJS 타입과 브라우저 JS/CSS·폰트·인라인 아이콘 번들 통과');
 }
