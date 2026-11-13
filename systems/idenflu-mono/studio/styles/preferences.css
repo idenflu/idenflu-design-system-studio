@@ -83,7 +83,7 @@
 #studio-preferences-preview { display: grid; min-width: 0; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--border); background: var(--surface); font-size: var(--font-size-body); line-height: var(--line-height-body); overflow-wrap: anywhere; }
 #studio-preferences-preview h3 { margin: 0; font-size: var(--font-size-title); line-height: var(--line-height-title); font-weight: 600; }
 #studio-preferences-preview p { margin: 0; font-size: inherit; line-height: inherit; }
-#studio-preferences-preview .field-label { margin: 0; font-size: inherit; line-height: inherit; }
+#studio-preferences-preview .field-label { margin: 0; line-height: inherit; }
 #studio-preferences-preview .text-input, #studio-preferences-preview .button { min-width: 0; max-width: 100%; border-radius: var(--radius-control); font-size: var(--font-size-body); line-height: var(--line-height-control); }
 #studio-preferences-preview .button { justify-self: start; width: auto; }
 #studio-preview-feedback:empty { display: none; }

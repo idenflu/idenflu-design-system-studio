@@ -152,7 +152,6 @@
   .layout-filter-panel > div:has(.layout-project-keyword) { flex-basis:100%; }
 }
 .layout-filter-panel > .button[type="submit"] { padding-inline:var(--space-3); }
-.layout-sample-app .field-label { font-size:max(12px,calc(var(--font-size-base) - 2px)); }
 .layout-sample-app .data-grid-table { min-width:100%; }
 .layout-grid-footer { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-2) var(--space-4); width:100%; padding-inline-end:48px; }
 .layout-grid-footer > p { margin:0; }

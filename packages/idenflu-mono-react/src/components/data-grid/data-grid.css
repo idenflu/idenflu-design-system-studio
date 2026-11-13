@@ -105,7 +105,7 @@
 .data-grid-editor-controls .icon-button { width:28px; height:var(--control-height); min-height:0; padding:6px; }
 .data-grid-editor-error { flex-basis:100%; color:var(--danger-text); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .data-grid-page-size > div { display:flex; align-items:center; gap:var(--space-2); }
-.data-grid-page-size .field-label { margin:0; color:var(--text-secondary); font-size:var(--font-size-caption); white-space:nowrap; }
+.data-grid-page-size .field-label { margin:0; white-space:nowrap; }
 .data-grid-page-size .select-trigger { width:96px; }
 .data-grid-page-size .select-popup { top:auto; bottom:calc(100% + var(--space-1)); }
 .data-grid .data-grid-table[data-interactive] tbody tr { cursor:default; }
