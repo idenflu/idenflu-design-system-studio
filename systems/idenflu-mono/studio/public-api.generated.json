@@ -113,6 +113,10 @@
         "type": "React.ReactNode",
         "optional": true
       },
+      "readOnly": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
       "ref": {
         "type": "React.Ref<HTMLButtonElement> | undefined",
         "optional": true
@@ -189,6 +193,10 @@
       },
       "prefixIcon": {
         "type": "React.ReactNode",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
         "optional": true
       },
       "ref": {
@@ -283,6 +291,10 @@
       },
       "presentation": {
         "type": "\"default\" | \"inline\" | undefined",
+        "optional": true
+      },
+      "readOnly": {
+        "type": "boolean | undefined",
         "optional": true
       },
       "ref": {

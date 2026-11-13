@@ -11,6 +11,7 @@ interface InlineSelectTagsProps {
   placeholder: string;
   options: readonly SelectOption[];
   disabled?: boolean;
+  readOnly?: boolean;
   maxVisibleTags?: number | 'responsive';
   open: boolean;
   listId: string;
@@ -19,7 +20,7 @@ interface InlineSelectTagsProps {
   onFocusControl: () => void;
 }
 
-export function InlineSelectTags({label, placeholder, options, disabled, maxVisibleTags, open, listId, onRemove, onOpen, onFocusControl}: InlineSelectTagsProps) {
+export function InlineSelectTags({label, placeholder, options, disabled, readOnly, maxVisibleTags, open, listId, onRemove, onOpen, onFocusControl}: InlineSelectTagsProps) {
   const host = React.useRef<HTMLDivElement>(null);
   const measure = React.useRef<HTMLDivElement>(null);
   const focusControl = React.useRef(onFocusControl);
@@ -75,11 +76,11 @@ export function InlineSelectTags({label, placeholder, options, disabled, maxVisi
   const content = (option: SelectOption) => <>
     {option.icon && <span className="select-option-icon" aria-hidden="true">{option.icon}</span>}
     <span className="multi-inline-chip-label">{option.label}</span>
-    <span className="ui-icon icon-close" aria-hidden="true" />
+    {!readOnly && <span className="ui-icon icon-close" aria-hidden="true" />}
   </>;
   return <div ref={host} className={`multi-inline-tags${hiddenCount ? ' has-overflow' : ''}`} role="group" aria-label={`${label} 선택 항목`}>
-    {options.length ? options.slice(0, visibleCount).map((option, index) => <button key={option.value} type="button" className="chip multi-inline-chip" data-selected-tag-index={index} aria-label={`${option.label} 제거`} disabled={disabled || option.disabled} onClick={() => onRemove(option.value)}>{content(option)}</button>) : <span className="multi-inline-placeholder">{placeholder}</span>}
-    {hiddenCount > 0 && <button className="multi-inline-more" type="button" disabled={disabled} aria-label={`${label} 선택 항목 ${hiddenCount}개 더 보기`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={onOpen}>+{hiddenCount}개</button>}
+    {options.length ? options.slice(0, visibleCount).map((option, index) => readOnly ? <span key={option.value} className="chip multi-inline-chip">{content(option)}</span> : <button key={option.value} type="button" className="chip multi-inline-chip" data-selected-tag-index={index} aria-label={`${option.label} 제거`} disabled={disabled || option.disabled} onClick={() => onRemove(option.value)}>{content(option)}</button>) : <span className="multi-inline-placeholder">{placeholder}</span>}
+    {hiddenCount > 0 && (readOnly ? <span className="multi-inline-more">+{hiddenCount}개</span> : <button className="multi-inline-more" type="button" disabled={disabled} aria-label={`${label} 선택 항목 ${hiddenCount}개 더 보기`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={onOpen}>+{hiddenCount}개</button>)}
     <div ref={measure} className="multi-inline-metrics" aria-hidden="true">
       {options.map(option => <span key={option.value} className="chip multi-inline-tag-metric" data-tag-metric>{content(option)}</span>)}
       <span className="multi-inline-more" data-more-metric>+{options.length}개</span>

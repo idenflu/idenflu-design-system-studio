@@ -16,6 +16,7 @@ interface SelectShared {
   hideLabel?: boolean;
   name?: string;
   disabled?: boolean;
+  readOnly?: boolean;
   placeholder?: string;
   className?: string;
   size?: Size;
@@ -56,7 +57,7 @@ interface SelectCoreProps extends SelectShared {
   inputRef?: React.ForwardedRef<HTMLInputElement>;
 }
 
-function SelectCore({options, label, hideLabel = false, name, disabled, placeholder = '선택하세요', className, size, required, helperText, error, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, maxVisibleLabels, maxVisibleTags = 'responsive', onClear, buttonRef, inputRef, ...aria}: SelectCoreProps) {
+function SelectCore({options, label, hideLabel = false, name, disabled, readOnly, placeholder = '선택하세요', className, size, required, helperText, error, prefixIcon, popupStrategy = 'absolute', selected, onSelect, onReset, multiple, searchable, presentation = 'default', clearable = false, maxVisibleLabels, maxVisibleTags = 'responsive', onClear, buttonRef, inputRef, ...aria}: SelectCoreProps) {
   const id = React.useId();
   const root = React.useRef<HTMLDivElement>(null);
   const native = React.useRef<HTMLSelectElement>(null);
@@ -86,7 +87,7 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
       if (option.defaultSelected !== isSelected) option.defaultSelected = isSelected;
     }
   });
-  const requiredInvalid = Boolean(attempted && required && !validSelected.length);
+  const requiredInvalid = Boolean(attempted && required && !readOnly && !validSelected.length);
   const message = error != null ? error : requiredInvalid ? '항목을 선택해주세요.' : null;
   const invalid = message != null || aria['aria-invalid'] === true || aria['aria-invalid'] === 'true';
   const describedBy = [aria['aria-describedby'], helperText != null && `${id}-help`, message != null && `${id}-error`].filter(Boolean).join(' ') || undefined;
@@ -134,17 +135,22 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
     document.addEventListener('pointerdown', handlePointer);
     return () => document.removeEventListener('pointerdown', handlePointer);
   }, [open]);
-  React.useEffect(() => { if (disabled) { setOpen(false); setQuery(''); } }, [disabled]);
+  React.useEffect(() => {
+    if (disabled || readOnly) {
+      if (readOnly && open && popupElement.current?.contains(popupElement.current.ownerDocument.activeElement)) trigger.current?.focus();
+      setOpen(false); setQuery(''); setActive(null); setAttempted(false);
+    }
+  }, [disabled, readOnly]);
   const popupReady = popupStrategy !== 'fixed' || popupPosition !== null;
   React.useEffect(() => { if (open && multiple && searchable && popupReady) search.current?.focus(); }, [open, multiple, searchable, popupReady]);
   const openMenu = () => {
-    if (disabled) return;
+    if (disabled || readOnly) return;
     setOpen(true);
     setActive(enabled.find(option => selected.includes(option.value))?.value ?? enabled[0]?.value ?? null);
   };
   const closeMenu = (restoreFocus = false) => { setOpen(false); setQuery(''); if (restoreFocus) (searchable && !multiple ? search : trigger).current?.focus(); };
   const focusInlineControl = () => { if (open && searchable) search.current?.focus(); else trigger.current?.focus(); };
-  const openInlineMenu = () => { if (disabled) return; focusInlineControl(); if (!open) openMenu(); };
+  const openInlineMenu = () => { if (disabled || readOnly) return; focusInlineControl(); if (!open) openMenu(); };
   useEscapeLayer(open, root, () => closeMenu(true));
   const move = (delta: number) => {
     if (!enabled.length) { setActive(null); return; }
@@ -153,11 +159,12 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
   };
   const selectOption = (value: string) => {
     const option = options.find(item => item.value === value);
-    if (!option || option.disabled) return;
+    if (readOnly || !option || option.disabled) return;
     onSelect(value);
     if (!multiple) closeMenu(true);
   };
   const onKeyDown = (event: React.KeyboardEvent) => {
+    if (readOnly) return;
     if (event.key === 'Tab') { setOpen(false); setQuery(''); return; }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
@@ -189,22 +196,22 @@ function SelectCore({options, label, hideLabel = false, name, disabled, placehol
   </div>;
   return <div>
     <label className={`field-label${hideLabel ? ' sr-only' : ''}`} htmlFor={`${id}-trigger`}>{label}</label>
-    <div ref={root} className={`custom-select${searchable && !multiple ? ' search-select' : ''}${open ? ' is-open' : ''}${invalid ? ' is-invalid' : ''}${className ? ` ${className}` : ''}`} data-size={size} data-multiselect={multiple ? '' : undefined}>
-    <select ref={native} className="sr-only" aria-hidden="true" tabIndex={-1} name={name} multiple={multiple} required={required} disabled={disabled} value={multiple ? validSelected : validSelected[0] ?? ''} onChange={() => {}} onInvalid={event => { event.preventDefault(); setAttempted(true); const control = event.currentTarget; const firstInvalid = control.form && Array.from(control.form.elements).find(element => { const candidate = element as HTMLInputElement; return candidate.willValidate && !candidate.validity.valid; }); if (!firstInvalid || firstInvalid === control) (searchable && !multiple ? search : trigger).current?.focus(); }}>
+    <div ref={root} className={`custom-select${searchable && !multiple ? ' search-select' : ''}${open ? ' is-open' : ''}${invalid ? ' is-invalid' : ''}${className ? ` ${className}` : ''}`} data-size={size} data-multiselect={multiple ? '' : undefined} data-readonly={readOnly ? '' : undefined}>
+    <select ref={native} className="sr-only" aria-hidden="true" tabIndex={-1} name={name} multiple={multiple} required={required && !readOnly} disabled={disabled} value={multiple ? validSelected : validSelected[0] ?? ''} onChange={() => {}} onInvalid={event => { event.preventDefault(); setAttempted(true); const control = event.currentTarget; const firstInvalid = control.form && Array.from(control.form.elements).find(element => { const candidate = element as HTMLInputElement; return candidate.willValidate && !candidate.validity.valid; }); if (!firstInvalid || firstInvalid === control) (searchable && !multiple ? search : trigger).current?.focus(); }}>
       {!multiple && <option value="">{placeholder}</option>}
       {options.filter(option => option.value !== '').map(option => <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>)}
     </select>
-    {searchable && !multiple ? <div className="search-select-control">{prefix}<input id={`${id}-trigger`} ref={search} className="search-select-input" role="combobox" aria-label={label} aria-autocomplete="list" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} placeholder={placeholder} value={open ? query : selectedLabels[0] ?? ''} onFocus={() => { setQuery(''); openMenu(); }} onClick={() => { if (!open) openMenu(); }} onChange={event => { const next = event.target.value; setQuery(next); setOpen(true); setActive(options.find(option => !option.disabled && option.label.toLocaleLowerCase().includes(next.toLocaleLowerCase()))?.value ?? null); }} onKeyDown={onKeyDown} /></div>
+    {searchable && !multiple ? <div className="search-select-control">{prefix}<input id={`${id}-trigger`} ref={search} className="search-select-input" role="combobox" aria-label={label} aria-autocomplete="list" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required && !readOnly || undefined} aria-readonly={readOnly || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} readOnly={readOnly} placeholder={placeholder} value={open ? query : selectedLabels[0] ?? ''} onFocus={() => { setQuery(''); openMenu(); }} onClick={() => { if (!open) openMenu(); }} onChange={event => { const next = event.target.value; setQuery(next); setOpen(true); setActive(options.find(option => !option.disabled && option.label.toLocaleLowerCase().includes(next.toLocaleLowerCase()))?.value ?? null); }} onKeyDown={onKeyDown} /></div>
       : multiple && presentation === 'inline' ? <div className="multi-inline-control" onMouseDown={event => {
           if (!disabled && event.button === 0 && !(event.target as Element).closest('button')) event.preventDefault();
         }} onClick={event => {
-          if (disabled || (event.target as Element).closest('button')) return;
+          if (disabled || readOnly || (event.target as Element).closest('button')) return;
           openInlineMenu();
-        }}>{prefix}<InlineSelectTags label={label} placeholder={placeholder} options={selectedOptions} disabled={disabled} maxVisibleTags={maxVisibleTags} open={open} listId={listId} onRemove={value => {onSelect(value); focusInlineControl();}} onOpen={openInlineMenu} onFocusControl={focusInlineControl} />{clearable && <button type="button" className="input-action multi-inline-clear" aria-label={`${label} 모두 지우기`} disabled={disabled || !selected.length} onClick={onClear}><span className="ui-icon icon-close" aria-hidden="true" /></button>}
-        <button id={`${id}-trigger`} ref={trigger} type="button" className="input-action multi-inline-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span className="ui-icon icon-caret" aria-hidden="true" /></button></div>
-      : <button id={`${id}-trigger`} ref={trigger} type="button" className="select-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span data-select-label className="select-value-content">{prefix}{!multiple && selectedOptions[0]?.icon && <span className="select-option-icon" aria-hidden="true">{selectedOptions[0].icon}</span>}<span className="select-value-text">{displayValue || placeholder}</span></span><span className="ui-icon icon-caret" aria-hidden="true" /></button>}
+        }}>{prefix}<InlineSelectTags label={label} placeholder={placeholder} options={selectedOptions} disabled={disabled} readOnly={readOnly} maxVisibleTags={maxVisibleTags} open={open} listId={listId} onRemove={value => {onSelect(value); focusInlineControl();}} onOpen={openInlineMenu} onFocusControl={focusInlineControl} />{clearable && <button type="button" className="input-action multi-inline-clear" aria-label={`${label} 모두 지우기`} disabled={disabled || readOnly || !selected.length} onClick={onClear}><span className="ui-icon icon-close" aria-hidden="true" /></button>}
+        <button id={`${id}-trigger`} ref={trigger} type="button" className="input-action multi-inline-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required && !readOnly || undefined} aria-readonly={readOnly || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span className="ui-icon icon-caret" aria-hidden="true" /></button></div>
+      : <button id={`${id}-trigger`} ref={trigger} type="button" className="select-trigger" role="combobox" aria-label={`${label}: ${selectedLabels.join(', ') || placeholder}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} aria-required={required && !readOnly || undefined} aria-readonly={readOnly || undefined} aria-describedby={describedBy} aria-invalid={invalid || aria['aria-invalid']} disabled={disabled} onClick={() => open ? closeMenu() : openMenu()} onKeyDown={onKeyDown}><span data-select-label className="select-value-content">{prefix}{!multiple && selectedOptions[0]?.icon && <span className="select-option-icon" aria-hidden="true">{selectedOptions[0].icon}</span>}<span className="select-value-text">{displayValue || placeholder}</span></span><span className="ui-icon icon-caret" aria-hidden="true" /></button>}
     {popup}
-    {multiple && presentation !== 'inline' && clearable && <button type="button" className="button button--ghost button-inline multi-clear" disabled={disabled || !selected.length} onClick={onClear}>모두 지우기</button>}
+    {multiple && presentation !== 'inline' && clearable && <button type="button" className="button button--ghost button-inline multi-clear" disabled={disabled || readOnly || !selected.length} onClick={onClear}>모두 지우기</button>}
     </div>
     {helperText != null && <p id={`${id}-help`} className="component-helper" style={{marginTop:'var(--space-1)'}}>{helperText}</p>}
     {message != null && <p id={`${id}-error`} className="field-error" role={error == null && requiredInvalid ? 'alert' : undefined}>{message}</p>}

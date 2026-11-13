@@ -44,7 +44,7 @@ export function SelectAPIReference() {return <>
       ['onValueChange','undefined','선택·해제·전체 지우기 후의 문자열 또는 전체 문자열 배열을 전달합니다. 검색어 입력만으로는 호출하지 않습니다.'],
       ['name','undefined','단일 선택은 하나의 값, 복수 선택은 같은 name의 반복 값으로 제출합니다. 선택하지 않은 복수 값은 제출 항목이 없습니다.'],
       ['placeholder',"'선택하세요'",'선택값이 없을 때 표시합니다. label을 대신하지 않습니다.'],
-      ['disabled / required','false','컴포넌트 비활성화 또는 필수값 검증입니다. required는 비활성·빈 value를 제외한 선택이 있어야 통과합니다.'],
+      ['disabled / readOnly / required','false','readOnly는 포커스와 값 제출을 유지하면서 선택 변경을 막습니다. disabled 값은 제출되지 않습니다. required는 수정 가능한 필드에서 유효한 선택이 있어야 통과합니다.'],
       ['helperText / error','undefined','필드 아래에 도움말과 외부 오류를 표시하고 실제 조작 컨트롤의 설명으로 연결합니다. 오류가 없으면 error를 undefined 또는 null로 지정하세요. 외부 error는 내부 필수 선택 오류보다 우선하며 같은 오류 문구를 중복 표시하지 않습니다.'],
       ['ref','undefined','Select·MultiSelect는 실제 트리거 button, SearchSelect는 검색 input을 가리킵니다. 태그형 MultiSelect도 트리거 button입니다. ref.current?.focus()로 첫 오류나 원하는 필드로 이동합니다.'],
       ['size','기본 크기(md)','트리거와 옵션 목록의 높이·여백을 같은 크기 토큰으로 적용합니다.'],

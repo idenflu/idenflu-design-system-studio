@@ -153,3 +153,49 @@ test('Select public ref types match their interactive DOM controls',()=>{
     getCanonicalFileName:file=>file,getCurrentDirectory:()=>process.cwd(),getNewLine:()=> '\n',
   }));
 });
+
+for (const {name,Component,props,empty} of variants) {
+  test(`${name} readOnly preserves focus and submission while preventing changes`, async()=>{
+    const f=fixture(), ref=React.createRef(), changes=[];
+    const initial=Array.isArray(empty) ? ['design','development'] : 'design';
+    const render=readOnly=>f.render(h('form',null,h(Component,{label:'담당 팀',name:'team',options,...props,ref,defaultValue:initial,clearable:true,readOnly,onValueChange:value=>changes.push(value)})));
+    try {
+      await render(false);
+      await click(ref.current);
+      assert.equal(ref.current.getAttribute('aria-expanded'),'true');
+      await render(true);
+      const control=ref.current, form=f.node.querySelector('form');
+      assert.equal(control.getAttribute('aria-readonly'),'true');
+      assert.equal(control.getAttribute('aria-expanded'),'false');
+      await act(async()=>control.focus());
+      assert.equal(document.activeElement,control);
+      await click(control);
+      await act(async()=>control.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true})));
+      assert.equal(control.getAttribute('aria-expanded'),'false');
+      if (control.tagName==='INPUT') assert.equal(control.readOnly,true);
+      assert.equal(f.node.querySelectorAll('.multi-inline-chip button, button.multi-inline-chip').length,0);
+      for (const button of f.node.querySelectorAll('.multi-clear,.multi-inline-clear')) assert.equal(button.disabled,true);
+      assert.deepEqual(new dom.window.FormData(form).getAll('team'),Array.isArray(initial)?initial:[initial]);
+      assert.deepEqual(changes,[]);
+      await render(false);
+      await click(control);
+      assert.equal(control.getAttribute('aria-expanded'),'true');
+    } finally { await f.dispose(); }
+  });
+}
+
+for (const {name,Component,props,empty} of variants) {
+  test(`${name} skips required validation only while readOnly`, async()=>{
+    const f=fixture();
+    const render=readOnly=>f.render(h('form',null,h(Component,{label:'팀',name:'team',options,...props,required:true,readOnly})));
+    try {
+      await render(true);
+      const form=f.node.querySelector('form');
+      assert.equal(form.checkValidity(),true);
+      await render(false);
+      let valid;
+      await act(async()=>{valid=form.checkValidity();});
+      assert.equal(valid,false);
+    } finally { await f.dispose(); }
+  });
+}
