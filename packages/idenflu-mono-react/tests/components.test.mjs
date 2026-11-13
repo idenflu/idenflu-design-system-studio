@@ -157,15 +157,16 @@ test('Tooltip activation dismisses without stealing focus or replacing the child
     await f.render(h(Tooltip, {content:'버튼 설명'}, h('button', {type:'button', onClick:event => { event.stopPropagation(); activations++; }}, '실행')));
     const button = f.container.querySelector('button'), wrapper = f.container.querySelector('.tooltip-wrap');
     await act(async () => button.focus());
+    assert.equal(wrapper.classList.contains('tooltip-open'),true);
     await click(button);
     assert.equal(activations,1);
     assert.equal(document.activeElement,button);
-    assert.equal(wrapper.classList.contains('tooltip-dismissed'),true);
+    assert.equal(wrapper.classList.contains('tooltip-open'),false);
     await act(async () => button.dispatchEvent(new MouseEvent('mouseout',{bubbles:true,relatedTarget:document.body})));
-    assert.equal(wrapper.classList.contains('tooltip-dismissed'),true);
+    assert.equal(wrapper.classList.contains('tooltip-open'),false);
     await act(async () => button.blur());
     await act(async () => button.focus());
-    assert.equal(wrapper.classList.contains('tooltip-dismissed'),false);
+    assert.equal(wrapper.classList.contains('tooltip-open'),true);
     assert.equal(document.getElementById(button.getAttribute('aria-describedby')).textContent,'버튼 설명');
   } finally { await f.dispose(); }
 });
