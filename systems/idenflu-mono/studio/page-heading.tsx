@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title' | 'children'> {
+interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title' | 'children'> {
   /** The page or section heading. */
   title: React.ReactNode;
   /** Supporting content below the heading. */
@@ -15,7 +15,7 @@ export interface PageHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>,
   titleId?: string;
 }
 
-/** A page heading and its actions, without page padding, margins, or business logic. */
+/** Example project-owned page heading used by Studio layouts. */
 export const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(function PageHeader({
   title, description, eyebrow, actions, headingLevel = 1, titleId, className = '',
   'aria-label': ariaLabel, 'aria-labelledby': labelledBy, ...props

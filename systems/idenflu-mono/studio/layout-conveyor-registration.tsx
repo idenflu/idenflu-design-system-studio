@@ -1,5 +1,6 @@
+import { PageHeader } from './page-heading';
 import * as React from 'react';
-import { Badge, Button, DatePicker, Dialog, DialogBody, DialogFooter, DialogHeader, Grid, Icon, NumberField, PageHeader, Select, Stepper, TextArea, TextField } from '@idenflu/mono-react';
+import { Badge, Button, DatePicker, Dialog, DialogBody, DialogFooter, DialogHeader, Grid, Icon, NumberField, Select, Stepper, TextArea, TextField } from '@idenflu/mono-react';
 import {
   conveyorDriveLabels, conveyorDriveOptions, conveyorLocationOptions, conveyorOwnerOptions,
   conveyorStatusLabels, conveyorStatusVariant, conveyorTypeLabels, conveyorTypeOptions,

@@ -18,14 +18,12 @@ async function main() {
   }
   const React=require('react');
   const components=options.format==='esm'?await import('@idenflu/mono-react'):require('@idenflu/mono-react');
-  const {PageHeader,Select,SearchSelect,NumberField,DatePicker,DateRangePicker,TimePicker,DateTimePicker,DateTimeRangePicker}=components;
+  const {Select,SearchSelect,NumberField,DatePicker,DateRangePicker,TimePicker,DateTimePicker,DateTimeRangePicker}=components;
   const h=React.createElement;
-  const headerRef=React.createRef();
   const refs=Object.fromEntries(['team','searchTeam','number','date','rangeStart','rangeEnd','time','datetime','datetimeStart','datetimeEnd'].map(name=>[name,React.createRef()]));
   const common={label:'입력','aria-describedby':'shared-help','aria-invalid':false,helperText:'필드 안내'};
   const teams=[{value:'design',label:'디자인'},{value:'development',label:'개발'}];
   const fixture=()=>h('form',null,
-    h(PageHeader,{ref:headerRef,title:'예약 입력',headingLevel:2,description:'공개 패키지 서버 렌더링과 폼 연결'}),
     h('p',{id:'shared-help'},'조직 공통 안내'),
     h(Select,{...common,label:'담당 팀',name:'team',options:teams,defaultValue:'design',ref:refs.team}),
     h(SearchSelect,{...common,label:'팀 검색',name:'search-team',options:teams,defaultValue:'design',ref:refs.searchTeam}),
@@ -52,8 +50,6 @@ async function main() {
       const serverRangeStart=container.querySelector('input[name="period-start"]');
       await act(async()=>{root=hydrateRoot(container,fixture(),{identifierPrefix:prefix,onRecoverableError:error=>errors.push(error.message)});});
       assert.deepEqual(Array.from(container.querySelectorAll('input[type="text"]')),serverInputs,'hydration reuses the server-rendered inputs');
-      assert.equal(headerRef.current.tagName,'HEADER');
-      assert.equal(headerRef.current.getAttribute('aria-labelledby'),headerRef.current.querySelector('h2').id);
       assert.equal(refs.team.current.tagName,'BUTTON');
       for(const [name,ref] of Object.entries(refs)) {
         const control=ref.current;
@@ -107,7 +103,6 @@ async function main() {
       assert.equal(refs.rangeStart.current,serverRangeStart);
       await act(async()=>root.unmount()); root=null;
       assert.ok(Object.values(refs).every(ref=>ref.current===null),'unmount clears every public ref');
-      assert.equal(headerRef.current,null,'unmount clears the page header ref');
     }
     assert.deepEqual(errors,[],'hydration has no recoverable errors');
     assert.deepEqual(warnings,[],'SSR/hydration has no console warnings');

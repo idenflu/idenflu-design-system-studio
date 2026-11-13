@@ -18,10 +18,6 @@ test('Studio API tables cover the selected public contracts and use current decl
   assert.ok(result.tables > 0);
   assert.ok(result.properties > 0);
   const {contracts} = JSON.parse(await readFile(apiMetadataPath, 'utf8'));
-  assert.match(contracts.PageHeader.ref.type, /HTMLElement/);
-  assert.match(contracts.PageHeader.headingLevel.type, /1/);
-  assert.equal(contracts.PageHeader.title.optional, false);
-  assert.equal(contracts.PageHeader.actions.optional, true);
   assert.equal(contracts.Select.label.type, 'string');
   assert.match(contracts.SearchSelect.ref.type, /HTMLInputElement/);
   assert.match(contracts.NumberField.ref.type, /HTMLInputElement/);

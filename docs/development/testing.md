@@ -39,7 +39,7 @@ npm run test:react-compat -- --react=19.2.0
 
 `npm run check`에는 패키지 CSS 입력 누락·중복, 스튜디오 없이 사용하는 토큰·에셋 경로 검사와 색상 토큰·참조 문서 기본값 표의 일치 검사가 포함됩니다. `packages/idenflu-mono-react/src/styles/tokens.css`의 기본 색상을 변경한 뒤에는 `npm run docs:tokens`로 문서 표를 갱신합니다. `npm run check:tokens`로 이 항목만 확인할 수 있습니다.
 
-공개 API 문서는 빌드한 `packages/idenflu-mono-react/dist/index.d.ts`에서 추출한 타입과 실제 Studio 속성 표를 비교합니다. 현재 PageHeader, 선택·숫자·날짜·시간·일시 입력과 DataGrid 관련 15개 타입을 검사합니다. PageHeader의 표준 HTML 속성은 대표 공통 속성만 선별합니다. API 변경 후에는 React 패키지를 빌드하고 `npm run docs:api`로 생성 자료를 갱신한 뒤 문서 표의 설명·기본값과 변경 내용을 검토합니다. `npm run check:api`는 소스와 공개 선언의 일치, 생성 자료의 최신 여부와 문서 속성·타입·필수 여부·누락을 검사합니다. 기본값·동작 설명은 수기로 관리하며 자동 검증 대상이 아닙니다. 문서 전체 타입 검사는 루트의 `npm run studio:check`로 실행합니다. 문서 검사 도구와 복사 예제 생성기는 `systems/idenflu-mono/studio/scripts/`에서 관리합니다.
+공개 API 문서는 빌드한 `packages/idenflu-mono-react/dist/index.d.ts`에서 추출한 타입과 실제 Studio 속성 표를 비교합니다. 현재 선택·숫자·날짜·시간·일시 입력과 DataGrid 관련 타입을 검사합니다. API 변경 후에는 React 패키지를 빌드하고 `npm run docs:api`로 생성 자료를 갱신한 뒤 문서 표의 설명·기본값과 변경 내용을 검토합니다. `npm run check:api`는 소스와 공개 선언의 일치, 생성 자료의 최신 여부와 문서 속성·타입·필수 여부·누락을 검사합니다. 기본값·동작 설명은 수기로 관리하며 자동 검증 대상이 아닙니다. 문서 전체 타입 검사는 루트의 `npm run studio:check`로 실행합니다. 문서 검사 도구와 복사 예제 생성기는 `systems/idenflu-mono/studio/scripts/`에서 관리합니다.
 
 ## 브라우저 환경 선택
 

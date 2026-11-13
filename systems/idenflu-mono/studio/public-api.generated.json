@@ -2,56 +2,6 @@
   "schemaVersion": 1,
   "source": "@idenflu/mono-react public declarations",
   "contracts": {
-    "PageHeader": {
-      "actions": {
-        "type": "React.ReactNode",
-        "optional": true
-      },
-      "aria-label": {
-        "type": "string | undefined",
-        "optional": true
-      },
-      "aria-labelledby": {
-        "type": "string | undefined",
-        "optional": true
-      },
-      "className": {
-        "type": "string | undefined",
-        "optional": true
-      },
-      "description": {
-        "type": "React.ReactNode",
-        "optional": true
-      },
-      "eyebrow": {
-        "type": "React.ReactNode",
-        "optional": true
-      },
-      "headingLevel": {
-        "type": "1 | 2 | 3 | 4 | 5 | 6 | undefined",
-        "optional": true
-      },
-      "id": {
-        "type": "string | undefined",
-        "optional": true
-      },
-      "ref": {
-        "type": "React.Ref<HTMLElement> | undefined",
-        "optional": true
-      },
-      "style": {
-        "type": "React.CSSProperties | undefined",
-        "optional": true
-      },
-      "title": {
-        "type": "React.ReactNode",
-        "optional": false
-      },
-      "titleId": {
-        "type": "string | undefined",
-        "optional": true
-      }
-    },
     "Select": {
       "aria-describedby": {
         "type": "string | undefined",

@@ -1,5 +1,6 @@
+import { PageHeader } from './page-heading';
 import * as React from 'react';
-import { Avatar, Badge, Button, Card, Drawer, DrawerBody, DrawerFooter, DrawerHeader, Grid, Icon, IconButton, PageHeader, Select, TextField } from '@idenflu/mono-react';
+import { Avatar, Badge, Button, Card, Drawer, DrawerBody, DrawerFooter, DrawerHeader, Grid, Icon, IconButton, Select, TextField } from '@idenflu/mono-react';
 import { conveyorStatusLabels as statusLabels, conveyorTypeLabels as typeLabels, conveyorUnitKindLabels as kindLabels, conveyorDriveLabels as driveLabels, conveyorStatusVariant as statusVariant, type Conveyor, type ConveyorStatus, type ConveyorType, type ConveyorUnit } from './layout-conveyor-data';
 const totalLength = (conveyor:Conveyor) => conveyor.units.reduce((sum,unit)=>sum+unit.length,0);
 const meters = (length:number) => (length/1000).toLocaleString('ko-KR',{maximumFractionDigits:1});

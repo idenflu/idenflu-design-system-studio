@@ -21,7 +21,7 @@ npm run dev
 
 ## 로컬 React 예제
 
-문서 스튜디오의 PageHeader·Table·Chips·폼 8종과 Select·Number fields·Date picker에는 데이터·상태·이벤트·배치 스타일을 포함한 전체 TSX 예제를 제공합니다. 화면에서 사용하는 구현을 기반으로 코드를 만들고, 문서 빌드 시 공개 패키지 타입으로 검사합니다. 폼은 검증·초기화와 FormData 미리보기를 포함하며 비밀번호·파일 내용은 미리보기에 노출하지 않습니다.
+문서 스튜디오의 Page header 패턴·Table·Chips·폼 8종과 Select·Number fields·Date picker에는 데이터·상태·이벤트·배치 스타일을 포함한 전체 TSX 예제를 제공합니다. 화면에서 사용하는 구현을 기반으로 코드를 만들고, 문서 빌드 시 공개 패키지 타입으로 검사합니다. 폼은 검증·초기화와 FormData 미리보기를 포함하며 비밀번호·파일 내용은 미리보기에 노출하지 않습니다.
 
 저장소 루트와 `packages/idenflu-mono-react/`에서 `npm ci`를 실행하고 루트의 `npm run dev`로 서버를 시작합니다. 독립 React 예제도 스튜디오의 `examples/`에서 관리합니다. 아래 루트 명령으로 빌드한 뒤 `/systems/idenflu-mono/studio/examples/index.html`에서 엽니다.
 

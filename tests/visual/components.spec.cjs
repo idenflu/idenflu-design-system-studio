@@ -9,7 +9,7 @@ test.beforeAll(async () => {
     stdin: { loader: 'tsx', resolveDir: resolve(__dirname, '../../packages/idenflu-mono-react'), contents: `
       import * as React from 'react';
       import { createRoot } from 'react-dom/client';
-      import { Button, Badge, PageHeader, TextField, Select, NumberField, DatePicker, TimePicker, DataGrid } from './dist/index.js';
+      import { Button, Badge, TextField, Select, NumberField, DatePicker, TimePicker, DataGrid } from './dist/index.js';
       const columns = [
         {id:'name',header:'프로젝트',width:472,accessor:row=>row.name},
         {id:'status',header:'상태',width:236,accessor:row=>row.status,cell:row=><Badge variant="primary">{row.status}</Badge>},
@@ -17,7 +17,7 @@ test.beforeAll(async () => {
       ];
       const rows=[{id:'1',name:'디자인 시스템',status:'진행 중',owner:'김민수'},{id:'2',name:'컴포넌트 가이드',status:'검토 중',owner:'이서연'}];
       createRoot(document.getElementById('fixture')).render(<main id="sheet">
-        <PageHeader title="컴포넌트 시각 기준" description="제목과 작업, 입력과 목록을 함께 확인합니다." actions={<Button variant="outline">보조 작업</Button>} style={{marginBottom:24}} />
+        <header style={{marginBottom:24}}><h1>컴포넌트 시각 기준</h1><p>제목과 작업, 입력과 목록을 함께 확인합니다.</p><Button variant="outline">보조 작업</Button></header>
         <section><h2>작업과 상태</h2><div className="row">
           <Button>저장</Button><Button variant="outline">취소</Button><Button variant="danger" appearance="outline">삭제</Button><Button disabled>처리 불가</Button>
         </div><div className="row">{['neutral','primary','success','warning','danger'].map(variant=><Badge key={variant} variant={variant} appearance="solid">{variant}</Badge>)}</div></section>

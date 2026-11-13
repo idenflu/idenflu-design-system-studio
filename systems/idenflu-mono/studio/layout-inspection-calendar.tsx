@@ -1,5 +1,6 @@
+import { PageHeader } from './page-heading';
 import * as React from 'react';
-import { Badge, Button, Icon, IconButton, PageHeader, Segmented, Select } from '@idenflu/mono-react';
+import { Badge, Button, Icon, IconButton, Segmented, Select } from '@idenflu/mono-react';
 import { type Conveyor } from './layout-conveyor-data';
 import {
   addDays, createInspectionDraft, inspectionEndTime, inspectionStatusLabels,

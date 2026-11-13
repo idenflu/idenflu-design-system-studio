@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test');
 const base='/systems/idenflu-mono/index.html#/';
 
 test('complete examples cover PageHeader, Table, Chips, eight forms and three field bindings with public imports',{tag:['@mobile','@theme']},async({page})=>{
-  for(const route of ['components/page-header','components/table','components/chips','patterns/form/basic','patterns/form/preferences','patterns/form/password','patterns/form/inquiry','patterns/form/project','patterns/form/booking','patterns/form/states','patterns/form/profile','components/select','components/number-fields','components/date-picker']) {
+  for(const route of ['patterns/page-header','components/table','components/chips','patterns/form/basic','patterns/form/preferences','patterns/form/password','patterns/form/inquiry','patterns/form/project','patterns/form/booking','patterns/form/states','patterns/form/profile','components/select','components/number-fields','components/date-picker']) {
     await page.goto(base+route);
     const code=await page.getByRole('region',{name:'React 사용 예시 코드',exact:true}).textContent();
     expect(code).toContain("import '@idenflu/mono-react/styles.css'");

@@ -2,6 +2,12 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
+## 미배포
+
+### 변경
+
+- 공개 `PageHeader`와 전용 스타일을 제거하고 프로젝트에서 구성할 수 있는 Page header 패턴 문서로 이동. 기존 사용자는 제목 영역 구현과 스타일을 직접 정의해야 합니다.
+
 ## 0.5.2 — 2026-11-12
 
 [게시 소스 `c58faf5`](https://github.com/idenflu/idenflu-design-system-studio/commit/c58faf5994a77b72dbd4746024e4b464525fb478) · [게시 워크플로 #10](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/43061203691)

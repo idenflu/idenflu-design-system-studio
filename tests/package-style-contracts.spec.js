@@ -36,7 +36,7 @@ test('public component families own their typography and geometry without docume
   await expect(page.locator('#host')).toHaveCSS('font-size','18px');
 });
 
-test('NumberField metadata and PageHeader content need no Studio typography or reset', {tag:['@theme','@mobile']}, async ({page},testInfo) => {
+test('NumberField metadata need no Studio typography or reset', {tag:['@theme','@mobile']}, async ({page},testInfo) => {
   await mount(page,testInfo,renderCases().markup);
   const number = page.locator('[data-case="number-field"]');
   await expect(number.locator('.number-field-meta')).toHaveCSS('font-size','12px');
@@ -49,8 +49,6 @@ test('NumberField metadata and PageHeader content need no Studio typography or r
   });
   await expect(error).toHaveCSS('color',expected);
   await expect(error).toHaveCSS('font-size','12px');
-  await expect(page.locator('.page-header-description > p')).toHaveCSS('margin-top','0px');
-  await expect(page.locator('.page-header-description > p')).toHaveCSS('margin-bottom','0px');
   await expect(page.locator('.data-state')).toHaveCSS('display','grid');
   await expect(page.locator('.data-state')).toHaveCSS('row-gap','16px');
 });

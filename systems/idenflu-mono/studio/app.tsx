@@ -18,7 +18,6 @@ import { DocumentShell, Overview, notFoundRouteId, useDocumentRoute } from './sh
 import { DocumentNotFound, LayoutNotFound } from './not-found';
 import { DividerDemos } from './divider-demos';
 import { GridDemos, gridUsage } from './grid-demos';
-import { PageHeaderDemos } from './page-header-demos';
 import { patternPages, patternSnippets } from './patterns';
 import { componentUsage } from './component-usage';
 import completeExamples from './dist/complete-examples.json';
@@ -301,7 +300,6 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/list': return <ListDemos />;
     case 'components/divider': return <DividerDemos />;
     case 'components/grid': return <GridDemos />;
-    case 'components/page-header': return <PageHeaderDemos />;
     case 'components/slider': return <SliderDemos />;
     case 'components/tooltip': return <TooltipDemos />;
     case 'components/dropdown-menu': return <MenuDemos />;

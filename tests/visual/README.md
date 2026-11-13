@@ -3,7 +3,7 @@
 - 최초 검토 환경: macOS 27.0.1, Apple Silicon, Playwright 1.64.1
 - 브라우저: Playwright Chromium revision 1248, headless, DPR 1
 - 화면: 1080 × 1000, 라이트·다크, 저장소의 Pretendard WOFF2
-- 대상: 제목·설명·작업 슬롯의 PageHeader, 기본·위험 아웃라인·비활성 버튼, 반전 배지, 도움말·오류 입력,
+- 대상: 기본·위험 아웃라인·비활성 버튼, 반전 배지, 도움말·오류 입력,
   선택·숫자·날짜·시간 입력, 데이터그리드
 
 패키지와 Studio를 빌드한 뒤 저장소 루트에서 `npm run test:visual`을

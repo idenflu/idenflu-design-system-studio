@@ -39,7 +39,6 @@ export * from './components/time-picker/TimePicker';
 export * from './components/data-state/DataState';
 export * from './components/divider/Divider';
 export * from './components/grid/Grid';
-export * from './components/page-header/PageHeader';
 export * from './components/nova-spinner/NovaSpinner';
 export * from './components/data-grid/DataGrid';
 export * from './components/data-grid/DataGridTools';

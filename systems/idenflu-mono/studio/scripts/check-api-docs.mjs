@@ -6,7 +6,6 @@ import {packageRequire,packageRoot,publicTypePaths,repositoryRoot,studioRoot} fr
 const ts=packageRequire('typescript');
 export const apiMetadataPath = resolve(studioRoot, 'public-api.generated.json');
 export const apiDocumentFiles = [
-  'page-header-demos.tsx',
   'field-api-reference.tsx',
   'time-picker-demos.tsx',
   'datetime-api-reference.tsx',
@@ -16,7 +15,6 @@ export const apiDocumentFiles = [
 // ComponentProps includes the public ref as well as the exported Props interface.
 // Generic aliases keep T visible in the grid reference instead of replacing it with unknown.
 const contracts = {
-  PageHeader: "Pick<ComponentProps<typeof Mono.PageHeader>, 'title' | 'description' | 'eyebrow' | 'actions' | 'headingLevel' | 'titleId' | 'className' | 'id' | 'style' | 'aria-label' | 'aria-labelledby' | 'ref'>",
   Select: 'ComponentProps<typeof Mono.Select>',
   SearchSelect: 'ComponentProps<typeof Mono.SearchSelect>',
   MultiSelect: 'ComponentProps<typeof Mono.MultiSelect>',

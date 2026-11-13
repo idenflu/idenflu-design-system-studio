@@ -1,5 +1,6 @@
+import { PageHeader } from './page-heading';
 import * as React from 'react';
-import { PageHeader, Avatar, Badge, Button, Checkbox, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Select, Tabs, TextArea, TextField } from '@idenflu/mono-react';
+import { Avatar, Badge, Button, Checkbox, Dialog, DialogBody, DialogFooter, DialogHeader, Icon, Select, Tabs, TextArea, TextField } from '@idenflu/mono-react';
 import { roleNotificationChannels, roleNotifications, rolePermissions, type RoleConnections, type RoleNotificationChannel, type WorkspaceRole } from './layout-role-data';
 import { type Member } from './layout-workspace-data';
 

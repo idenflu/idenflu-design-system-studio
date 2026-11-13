@@ -53,7 +53,6 @@ function createCases() {
     ['time-picker', '.date-picker', h(C.TimePicker,{label:'시작 시간',defaultValue:'09:00'})],
     ['data-state', '.data-state', h(C.DataState,{load:async()=>[],matches:()=>true,initialItems:['프로젝트'],getKey:value=>value,renderItem:value=>value})],
     ['divider', '.divider', h(C.Divider,null,'상세 정보')],
-    ['page-header', '.page-header', h(C.PageHeader,{title:'프로젝트 관리',eyebrow:'WORKSPACE',description:h('p',null,'진행 중인 프로젝트를 관리합니다.'),actions:h(C.Button,null,'추가')})],
     ['data-grid', '.data-grid', h(C.DataGrid,{label:'프로젝트',columns:[{id:'name',header:'이름',accessor:row=>row.name}],rows:[{id:'one',name:'디자인 시스템'}],getRowId:row=>row.id})],
   ];
 }
