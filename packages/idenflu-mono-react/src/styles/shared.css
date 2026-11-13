@@ -1,0 +1,11 @@
+.IdsControl-sm {
+  --control-height: var(--size-sm-height);
+}
+
+.IdsControl-md {
+  --control-height: var(--size-md-height);
+}
+
+.IdsControl-lg {
+  --control-height: var(--size-lg-height);
+}

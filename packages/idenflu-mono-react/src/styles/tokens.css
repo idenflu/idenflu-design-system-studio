@@ -177,16 +177,26 @@
   --space-8: calc(var(--space-unit) * 8);
   --space-10: calc(var(--space-unit) * 10);
   --space-12: calc(var(--space-unit) * 12);
-  --font-family-body: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-body: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   --font-size-caption: max(11px, calc(var(--font-size-base) - 2px));
   --font-size-body: var(--font-size-base);
   --font-size-title: calc(var(--font-size-base) + 4px);
   --font-size-heading: calc(var(--font-size-base) + 10px);
-  --line-height-caption: max(calc(var(--font-size-caption) + 2px), calc(var(--line-height-base) - 4px));
+  --line-height-caption: max(
+    calc(var(--font-size-caption) + 2px),
+    calc(var(--line-height-base) - 4px)
+  );
   --line-height-control: calc(var(--font-size-base) + 6px);
   --line-height-body: max(var(--font-size-body), var(--line-height-base));
-  --line-height-title: max(var(--font-size-title), calc(var(--line-height-base) + 4px));
-  --line-height-heading: max(var(--font-size-heading), calc(var(--line-height-base) + 10px));
+  --line-height-title: max(
+    var(--font-size-title),
+    calc(var(--line-height-base) + 4px)
+  );
+  --line-height-heading: max(
+    var(--font-size-heading),
+    calc(var(--line-height-base) + 10px)
+  );
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -262,7 +272,7 @@
   --selection-text: var(--color-white);
   --switch-off: var(--color-switch-off-dark);
   --switch-thumb-color: var(--color-neutral-100);
-  --icon-filter: brightness(0) invert(.84);
+  --icon-filter: brightness(0) invert(0.84);
   --select-arrow-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b3b3b3' stroke-width='1.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --overlay-backdrop: rgb(0 0 0 / 64%);
   --shadow-popup: 0 12px 28px rgb(0 0 0 / 30%);
@@ -271,10 +281,14 @@
 
 /* Component dimensions: md is the default; data-size also scopes children. */
 :root {
-  --control-effective-height: max(32px, var(--control-base-height), calc(var(--font-size-base) + 18px));
-  --size-sm-height: calc(var(--control-effective-height) - 6px);
+  --control-effective-height: max(
+    32px,
+    var(--control-base-height),
+    calc(var(--font-size-base) + 18px)
+  );
+  --size-sm-height: calc(var(--control-effective-height) - 4px);
   --size-md-height: var(--control-effective-height);
-  --size-lg-height: calc(var(--control-effective-height) + 6px);
+  --size-lg-height: calc(var(--control-effective-height) + 4px);
   --size-sm-padding: calc(var(--space-unit) * 2.5);
   --size-md-padding: var(--space-3);
   --size-lg-padding: var(--space-4);
@@ -284,9 +298,18 @@
   --badge-sm-font-size: var(--font-size-caption);
   --badge-md-font-size: max(12px, calc(var(--font-size-base) - 1px));
   --badge-lg-font-size: var(--font-size-body);
-  --badge-sm-line-height: max(calc(var(--badge-sm-font-size) + 4px), calc(var(--line-height-base) - 6px));
-  --badge-md-line-height: max(calc(var(--badge-md-font-size) + 5px), calc(var(--line-height-base) - 4px));
-  --badge-lg-line-height: max(calc(var(--badge-lg-font-size) + 6px), calc(var(--line-height-base) - 2px));
+  --badge-sm-line-height: max(
+    calc(var(--badge-sm-font-size) + 4px),
+    calc(var(--line-height-base) - 6px)
+  );
+  --badge-md-line-height: max(
+    calc(var(--badge-md-font-size) + 5px),
+    calc(var(--line-height-base) - 4px)
+  );
+  --badge-lg-line-height: max(
+    calc(var(--badge-lg-font-size) + 6px),
+    calc(var(--line-height-base) - 2px)
+  );
   --badge-sm-height: max(20px, calc(var(--badge-sm-line-height) + 4px));
   --badge-md-height: max(24px, calc(var(--badge-md-line-height) + 4px));
   --badge-lg-height: max(28px, calc(var(--badge-lg-line-height) + 4px));
@@ -314,7 +337,10 @@
   --badge-icon-size: var(--badge-md-icon-size);
   --badge-padding-inline: var(--badge-md-padding-inline);
   --multi-chip-height: max(24px, calc(var(--font-size-base) + 10px));
-  --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
+  --multi-tag-padding-y: max(
+    0px,
+    calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2)
+  );
 }
 [data-size="sm"] {
   --control-height: var(--size-sm-height);
@@ -333,7 +359,10 @@
   --badge-icon-size: var(--badge-sm-icon-size);
   --badge-padding-inline: var(--badge-sm-padding-inline);
   --multi-chip-height: max(24px, calc(var(--font-size-base) + 10px));
-  --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
+  --multi-tag-padding-y: max(
+    0px,
+    calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2)
+  );
 }
 [data-size="md"] {
   --control-height: var(--size-md-height);
@@ -352,7 +381,10 @@
   --badge-icon-size: var(--badge-md-icon-size);
   --badge-padding-inline: var(--badge-md-padding-inline);
   --multi-chip-height: max(24px, calc(var(--font-size-base) + 10px));
-  --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
+  --multi-tag-padding-y: max(
+    0px,
+    calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2)
+  );
 }
 [data-size="lg"] {
   --control-height: var(--size-lg-height);
@@ -371,5 +403,8 @@
   --badge-icon-size: var(--badge-lg-icon-size);
   --badge-padding-inline: var(--badge-lg-padding-inline);
   --multi-chip-height: max(28px, calc(var(--font-size-base) + 10px));
-  --multi-tag-padding-y: max(0px, calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2));
+  --multi-tag-padding-y: max(
+    0px,
+    calc((var(--control-height) - var(--multi-chip-height) - 2px) / 2)
+  );
 }
