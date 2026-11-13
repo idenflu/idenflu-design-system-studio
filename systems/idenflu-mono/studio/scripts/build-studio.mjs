@@ -40,8 +40,6 @@ export async function buildStudio(destination = resolve(system, 'docs-dist'), { 
   await mkdir(metadata, { recursive: true });
   await writeFile(resolve(metadata, 'routes.json'), JSON.stringify(routes, null, 2));
   await writeFile(resolve(metadata, 'navigation.json'), JSON.stringify(routes.map(item => item.route), null, 2));
-  const icons = (await readdir(resolve(packageAssets, 'icons/idenflu'))).filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
-  await writeFile(resolve(metadata, 'icons.json'), JSON.stringify(icons, null, 2));
   const sprite = new JSDOM(await readFile(resolve(packageAssets, 'icons/icons.svg'), 'utf8'), { contentType: 'image/svg+xml' });
   const spriteIcons = [...sprite.window.document.documentElement.children].map(symbol => symbol.getAttribute('id')).sort();
   sprite.window.close();

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-  <mask id="nova-icon-warning-fill-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
-    <path d="M12 3 22 21H2z" fill="white" stroke="none" />
-    <path d="M12 9v4" fill="none" stroke="black" stroke-width="2" stroke-linecap="butt" stroke-linejoin="miter" />
-    <circle cx="12" cy="17" r="1" fill="black" stroke="none" />
-  </mask>
-  <rect width="24" height="24" mask="url(#nova-icon-warning-fill-mask)" />
-</svg>

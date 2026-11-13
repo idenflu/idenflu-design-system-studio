@@ -87,7 +87,7 @@ import './theme.css';
 
 ## 아이콘
 
-`Icon`과 `IconButton`으로 아이콘을 표시합니다. 지원 이름·Outline/Filled 구분·상태별 사용·접근성 기준과 예시는 [React 아이콘 참조](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/reference/icons.md)에 정리했습니다.
+`Icon`과 `IconButton`으로 아이콘을 표시합니다. 지원 이름·상태별 사용·접근성 기준과 예시는 [React 아이콘 참조](https://github.com/idenflu/idenflu-design-system-studio/blob/main/docs/reference/icons.md)에 정리했습니다.
 
 ## 문서와 개발
 

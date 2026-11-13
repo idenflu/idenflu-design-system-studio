@@ -98,7 +98,7 @@ export function StudioSettings() {
   return <>
     <Tooltip content="화면 조정"><button ref={trigger} type="button" className="icon-button studio-settings-open" aria-label="화면 조정" aria-haspopup="dialog" aria-expanded={open} aria-controls="studio-settings-dialog" onClick={() => open ? close() : setOpen(true)}><Icon name="settings" /></button></Tooltip>
     {createPortal(<Dialog id="studio-settings-dialog" open={open} modal={false} onOpenChange={next => next ? setOpen(true) : close()} aria-labelledby="react-settings-title" aria-describedby="react-settings-description">
-      <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={close}><Icon name="close" /></button></header>
+      <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={close}><Icon name="x" /></button></header>
       <div className="studio-preferences-body" ref={body}>
         <section aria-labelledby="studio-font-title">
           <h3 id="studio-font-title" className="studio-preferences-section-title">폰트</h3>

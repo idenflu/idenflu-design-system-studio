@@ -11,7 +11,7 @@ export function PageHeaderExample({headingLevel = 1}: {headingLevel?: 1 | 2 | 3 
       description="팀의 프로젝트를 검색하고 진행 상황을 관리하세요."
       actions={<>
         <Button variant="outline" onClick={() => setMessage('프로젝트 내보내기를 선택했습니다.')}><Icon name="download" />내보내기</Button>
-        <Button onClick={() => setMessage('새 프로젝트 만들기를 선택했습니다.')}><Icon name="add" />새 프로젝트</Button>
+        <Button onClick={() => setMessage('새 프로젝트 만들기를 선택했습니다.')}><Icon name="plus" />새 프로젝트</Button>
       </>} />
     <p className="component-helper" role="status">{message || '오른쪽 작업은 호출 화면에서 연결합니다.'}</p>
   </div>;

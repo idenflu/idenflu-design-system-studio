@@ -43,7 +43,7 @@ export function NumberBindingExample() {
     setResult({formValue:data.get('amount'),request:{amount}});
   }} onReset={()=>{setAmount(initial);setResult(null);setRevision(value=>value+1);}}>
     <NumberField key={revision} label="바인딩 금액" name="amount" value={amount} onValueChange={value=>{setAmount(value);setResult(null);}}
-      decimals={2} step="0.5" min="0" grouping selectOnFocus prefixIcon={<Icon name="credit-card" />} unit="원"
+      decimals={2} step="0.5" min="0" grouping selectOnFocus prefixIcon={<Icon name="file" />} unit="원"
       helperText="표시는 12,500.5원, 확정값은 쉼표 없는 문자열입니다. 비우면 null입니다." />
     <p className="component-helper" role="status">확정값: {amount===null ? 'null' : JSON.stringify(amount)}</p>
     <div className="form-pattern-actions"><Button type="submit">금액값 확인</Button><Button type="reset" variant="outline" onPointerDown={event=>event.preventDefault()}>금액 초기화</Button></div>

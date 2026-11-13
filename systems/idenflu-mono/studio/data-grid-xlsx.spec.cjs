@@ -53,7 +53,7 @@ test('Excel fallback downloads actual filtered sorted XLSX rows across pages usi
   await page.goto(route);
   await page.evaluate(()=>{window.showSaveFilePicker=undefined;});
   const projectGrid=grid(page),excel=projectGrid.getByRole('button',{name:'Excel 내보내기',exact:true});
-  await expect(excel.locator('.icon-microsoft-excel')).toHaveCount(1);
+  await expect(excel.locator('.icon-excel')).toHaveCount(1);
   await expect(projectGrid.getByRole('button',{name:'CSV 내보내기',exact:true})).toBeVisible();
   await projectGrid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('디자인');
   await projectGrid.getByRole('combobox',{name:'상태 필터: 전체',exact:true}).click();
@@ -89,7 +89,7 @@ test('selected Excel export includes chosen records outside current results and 
   expect(selected).toHaveLength(5);
   await projectGrid.getByRole('checkbox',{name:'현재 페이지 전체 선택',exact:true}).check();
   const selectedExcel=projectGrid.getByRole('button',{name:'선택한 행 Excel 내보내기',exact:true});
-  await expect(selectedExcel.locator('.icon-microsoft-excel')).toHaveCount(1);
+  await expect(selectedExcel.locator('.icon-excel')).toHaveCount(1);
   await projectGrid.getByRole('searchbox',{name:'프로젝트 검색',exact:true}).fill('없는프로젝트XYZ');
   await expect(projectGrid.getByRole('button',{name:'Excel 내보내기',exact:true})).toBeDisabled();
   await expect(selectedExcel).toBeEnabled();

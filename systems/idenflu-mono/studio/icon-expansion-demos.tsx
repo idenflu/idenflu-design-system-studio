@@ -7,7 +7,7 @@ const groups:readonly {label:string;description:string;names:readonly IconName[]
   {label:'그리드·목록',description:'표시 열, 고정·해제, 순서 변경과 행 메뉴',names:['columns','pin','pin-off','drag-handle','more-vertical']},
   {label:'문서·파일',description:'문서 종류와 열기·보관·공유·인쇄',names:['file-text','folder-open','archive','share','printer']},
   {label:'계정·권한',description:'멤버 추가·제외, 로그인과 잠금 해제',names:['user-plus','user-minus','login','unlock']},
-  {label:'상태',description:'오류와 사용 제한을 구분',names:['error-circle','ban']},
+  {label:'상태',description:'오류와 사용 제한을 구분',names:['x-circle','ban']},
   {label:'설정·화면',description:'상세 설정, 화면 확대·복원과 테마 전환',names:['sliders','maximize','minimize','sun','moon']},
 ];
 const previewSizes=[14,16,18,20] as const;

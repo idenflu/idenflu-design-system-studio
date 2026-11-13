@@ -22,7 +22,7 @@ export function TabsDemos() {
     <Section title="세로 탭" description="탭 목록을 왼쪽에, 선택한 내용을 오른쪽에 배치합니다. 위·아래 방향키로 이동하며 Home·End 키를 지원합니다. 비활성 탭은 건너뛰고 입력값은 탭을 전환해도 유지합니다.">
       <Tabs label="워크스페이스 세로 설정" orientation="vertical" items={[
         {value:'general',label:<span className="react-studio-icon-label"><Icon name="settings" />기본 정보</span>,content:<><h3 className="react-studio-example-title">워크스페이스 설정</h3><p>프로젝트에 표시할 이름과 기본 정보를 관리합니다.</p><TextField label="워크스페이스 이름" defaultValue="idenflu" /></>},
-        {value:'notifications',label:<span className="react-studio-icon-label"><Icon name="email" />알림</span>,content:<><h3 className="react-studio-example-title">알림 설정</h3><p>중요한 알림을 받을 이메일을 지정합니다.</p><TextField label="알림 받을 이메일" type="email" defaultValue="team@idenflu.com" /></>},
+        {value:'notifications',label:<span className="react-studio-icon-label"><Icon name="mail" />알림</span>,content:<><h3 className="react-studio-example-title">알림 설정</h3><p>중요한 알림을 받을 이메일을 지정합니다.</p><TextField label="알림 받을 이메일" type="email" defaultValue="team@idenflu.com" /></>},
         {value:'security',label:<span className="react-studio-icon-label"><Icon name="shield-check" />보안</span>,disabled:true,content:<p>보안 설정은 관리자만 변경할 수 있습니다.</p>},
         {value:'members',label:<span className="react-studio-icon-label"><Icon name="users" />멤버</span>,content:<><h3 className="react-studio-example-title">멤버 관리</h3><p>총 12명의 멤버가 함께 작업하고 있습니다.</p><p>관리자 2명 · 편집자 8명 · 뷰어 2명</p></>},
       ]} />
@@ -63,7 +63,7 @@ export function FeedbackDemos() {
     <BadgeSizeDemos />
     <Section id="workflow-status-badges" title="업무 상태 배지" description="진행 상태와 주의·오류를 구분합니다. 검토 중은 진행 상태로, 검토가 필요한 조건은 주의 상태로 표시합니다. 같은 기준을 데이터그리드 셀에도 적용합니다.">
       <div className="react-studio-row" role="group" aria-label="업무 상태별 배지"><StatusBadge status="review" /><StatusBadge status="paused" /><StatusBadge status="inactive" /><StatusBadge status="blocked" /><StatusBadge status="blocked" appearance="solid" /></div>
-      <p className="react-studio-caption">기본은 Outline을 사용합니다. 반전 스타일의 완료·안내·주의·오류·차단은 같은 의미의 Filled로 강조하며, 대기·진행·보류·비활성은 기본 도형을 유지합니다.</p>
+      <p className="react-studio-caption">기본과 반전 스타일 모두 같은 상태 아이콘을 사용합니다.</p>
     </Section>
     <Section title="인라인 알림" description="관련된 입력이나 작업 영역 가까이에 안내와 결과를 표시합니다.">
       <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid"><Alert><strong>안내</strong><p>변경사항은 저장 후 적용됩니다.</p></Alert><Alert variant="success"><strong>완료</strong><p>모든 변경사항을 저장했습니다.</p></Alert><Alert variant="warning"><strong>주의</strong><p>저장 공간이 부족합니다. 불필요한 파일을 정리해주세요.</p></Alert><Alert variant="danger"><strong>오류</strong><p>변경사항을 저장하지 못했습니다. 연결을 확인하고 다시 시도해주세요.</p></Alert></Grid>
@@ -122,7 +122,7 @@ export function OverlayDemos() {
       </div>
       <p role="status" className="component-helper">{feedback}</p>
       <Dialog open={dialog === 'info'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-info-dialog-title" aria-describedby="studio-info-dialog-description">
-        <button className="icon-button dialog-close" type="button" aria-label="안내 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
+        <button className="icon-button dialog-close" type="button" aria-label="안내 닫기" onClick={() => setDialog(null)}><Icon name="x" /></button>
         <DialogHeader><h2 id="studio-info-dialog-title">공유 범위 안내</h2></DialogHeader>
         <DialogBody tabIndex={-1}><p id="studio-info-dialog-description">초대한 팀원만 프로젝트를 볼 수 있습니다. 공유 범위는 프로젝트 설정에서 변경할 수 있습니다.</p></DialogBody>
         <DialogFooter><Button ref={infoConfirm} onClick={() => setDialog(null)}>확인</Button></DialogFooter>
@@ -135,7 +135,7 @@ export function OverlayDemos() {
         <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button color="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></DialogFooter>
       </Dialog>
       <Dialog open={dialog === 'form'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-project-dialog-title" aria-describedby="studio-project-dialog-description">
-        <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button>
+        <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setDialog(null)}><Icon name="x" /></button>
         <DialogHeader><h2 id="studio-project-dialog-title">새 프로젝트</h2></DialogHeader>
         <DialogBody tabIndex={-1}><p id="studio-project-dialog-description">함께 시작할 프로젝트의 이름을 정해주세요.</p>
         <form id={projectFormId} noValidate onSubmit={event => {
@@ -162,12 +162,12 @@ export function OverlayDemos() {
       </Grid>
       <p role="status" className="component-helper">{dividedFeedback}</p>
       <Dialog variant="divided" open={dialog === 'divided'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-divided-title" aria-describedby="studio-divided-description">
-        <DialogHeader><div><h2 id="studio-divided-title">프로젝트 상세</h2><p id="studio-divided-description">프로젝트의 기본 정보와 공유 범위를 확인합니다.</p></div><button type="button" className="icon-button" aria-label="프로젝트 상세 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button></DialogHeader>
+        <DialogHeader><div><h2 id="studio-divided-title">프로젝트 상세</h2><p id="studio-divided-description">프로젝트의 기본 정보와 공유 범위를 확인합니다.</p></div><button type="button" className="icon-button" aria-label="프로젝트 상세 닫기" onClick={() => setDialog(null)}><Icon name="x" /></button></DialogHeader>
         <DialogBody><div className="react-studio-stack"><div><Badge variant="primary">진행 중</Badge></div><DetailRows style={{margin:0}} items={[["프로젝트", "디자인 시스템 고도화"], ["담당 팀", "프로덕트 디자인"], ["공유 범위", "초대한 팀원만"], ["최근 수정", "2026-11-03"]]} /><p>공통 컴포넌트와 패턴을 정리하고, 제품 전반에 일관된 사용 경험을 적용합니다.</p></div></DialogBody>
         <DialogFooter><Button variant="outline" onClick={() => setDialog(null)}>취소</Button><Button onClick={() => { setDialog(null); setDividedFeedback('프로젝트 상세를 확인했습니다.'); }}>확인</Button></DialogFooter>
       </Dialog>
       <Dialog variant="divided" style={{maxHeight:'min(640px, calc(100dvh - 32px))'}} open={dialog === 'divided-scroll'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-divided-scroll-title" aria-describedby="studio-divided-scroll-description">
-        <DialogHeader><div><h2 id="studio-divided-scroll-title">프로젝트 운영 안내</h2><p id="studio-divided-scroll-description">본문을 스크롤해 항목별 안내를 확인하세요.</p></div><button type="button" className="icon-button" aria-label="운영 안내 닫기" onClick={() => setDialog(null)}><Icon name="close" /></button></DialogHeader>
+        <DialogHeader><div><h2 id="studio-divided-scroll-title">프로젝트 운영 안내</h2><p id="studio-divided-scroll-description">본문을 스크롤해 항목별 안내를 확인하세요.</p></div><button type="button" className="icon-button" aria-label="운영 안내 닫기" onClick={() => setDialog(null)}><Icon name="x" /></button></DialogHeader>
         <DialogBody aria-label="운영 안내 본문"><div className="react-studio-stack">{[
           ['프로젝트 개요', '프로젝트의 목적과 작업 범위를 팀원에게 공유합니다. 목표와 완료 기준을 먼저 정리하면 작업 과정에서 같은 기준으로 의사결정할 수 있습니다.'],
           ['팀원과 역할', '프로젝트에 필요한 팀원을 초대하고 담당 역할을 정합니다. 새로운 팀원이 참여하면 진행 중인 작업과 필요한 자료를 함께 안내해주세요.'],

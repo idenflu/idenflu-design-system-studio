@@ -529,7 +529,7 @@ export function ChipDemos() {
               }
             >
               {name}
-              <Icon name="close" />
+              <Icon name="x" />
             </Chip>
           ))}
           {!removable.length && (

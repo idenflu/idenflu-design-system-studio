@@ -444,12 +444,12 @@ export function DataGrid<T>({
   };
 
   const toolbarItems: Record<DataGridToolbarItem, React.ReactNode> = {
-    search: searchable && <TextField hideLabel containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="close" /></button> : undefined} />,
+    search: searchable && <TextField hideLabel containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="x" /></button> : undefined} />,
     selection: selectable && selectedSet.size > 0 && <div className="data-grid-selection">
       <div className="data-grid-selection-actions">
         {selectionActions}
-        {enabledExportFormats.map(format=><Tooltip key={format} content={`선택한 행 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="ghost" iconOnly aria-label={format==='xlsx'?'선택한 행 Excel 내보내기':'선택한 행 내보내기'} disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,rows.filter(row => selectedSet.has(getRowId(row))),dataGridFileName(exportFileName,format).replace(/\.(csv|xlsx)$/i,`-selected.${format}`))}><Icon name={format==='xlsx'?'microsoft-excel':'download'} /></Button></Tooltip>)}
-        <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="close" /></Button></Tooltip>
+        {enabledExportFormats.map(format=><Tooltip key={format} content={`선택한 행 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="ghost" iconOnly aria-label={format==='xlsx'?'선택한 행 Excel 내보내기':'선택한 행 내보내기'} disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,rows.filter(row => selectedSet.has(getRowId(row))),dataGridFileName(exportFileName,format).replace(/\.(csv|xlsx)$/i,`-selected.${format}`))}><Icon name={format==='xlsx'?'excel':'download'} /></Button></Tooltip>)}
+        <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="x" /></Button></Tooltip>
       </div>
     </div>,
     columnFilters: showColumnFilterToggle && anyFilters && <Tooltip content={filtersEnabled ? '컬럼 필터 끄기' : '컬럼 필터 켜기'}>
@@ -469,7 +469,7 @@ export function DataGrid<T>({
         return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;
       })}</div>
     </Popover>,
-    export: <>{enabledExportFormats.map(format=><Tooltip key={format} content={`검색 결과 전체 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="outline" iconOnly aria-label={format==='xlsx'?'Excel 내보내기':'CSV 내보내기'} disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,filtered,dataGridFileName(exportFileName,format))}><Icon name={format==='xlsx'?'microsoft-excel':'download'} /></Button></Tooltip>)}</>,
+    export: <>{enabledExportFormats.map(format=><Tooltip key={format} content={`검색 결과 전체 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="outline" iconOnly aria-label={format==='xlsx'?'Excel 내보내기':'CSV 내보내기'} disabled={blocked || !count || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,filtered,dataGridFileName(exportFileName,format))}><Icon name={format==='xlsx'?'excel':'download'} /></Button></Tooltip>)}</>,
     resetFilters: activeFilters && <Button variant="ghost" onClick={() => { setFilters({}); resetPageFor(query, sorting, {}); }}>필터 초기화</Button>,
     actions: toolbarActions != null && <div className="data-grid-toolbar-actions">{toolbarActions}</div>,
   };

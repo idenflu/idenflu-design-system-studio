@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-  <mask id="mono-icon-error-circle-fill-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
-    <circle cx="12" cy="12" r="10" fill="white" />
-    <path d="m8 8 8 8m0-8-8 8" fill="none" stroke="black" stroke-width="2" stroke-linecap="butt" />
-  </mask>
-  <rect width="24" height="24" mask="url(#mono-icon-error-circle-fill-mask)" />
-</svg>

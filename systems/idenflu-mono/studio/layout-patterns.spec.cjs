@@ -168,7 +168,7 @@ test('project toolbar groups creation with selection actions and utilities',asyn
     await expect(selection.getByRole('button',{name:'선택한 행 내보내기',exact:true})).toBeEnabled();
     const excel=selection.getByRole('button',{name:'선택한 행 Excel 내보내기',exact:true});
     await expect(excel).toBeEnabled();
-    await expect(excel.locator('.icon-microsoft-excel')).toHaveCount(1);
+    await expect(excel.locator('.icon-excel')).toHaveCount(1);
     await selection.getByRole('button',{name:'선택 해제',exact:true}).click();
     await expect(checkbox).not.toBeChecked();
     await expect(selection).toHaveCount(0);
@@ -659,7 +659,7 @@ test('project reset clears bound data until search while preserving density and 
     const search=panel(page).getByRole('search',{name:'프로젝트 필터 검색',exact:true});
     const reset=search.getByRole('button',{name:'초기화',exact:true});
     await expect(search.locator(':scope > button')).toHaveText(['초기화','검색']);
-    await expect(reset.locator('.icon-refresh')).toHaveAttribute('aria-hidden','true');
+    await expect(reset.locator('.icon-rotate')).toHaveAttribute('aria-hidden','true');
     const grid=panel(page).getByRole('group',{name:`${title} 목록`,exact:true});
     const originalIds=await grid.locator('tr[data-grid-row-id]').evaluateAll(rows=>rows.map(row=>row.dataset.gridRowId));
     await search.getByRole('combobox',{name:'담당 팀: 전체 팀',exact:true}).click();

@@ -118,7 +118,7 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
     <div className="layout-master-detail layout-role-management">
       <section className="layout-master-panel" aria-label="역할 목록 영역">
         <div className="layout-master-toolbar">
-          <div className="layout-role-list-title"><h2>역할 목록 <span className="layout-role-list-count">{roles.length}개</span></h2><Button ref={addButton} size="sm" onClick={()=>openEditor()}><Icon name="add"/>역할 추가</Button></div>
+          <div className="layout-role-list-title"><h2>역할 목록 <span className="layout-role-list-count">{roles.length}개</span></h2><Button ref={addButton} size="sm" onClick={()=>openEditor()}><Icon name="plus"/>역할 추가</Button></div>
           <TextField label="역할 검색" type="search" value={query} onChange={event=>setQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="역할 이름 검색"/>
         </div>
         <div ref={roleList} className="layout-master-list" role="group" aria-label="역할 목록">
@@ -184,12 +184,12 @@ export function RoleManagementPage({roles,members,onSave,onCreate,onUpdate,onDel
       </section>
     </div>
     <Dialog open={editor!==null} onOpenChange={open=>{if(!open)setEditor(null);}} variant="divided" className="layout-role-dialog" aria-labelledby={`${dialogId}-edit-title`} aria-describedby={`${dialogId}-edit-description`} closeOnBackdrop>
-      <DialogHeader><div><h2 id={`${dialogId}-edit-title`}>{editor?.id?'역할 수정':'역할 추가'}</h2><p id={`${dialogId}-edit-description`}>{editor?.id?'이름과 설명을 수정합니다. 멤버의 역할 이름도 함께 반영됩니다.':'역할을 만든 뒤 사용 권한과 수신 알림을 설정하세요.'}</p></div><Button variant="ghost" size="sm" aria-label="닫기" onClick={()=>setEditor(null)}><Icon name="close"/></Button></DialogHeader>
+      <DialogHeader><div><h2 id={`${dialogId}-edit-title`}>{editor?.id?'역할 수정':'역할 추가'}</h2><p id={`${dialogId}-edit-description`}>{editor?.id?'이름과 설명을 수정합니다. 멤버의 역할 이름도 함께 반영됩니다.':'역할을 만든 뒤 사용 권한과 수신 알림을 설정하세요.'}</p></div><Button variant="ghost" size="sm" aria-label="닫기" onClick={()=>setEditor(null)}><Icon name="x"/></Button></DialogHeader>
       <DialogBody>{editor&&<form id={formId} className="layout-role-form" noValidate onSubmit={saveDetails}><TextField ref={nameInput} label="역할 이름" prefix={<Icon name="shield-check"/>} prefixDecorative value={editor.name} onChange={event=>{setEditor({...editor,name:event.target.value});setNameError('');}} required maxLength={40} error={nameError||undefined} placeholder="예: 프로젝트 검토자"/><TextArea label="역할 설명" value={editor.description} onChange={event=>setEditor({...editor,description:event.target.value})} maxLength={240} rows={3} placeholder="역할의 목적과 담당 업무를 적어주세요."/></form>}</DialogBody>
       <DialogFooter><Button variant="outline" onClick={()=>setEditor(null)}>취소</Button><Button type="submit" form={formId}>{editor?.id?'저장':'역할 추가'}</Button></DialogFooter>
     </Dialog>
     <Dialog open={deleteId!==null} onOpenChange={open=>{if(!open)setDeleteId(null);}} variant="divided" className="layout-role-dialog" aria-labelledby={`${dialogId}-delete-title`} aria-describedby={`${dialogId}-delete-description`}>
-      <DialogHeader><h2 id={`${dialogId}-delete-title`}>역할 삭제</h2><Button variant="ghost" size="sm" aria-label="닫기" onClick={()=>setDeleteId(null)}><Icon name="close"/></Button></DialogHeader>
+      <DialogHeader><h2 id={`${dialogId}-delete-title`}>역할 삭제</h2><Button variant="ghost" size="sm" aria-label="닫기" onClick={()=>setDeleteId(null)}><Icon name="x"/></Button></DialogHeader>
       <DialogBody><div className="layout-role-form"><p id={`${dialogId}-delete-description`}><strong>{deleting?.name}</strong> 역할을 삭제할까요? 연결된 권한과 알림 설정도 함께 삭제됩니다.</p>{deletingMemberCount>0?<>{replacements.length?<Select label="대체 역할" value={replacementId} onValueChange={setReplacementId} options={replacements.map(role=>({value:role.id,label:role.name}))} placeholder="대체 역할 선택" required popupStrategy="fixed" helperText={`이 역할을 사용하는 멤버 ${deletingMemberCount}명에게 적용할 대체 역할을 선택하세요.`}/>:<p className="field-error">사용 중인 마지막 역할은 삭제할 수 없습니다. 다른 역할을 먼저 추가해주세요.</p>}</>:<p className="component-helper">현재 이 역할을 사용하는 멤버가 없습니다.</p>}</div></DialogBody>
       <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={()=>setDeleteId(null)}>취소</Button><Button color="danger" disabled={!canDelete} onClick={deleteRole}><Icon name="trash"/>삭제</Button></DialogFooter>
     </Dialog>

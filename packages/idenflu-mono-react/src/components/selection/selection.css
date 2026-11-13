@@ -34,6 +34,5 @@
 .radio-mark::after { width: calc(var(--choice-size) - 10px); height: calc(var(--choice-size) - 10px); }
 .choice-mark img { filter:var(--icon-on-primary-filter); }
 .choice-mark .ui-icon { display:none; width:calc(var(--choice-size) - 4px); height:calc(var(--choice-size) - 4px); flex:0 0 auto; color:var(--text-on-primary); }
-.choice-mark .minus-icon { --icon:url('./assets/icons/idenflu/remove.svg'); }
 .choice-input:checked + .choice-mark .check-icon, .choice-input:indeterminate + .choice-mark .minus-icon { display:block; }
 .choice-input:indeterminate + .choice-mark .check-icon { display:none; }

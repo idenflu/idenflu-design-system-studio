@@ -23,15 +23,12 @@ import { componentUsage } from './component-usage';
 import completeExamples from './dist/complete-examples.json';
 import { DataGridDemos, dataGridUsage } from './data-grid-demos';
 import { SidebarLayoutSample } from './layout-samples';
-import releasedIcons from './icon-names-0.4.1.json';
 import spriteIcons from './dist/sprite-icons.json';
 
 const componentIcons = spriteIcons.map(name => {
   const component = name.split('-').map(part => part[0].toUpperCase() + part.slice(1)).join('') + 'Icon';
   return { name, component, IconComponent: generatedIcons[component as keyof typeof generatedIcons] };
 });
-type IconVersion = '0.4.1' | '0.5.0';
-const iconVersionLabels = { '0.4.1': '0.4.1', '0.5.0': '0.5.0 예정' } as const;
 const componentIconExample = `import { Button, IconButton } from '@idenflu/mono-react';
 import { SaveIcon, BellIcon, BookmarkIcon } from '@idenflu/mono-react/icons';
 import '@idenflu/mono-react/styles.css';
@@ -105,23 +102,23 @@ export function IconExample() {
   const [pinned, setPinned] = useState(false);
   return <>
     <Button><Icon name="save" />저장</Button>
-    <Button variant="outline"><Icon name="microsoft-excel" />Excel 내보내기</Button>
+    <Button variant="outline"><Icon name="excel" />Excel 내보내기</Button>
     <IconButton label="알림"><Icon name="bell" /></IconButton>
     <IconButton label={pinned ? '고정 해제' : '상단에 고정'}
       aria-pressed={pinned} onClick={() => setPinned(value => !value)}>
       <Icon name={pinned ? 'pin-off' : 'pin'} />
     </IconButton>
     <Button variant="outline"><Icon name="user-plus" />멤버 초대</Button>
-    <Badge><Icon name="crown" />소유자</Badge>
+    <Badge><Icon name="star" />소유자</Badge>
     <Badge variant="success"><Icon name="shield-check" />접근 허용</Badge>
     <Badge variant="danger"><Icon name="shield-off" />접근 거부</Badge>
     <Badge variant="primary"><Icon name="circle-dot" />진행 중</Badge>
-    <Badge variant="danger" appearance="solid"><Icon name="error-circle-fill" />오류</Badge>
+    <Badge variant="danger" appearance="solid"><Icon name="x-circle" />오류</Badge>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <Icon name="columns" style={{ '--icon-size': '20px' } as CSSProperties} />
       <span>표시 열</span>
     </div>
-    <Button variant="outline" aria-pressed="true"><Icon name="bookmark-fill" />북마크됨</Button>
+    <Button variant="outline" aria-pressed="true"><Icon name="bookmark" />북마크됨</Button>
     <TextField label="프로젝트 검색" prefix={<Icon name="search" />} prefixDecorative />
   </>;
 }`,
@@ -130,7 +127,7 @@ export function IconExample() {
 
 <TextField
   label={<>이름 <span className="form-pattern-required">필수</span></>}
-  required prefix={<Icon name="person" />} prefixDecorative
+  required prefix={<Icon name="user" />} prefixDecorative
   placeholder="이름을 입력해주세요"
 />
 <TextField
@@ -247,26 +244,18 @@ function CodeContent({ code }: { code:string }) {
 function CodeExample({ code, complete = false }: { code:string; complete?:boolean }) {
   return <Section title="React 사용 예시" description={complete ? "현재 화면의 데이터·상태·이벤트와 예제용 배치를 포함한 전체 TSX 코드입니다. 복사 후 내보낸 컴포넌트를 렌더링하세요." : "패키지에서 컴포넌트를 가져와 사용합니다."}><CodeContent code={code} /></Section>;
 }
-function FoundationIcons({ version }: { version: IconVersion }) {
+function FoundationIcons() {
   const [query, setQuery] = React.useState('');
-  const [variant, setVariant] = React.useState('all');
-  const options = version === '0.4.1' ? releasedIcons.map(name => ({ name, component: '', IconComponent: null })) : componentIcons;
   const term = query.trim().toLowerCase();
-  const visible = options.filter(item => (item.name.includes(term) || item.component.toLowerCase().includes(term)) && (variant === 'all' || item.name.endsWith('-fill') === (variant === 'filled')));
-  return <><div className="react-studio-stack">{version === '0.4.1' && <Segmented label="아이콘 유형" value={variant} onValueChange={setVariant} options={[{value:'all', label:'전체'}, {value:'outline', label:'Outline'}, {value:'filled', label:'Filled'}]} />}<div className="react-studio-search-field"><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: bookmark, cart, chart" /></div></div><p className="component-helper" role="status">{visible.length ? `${visible.length}개 아이콘` : '검색 결과가 없습니다. 이름이나 유형을 바꿔 검색해주세요.'}</p><ul className="react-studio-icons">{visible.map(({name, component, IconComponent}) => <li key={name}>{IconComponent ? <IconComponent size={24} /> : <Icon name={name as IconName} />}<span>{component || name}</span></li>)}</ul></>;
+  const visible = componentIcons.filter(item => item.name.includes(term) || item.component.toLowerCase().includes(term));
+  return <><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: bookmark, search" /><p className="component-helper" role="status">{visible.length}개 아이콘</p><ul className="react-studio-icons">{visible.map(({name, component}) => <li key={name}><Icon name={name as IconName} /><span>{name}</span><small>{component}</small></li>)}</ul></>;
 }
 function IconsPage() {
-  const [version, setVersion] = React.useState<IconVersion>('0.4.1');
-  const versions: IconVersion[] = ['0.4.1', '0.5.0'];
-  const updateVersion = (value: string) => setVersion(value as IconVersion);
-  return <><IconDemos />
-    <Section title="아이콘 목록" description="패키지 버전을 선택하고 유형이나 이름으로 아이콘을 찾아보세요. 0.5.0은 출시 예정입니다.">
-      <Tabs label="아이콘 목록 패키지 버전" value={version} onValueChange={updateVersion} items={versions.map(value => ({ value, label: iconVersionLabels[value], content: value === version ? <><p className="react-studio-caption">{value === '0.4.1' ? '표시된 이름을 Icon의 name에 사용합니다.' : 'Outline 컴포넌트를 @idenflu/mono-react/icons에서 가져옵니다.'}</p><FoundationIcons version={value} /></> : null }))} />
-    </Section>
-    <Section title="React 사용 예시" description="선택한 패키지 버전의 사용 예시입니다.">
-      <Tabs label="사용 예시 패키지 버전" value={version} onValueChange={updateVersion} items={versions.map(value => ({ value, label: iconVersionLabels[value], content: value === version ? <CodeContent key={value} code={value === '0.4.1' ? snippets['foundations/icons'] : componentIconExample} /> : null }))} />
-    </Section>
-  </>;
+  return <><IconDemos /><Section title="아이콘 목록" description="이름 또는 컴포넌트 이름으로 아이콘을 찾아보세요."><FoundationIcons /></Section>
+    <Section title="React 사용 예시" description="name 기반 Icon과 개별 아이콘 컴포넌트를 사용할 수 있습니다.">
+      <h3>Icon</h3><CodeContent code={snippets['foundations/icons']} />
+      <h3>개별 아이콘 컴포넌트</h3><CodeContent code={componentIconExample} />
+    </Section></>;
 }
 function ComponentPage({ route }: { route:string }) {
   const Pattern = patternPages[route as keyof typeof patternPages];

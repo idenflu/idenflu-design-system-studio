@@ -51,18 +51,18 @@ for (const searchable of [false,true]) {
     const f = await fixture({searchable,defaultValue:['design','development'],prefixIcon:h('svg',null,h('path',null))});
     try {
       const trigger = f.container.querySelector('.multi-inline-trigger');
-      await click(f.container.querySelector('[aria-label="디자인 제거"] .icon-close'));
+      await click(f.container.querySelector('[aria-label="디자인 제거"] .icon-x'));
       assert.equal(trigger.getAttribute('aria-expanded'),'false');
-      await click(f.container.querySelector('.multi-inline-clear .icon-close'));
+      await click(f.container.querySelector('.multi-inline-clear .icon-x'));
       assert.equal(f.container.querySelectorAll('.multi-inline-chip').length,0);
       assert.equal(trigger.getAttribute('aria-expanded'),'false');
       await click(f.container.querySelector('.select-prefix-icon path'));
       assert.equal(trigger.getAttribute('aria-expanded'),'true');
       await click(f.container.querySelector('.select-prefix-icon path'));
       assert.equal(trigger.getAttribute('aria-expanded'),'true');
-      await click(trigger.querySelector('.icon-caret'));
+      await click(trigger.querySelector('.icon-keyboard-arrow-down'));
       assert.equal(trigger.getAttribute('aria-expanded'),'false');
-      await click(trigger.querySelector('.icon-caret'));
+      await click(trigger.querySelector('.icon-keyboard-arrow-down'));
       assert.equal(trigger.getAttribute('aria-expanded'),'true');
     } finally { await f.dispose(); }
   });

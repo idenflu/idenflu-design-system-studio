@@ -361,8 +361,8 @@ test('DataGrid export formats preserve CSV defaults and expose Excel icons only 
     await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['xlsx'],selectable:true,defaultSelectedRowIds:['a']}));
     assert.equal(button(f.node,'CSV 내보내기'),undefined);
     assert.equal(button(f.node,'선택한 행 내보내기'),undefined);
-    assert.ok(button(f.node,'Excel 내보내기').querySelector('.icon-microsoft-excel'));
-    assert.ok(button(f.node,'선택한 행 Excel 내보내기').querySelector('.icon-microsoft-excel'));
+    assert.ok(button(f.node,'Excel 내보내기').querySelector('.icon-excel'));
+    assert.ok(button(f.node,'선택한 행 Excel 내보내기').querySelector('.icon-excel'));
     await f.render(h(DataGrid,{...props,exportable:true,exportFormats:['csv','xlsx','xlsx'],selectable:true,defaultSelectedRowIds:['a']}));
     assert.equal(f.node.querySelectorAll('button[aria-label="Excel 내보내기"]').length,1);
     assert.ok(button(f.node,'CSV 내보내기'));

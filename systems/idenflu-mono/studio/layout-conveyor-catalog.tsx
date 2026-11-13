@@ -60,7 +60,7 @@ export function ConveyorCatalogPage({conveyors,onCreate,selectedId,onSelect,rese
   const hasFilters=!!needle||status!=='all';
   return <>
     <PageHeader className="layout-page-heading" title="컨베이어" eyebrow="EQUIPMENT MANAGEMENT" description="설비의 가동 상태와 구성을 확인하고 새로운 컨베이어를 등록하세요."
-      actions={<Button onClick={onCreate}><Icon name="add" />새 컨베이어</Button>} />
+      actions={<Button onClick={onCreate}><Icon name="plus" />새 컨베이어</Button>} />
     <section className="cv-catalog-summary" aria-label="컨베이어 현황">
       <span>전체 <strong>{conveyors.length}</strong></span>
       {(['running','stopped','maintenance'] as const).map(value=><span key={value}><i className="cv-catalog-state-dot" data-status={value} aria-hidden="true" />{statusLabels[value]} <strong>{conveyors.filter(item=>item.status===value).length}</strong></span>)}
@@ -81,7 +81,7 @@ export function ConveyorCatalogPage({conveyors,onCreate,selectedId,onSelect,rese
       </Card>)}
     </Grid> : <div className="cv-catalog-empty"><Icon name="search" /><h2>{hasFilters?'검색 결과가 없습니다':'등록된 컨베이어가 없습니다'}</h2><p>{hasFilters?'다른 검색어나 가동 상태로 다시 찾아보세요.':'컨베이어를 등록하고 하위 유닛을 구성해보세요.'}</p><Button variant="outline" onClick={hasFilters?()=>{setQuery('');setStatus('all');}:onCreate}>{hasFilters?'검색 초기화':'새 컨베이어'}</Button></div>}
     <Drawer open={selected!==null} onOpenChange={open=>{if(!open)onSelect(null);}} variant="divided" size="lg" aria-label="컨베이어 상세" className="cv-detail-drawer" initialFocusRef={closeButton}>
-      <DrawerHeader><div><span className="cv-detail-code">{selected?.code}</span><h2>{selected?.name??'컨베이어 상세'}</h2></div><IconButton ref={closeButton} variant="ghost" label="컨베이어 상세 닫기" tooltip={false} onClick={()=>onSelect(null)}><Icon name="close" /></IconButton></DrawerHeader>
+      <DrawerHeader><div><span className="cv-detail-code">{selected?.code}</span><h2>{selected?.name??'컨베이어 상세'}</h2></div><IconButton ref={closeButton} variant="ghost" label="컨베이어 상세 닫기" tooltip={false} onClick={()=>onSelect(null)}><Icon name="x" /></IconButton></DrawerHeader>
       <DrawerBody>{selected&&<div className="cv-detail-content">
         <div className="cv-detail-status"><Badge variant={statusVariant(selected.status)}>{statusLabels[selected.status]}</Badge><span>{typeLabels[selected.type]}</span></div>
         <div className="cv-detail-art"><ConveyorDrawing type={selected.type} status={selected.status} /></div>

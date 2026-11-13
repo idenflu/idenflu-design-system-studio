@@ -6,7 +6,7 @@ const sides = [{value:'right', label:'오른쪽'}, {value:'left', label:'왼쪽'
 const sizes = [{value:'sm', label:'SM · 320px'}, {value:'md', label:'MD · 480px'}, {value:'lg', label:'LG · 640px'}, {value:560, label:'사용자 지정 · 560px'}, {value:'full', label:'전체 화면'}] as const;
 
 function CloseButton({onClick}: {onClick: () => void}) {
-  return <Button variant="ghost" iconOnly aria-label="패널 닫기" onClick={onClick}><Icon name="close" /></Button>;
+  return <Button variant="ghost" iconOnly aria-label="패널 닫기" onClick={onClick}><Icon name="x" /></Button>;
 }
 
 function SettingsDrawer() {

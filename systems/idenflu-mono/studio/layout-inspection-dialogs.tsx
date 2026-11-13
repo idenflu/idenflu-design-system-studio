@@ -59,10 +59,10 @@ export function InspectionEditor({open,initial,editingId,conveyors,inspections,o
     }
   };
   return <Dialog open={open} onOpenChange={value=>{if(!value)onClose();}} variant="divided" className="inspection-editor" aria-labelledby={`${id}-title`} aria-describedby={`${id}-description`} initialFocusRef={firstInput} closeOnBackdrop>
-    <DialogHeader><div><h2 id={`${id}-title`}>{title}</h2><p id={`${id}-description`}>점검할 설비와 시간을 정하고 담당자를 지정하세요.</p></div><IconButton label="점검 일정 편집 닫기" tooltip={false} onClick={onClose}><Icon name="close"/></IconButton></DialogHeader>
+    <DialogHeader><div><h2 id={`${id}-title`}>{title}</h2><p id={`${id}-description`}>점검할 설비와 시간을 정하고 담당자를 지정하세요.</p></div><IconButton label="점검 일정 편집 닫기" tooltip={false} onClick={onClose}><Icon name="x"/></IconButton></DialogHeader>
     <DialogBody>
       <form ref={form} id={`${id}-form`} className="inspection-editor-form" noValidate onSubmit={submit}>
-        {message&&<p className="inspection-editor-error" role="alert"><Icon name="error-circle"/>{message}</p>}
+        {message&&<p className="inspection-editor-error" role="alert"><Icon name="x-circle"/>{message}</p>}
         <TextField ref={node=>{firstInput.current=node;fields.current.title=node;}} label="점검 이름" name="inspection-title" value={draft.title} onChange={event=>change('title',event.target.value)} required maxLength={60} error={errors.title} placeholder="예: 구동부 정기 점검"/>
         <Select ref={node=>{fields.current.conveyorId=node;}} label="대상 설비" name="inspection-conveyor" value={draft.conveyorId} onValueChange={value=>{
           setDraft(current=>({...current,conveyorId:value,owner:conveyors.find(item=>item.id===value)?.owner??current.owner}));
@@ -96,7 +96,7 @@ export function InspectionDetail({inspection,conveyors,onClose,onEdit,onViewConv
   const closeButton=React.useRef<HTMLButtonElement>(null);
   const conveyor=conveyors.find(item=>item.id===inspection?.conveyorId);
   return <Drawer open={inspection!==null} onOpenChange={open=>{if(!open)onClose();}} variant="divided" size="lg" className="inspection-detail" aria-label="점검 일정 상세" initialFocusRef={closeButton}>
-    <DrawerHeader><div><span className="inspection-detail-eyebrow">INSPECTION SCHEDULE</span><h2>{inspection?.title??'점검 일정 상세'}</h2></div><IconButton ref={closeButton} label="점검 일정 상세 닫기" tooltip={false} onClick={onClose}><Icon name="close"/></IconButton></DrawerHeader>
+    <DrawerHeader><div><span className="inspection-detail-eyebrow">INSPECTION SCHEDULE</span><h2>{inspection?.title??'점검 일정 상세'}</h2></div><IconButton ref={closeButton} label="점검 일정 상세 닫기" tooltip={false} onClick={onClose}><Icon name="x"/></IconButton></DrawerHeader>
     <DrawerBody>{inspection&&<div className="inspection-detail-content">
       <div className="inspection-detail-status"><Badge variant={inspectionStatusVariant(inspection.status)}>{inspectionStatusLabels[inspection.status]}</Badge><span>{inspectionKindLabels[inspection.kind]}</span></div>
       <section className="inspection-detail-time" aria-label="점검 시간"><Icon name="calendar"/><div><strong>{dateText(inspection.date)}</strong><p>{inspection.startTime} – {inspectionEndTime(inspection)} <span>· {inspection.durationMinutes}분</span></p></div></section>

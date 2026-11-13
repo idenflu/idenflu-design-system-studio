@@ -32,7 +32,7 @@ export function DataGridFooterDemo() {
   return <Section id="data-grid-footer-demo" title="사용자 지정 하단" description="페이지네이션 없이 합계·선택 건수·마지막 조회 일시를 표시합니다. 검색·필터를 바꾸거나 행을 선택해 하단 값이 갱신되는지 확인하세요.">
     <DataGrid label="하단 요약 데이터그리드" rows={rows} columns={columns} getRowId={row=>row.id} getRowLabel={row=>row.name}
       selectable pagination={false} searchLabel="하단 요약 검색" maxHeight={360} loading={loading}
-      toolbarActions={<Button variant="outline" disabled={loading} onClick={()=>setLoading(true)}><Icon name="refresh"/>{loading ? '조회 중' : '다시 조회'}</Button>}
+      toolbarActions={<Button variant="outline" disabled={loading} onClick={()=>setLoading(true)}><Icon name="rotate"/>{loading ? '조회 중' : '다시 조회'}</Button>}
       footer={({totalCount,filteredCount,filteredRows,selectedCount,selectedRows,loading})=><div className="studio-grid-footer-summary">
         {loading ? <span>데이터를 조회하는 중입니다.</span> : <dl className="studio-grid-footer-metrics">
           <div><dt>조회</dt><dd>{filteredCount} / {totalCount}건</dd></div>

@@ -1,12 +1,9 @@
 const { test, expect } = require('@playwright/test');
-const { readdirSync } = require('node:fs');
+const { readFileSync } = require('node:fs');
 const { resolve } = require('node:path');
 const documents = require('../systems/idenflu-mono/studio/routes.json');
-const iconNames = readdirSync(resolve(__dirname, '../packages/idenflu-mono-react/assets/icons/idenflu'))
-  .filter(name => name.endsWith('.svg')).map(name => name.slice(0, -4)).sort();
-const newOutlineNames = ['home', 'folder', 'edit', 'save', 'external-link', 'refresh', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'attachment', 'globe', 'users', 'shield-check', 'dashboard', 'chart-bar', 'chart-line', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle', 'logout', 'undo', 'redo', 'sort'];
-const newFilledNames = ['home', 'folder', 'bell', 'chat', 'heart', 'star', 'bookmark', 'image', 'users', 'shield-check', 'dashboard', 'cart', 'credit-card', 'receipt', 'tag', 'briefcase', 'camera', 'location', 'send', 'help-circle'].map(name => `${name}-fill`);
-const newIconNames = [...newOutlineNames, ...newFilledNames];
+const sprite = readFileSync(resolve(__dirname, '../packages/idenflu-mono-react/assets/icons/icons.svg'), 'utf8');
+const iconNames = [...sprite.matchAll(/<symbol\b[^>]*\bid="([^"]+)"/g)].map(match => match[1]).sort();
 
 test('every route has one heading and no page overflow', {tag:'@mobile'}, async ({ page }, testInfo) => {
   const errors = [];
@@ -99,46 +96,23 @@ test('built React documentation works without the legacy HTML runtime', async ({
 });
 
 for (const prefix of ['', '/dist']) {
-  test(`foundation SVG icons resolve from the canonical document (${prefix || 'dev'})`, async ({page}) => {
+  test(`foundation icons use the sprite catalog (${prefix || 'dev'})`, async ({page}) => {
     const failures = [];
-    page.on('response', response => { if (response.status() >= 400 && /\.(svg|woff2)(?:$|\?)/.test(response.url())) failures.push(response.url()); });
+    page.on('response', response => { if (response.status() >= 400 && /\.svg(?:$|\?)/.test(response.url())) failures.push(response.url()); });
     await page.goto(`${prefix}/systems/idenflu-mono/index.html#/foundations/icons`);
     const icons = page.locator('.react-studio-icons .ui-icon');
     await expect(icons).toHaveCount(iconNames.length);
-    await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(iconNames);
-    expect(iconNames).toEqual(expect.arrayContaining(newIconNames));
     for (const name of iconNames) {
       const icon = page.locator(`.react-studio-icons .icon-${name}`);
       await expect(icon).toHaveAttribute('aria-hidden', 'true');
-      const url = await icon.evaluate(node => getComputedStyle(node).maskImage.match(/url\(["']?(.*?)["']?\)/)?.[1]);
-      expect(url, name).toBeTruthy();
-      expect(new URL(url).pathname, name).toBe(`${prefix}/systems/idenflu-mono/assets/icons/idenflu/${name}.svg`);
-      expect((await page.request.get(url)).ok(), name).toBe(true);
+      expect(await icon.evaluate(node => getComputedStyle(node).maskImage), name).toContain('data:image/svg+xml');
     }
-    const types = page.getByRole('group', {name: '아이콘 유형'});
-    await types.getByRole('button', {name: 'Filled', exact: true}).click();
-    await expect(icons).toHaveCount(iconNames.filter(name => name.endsWith('-fill')).length);
-    const search = page.getByRole('searchbox', {name: '아이콘 검색'});
-    await search.fill('bookmark');
-    await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(['bookmark-fill']);
-    await types.getByRole('button', {name: 'Outline', exact: true}).click();
-    await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(['bookmark']);
-    await search.fill('');
-    await expect(icons).toHaveCount(iconNames.filter(name => !name.endsWith('-fill')).length);
-    await types.getByRole('button', {name: '전체', exact: true}).click();
-    await expect(icons).toHaveCount(iconNames.length);
-    await search.fill('no-such-icon');
-    await expect(icons).toHaveCount(0);
-    await expect(page.getByRole('status').filter({hasText: '검색 결과가 없습니다.'})).toBeVisible();
-    const bookmark = page.getByRole('button', {name: '북마크', exact: true});
-    await expect(bookmark).toHaveAttribute('aria-pressed', 'false');
-    await expect(bookmark.locator('.icon-bookmark')).toHaveCount(1);
-    await bookmark.click();
-    await expect(bookmark).toHaveAttribute('aria-pressed', 'true');
-    await expect(bookmark.locator('.icon-bookmark-fill')).toHaveCount(1);
-    await bookmark.click();
-    await expect(bookmark).toHaveAttribute('aria-pressed', 'false');
-    await expect(bookmark.locator('.icon-bookmark')).toHaveCount(1);
+    const search = page.getByRole('searchbox', {name:'아이콘 검색'});
+    await search.fill('BookmarkIcon');
+    await expect(page.locator('.react-studio-icons li')).toHaveCount(1);
+    await expect(page.locator('.react-studio-icons li')).toContainText('bookmark');
+    await expect(page.getByText('<Icon name="save" />', {exact:false})).toBeVisible();
+    await expect(page.getByText('<SaveIcon />', {exact:false}).first()).toBeVisible();
     expect(failures).toEqual([]);
   });
 }

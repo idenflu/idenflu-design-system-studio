@@ -30,11 +30,11 @@ export function BookmarkActions() {
       <IconButton ref={bookmarkRef} label="북마크"
         variant="outline" size="md" aria-pressed={bookmarked}
         onClick={() => setBookmarked(value => !value)}>
-        <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
+        <Icon name="bookmark" />
       </IconButton>
       <IconButton label="북마크 초기화" tooltip="저장한 북마크를 해제합니다."
         onClick={() => setBookmarked(false)}>
-        <Icon name="refresh" />
+        <Icon name="rotate" />
       </IconButton>
       <IconButton label="자세히 보기" tooltip={false}
         aria-expanded={details} aria-controls="bookmark-details"

@@ -8,7 +8,7 @@ const rows=statuses.map(status=>({id:status,status,label:statusDefinitions[statu
 
 export function StatusIconDemos() {
   const [size,setSize]=React.useState('16');
-  return <Section id="status-icon-guide" title="상태 아이콘과 사용 기준" description="대기·진행·보류·비활성 4종과 오류·차단의 Filled 2종을 추가했습니다. 상태는 도형과 문구로 함께 전달하며, 강조할 때만 같은 의미의 Filled를 사용합니다.">
+  return <Section id="status-icon-guide" title="상태 아이콘과 사용 기준" description="상태는 아이콘과 문구로 함께 전달합니다. 강조된 배지에서도 동일한 도형을 사용합니다.">
     <Segmented label="상태 아이콘 크기" value={size} onValueChange={setSize} options={[14,16,18,20].map(value=>({value:String(value),label:`${value}px`}))} />
     <TableContainer label="상태 아이콘 사용 기준" className="studio-status-table"><Table density="compact">
       <caption className="sr-only">상태별 기본·강조 아이콘과 배지, 사용 기준</caption>

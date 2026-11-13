@@ -166,15 +166,15 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
     if (current.section === item.id) { event.preventDefault(); requestAnimationFrame(() => focusSection(item.id)); }
   }}>{item.title}</a>;
   const groupOpen = (group:string) => needle ? shown.some(item => groupItems(group).includes(item)) : !!expanded[group];
-  const groupSummary = (group:string) => <summary onClick={event => { event.preventDefault(); if (!needle) setExpanded(previous => ({...previous, [group]:!previous[group]})); }}>{group.split(' / ').pop()}<Icon name="caret" /></summary>;
+  const groupSummary = (group:string) => <summary onClick={event => { event.preventDefault(); if (!needle) setExpanded(previous => ({...previous, [group]:!previous[group]})); }}>{group.split(' / ').pop()}<Icon name="keyboard-arrow-down" /></summary>;
   return <div className="docs-layout react-studio">
     <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); surface.current?.querySelector<HTMLElement>('main')?.focus(); }}>본문 바로가기</a>
     <aside className="sidebar" id="sidebar" ref={sidebar} aria-label="문서 메뉴" role={mobile && menuOpen ? 'dialog' : undefined} aria-modal={mobile && menuOpen ? true : undefined} aria-hidden={mobile && !menuOpen ? true : undefined}>
-      <div className="sidebar-brand"><a className="wordmark" href="#/overview" aria-label="idenflu mono 홈" onClick={event => navigate('overview', event)}>idenflu mono</a><button className="icon-button sidebar-close" type="button" aria-label="메뉴 닫기" onClick={() => closeMenu()}><Icon name="close" /></button><p>Design system</p></div>
+      <div className="sidebar-brand"><a className="wordmark" href="#/overview" aria-label="idenflu mono 홈" onClick={event => navigate('overview', event)}>idenflu mono</a><button className="icon-button sidebar-close" type="button" aria-label="메뉴 닫기" onClick={() => closeMenu()}><Icon name="x" /></button><p>Design system</p></div>
       <div className="docs-search"><label className="sr-only" htmlFor="docs-search">문서 검색</label><div className="docs-search-control"><input ref={search} className="text-input" id="docs-search" type="search" placeholder="문서 검색 · /" autoComplete="off" aria-describedby="docs-search-status" value={query} onChange={event => { setQuery(event.target.value); if (!normalize(event.target.value)) setExpanded(previous => ({...previous, ...currentGroups(current.group)})); }} onKeyDown={event => {
         if (event.key === 'Escape' && query) { event.preventDefault(); event.stopPropagation(); clearSearch(); }
         else if (event.key === 'Enter' && shown.length) { event.preventDefault(); location.hash = documentHref(shown[0].route); navigate(shown[0].route); }
-      }} />{query && <button className="icon-button docs-search-clear" type="button" aria-label="검색어 지우기" onClick={clearSearch}><Icon name="close" /></button>}</div><p id="docs-search-status" role="status" aria-live="polite">{shown.length ? `${shown.length}개 문서` : '검색 결과가 없습니다.'}</p></div>
+      }} />{query && <button className="icon-button docs-search-clear" type="button" aria-label="검색어 지우기" onClick={clearSearch}><Icon name="x" /></button>}</div><p id="docs-search-status" role="status" aria-live="polite">{shown.length ? `${shown.length}개 문서` : '검색 결과가 없습니다.'}</p></div>
       <nav className="docs-navigation" id="react-studio-nav" ref={nav} aria-label="문서 탐색">
         {!shown.length && <div className="docs-search-empty"><p>문서 이름이나 다른 키워드로 검색해보세요.</p><button className="button button--outline button-inline" type="button" onClick={clearSearch}>전체 문서 보기</button></div>}
         {docLink(menuRoutes[0], 'nav-overview')}
@@ -193,7 +193,7 @@ export function DocumentShell({current, children}: {current:DocumentRoute; child
       <main className="docs-content react-studio-content" id="main" tabIndex={-1}>
         {current.route !== 'overview' && <header className="doc-heading"><p className="doc-kicker">{current.group}</p><h1 id="doc-title" tabIndex={-1}>{current.title}</h1><p className="doc-description">{current.description}</p></header>}
         {current.route !== 'overview' && toc.length > 1 && <details className="docs-toc" open={!mobile || tocOpen} onToggle={event => { if (mobile) setTocOpen(event.currentTarget.open); }}>
-          <summary>이 페이지 목차 <Icon name="caret" /></summary>
+          <summary>이 페이지 목차 <Icon name="keyboard-arrow-down" /></summary>
           <nav aria-label="이 페이지 목차">{toc.length > 8 ? groupDocumentSections(toc).map(group => <div className="docs-toc-group" key={group.title}><span>{group.title}</span><div>{group.sections.map(tocLink)}</div></div>) : <div className="docs-toc-links">{toc.map(tocLink)}</div>}</nav>
         </details>}
         <div className={`route-view route-${current.route.split('/').pop()}`} ref={body} data-route={current.route}>{children}</div>

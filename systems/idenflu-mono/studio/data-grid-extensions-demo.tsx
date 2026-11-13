@@ -54,7 +54,7 @@ export function ToolbarExtensionGrid({loading=false}:{loading?:boolean}) {
       exportable exportFileName="extension-projects.csv" pagination={false} maxHeight={320}
       toolbarActions={<>
         <IconButton label="확장 예제 데이터 초기화" variant="outline" disabled={loading}
-          onClick={reset}><Icon name="refresh" /></IconButton>
+          onClick={reset}><Icon name="rotate" /></IconButton>
         <Button ref={addButton} disabled={loading} onClick={add}><Icon name="plus" />프로젝트 추가</Button>
       </>}
       selectionActions={<Button variant="outline" disabled={loading} onClick={completeSelected}>
@@ -146,7 +146,7 @@ export function ToolbarExtensionGrid({loading=false}:{loading?:boolean}) {
       exportable exportFileName="extension-projects.csv" pagination={false} maxHeight={320}
       toolbarActions={<>
         <IconButton label="확장 예제 데이터 초기화" variant="outline" disabled={loading}
-          onClick={reset}><Icon name="refresh" /></IconButton>
+          onClick={reset}><Icon name="rotate" /></IconButton>
         <Button ref={addButton} disabled={loading} onClick={add}><Icon name="plus" />프로젝트 추가</Button>
       </>}
       selectionActions={<Button variant="outline" disabled={loading} onClick={completeSelected}>

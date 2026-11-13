@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-  <mask id="nova-icon-tag-fill-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
-    <path d="M3 3h9l9 9-9 9-9-9z" fill="white" />
-    <circle cx="7" cy="7" r="1.5" fill="black" />
-  </mask>
-  <rect width="24" height="24" mask="url(#nova-icon-tag-fill-mask)" />
-</svg>

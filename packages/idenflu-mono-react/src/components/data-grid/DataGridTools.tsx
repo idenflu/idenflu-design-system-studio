@@ -70,7 +70,7 @@ export function DataGridCellEditor({ value, label, type = 'text', validate, onCo
       onChange={event => { setDraft(event.target.value); setError(''); }} />
     <div className="data-grid-editor-controls">
       <button type="button" className="icon-button" aria-label={`${label} 저장`} onClick={commit}><Icon name="check" /></button>
-      <button type="button" className="icon-button" aria-label={`${label} 취소`} onClick={onCancel}><Icon name="close" /></button>
+      <button type="button" className="icon-button" aria-label={`${label} 취소`} onClick={onCancel}><Icon name="x" /></button>
     </div>
     {error && <p className="data-grid-editor-error" id={errorId} role="alert">{error}</p>}
   </div>;

@@ -6,7 +6,7 @@
 .demo-tree summary { justify-content:space-between; gap:var(--space-3); }
 .demo-tree summary::-webkit-details-marker { display:none; }
 .demo-tree summary::marker { content:""; }
-.demo-tree summary::after { content:""; flex:0 0 16px; width:16px; height:16px; background:currentColor; mask:url('./assets/icons/idenflu/keyboard-arrow-down.svg') no-repeat center / contain; transition:transform var(--motion-fast) var(--motion-easing); }
+.demo-tree summary::after { content:""; flex:0 0 16px; width:16px; height:16px; background:currentColor; mask:var(--icon) no-repeat center / contain; transition:transform var(--motion-fast) var(--motion-easing); }
 .demo-tree details[open] > summary::after { transform:rotate(180deg); }
 .demo-tree summary:hover, .tree-item:hover:not(:disabled) { background:var(--surface); color:var(--text); }
 .demo-tree summary:focus-visible, .tree-item:focus-visible { outline:2px solid var(--focus-on-light); outline-offset:-2px; }

@@ -76,7 +76,7 @@ export function InlineSelectTags({label, placeholder, options, disabled, readOnl
   const content = (option: SelectOption) => <>
     {option.icon && <span className="select-option-icon" aria-hidden="true">{option.icon}</span>}
     <span className="multi-inline-chip-label">{option.label}</span>
-    {!readOnly && <span className="ui-icon icon-close" aria-hidden="true" />}
+    {!readOnly && <span className="ui-icon icon-x" aria-hidden="true" />}
   </>;
   return <div ref={host} className={`multi-inline-tags${hiddenCount ? ' has-overflow' : ''}`} role="group" aria-label={`${label} 선택 항목`}>
     {options.length ? options.slice(0, visibleCount).map((option, index) => readOnly ? <span key={option.value} className="chip multi-inline-chip">{content(option)}</span> : <button key={option.value} type="button" className="chip multi-inline-chip" data-selected-tag-index={index} aria-label={`${option.label} 제거`} disabled={disabled || option.disabled} onClick={() => onRemove(option.value)}>{content(option)}</button>) : <span className="multi-inline-placeholder">{placeholder}</span>}

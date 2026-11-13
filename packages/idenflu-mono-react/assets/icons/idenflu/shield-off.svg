@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter">
-  <mask id="mono-shield-off-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24"><rect width="24" height="24" fill="white" stroke="none" /><path d="m2 2 20 20" stroke="black" stroke-width="4.5" /></mask>
-  <path d="m12 2 8 3v7c0 5-8 10-8 10S4 17 4 12V5Z" mask="url(#mono-shield-off-gap)" />
-  <path d="m2 2 20 20" />
-</svg>

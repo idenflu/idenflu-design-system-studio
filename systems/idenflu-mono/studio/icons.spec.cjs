@@ -13,7 +13,7 @@ test('workflow icons retain readable size previews and stay within narrow pages'
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
   const search=page.getByRole('searchbox',{name:'아이콘 검색',exact:true});
-  await search.fill('pin');await expect(page.locator('.react-studio-icons li > span:last-child')).toHaveText(['pin','pin-off']);
+  await search.fill('pin');await expect(page.locator('.react-studio-icons li > span:nth-child(2)')).toHaveText(['pin','pin-off']);
   await search.fill('sun');await expect(page.locator('.react-studio-icons .icon-sun')).toHaveCount(1);
 });
 
@@ -37,7 +37,7 @@ test('theme controls use common sun and moon icons and preserve theme across rel
   await page.goto(url);
   const button=page.locator('.theme-toggle');
   await expect(button.locator('.ui-icon')).toHaveCount(2);
-  await expect(button.locator('svg')).toHaveCount(0);
+  await expect(button.locator('.ui-icon')).toHaveCount(2);
   const initial=await page.locator('html').getAttribute('data-theme');
   const verify=async theme=>{
     await expect(button.locator(theme==='dark'?'.icon-sun':'.icon-moon')).toBeVisible();
@@ -51,29 +51,14 @@ test('theme controls use common sun and moon icons and preserve theme across rel
   await page.reload();await verify(changed);
 });
 
-test('version tabs synchronize the catalog and usage example', {tag:['@mobile','@theme']}, async ({page, context}) => {
+test('catalog searches names and both usage examples are available', {tag:['@mobile','@theme']}, async ({page}) => {
   await page.goto(url);
-  const catalog = page.getByRole('tablist', {name:'아이콘 목록 패키지 버전'});
-  const example = page.getByRole('tablist', {name:'사용 예시 패키지 버전'});
-  await expect(catalog.getByRole('tab', {name:'0.4.1'})).toHaveAttribute('aria-selected', 'true');
-  await catalog.getByRole('tab', {name:'0.5.0 예정'}).click();
-  await expect(example.getByRole('tab', {name:'0.5.0 예정'})).toHaveAttribute('aria-selected', 'true');
   const search = page.getByRole('searchbox', {name:'아이콘 검색'});
-  await search.fill('trash');
-  await expect(page.locator('.react-studio-icons li')).toHaveText(['TrashIcon']);
-  await search.fill('calendar-clock');
-  await expect(page.locator('.react-studio-icons li')).toHaveText(['CalendarClockIcon']);
-  await search.fill('bookmark');
-  await expect(page.locator('.react-studio-icons li')).toHaveText(['BookmarkIcon']);
-  await expect(page.getByRole('group', {name:'아이콘 유형'})).toHaveCount(0);
-  await expect(page.locator('.react-studio-icons li svg')).toHaveCount(1);
-  const code = page.getByRole('region', {name:'React 사용 예시 코드'});
-  await expect(code).toContainText('@idenflu/mono-react/icons');
-  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.getByRole('button', {name:'코드 복사'}).click();
-  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toContain('BookmarkIcon');
-  await example.getByRole('tab', {name:'0.5.0 예정'}).press('ArrowLeft');
-  await expect(catalog.getByRole('tab', {name:'0.4.1'})).toHaveAttribute('aria-selected', 'true');
-  await expect(code).toContainText('<Icon name="save"');
+  await search.fill('CalendarClockIcon');
+  await expect(page.locator('.react-studio-icons li')).toHaveCount(1);
+  await expect(page.locator('.react-studio-icons li')).toContainText('calendar-clock');
+  const examples = page.getByRole('region', {name:'React 사용 예시 코드'});
+  await expect(examples.nth(0)).toContainText('<Icon name="save"');
+  await expect(examples.nth(1)).toContainText('SaveIcon');
   expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });

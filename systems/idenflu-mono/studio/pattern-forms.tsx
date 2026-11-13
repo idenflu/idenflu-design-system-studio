@@ -11,8 +11,8 @@ function ContactForm({profile = false}:{profile?:boolean}) {
   }), profile ? '변경사항을 저장했습니다.' : '기본 정보를 확인했습니다.');
   return <form {...form.props}>
     <Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
-      <TextField label={fieldLabel('이름',true)} name="name" required autoComplete="name" maxLength={60} defaultValue={profile ? '김민수' : ''} placeholder="이름을 입력해주세요" prefix={<Icon name="person" />} prefixDecorative error={form.errors.name || undefined} />
-      <TextField label={fieldLabel('이메일',true)} name="email" required type="email" autoComplete="email" defaultValue={profile ? 'minsu@example.com' : ''} placeholder="name@example.com" prefix={<Icon name="email" />} prefixDecorative error={form.errors.email || undefined} />
+      <TextField label={fieldLabel('이름',true)} name="name" required autoComplete="name" maxLength={60} defaultValue={profile ? '김민수' : ''} placeholder="이름을 입력해주세요" prefix={<Icon name="user" />} prefixDecorative error={form.errors.name || undefined} />
+      <TextField label={fieldLabel('이메일',true)} name="mail" required type="email" autoComplete="email" defaultValue={profile ? 'minsu@example.com' : ''} placeholder="name@example.com" prefix={<Icon name="mail" />} prefixDecorative error={form.errors.email || undefined} />
       {profile ? <GridItem colSpan="full" className="form-pattern-field--wide"><Switch label="제품 소식 받기" name="updates" defaultChecked aria-describedby="profile-updates-help" /><p id="profile-updates-help" className="react-studio-caption">새로운 기능과 소식을 이메일로 받아요.</p></GridItem> : <>
         <TextField label={fieldLabel('회사명')} name="company" autoComplete="organization" placeholder="회사명을 입력해주세요" />
         <TextField label={fieldLabel('연락처')} name="phone" type="tel" autoComplete="tel-national" prefix="+82" placeholder="10-1234-5678" />
@@ -39,7 +39,7 @@ export function PreferencesPattern() {
 
 function PasswordField({label,name,error,helperText}:{label:string; name:string; error?:string; helperText?:string}) {
   const [visible,setVisible] = React.useState(false); const id = React.useId();
-  return <TextField id={id} label={fieldLabel(label,true)} name={name} required type={visible ? 'text' : 'password'} autoComplete={name === 'current' ? 'current-password' : 'new-password'} prefix={<Icon name="lock" />} prefixDecorative error={error || undefined} helperText={helperText} action={<button className="input-action" type="button" aria-controls={id} aria-label={`${label} ${visible ? '숨기기' : '표시'}`} aria-pressed={visible} onClick={() => setVisible(!visible)}><Icon name={visible ? 'eye-slash' : 'eye'} /></button>} />;
+  return <TextField id={id} label={fieldLabel(label,true)} name={name} required type={visible ? 'text' : 'password'} autoComplete={name === 'current' ? 'current-password' : 'new-password'} prefix={<Icon name="lock" />} prefixDecorative error={error || undefined} helperText={helperText} action={<button className="input-action" type="button" aria-controls={id} aria-label={`${label} ${visible ? '숨기기' : '표시'}`} aria-pressed={visible} onClick={() => setVisible(!visible)}><Icon name={visible ? 'visibility-off' : 'visibility'} /></button>} />;
 }
 export function PasswordPattern() {
   const form = usePatternForm(data => {

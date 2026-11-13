@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test');
 const base='/systems/idenflu-mono/index.html#/';
-const workflow=[['대기','circle-dashed'],['진행 중','circle-dot'],['완료','check-circle'],['주의','warning'],['오류','error-circle']];
+const workflow=[['대기','circle-dashed'],['진행 중','circle-dot'],['완료','check-circle'],['주의','warning'],['오류','x-circle']];
 
 test('status semantics stay consistent across badge, toast and data grid examples',{tag:['@mobile','@theme']},async({page})=>{
   await page.goto(base+'components/feedback');
@@ -8,29 +8,29 @@ test('status semantics stay consistent across badge, toast and data grid example
     const badges=page.getByRole('group',{name:group,exact:true}).locator('.badge');
     await expect(badges).toHaveText(workflow.map(([label])=>label));
     for(let i=0;i<workflow.length;i++) {
-      const icon=workflow[i][1]+(solid&&i>=2?'-fill':'');
+      const icon=workflow[i][1];
       await expect(badges.nth(i).locator(`.icon-${icon}`)).toBeVisible();
       await expect(badges.nth(i).locator('.ui-icon')).toHaveAttribute('aria-hidden','true');
     }
   }
   const work=page.getByRole('group',{name:'업무 상태별 배지',exact:true});
-  await expect(work.locator('.icon-pause-circle')).toBeVisible();await expect(work.locator('.icon-minus-circle')).toBeVisible();await expect(work.locator('.icon-ban-fill')).toBeVisible();
+  await expect(work.locator('.icon-pause-circle')).toBeVisible();await expect(work.locator('.icon-minus-circle')).toBeVisible();await expect(work.locator('.icon-ban')).toBeVisible();
   await page.goto(base+'components/overlays');
   await page.getByRole('button',{name:'오류 알림 표시',exact:true}).click();
-  await expect(page.locator('.toast[role="alert"] .icon-error-circle')).toBeVisible();
+  await expect(page.locator('.toast[role="alert"] .icon-x-circle')).toBeVisible();
   await page.getByRole('button',{name:'주의 배경 토스트',exact:true}).click();
-  await expect(page.locator('.toast .icon-warning-fill')).toBeVisible();
+  await expect(page.locator('.toast .icon-warning')).toBeVisible();
   await page.getByRole('button',{name:'오류 배경 토스트',exact:true}).click();
-  await expect(page.locator('.toast .icon-error-circle-fill')).toBeVisible();
+  await expect(page.locator('.toast .icon-x-circle')).toBeVisible();
   await page.goto(base+'components/data-grid');
   const guide=page.locator('#data-grid-status-demo');
   const grid=guide.getByRole('group',{name:'상태 기준 데이터그리드',exact:true});
-  for(const [state,icon] of [['대기','circle-dashed'],['진행 중','circle-dot'],['검토 중','circle-dot'],['보류','pause-circle'],['비활성','minus-circle'],['완료','check-circle'],['안내','info'],['주의','warning'],['오류','error-circle'],['차단','ban']]) {
+  for(const [state,icon] of [['대기','circle-dashed'],['진행 중','circle-dot'],['검토 중','circle-dot'],['보류','pause-circle'],['비활성','minus-circle'],['완료','check-circle'],['안내','info'],['주의','warning'],['오류','x-circle'],['차단','ban']]) {
     const badge=grid.locator('tbody .badge').filter({hasText:new RegExp(`^${state}$`)});
     await expect(badge.locator(`.icon-${icon}`)).toHaveCount(1);
   }
   await guide.getByRole('button',{name:'반전',exact:true}).click();
-  await expect(grid.locator('.icon-error-circle-fill')).toHaveCount(1);await expect(grid.locator('.icon-ban-fill')).toHaveCount(1);
+  await expect(grid.locator('.icon-x-circle')).toHaveCount(1);await expect(grid.locator('.icon-ban')).toHaveCount(1);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
 });
 

@@ -55,7 +55,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
     aria-label={typeof label === 'string' ? `${label} 지우기` : '검색어 지우기'}
     hidden={!hasSearchValue || props.disabled || props.readOnly}
     onMouseDown={event => event.preventDefault()} onClick={clearSearch}>
-    <span className="ui-icon icon-close" aria-hidden="true" />
+    <span className="ui-icon icon-x" aria-hidden="true" />
   </button> : action;
   const inputId = id || `field-${generated}`;
   const helperId = `${inputId}-help`;

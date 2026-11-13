@@ -103,7 +103,7 @@ export function StatusBadges() {
     <Badge size="sm" variant="success">완료</Badge>
     <Badge size="md" variant="success"><Icon name="check-circle" />완료</Badge>
     <Badge size="lg" variant="success" appearance="solid">
-      <Icon name="check-circle-fill" />완료
+      <Icon name="check-circle" />완료
     </Badge>
     <div data-size="sm">
       <Badge>SM 상속</Badge>
@@ -212,7 +212,7 @@ export function BookmarkButton() {
   const [bookmarked, setBookmarked] = useState(false);
   return <IconButton label="북마크" variant="outline" size="md"
     aria-pressed={bookmarked} onClick={() => setBookmarked(value => !value)}>
-    <Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} />
+    <Icon name="bookmark" />
   </IconButton>;
 }
 ```
@@ -440,7 +440,7 @@ const columns: DataGridColumn<Project>[] = [
 `NumberField`도 `prefixIcon`을 지원합니다. 아이콘은 입력값 앞에 표시되고, `unit`은 오른쪽에 표시됩니다. 아이콘을 눌러 입력에 포커스할 수 있으며 아이콘은 제출 값과 읽기 설명에서 제외됩니다.
 
 ```tsx
-<NumberField label="참여 인원" prefixIcon={<Icon name="person" />}
+<NumberField label="참여 인원" prefixIcon={<Icon name="user" />}
   defaultValue="8" min="0" unit="명" />
 ```
 
@@ -565,7 +565,7 @@ function ProjectForm() {
 ```tsx
 import { Icon, Select } from '@idenflu/mono-react';
 
-<Select label="담당 팀" prefixIcon={<Icon name="person" />} options={[
+<Select label="담당 팀" prefixIcon={<Icon name="user" />} options={[
   { value: 'design', label: '디자인', description: '제품 경험을 설계합니다.' },
   { value: 'development', label: '개발', description: '제품을 구현합니다.' },
 ]} />
@@ -631,7 +631,7 @@ import { Button, Drawer, DrawerHeader, DrawerBody, DrawerFooter, Icon } from '@i
   <DrawerHeader>
     <h2 id="settings-title">프로젝트 설정</h2>
     <Button variant="ghost" iconOnly aria-label="설정 닫기"
-            onClick={() => setOpen(false)}><Icon name="close" /></Button>
+            onClick={() => setOpen(false)}><Icon name="x" /></Button>
   </DrawerHeader>
   <DrawerBody><p>스크롤할 상세 내용을 배치합니다.</p></DrawerBody>
   <DrawerFooter><Button onClick={() => setOpen(false)}>완료</Button></DrawerFooter>
@@ -677,7 +677,7 @@ export function ChipExample() {
       onClick={() => setSelected(value => !value)}>프로젝트 필터</Chip>
     {tags.map(tag => <Chip key={tag} aria-label={`${tag} 제거`}
       onClick={() => setTags(current => current.filter(item => item !== tag))}>
-      {tag}<Icon name="close" />
+      {tag}<Icon name="x" />
     </Chip>)}
     <Button variant="outline" onClick={() => {
       setSelected(false); setTags(['프로젝트', '브랜드', '문서']);

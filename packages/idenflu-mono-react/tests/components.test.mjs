@@ -215,8 +215,8 @@ test('Toast exposes urgency and keeps its action separate from dismissing the no
 test('Toast supplies status icons and supports replacing or hiding them', async () => {
   const f = fixture();
   try {
-    for (const appearance of ['default','solid']) for (const [variant,base] of [['info','info'],['success','check-circle'],['warning','warning'],['danger','error-circle']]) {
-      const icon=base+(appearance==='solid'?'-fill':'');
+    for (const appearance of ['default','solid']) for (const [variant,base] of [['info','info'],['success','check-circle'],['warning','warning'],['danger','x-circle']]) {
+      const icon=base;
       await f.render(h(Toast, {variant,appearance}, '상태 안내'));
       assert.ok(f.container.querySelector(`.toast-icon .icon-${icon}`));
       assert.equal(f.container.querySelector('.toast-icon').getAttribute('aria-hidden'), 'true');

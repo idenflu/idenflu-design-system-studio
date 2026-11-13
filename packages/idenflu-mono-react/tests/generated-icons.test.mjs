@@ -79,3 +79,20 @@ test('renamed and removed icons expose only their intended component names', () 
   for (const name of ['PlusIcon', 'XIcon', 'XCircleIcon', 'VisibilityOffIcon', 'ExcelIcon', 'RotateIcon', 'MinusIcon', 'TrashIcon', 'UserIcon', 'ArrowRightLeftIcon', 'AsteriskSquareIcon', 'CalendarClockIcon', 'CropIcon', 'FilePenIcon', 'FolderInputIcon', 'FolderOutputIcon', 'LineHeightIcon', 'ListIcon', 'PenLineIcon', 'PlayDisabledIcon', 'RestartIcon', 'RotateAsteriskIcon', 'TableIcon', 'Table2Icon', 'TextIcon', 'TreeIcon']) assert.ok(icons[name], name);
   for (const name of ['AddIcon', 'CloseIcon', 'CloseCircleIcon', 'ErrorCircleIcon', 'EyeOffIcon', 'MicrosoftExcelIcon', 'RefreshIcon', 'RemoveIcon', 'Trash2Icon', 'BriefcaseIcon', 'CartIcon', 'CreditCardIcon', 'CrownIcon', 'IdCardIcon', 'ReceiptIcon', 'PersonIcon']) assert.equal(icons[name], undefined, name);
 });
+
+test('name-based icons and CSS masks cover the same final sprite symbols', async () => {
+  const symbols = [...parse(sprite).documentElement.children];
+  const names = await readFile(new URL('../src/icons/icon-names.ts', import.meta.url), 'utf8');
+  const css = await readFile(new URL('../src/components/icon/icon.css', import.meta.url), 'utf8');
+  for (const symbol of symbols) {
+    assert.ok(names.includes(JSON.stringify(symbol.id)), symbol.id);
+    const rule = css.split('\n').find(line => line.startsWith(`.icon-${symbol.id} {`));
+    assert.ok(rule, symbol.id);
+    const encoded = rule.match(/data:image\/svg\+xml,([^" ]+)/)?.[1];
+    assert.ok(encoded, symbol.id);
+    const mask = parse(decodeURIComponent(encoded)).documentElement;
+    assert.equal(mask.localName, 'svg');
+    assert.equal(mask.querySelectorAll('*').length, symbol.querySelectorAll('*').length, symbol.id);
+  }
+  assert.doesNotMatch(css, /assets\/icons\//);
+});

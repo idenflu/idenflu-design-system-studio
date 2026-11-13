@@ -90,13 +90,13 @@ test('select examples show option descriptions and decorative icons while choosi
   await page.goto('/systems/idenflu-mono/index.html#/components/select');
   const described = page.getByRole('combobox', {name:/^담당 팀 · 설명:/});
   await expect(described.locator('.select-prefix-icon')).toHaveAttribute('aria-hidden', 'true');
-  await expect(described.locator('.icon-person')).toBeVisible();
+  await expect(described.locator('.icon-user')).toBeVisible();
   await described.click();
   const options = page.getByRole('listbox', {name:'담당 팀 · 설명'});
   await expect(options.getByRole('option', {name:/브랜드 디자인/})).toContainText('브랜드의 일관된 인상을 만듭니다.');
   await options.getByRole('option', {name:/브랜드 디자인/}).click();
   await expect(described).toContainText('브랜드 디자인');
-  await expect(described.locator('.icon-person')).toBeVisible();
+  await expect(described.locator('.icon-user')).toBeVisible();
   const iconSelect = page.getByRole('combobox', {name:/^보기 방식 · 아이콘:/});
   await expect(iconSelect.locator('.select-option-icon')).toHaveAttribute('aria-hidden', 'true');
   await iconSelect.press('ArrowDown');

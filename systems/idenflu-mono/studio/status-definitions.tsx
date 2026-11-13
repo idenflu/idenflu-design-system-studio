@@ -7,11 +7,11 @@ export const statusDefinitions = {
   review:{label:'검토 중',icon:'circle-dot',solidIcon:'circle-dot',variant:'primary',description:'검토가 진행 중인 상태. 검토가 필요한 주의 상태와 구분'},
   paused:{label:'보류',icon:'pause-circle',solidIcon:'pause-circle',variant:'neutral',description:'일시중지하거나 재개를 기다리는 상태'},
   inactive:{label:'비활성',icon:'minus-circle',solidIcon:'minus-circle',variant:'neutral',description:'적용하지 않거나 현재 사용하지 않는 상태'},
-  success:{label:'완료',icon:'check-circle',solidIcon:'check-circle-fill',variant:'success',description:'작업을 완료하거나 성공한 결과'},
-  info:{label:'안내',icon:'info',solidIcon:'info-fill',variant:'primary',description:'사용자에게 전달하는 부가 정보'},
-  warning:{label:'주의',icon:'warning',solidIcon:'warning-fill',variant:'warning',description:'검토·확인 등 주의가 필요한 조건'},
-  error:{label:'오류',icon:'error-circle',solidIcon:'error-circle-fill',variant:'danger',description:'작업 실패나 해결이 필요한 오류'},
-  blocked:{label:'차단',icon:'ban',solidIcon:'ban-fill',variant:'danger',description:'허용되지 않은 접근이나 실행을 차단한 상태'},
+  success:{label:'완료',icon:'check-circle',solidIcon:'check-circle',variant:'success',description:'작업을 완료하거나 성공한 결과'},
+  info:{label:'안내',icon:'info',solidIcon:'info',variant:'primary',description:'사용자에게 전달하는 부가 정보'},
+  warning:{label:'주의',icon:'warning',solidIcon:'warning',variant:'warning',description:'검토·확인 등 주의가 필요한 조건'},
+  error:{label:'오류',icon:'x-circle',solidIcon:'x-circle',variant:'danger',description:'작업 실패나 해결이 필요한 오류'},
+  blocked:{label:'차단',icon:'ban',solidIcon:'ban',variant:'danger',description:'허용되지 않은 접근이나 실행을 차단한 상태'},
 } as const;
 export type DemoStatus = keyof typeof statusDefinitions;
 

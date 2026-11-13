@@ -122,7 +122,7 @@ export function InspectionCalendarPage({active=true,conveyors,inspections,reques
 
   return <>
     <PageHeader className="layout-page-heading" eyebrow="EQUIPMENT MANAGEMENT" title="점검 일정" description="설비의 점검 일정을 계획하고, 진행 상황과 완료 결과를 확인하세요."
-      actions={<Button ref={createButton} onClick={()=>openCreate()} disabled={!conveyors.length}><Icon name="add"/>점검 일정 등록</Button>}/>
+      actions={<Button ref={createButton} onClick={()=>openCreate()} disabled={!conveyors.length}><Icon name="plus"/>점검 일정 등록</Button>}/>
     <div className="inspection-calendar">
       <div className="inspection-toolbar">
         <div className="inspection-period-controls"><div><IconButton variant="outline" label="이전 기간" tooltip={false} onClick={()=>navigate(-1)}><Icon name="keyboard-arrow-left"/></IconButton><IconButton variant="outline" label="다음 기간" tooltip={false} onClick={()=>navigate(1)}><Icon name="keyboard-arrow-right"/></IconButton></div><h2 aria-live="polite">{periodLabel}</h2><Button variant="outline" onClick={()=>{setAnchor(today);setSelectedDate(today);}}>오늘</Button></div>
@@ -131,7 +131,7 @@ export function InspectionCalendarPage({active=true,conveyors,inspections,reques
       <div className="inspection-filters">
         <Select label="대상 설비 필터" hideLabel value={conveyorFilter} onValueChange={setConveyorFilter} options={[{value:'all',label:'전체 설비'},...conveyors.map(item=>({value:item.id,label:`${item.code} · ${item.name}`}))]} popupStrategy="fixed"/>
         <Select label="진행 상태 필터" hideLabel value={statusFilter} onValueChange={setStatusFilter} options={[{value:'all',label:'전체 상태'},...Object.entries(inspectionStatusLabels).map(([value,label])=>({value,label}))]} popupStrategy="fixed"/>
-        {hasFilters&&<Button variant="ghost" onClick={()=>{setConveyorFilter('all');setStatusFilter('all');}}><Icon name="refresh"/>필터 초기화</Button>}
+        {hasFilters&&<Button variant="ghost" onClick={()=>{setConveyorFilter('all');setStatusFilter('all');}}><Icon name="rotate"/>필터 초기화</Button>}
         <p role="status">{view==='month'?'이번 달':'이번 주'} <strong>{countItems.length}</strong>건<span aria-hidden="true"> · </span>완료 <strong>{countItems.filter(item=>item.status==='completed').length}</strong>건</p>
       </div>
       <div className="inspection-layout" data-view={view}>
@@ -158,7 +158,7 @@ export function InspectionCalendarPage({active=true,conveyors,inspections,reques
               <strong>{item.title}</strong><span>{conveyor?.name}</span><small>{conveyor?.code}<span aria-hidden="true"> · </span>{item.owner}</small>
             </button>;
           }):<div className="inspection-agenda-empty"><Icon name="calendar"/><h3>{hasFilters?'조건에 맞는 점검이 없습니다':'예정된 점검이 없습니다'}</h3><p>{hasFilters?'설비나 상태 필터를 변경해보세요.':'이 날짜에 새 점검을 등록해보세요.'}</p></div>}</div>
-          <Button variant="outline" onClick={event=>openCreate(selectedDate,event.currentTarget)} disabled={!conveyors.length}><Icon name="add"/>이 날짜에 등록</Button>
+          <Button variant="outline" onClick={event=>openCreate(selectedDate,event.currentTarget)} disabled={!conveyors.length}><Icon name="plus"/>이 날짜에 등록</Button>
         </aside>
       </div>
     </div>

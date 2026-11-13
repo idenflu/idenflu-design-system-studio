@@ -121,7 +121,7 @@ export function ConveyorRegistrationPage({active=true,existingCodes,onCreate,onC
         <div className="cv-registration-main">
           <section className="cv-registration-panel" aria-labelledby={`${id}-step-heading`}>
             <header className="cv-registration-heading"><div><span>STEP {String(step+1).padStart(2,'0')} / 03</span><h2 id={`${id}-step-heading`} ref={stepHeading} tabIndex={-1}>{steps[step]}</h2><p>{step===0?'설비를 식별할 정보와 설치 위치를 입력하세요.':step===1?'실제 이송 구간을 구성하는 조각 단위로 유닛을 추가하세요.':'설비와 하위 유닛의 정보를 확인하고 등록하세요.'}</p></div>{step===1&&<Badge>{draft.units.length}개 유닛</Badge>}</header>
-            {message&&<p role="alert" className="cv-registration-error"><Icon name="error-circle"/>{message}</p>}
+            {message&&<p role="alert" className="cv-registration-error"><Icon name="x-circle"/>{message}</p>}
             {step===0&&<div className="cv-registration-fields">
               <Grid columns={{base:1,sm:2}} gap={6}>
                 <TextField ref={node=>{basicRefs.current.code=node;}} label="설비 코드" name="code" value={draft.code} onChange={event=>changeBasic('code',event.target.value)} error={basicErrors.code} required maxLength={24} placeholder="예: CV-007" helperText="영문·숫자·하이픈·밑줄, 3~24자" autoComplete="off"/>
@@ -145,7 +145,7 @@ export function ConveyorRegistrationPage({active=true,existingCodes,onCreate,onC
                   <Select ref={node=>{unitRefs.current[`${unit.id}:drive`]=node;}} label="구동 방식" name={`${unit.id}-drive`} value={unit.drive} options={conveyorDriveOptions} onValueChange={value=>changeUnit(unit.id,'drive',value as ConveyorUnit['drive'])} error={unitErrors[unit.id]?.drive} popupStrategy="fixed"/>
                 </Grid>
               </section>)}
-              <Button variant="outline" className="cv-registration-add" onClick={addUnit}><Icon name="add"/>유닛 추가</Button>
+              <Button variant="outline" className="cv-registration-add" onClick={addUnit}><Icon name="plus"/>유닛 추가</Button>
               <p className="component-helper">유닛은 한 개 이상 필요합니다. 길이와 폭은 mm 단위로 입력하세요.</p>
             </div>}
             {step===2&&<div className="cv-registration-review">
@@ -169,7 +169,7 @@ export function ConveyorRegistrationPage({active=true,existingCodes,onCreate,onC
       </form>
     </div>
     <Dialog open={active&&cancelOpen} onOpenChange={setCancelOpen} variant="divided" aria-labelledby={`${id}-cancel-title`}>
-      <DialogHeader><h2 id={`${id}-cancel-title`}>등록을 취소할까요?</h2><Button variant="ghost" iconOnly aria-label="확인 창 닫기" onClick={()=>setCancelOpen(false)}><Icon name="close"/></Button></DialogHeader>
+      <DialogHeader><h2 id={`${id}-cancel-title`}>등록을 취소할까요?</h2><Button variant="ghost" iconOnly aria-label="확인 창 닫기" onClick={()=>setCancelOpen(false)}><Icon name="x"/></Button></DialogHeader>
       <DialogBody><p>입력한 기본정보와 유닛 구성이 저장되지 않습니다. 계속 작성하거나 등록을 취소할 수 있습니다.</p></DialogBody>
       <DialogFooter><Button variant="outline" onClick={()=>setCancelOpen(false)}>계속 작성</Button><Button variant="outline" color="danger" onClick={()=>{setCancelOpen(false);onCancel();}}>등록 취소</Button></DialogFooter>
     </Dialog>

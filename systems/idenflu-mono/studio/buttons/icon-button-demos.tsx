@@ -21,8 +21,8 @@ export function IconButtonDemos() {
     </Section>
     <Section id="icon-button-states" title="툴팁과 선택 상태" description="북마크를 전환하거나 툴팁을 바꾸고 제거합니다. 비활성 버튼과 ref로 포커스를 이동하는 동작도 확인할 수 있습니다.">
       <div className="react-studio-row">
-        <IconButton ref={bookmarkRef} label="북마크" variant="outline" aria-pressed={bookmarked} onClick={() => setBookmarked(value => !value)}><Icon name={bookmarked ? 'bookmark-fill' : 'bookmark'} /></IconButton>
-        <IconButton label="북마크 초기화" tooltip={<span>저장한 북마크를 해제합니다.</span>} onClick={() => setBookmarked(false)}><Icon name="refresh" /></IconButton>
+        <IconButton ref={bookmarkRef} label="북마크" variant="outline" aria-pressed={bookmarked} onClick={() => setBookmarked(value => !value)}><Icon name="bookmark" /></IconButton>
+        <IconButton label="북마크 초기화" tooltip={<span>저장한 북마크를 해제합니다.</span>} onClick={() => setBookmarked(false)}><Icon name="rotate" /></IconButton>
         <IconButton label="자세히 보기" tooltip={false} aria-expanded={details} aria-controls={detailsId} onClick={() => setDetails(value => !value)}><Icon name="info" /></IconButton>
         <IconButton label="삭제할 항목 없음" disabled><Icon name="trash" /></IconButton>
         <Button variant="outline" onClick={() => bookmarkRef.current?.focus()}>북마크로 포커스</Button>

@@ -6,8 +6,8 @@ const accessIcons:readonly {name:IconName;label:string}[]=[
   {name:'key',label:'접근 키·자격 증명'}, {name:'shield',label:'권한·정책'},
   {name:'shield-off',label:'접근 거부'}, {name:'shield-alert',label:'권한 확인 필요'},
   {name:'user-check',label:'승인된 사용자'}, {name:'user-lock',label:'계정 잠금'},
-  {name:'user-settings',label:'역할 관리'}, {name:'id-card',label:'역할·멤버 정보'},
-  {name:'hierarchy',label:'조직·권한 상속'}, {name:'crown',label:'소유자'},
+  {name:'user-settings',label:'역할 관리'}, {name:'user',label:'역할·멤버 정보'},
+  {name:'hierarchy',label:'조직·권한 상속'}, {name:'star',label:'소유자'},
 ];
 export function AccessIconDemos() {
   const [size,setSize]=React.useState('18');
@@ -15,7 +15,7 @@ export function AccessIconDemos() {
     <Segmented label="권한 아이콘 크기" value={size} onValueChange={setSize} options={[14,16,18,20].map(value=>({value:String(value),label:`${value}px`}))} />
     <ul className="studio-icon-expansion-list" style={{'--preview-icon-size':`${size}px`} as React.CSSProperties}>{accessIcons.map(item=><li key={item.name}><Icon name={item.name} /><code>{item.name}</code><span className="react-studio-caption">{item.label}</span></li>)}</ul>
     <div className="react-studio-row" role="group" aria-label="역할 표시 예시">
-      <Badge><Icon name="crown" />소유자</Badge><Badge><Icon name="user-settings" />관리자</Badge><Badge><Icon name="edit" />편집자</Badge><Badge><Icon name="eye" />뷰어</Badge>
+      <Badge><Icon name="star" />소유자</Badge><Badge><Icon name="user-settings" />관리자</Badge><Badge><Icon name="edit" />편집자</Badge><Badge><Icon name="visibility" />뷰어</Badge>
     </div>
     <div className="react-studio-row" role="group" aria-label="접근 상태 예시">
       <Badge variant="success"><Icon name="shield-check" />허용</Badge><Badge variant="danger"><Icon name="shield-off" />접근 거부</Badge><Badge><Icon name="user-lock" />계정 잠금</Badge><Badge variant="warning"><Icon name="shield-alert" />권한 확인</Badge>

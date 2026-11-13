@@ -83,7 +83,7 @@ export function DrawerExample() {
       <DrawerHeader>
         <h2 id={titleId}>프로젝트 설정</h2>
         <Button variant="ghost" iconOnly aria-label="패널 닫기"
-                onClick={() => setOpen(false)}><Icon name="close" /></Button>
+                onClick={() => setOpen(false)}><Icon name="x" /></Button>
       </DrawerHeader>
       <DrawerBody>
         <form id={formId} onSubmit={event => {
@@ -126,11 +126,11 @@ export function FeedbackExample() {
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       <Badge size="sm" variant="warning">검토 필요</Badge>
       <Badge size="md" variant="warning"><Icon name="warning" />검토 필요</Badge>
-      <Badge size="lg" variant="warning" appearance="solid"><Icon name="warning-fill" />검토 필요</Badge>
+      <Badge size="lg" variant="warning" appearance="solid"><Icon name="warning" />검토 필요</Badge>
       <Badge><Icon name="circle-dashed" />대기</Badge>
       <Badge variant="primary"><Icon name="circle-dot" />진행 중</Badge>
       <Badge><Icon name="pause-circle" />보류</Badge>
-      <Badge variant="danger"><Icon name="error-circle" />오류</Badge>
+      <Badge variant="danger"><Icon name="x-circle" />오류</Badge>
     </div>
     <div data-size="sm" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       <Badge variant="success"><Icon name="check-circle" />SM 상속</Badge>
