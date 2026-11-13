@@ -13,6 +13,8 @@ export interface TimePickerProps {
   min?: string;
   max?: string;
   minuteStep?: number;
+  showSeconds?: boolean;
+  secondStep?: number;
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   readOnly?: boolean;
@@ -25,26 +27,29 @@ export interface TimePickerProps {
 }
 
 const pad = (value: number) => String(value).padStart(2, '0');
-function parseTime(value: string) {
-  const match = value.trim().match(/^(\d{1,2}):(\d{2})$/) || value.trim().match(/^(\d{2})(\d{2})$/);
+function parseTime(value: string, showSeconds = false) {
+  const text = value.trim();
+  const match = text.match(showSeconds ? /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/ : /^(\d{1,2}):(\d{2})$/)
+    || text.match(showSeconds ? /^(\d{2})(\d{2})(\d{2})?$/ : /^(\d{2})(\d{2})$/);
   if (!match) return null;
-  const hour = Number(match[1]), minute = Number(match[2]);
-  if (hour > 23 || minute > 59) return null;
-  return {hour, minute, key: `${pad(hour)}:${pad(minute)}`};
+  const hour = Number(match[1]), minute = Number(match[2]), second = Number(match[3] ?? 0);
+  if (hour > 23 || minute > 59 || second > 59) return null;
+  return {hour, minute, second, key: `${pad(hour)}:${pad(minute)}${showSeconds ? `:${pad(second)}` : ''}`};
 }
-const normalized = (value: TimeValue) => parseTime(value ?? '')?.key ?? null;
-const display = (value: TimeValue) => normalized(value) ?? value ?? '';
-
 /** Local 24-hour time. Popup choices are pending until explicit confirmation. */
-export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(function TimePicker({label, id, name, value, defaultValue = null, onValueChange, min, max, minuteStep = 1,
+export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(function TimePicker({label, id, name, value, defaultValue = null, onValueChange, min, max, minuteStep = 1, showSeconds = false, secondStep = 1,
   size, disabled, readOnly, required, helperText, error: externalError, className, 'aria-describedby': describedBy, 'aria-invalid': ariaInvalid}, ref) {
   if (!Number.isInteger(minuteStep) || minuteStep < 1 || minuteStep > 60 || 60 % minuteStep !== 0) throw new RangeError('minuteStep은 60을 나누어떨어지게 하는 양의 정수여야 합니다.');
-  if ((min !== undefined && parseTime(min)?.key !== min) || (max !== undefined && parseTime(max)?.key !== max) || (min && max && min > max)) throw new RangeError('유효한 시간 범위를 HH:mm 형식으로 지정해주세요.');
+  if (!Number.isInteger(secondStep) || secondStep < 1 || secondStep > 60 || 60 % secondStep !== 0) throw new RangeError('secondStep은 60을 나누어떨어지게 하는 양의 정수여야 합니다.');
+  const normalized = (value: TimeValue) => parseTime(value ?? '', showSeconds)?.key ?? null;
+  const display = (value: TimeValue) => normalized(value) ?? value ?? '';
+  const lower = min === undefined ? null : normalized(min), upper = max === undefined ? null : normalized(max);
+  if ((min !== undefined && (!lower || !/^(?:\d{2}:\d{2})(?::\d{2})?$/.test(min) || (!showSeconds && lower !== min))) || (max !== undefined && (!upper || !/^(?:\d{2}:\d{2})(?::\d{2})?$/.test(max) || (!showSeconds && upper !== max))) || (lower && upper && lower > upper)) throw new RangeError(`유효한 시간 범위를 ${showSeconds ? 'HH:mm 또는 HH:mm:ss' : 'HH:mm'} 형식으로 지정해주세요.`);
   const uid = React.useId(), base = id || `time-${uid}`;
   const initial = React.useRef(defaultValue);
   const controlled = value !== undefined;
   const [internalValue, setInternalValue] = React.useState(() => normalized(defaultValue));
-  const current = controlled ? normalized(value) : internalValue;
+  const current = controlled ? normalized(value) : normalized(internalValue);
   const [draft, setDraft] = React.useState(() => display(controlled ? value : defaultValue));
   const [internalError, setError] = React.useState('');
   const error = externalError || internalError;
@@ -59,21 +64,33 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
   const previous = React.useRef({value, controlled});
   const title = typeof label === 'string' ? `${label} 선택` : '시간 선택';
   const validate = (text: string) => {
-    const parsed = parseTime(text);
+    const parsed = parseTime(text, showSeconds);
     if (!text.trim()) return required ? '시간을 입력해주세요.' : '';
-    if (!parsed) return '올바른 시간을 HH:mm 형식으로 입력해주세요.';
+    if (!parsed) return `올바른 시간을 ${showSeconds ? 'HH:mm:ss' : 'HH:mm'} 형식으로 입력해주세요.`;
     if (parsed.minute % minuteStep !== 0) return `분은 ${minuteStep}분 단위로 입력해주세요.`;
-    if ((min && parsed.key < min) || (max && parsed.key > max)) return '허용된 시간 범위를 확인해주세요.';
+    if (showSeconds && parsed.second % secondStep !== 0) return `초는 ${secondStep}초 단위로 입력해주세요.`;
+    if ((lower && parsed.key < lower) || (upper && parsed.key > upper)) return '허용된 시간 범위를 확인해주세요.';
     return '';
   };
+  // Keep one interval per eligible minute instead of materializing up to 86,400 times.
   const candidates = React.useMemo(() => Array.from({length:24}, (_, hour) =>
-    Array.from({length:60 / minuteStep}, (_, index) => `${pad(hour)}:${pad(index * minuteStep)}`))
-    .flat().filter(time => (!min || time >= min) && (!max || time <= max)), [min, max, minuteStep]);
+    Array.from({length:60 / minuteStep}, (_, index) => {
+      const prefix = `${pad(hour)}:${pad(index * minuteStep)}`;
+      const floor = lower && lower.slice(0, 5) === prefix ? Number(lower.slice(6) || 0) : 0;
+      const ceiling = upper && upper.slice(0, 5) === prefix ? Number(upper.slice(6) || 0) : 59;
+      const first = showSeconds ? Math.ceil(floor / secondStep) * secondStep : 0;
+      const last = showSeconds ? Math.floor(ceiling / secondStep) * secondStep : 0;
+      if ((lower && prefix < lower.slice(0, 5)) || (upper && prefix > upper.slice(0, 5)) || first > last) return null;
+      return {prefix, first, last};
+    })).flat().filter((item): item is {prefix:string; first:number; last:number} => item !== null), [lower, upper, minuteStep, showSeconds, secondStep]);
+  const candidateValue = (candidate: {prefix:string; first:number; last:number}, preferred = 0) =>
+    candidate.prefix + (showSeconds ? `:${pad(Math.max(candidate.first, Math.min(candidate.last, Math.ceil(preferred / secondStep) * secondStep)))}` : '');
+  const isCandidate = (value: TimeValue) => !!value && !validate(value);
   const close = (restore = false) => { setOpen(false); if (restore) trigger.current?.focus(); };
   useEscapeLayer(open, root, () => close(true));
 
   React.useEffect(() => {
-    if (open) setPanel(current => current && candidates.includes(current) ? current : candidates[0] ?? null);
+    if (open) setPanel(current => isCandidate(current) ? current : candidates[0] ? candidateValue(candidates[0]) : null);
   }, [open, candidates]);
   React.useEffect(() => {
     if (controlled && (!previous.current.controlled || value !== previous.current.value)) {
@@ -82,7 +99,7 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
     previous.current = {value, controlled};
   }, [value, controlled]);
   React.useEffect(() => { if (disabled || readOnly) setOpen(false); }, [disabled, readOnly]);
-  React.useEffect(() => { input.current?.setCustomValidity(externalError || validate(draft)); }, [draft, externalError, required, min, max, minuteStep]);
+  React.useEffect(() => { input.current?.setCustomValidity(externalError || validate(draft)); }, [draft, externalError, required, min, max, minuteStep, showSeconds, secondStep]);
   React.useEffect(() => {
     const form = input.current?.form;
     if (!form) return;
@@ -109,7 +126,7 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
   const openPanel = () => {
     if (disabled || readOnly || composing.current) return;
     const preferred = normalized(draft) ?? current;
-    setPanel(preferred && candidates.includes(preferred) ? preferred : candidates[0] ?? null);
+    setPanel(isCandidate(preferred) ? preferred : candidates[0] ? candidateValue(candidates[0]) : null);
     setOpen(true);
   };
   useClientLayoutEffect(() => {
@@ -170,23 +187,25 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
       const list = option.parentElement;
       if (list) list.scrollTop = option.offsetTop - list.offsetTop - Math.max(0, (list.clientHeight - option.offsetHeight) / 2);
     });
-  }, [open, panel, minuteStep]);
+  }, [open, panel, minuteStep, secondStep, showSeconds]);
 
-  const selected = parseTime(panel ?? '');
-  const hours = [...new Set(candidates.map(time => Number(time.slice(0,2))))];
+  const selected = parseTime(panel ?? '', showSeconds);
+  const hours = [...new Set(candidates.map(item => Number(item.prefix.slice(0, 2))))];
   const minutes = Array.from({length:60 / minuteStep}, (_, index) => index * minuteStep);
-  const availableMinutes = candidates.filter(time => Number(time.slice(0,2)) === selected?.hour).map(time => Number(time.slice(3)));
-  const choose = (kind: 'hour' | 'minute', number: number) => {
-    if (kind === 'minute' && selected) setPanel(`${pad(selected.hour)}:${pad(number)}`);
-    else {
-      const choices = candidates.filter(time => Number(time.slice(0,2)) === number);
-      const preferred = `${pad(number)}:${pad(selected?.minute ?? 0)}`;
-      setPanel(choices.find(time => time >= preferred) ?? choices[choices.length - 1] ?? null);
-    }
+  const seconds = Array.from({length:60 / secondStep}, (_, index) => index * secondStep);
+  const availableMinutes = candidates.filter(item => Number(item.prefix.slice(0, 2)) === selected?.hour).map(item => Number(item.prefix.slice(3, 5)));
+  const selectedCandidate = candidates.find(item => item.prefix === panel?.slice(0, 5));
+  const availableSeconds = selectedCandidate ? seconds.filter(second => second >= selectedCandidate.first && second <= selectedCandidate.last) : [];
+  const choose = (kind: 'hour' | 'minute' | 'second', number: number) => {
+    if (kind === 'second' && selectedCandidate) { setPanel(candidateValue(selectedCandidate, number)); return; }
+    const choices = candidates.filter(item => Number(item.prefix.slice(0, 2)) === (kind === 'hour' ? number : selected?.hour));
+    const preferredMinute = kind === 'minute' ? number : selected?.minute ?? 0;
+    const candidate = choices.find(item => Number(item.prefix.slice(3, 5)) >= preferredMinute) ?? choices[choices.length - 1];
+    setPanel(candidate ? candidateValue(candidate, selected?.second ?? 0) : null);
   };
-  const timeKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, kind: 'hour' | 'minute', number: number) => {
+  const timeKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, kind: 'hour' | 'minute' | 'second', number: number) => {
     if (!['ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(event.key)) return;
-    const choices = kind === 'hour' ? hours : availableMinutes;
+    const choices = kind === 'hour' ? hours : kind === 'minute' ? availableMinutes : availableSeconds;
     if (!choices.length) return;
     event.preventDefault();
     const index = Math.max(0, choices.indexOf(number));
@@ -203,7 +222,7 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
       if (open && event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close();
     }}>
       <div className={`date-field time-field${invalid ? ' has-error' : ''}`}>
-        <input ref={input} id={base} className="date-text time-input" type="text" inputMode="numeric" autoComplete="off" placeholder="HH:mm"
+        <input ref={input} id={base} className="date-text time-input" type="text" inputMode="numeric" autoComplete="off" placeholder={showSeconds ? "HH:mm:ss" : "HH:mm"}
           value={draft} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={invalid || ariaInvalid} aria-describedby={described}
           onChange={event => { setDraft(event.target.value); setError(''); }}
           onBlur={event => { if (!open && event.relatedTarget !== trigger.current) publish(draft); }}
@@ -223,13 +242,12 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
       {open && <div ref={popup} className="date-popup time-popup" id={`${base}-popup`} role="dialog" aria-label={title} tabIndex={-1} popover="manual"
         style={{position:'fixed',margin:0,top:position?.top??0,bottom:'auto',left:position?.left??0,right:'auto',maxWidth:position?.maxWidth,maxHeight:position?.maxHeight,visibility:position?'visible':'hidden'}}
         onMouseDownCapture={event => { if (!(event.target as Element).closest('button')) popup.current?.focus({preventScroll:true}); }}>
-        <div className="time-popup-heading"><span>시간 선택</span><strong aria-live="polite">{panel ?? '--:--'}</strong></div>
-        <div className="datetime-time-panel">
-          {(['hour','minute'] as const).map(kind => {
-            const label = kind === 'hour' ? '시' : '분';
-            const choices = kind === 'hour' ? Array.from({length:24}, (_, index) => index) : minutes;
-            const enabled = kind === 'hour' ? hours : availableMinutes;
-            const current = kind === 'hour' ? selected?.hour : selected?.minute;
+        <div className={`datetime-time-panel${showSeconds ? ' time-panel-seconds' : ''}`}>
+          {(showSeconds ? ['hour','minute','second'] as const : ['hour','minute'] as const).map(kind => {
+            const label = kind === 'hour' ? '시' : kind === 'minute' ? '분' : '초';
+            const choices = kind === 'hour' ? Array.from({length:24}, (_, index) => index) : kind === 'minute' ? minutes : seconds;
+            const enabled = kind === 'hour' ? hours : kind === 'minute' ? availableMinutes : availableSeconds;
+            const current = kind === 'hour' ? selected?.hour : kind === 'minute' ? selected?.minute : selected?.second;
             const focusValue = current !== undefined && enabled.includes(current) ? current : enabled[0];
             return <div className="datetime-time-column" key={kind}><span className="datetime-time-label">{label}</span>
               <div className="datetime-time-list" role="listbox" aria-label={label}>{choices.map(number =>
@@ -240,7 +258,7 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
           })}
         </div>
         {!candidates.length && <p className="time-empty" role="status">선택 가능한 시간이 없습니다.</p>}
-        <div className="datetime-footer"><span className="component-helper">24시간 형식</span><div className="datetime-actions">
+        <div className="datetime-footer"><div className="datetime-actions">
           <button type="button" className="button button--outline button-inline" onClick={() => close(true)}>취소</button>
           <button type="button" className="button button-inline" disabled={!panel || !!validate(panel)} onClick={() => { if (panel && publish(panel)) close(true); }}>확인</button>
         </div></div>

@@ -35,7 +35,7 @@ HTML 소비자용 `IdenfluMono` 런타임과 바닐라 어댑터는 제거했습
 | `[role=tablist]`, `.segmented-control`, `[data-disclosure-tree]` | `Tabs`, `Segmented`, `Tree` |
 | `reset()` / `destroy()` | 앱 상태 초기화 / React unmount |
 
-선택 컴포넌트는 `defaultValue`로 비제어 방식으로 사용할 수도 있습니다. 날짜는 `YYYY-MM-DD` 또는 `null`, 기간은 두 날짜의 배열이며, 숫자는 정밀도를 보존하는 문자열을 사용합니다. `TimePicker`의 시간값은 날짜·시간대가 없는 `HH:mm` 또는 `null`입니다. `TextField`와 같은 네이티브 입력 래퍼는 일반 React `onChange`를 받습니다. React 콜백의 값 형식과 지원 속성은 패키지 문서를 기준으로 확인합니다.
+선택 컴포넌트는 `defaultValue`로 비제어 방식으로 사용할 수도 있습니다. 날짜는 `YYYY-MM-DD` 또는 `null`, 기간은 두 날짜의 배열이며, 숫자는 정밀도를 보존하는 문자열을 사용합니다. `TimePicker`의 시간값은 날짜·시간대가 없는 `HH:mm` 또는 `null`이며 `showSeconds`를 켜면 `HH:mm:ss` 형식입니다. `TextField`와 같은 네이티브 입력 래퍼는 일반 React `onChange`를 받습니다. React 콜백의 값 형식과 지원 속성은 패키지 문서를 기준으로 확인합니다.
 
 ## 폼의 도움말·오류·포커스 연결
 

@@ -48,3 +48,21 @@ test('time picker is keyboard operable and its popup fits the viewport',{tag:'@m
   await expect(page.getByRole('button',{name:'시작 시간 선택 열기',exact:true})).toBeFocused();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
 });
+
+test('seconds fit in the unchanged panel width and support keyboard selection',{tag:'@mobile'},async({page})=>{
+  await page.goto(route);
+  await page.getByRole('button',{name:'시작 시간 선택 열기',exact:true}).click();
+  const basic=page.getByRole('dialog',{name:'시작 시간 선택',exact:true});
+  const basicWidth=(await basic.boundingBox()).width;
+  await basic.getByRole('button',{name:'취소'}).click();
+  await page.locator('#time-seconds').focus();await page.locator('#time-seconds').press('Alt+ArrowDown');
+  const popup=page.getByRole('dialog',{name:'초 단위 시간 선택',exact:true});
+  const bounds=await popup.boundingBox();expect(bounds.width).toBeCloseTo(basicWidth,1);expect(bounds.width).toBeLessThanOrEqual(280);
+  await expect(popup.locator('.time-popup-heading, .component-helper')).toHaveCount(0);
+  for (const label of await popup.locator('.datetime-time-label').all()) expect((await label.boundingBox()).height).toBe(24);
+  const seconds=popup.getByRole('listbox',{name:'초',exact:true});
+  await seconds.getByRole('option',{name:'15',exact:true}).focus();await page.keyboard.press('ArrowDown');
+  await expect(seconds.getByRole('option',{name:'20',exact:true})).toBeFocused();
+  await popup.getByRole('button',{name:'확인'}).click();await expect(page.locator('#time-seconds')).toHaveValue('09:30:20');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
+});

@@ -667,6 +667,14 @@
         "type": "boolean | undefined",
         "optional": true
       },
+      "secondStep": {
+        "type": "number | undefined",
+        "optional": true
+      },
+      "showSeconds": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
       "size": {
         "type": "\"lg\" | \"md\" | \"sm\" | undefined",
         "optional": true

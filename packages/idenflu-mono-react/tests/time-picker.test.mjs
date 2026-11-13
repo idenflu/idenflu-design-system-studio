@@ -267,3 +267,39 @@ test('TimePicker renders on the server and rejects invalid range or step configu
     assert.throws(()=>renderToString(h(TimePicker,{label:'시간',...props})),RangeError);
   }
 });
+
+test('seconds normalize, validate, submit, and reset with inclusive bounds',async()=>{
+  const f=fixture(),changes=[];
+  try{
+    await f.render(h('form',null,h(TimePicker,{label:'시간',name:'time',showSeconds:true,secondStep:5,min:'09:00:10',max:'10:00:20',defaultValue:'09:30',onValueChange:value=>changes.push(value)})));
+    assert.equal(input(f.node).value,'09:30:00');assert.equal(submitted(f.node),'09:30:00');
+    for(const raw of ['09:00:09','10:00:25','09:15:03','09:15:60']){await edit(input(f.node),raw);await key(input(f.node),'Enter');assert.equal(await validity(input(f.node)),false);assert.equal(submitted(f.node),'09:30:00');}
+    for(const [raw,expected] of [['090010','09:00:10'],['10:00:20','10:00:20'],['0945','09:45:00']]){await edit(input(f.node),raw);await key(input(f.node),'Enter');assert.equal(submitted(f.node),expected);}
+    await act(async()=>f.node.querySelector('form').reset());assert.equal(submitted(f.node),'09:30:00');
+    assert.deepEqual(changes,['09:00:10','10:00:20','09:45:00']);
+  }finally{await f.dispose();}
+});
+
+test('seconds picker respects boundary availability, keyboard and pending confirmation',async()=>{
+  const f=fixture(),changes=[];
+  try{
+    await f.render(h(TimePicker,{label:'시간',showSeconds:true,secondStep:5,min:'09:00:10',max:'09:01:15',defaultValue:'09:00:10',onValueChange:value=>changes.push(value)}));
+    await click(trigger(f.node));assert.equal(option(f.node,'초','05').disabled,true);assert.equal(option(f.node,'초','10').disabled,false);
+    await key(option(f.node,'초','10'),'ArrowDown');assert.equal(document.activeElement,option(f.node,'초','15'));
+    await click(option(f.node,'분','01'));assert.equal(option(f.node,'초','20').disabled,true);
+    await key(option(f.node,'초','15'),'End');await click(button(popup(f.node),'확인'));
+    assert.deepEqual(changes,['09:01:15']);
+    await f.render(h(TimePicker,{label:'시간',showSeconds:true,secondStep:10,min:'09:00:01',max:'09:00:09'}));
+    await click(trigger(f.node));assert.equal(button(popup(f.node),'확인').disabled,true);
+  }finally{await f.dispose();}
+});
+
+test('seconds configuration and controlled values use canonical precision',async()=>{
+  const f=fixture(),changes=[];
+  try{
+    await f.render(h('form',null,h(TimePicker,{label:'시간',name:'time',showSeconds:true,value:'09:30',onValueChange:value=>changes.push(value)})));
+    assert.equal(submitted(f.node),'09:30:00');await edit(input(f.node),'10:15:20');await key(input(f.node),'Enter');
+    assert.deepEqual(changes,['10:15:20']);assert.equal(input(f.node).value,'09:30:00');
+    for(const props of [{secondStep:7},{secondStep:0},{showSeconds:true,min:'09:00:60'},{showSeconds:true,min:'10:00:01',max:'10:00'}]) assert.throws(()=>renderToString(h(TimePicker,{label:'시간',...props})),RangeError);
+  }finally{await f.dispose();}
+});
