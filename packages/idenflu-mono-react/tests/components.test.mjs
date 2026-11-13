@@ -503,6 +503,7 @@ test('Tree expands branches, selects a leaf and resets the initial state', async
     const items = [{ value: 'design', label: '디자인', children: [{ value: 'system', label: '시스템' }, { value: 'brand', label: '브랜드' }] }];
     await f.render(h('form', null, h(Tree, { label: '프로젝트', items, name: 'item', onValueChange: value => changes.push(value) })));
     const form = f.container.querySelector('form'), branch = f.container.querySelector('details');
+    assert.equal(f.container.querySelector('.demo-tree').dataset.variant, 'tree');
     assert.equal(branch.open, false);
     await click(branch.querySelector('summary'));
     assert.equal(branch.open, true);
@@ -522,10 +523,11 @@ test('Tree category roots share selection and expansion with the default tree st
     { value: 'branch', label: '프로젝트 관리', children: [{ value: 'first', label: '전체 프로젝트' }, { value: 'second', label: '진행 중 프로젝트' }] },
     { value: 'disabled', label: '준비 중', disabled: true },
   ] }];
-  const render = rootStyle => h('form', null, h(Tree, { items, rootStyle, label: '업무 메뉴', name: 'page', defaultValue: 'first', defaultExpanded: ['root', 'branch'], onValueChange: value => changes.push(value), onExpandedChange: values => expansion.push(values) }));
+  const render = variant => h('form', null, h(Tree, { items, variant, label: '업무 메뉴', name: 'page', defaultValue: 'first', defaultExpanded: ['root', 'branch'], onValueChange: value => changes.push(value), onExpandedChange: values => expansion.push(values) }));
   try {
     await f.render(render('category'));
     const group = f.container.querySelector('.demo-tree');
+    assert.equal(group.dataset.variant, 'category');
     assert.equal(f.container.querySelectorAll('.demo-tree').length, 1);
     assert.equal(group.querySelectorAll('details').length, 1);
     const category = group.querySelector('.tree-category'), heading = category.querySelector('h3');
@@ -537,6 +539,7 @@ test('Tree category roots share selection and expansion with the default tree st
     await click(group.querySelector('summary'));
     assert.deepEqual(expansion, [['root']]);
     await f.render(render('tree'));
+    assert.equal(group.dataset.variant, 'tree');
     const rootBranch = group.querySelector('details');
     assert.equal(group.querySelector('.tree-category'), null);
     assert.equal(rootBranch.open, true);

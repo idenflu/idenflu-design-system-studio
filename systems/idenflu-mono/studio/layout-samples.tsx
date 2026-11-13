@@ -44,7 +44,7 @@ function SidebarNavigation({items,query,onQuery,selected,expanded,onExpanded,onP
   return <div className="layout-sidebar-inner">
     <div className="layout-sidebar-brand"><img className="layout-brand-mark" src="./assets/nova-workspace.svg" alt=""/><strong>NOVA Workspace</strong>{mobile&&<Button variant="ghost" size="sm" aria-label="메뉴 닫기" onClick={onClose}><Icon name="close"/></Button>}</div>
     <div className="layout-menu-search"><TextField hideLabel label="메뉴 검색" type="search" value={query} onChange={event=>onQuery(event.target.value)} prefix={<Icon name="search"/>} prefixDecorative placeholder="메뉴 검색"/></div>
-    <nav className="layout-tree-navigation" aria-label="워크스페이스 메뉴"><Tree label="워크스페이스 트리 메뉴" rootStyle={sideMenuStyle} items={items} value={selected} onValueChange={value=>onPage(value as WorkspacePage)} expanded={expanded} onExpandedChange={onExpanded}/>{!items.length&&<p className="layout-empty">검색 결과가 없습니다.</p>}</nav>
+    <nav className="layout-tree-navigation" aria-label="워크스페이스 메뉴"><Tree label="워크스페이스 트리 메뉴" variant={sideMenuStyle} items={items} value={selected} onValueChange={value=>onPage(value as WorkspacePage)} expanded={expanded} onExpandedChange={onExpanded}/>{!items.length&&<p className="layout-empty">검색 결과가 없습니다.</p>}</nav>
     <footer className="layout-sidebar-footer"><span>버전</span><span>v{packageVersion}</span></footer>
   </div>;
 }

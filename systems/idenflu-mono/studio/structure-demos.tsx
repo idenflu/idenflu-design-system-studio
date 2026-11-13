@@ -38,10 +38,11 @@ export function TreeDemos() {
   return <><Section title="계층 탐색" description="그룹은 접고 펼치며, 하위 항목을 선택해 현재 위치를 표시합니다.">
     <div className="react-studio-tree-sample"><Tree label="프로젝트 파일" defaultExpanded={['project','design']} defaultValue="system" onValueChange={value => setValue(treeLabels[value] || value)} items={[{value:'project',label:'프로젝트',children:[{value:'design',label:'디자인',children:[{value:'system',label:'디자인 시스템'},{value:'brand',label:'브랜드 가이드'}]},{value:'development',label:'개발',children:[{value:'components',label:'컴포넌트'},{value:'docs',label:'문서'}]},{value:'about',label:'프로젝트 소개'},{value:'archived',label:'보관된 파일',disabled:true}]}]} /></div>
     <p role="status" className="component-helper">선택: {value}</p>
-  </Section><Section title="루트 카테고리" description={'rootStyle="category"는 하나의 트리에서 루트를 고정 제목으로 표시하고, 다음 레벨부터 접고 펼칩니다. 기본값은 "tree"입니다.'}>
-    <div className="react-studio-tree-sample"><Tree label="카테고리 메뉴" rootStyle="category" defaultExpanded={['category-design']} defaultValue="category-system" items={[
+  </Section><Section title="루트 카테고리" description={'variant="category"는 자식이 있는 루트를 고정 제목으로 표시하고, 자식이 없는 루트는 선택 가능한 항목으로 표시합니다. 기본값은 "tree"입니다.'}>
+    <div className="react-studio-tree-sample"><Tree label="카테고리 메뉴" variant="category" defaultExpanded={['category-design']} defaultValue="category-system" items={[
       {value:'category-work',label:'업무 공간',children:[{value:'category-design',label:'디자인',children:[{value:'category-system',label:'디자인 시스템'},{value:'category-brand',label:'브랜드 가이드'}]}]},
       {value:'category-settings',label:'환경 설정',children:[{value:'category-profile',label:'프로필'},{value:'category-notifications',label:'알림 설정'}]},
+      {value:'category-help',label:'도움말'},
     ]}/></div>
   </Section><Section title="아이콘이 있는 트리" description="각 항목의 종류를 아이콘으로 보조합니다."><div className="react-studio-tree-sample"><Tree label="아이콘 프로젝트 메뉴" defaultExpanded={['workspace']} defaultValue="list" items={[{value:'workspace',label:<span className="react-studio-icon-label"><Icon name="grid" />워크스페이스</span>,children:[{value:'list',label:<span className="react-studio-icon-label"><Icon name="list" />프로젝트 목록</span>},{value:'schedule',label:<span className="react-studio-icon-label"><Icon name="calendar" />프로젝트 일정</span>}]}]} /></div></Section></>;
 }
