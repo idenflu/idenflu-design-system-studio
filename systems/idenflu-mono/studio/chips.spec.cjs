@@ -69,8 +69,8 @@ test('chip sizes and longest labels fit mobile at the largest preferences', {tag
   expect(heights[0]).toBeLessThan(heights[1]);
   expect(heights[1]).toBeLessThan(heights[2]);
   await page.evaluate(() => window.IdenfluPreferences.set({fontSize:18,lineHeight:32,spacing:150,controlHeight:48,radius:12}));
-  const geometry = await page.locator('.route-chips .chip').evaluateAll(chips => chips.map(el => ({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right,height:el.getBoundingClientRect().height,content:el.scrollWidth,width:el.clientWidth,compact:el.classList.contains('chip--compact')})));
-  for (const chip of geometry) { expect(chip.left).toBeGreaterThanOrEqual(0); expect(chip.right).toBeLessThanOrEqual(320); expect(chip.content).toBeLessThanOrEqual(chip.width); expect(chip.height).toBeGreaterThanOrEqual(chip.compact ? 24 : 32); }
+  const geometry = await page.locator('.route-chips .chip').evaluateAll(chips => chips.map(el => ({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right,height:el.getBoundingClientRect().height,content:el.scrollWidth,width:el.clientWidth,comfortable:el.classList.contains('chip--comfortable')})));
+  for (const chip of geometry) { expect(chip.left).toBeGreaterThanOrEqual(0); expect(chip.right).toBeLessThanOrEqual(320); expect(chip.content).toBeLessThanOrEqual(chip.width); expect(chip.height).toBeGreaterThanOrEqual(chip.comfortable ? 32 : 24); }
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
@@ -153,17 +153,17 @@ test('chip focus and selected colors respect forced-color system settings', asyn
 });
 
 
-test('compact display chips preserve comfortable sizes and fit dense mobile content', {tag:['@mobile','@mobile-only']}, async ({page}) => {
+test('comfortable display chips preserve control sizes and fit mobile content', {tag:['@mobile','@mobile-only']}, async ({page}) => {
   await page.setViewportSize({width:320,height:740});
   await page.goto(url);
-  const compact = section(page,'컴팩트 표시용 칩');
-  const chips = compact.locator('.chip--compact');
+  const comfortable = section(page,'Comfortable 표시용 칩');
+  const chips = comfortable.locator('.chip--comfortable');
   await expect(chips).toHaveCount(9);
-  const comfortableHeights = await section(page,'사이즈').locator('.react-studio-example').evaluateAll(cards => cards.map(card => card.querySelector('.chip').getBoundingClientRect().height));
-  expect(comfortableHeights).toEqual([30,36,42]);
-  const groups = await compact.locator('.react-studio-example').evaluateAll(cards => cards.map(card => [...card.querySelectorAll('.chip')].map(element => ({height:element.getBoundingClientRect().height,font:parseFloat(getComputedStyle(element).fontSize),tag:element.tagName,tabIndex:element.tabIndex,cursor:getComputedStyle(element).cursor}))));
+  const sizeMetrics = await section(page,'사이즈').locator('.react-studio-example').evaluateAll(cards => cards.map(card => [...card.querySelectorAll('.chip')].map(chip => chip.getBoundingClientRect().height)));
+  expect(sizeMetrics).toEqual([[24,24,24,32],[26,26,26,36],[30,30,30,40]]);
+  const groups = await comfortable.locator('.react-studio-example').evaluateAll(cards => cards.map(card => [...card.querySelectorAll('.chip')].map(element => ({height:element.getBoundingClientRect().height,font:parseFloat(getComputedStyle(element).fontSize),tag:element.tagName,tabIndex:element.tabIndex,cursor:getComputedStyle(element).cursor}))));
   for (const [index,group] of groups.entries()) {
-    for (const chip of group) expect(chip).toEqual({height:[24,26,30][index],font:[12,13,14][index],tag:'SPAN',tabIndex:-1,cursor:'default'});
+    for (const chip of group) expect(chip).toEqual({height:[32,36,40][index],font:14,tag:'SPAN',tabIndex:-1,cursor:'default'});
   }
   await chips.first().evaluate(element => { element.textContent = '아주 긴 프로젝트 분류와 상세 상태를 표시하는 칩'; });
   await page.evaluate(() => window.IdenfluPreferences.set({fontSize:18,lineHeight:32,spacing:150,controlHeight:48,radius:12}));

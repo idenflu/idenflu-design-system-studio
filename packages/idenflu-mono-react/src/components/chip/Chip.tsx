@@ -25,7 +25,7 @@ interface ChipComponent {
 
 export const Chip = React.forwardRef<HTMLButtonElement | HTMLSpanElement, ChipProps>(function Chip(props, ref) {
   const { variant = 'neutral', rounded = false, className } = props;
-  const classes = ['chip', variant !== 'neutral' && `chip--colored chip--${variant}`, rounded && 'chip--rounded', props.interactive === false && 'chip--static', props.interactive === false && props.density === 'compact' && 'chip--compact', className].filter(Boolean).join(' ');
+  const classes = ['chip', variant !== 'neutral' && `chip--colored chip--${variant}`, rounded && 'chip--rounded', props.interactive === false && 'chip--static', props.interactive === false && props.density === 'compact' && 'chip--compact', props.interactive === false && props.density === 'comfortable' && 'chip--comfortable', className].filter(Boolean).join(' ');
   if (props.interactive === false) {
     const { interactive, density, size, variant, rounded, className, onClick, onClickCapture, tabIndex, 'aria-pressed': pressed, ...attributes } = props;
     return <span {...attributes} ref={ref as React.ForwardedRef<HTMLSpanElement>} data-size={size} className={classes} />;

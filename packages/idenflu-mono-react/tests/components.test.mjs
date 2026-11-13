@@ -106,7 +106,7 @@ test('compact Chip keeps display semantics and forwards size and refs without le
       assert.equal(chip.hasAttribute('aria-pressed'),false);
     }
     await f.render(h(Chip,{interactive:false,density:'comfortable',ref},'기본 표시'));
-    assert.equal(ref.current.classList.contains('chip--compact'),false);
+    assert.equal(ref.current.classList.contains('chip--comfortable'),true);
     await f.render(h(Chip,{interactive:false,ref},'기본 표시'));
     assert.equal(ref.current.classList.contains('chip--compact'),false);
     await f.render(h(Chip,{ref,'aria-pressed':true},'필터'));
