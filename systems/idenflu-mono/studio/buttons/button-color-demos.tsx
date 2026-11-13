@@ -2,7 +2,6 @@ import * as React from "react";
 import { Button } from "@idenflu/mono-react";
 import { Section } from "../demo-layout";
 import { CodeExample } from "../convenience-api-reference";
-import { buttonColorsUsage } from "./button-usage";
 
 export function ButtonColorDemos() {
   const [feedback, setFeedback] = React.useState("");
