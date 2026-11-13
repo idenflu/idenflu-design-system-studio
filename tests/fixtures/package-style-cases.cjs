@@ -12,7 +12,6 @@ function createCases() {
     ['text-field', '.text-input', h(C.TextField, {label:'이름', defaultValue:'프로젝트'})],
     ['input-group', '.input-group', h(C.TextField, {label:'주소', prefix:'https://', defaultValue:'idenflu.io'})],
     ['text-area', '.text-area', h(C.TextArea, {label:'설명', defaultValue:'상세 설명'})],
-    ['native-select', '.select-input', h(C.NativeSelect, {label:'분류', defaultValue:'one'}, h('option', {value:'one'}, '디자인'))],
     ['select', '.custom-select', h(C.Select, {label:'팀', options, defaultValue:'one'})],
     ['search-select', '.custom-select', h(C.SearchSelect, {label:'팀 검색', options, defaultValue:'one'})],
     ['multi-select', '.custom-select', h(C.MultiSelect, {label:'참여 팀', options, defaultValue:['one']})],

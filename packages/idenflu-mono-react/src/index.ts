@@ -3,7 +3,6 @@
 export * from './components/button';
 export * from './components/text-field/TextField';
 export * from './components/text-area/TextArea';
-export * from './components/select/NativeSelect';
 export * from './components/selection/Selection';
 export * from './components/badge/Badge';
 export * from './components/alert/Alert';

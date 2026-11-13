@@ -76,11 +76,10 @@ test('default Drawer sections have their own spacing and aligned actions', {tag:
   expect(spacing.overflow).toBe(false);
 });
 
-test('native and searchable fields keep disabled and error appearances outside form patterns', {tag:['@theme','@mobile']}, async ({page},testInfo) => {
+test('text and searchable fields keep disabled and error appearances outside form patterns', {tag:['@theme','@mobile']}, async ({page},testInfo) => {
   const options=[{value:'one',label:'디자인'}];
   const markup=renderToStaticMarkup(h(React.Fragment,null,
     h(C.TextArea,{label:'오류 설명',error:'설명을 확인해주세요.'}),
-    h(C.NativeSelect,{label:'오류 분류',error:'분류를 확인해주세요.'},h('option',null,'선택')),
     h(C.TextArea,{label:'비활성 설명',disabled:true,defaultValue:'입력 불가'}),
     h(C.SearchSelect,{label:'비활성 검색',disabled:true,options,defaultValue:'one'}),
     h(C.MultiSelect,{label:'비활성 태그',disabled:true,presentation:'inline',options,defaultValue:['one']}),
@@ -93,7 +92,7 @@ test('native and searchable fields keep disabled and error appearances outside f
     const values={danger:resolve('borderColor','--danger'),disabled:resolve('color','--disabled-text'),surface:resolve('backgroundColor','--surface')};
     probe.remove();return values;
   });
-  for(const name of ['오류 설명','오류 분류']) {
+  for(const name of ['오류 설명']) {
     const input=page.getByLabel(name,{exact:true});
     await expect(input).toHaveCSS('border-top-color',tokens.danger);
     await input.focus();

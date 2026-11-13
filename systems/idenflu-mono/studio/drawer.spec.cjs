@@ -1,6 +1,10 @@
 const {test, expect} = require('@playwright/test');
 
 const url = '/systems/idenflu-mono/index.html#/components/drawer';
+const choose = async (page, field, option) => {
+  await page.getByRole('combobox', {name:new RegExp(`^${field}:`)}).click();
+  await page.getByRole('option', {name:option, exact:true}).click();
+};
 const settle = dialog => dialog.evaluate(element => Promise.all(element.getAnimations().map(animation => animation.finished)));
 
 test('drawer edges and preset or pixel sizes fit the viewport', {tag:'@mobile'}, async ({page}) => {
@@ -8,7 +12,7 @@ test('drawer edges and preset or pixel sizes fit the viewport', {tag:'@mobile'},
   const opener = page.getByRole('button', {name:'패널 미리보기', exact:true});
   const viewport = page.viewportSize();
   for (const [side, label] of [['right','오른쪽'],['left','왼쪽'],['top','위쪽'],['bottom','아래쪽']]) {
-    await page.getByLabel('패널 위치', {exact:true}).selectOption(side);
+    await choose(page, '패널 위치', label);
     await opener.click();
     const drawer = page.getByRole('dialog', {name:`${label} 패널`, exact:true});
     await expect(drawer).toBeVisible();
@@ -27,9 +31,9 @@ test('drawer edges and preset or pixel sizes fit the viewport', {tag:'@mobile'},
     await page.keyboard.press('Escape');
     await expect(opener).toBeFocused();
   }
-  await page.getByLabel('패널 위치', {exact:true}).selectOption('right');
-  for (const [size, pixels] of [['sm',320],['lg',640],['560',560],['full',viewport.width]]) {
-    await page.getByLabel('패널 크기', {exact:true}).selectOption(size);
+  await choose(page, '패널 위치', '오른쪽');
+  for (const [label, pixels] of [['SM · 320px',320],['LG · 640px',640],['사용자 지정 · 560px',560],['전체 화면',viewport.width]]) {
+    await choose(page, '패널 크기', label);
     await opener.click();
     const drawer = page.getByRole('dialog', {name:'오른쪽 패널', exact:true});
     await settle(drawer);
@@ -37,7 +41,7 @@ test('drawer edges and preset or pixel sizes fit the viewport', {tag:'@mobile'},
     await drawer.getByRole('button', {name:'패널 닫기', exact:true}).click();
     await expect(opener).toBeFocused();
   }
-  await page.getByLabel('패널 위치', {exact:true}).selectOption('bottom');
+  await choose(page, '패널 위치', '아래쪽');
   await opener.click();
   const full = page.getByRole('dialog', {name:'아래쪽 패널', exact:true});
   await settle(full);

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Button, DatePicker, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DrawerHeader, DrawerBody, DrawerFooter, Icon, NativeSelect, Select, Switch, TextArea, TextField, type DrawerSide, type DrawerSize } from '@idenflu/mono-react';
+import { Alert, Button, DatePicker, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DrawerHeader, DrawerBody, DrawerFooter, Icon, Select, Switch, TextArea, TextField, type DrawerSide, type DrawerSize } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 
 const sides = [{value:'right', label:'오른쪽'}, {value:'left', label:'왼쪽'}, {value:'top', label:'위쪽'}, {value:'bottom', label:'아래쪽'}] as const;
@@ -42,8 +42,8 @@ function PlacementDrawer() {
   const sideLabel = sides.find(item => item.value === side)!.label;
   return <Section title="위치와 크기" description="좌우 패널은 너비, 위아래 패널은 높이에 크기 옵션이 적용됩니다. 화면보다 크면 화면 안에 맞춥니다.">
     <div className="studio-drawer-controls">
-      <NativeSelect label="패널 위치" value={side} onChange={event => setSide(event.target.value as DrawerSide)}>{sides.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</NativeSelect>
-      <NativeSelect label="패널 크기" value={size} onChange={event => setSize(event.target.value === '560' ? 560 : event.target.value as DrawerSize)}>{sizes.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</NativeSelect>
+      <Select label="패널 위치" value={side} onValueChange={value => setSide(value as DrawerSide)} options={sides} />
+      <Select label="패널 크기" value={String(size)} onValueChange={value => setSize(value === '560' ? 560 : value as DrawerSize)} options={sizes.map(item => ({...item, value:String(item.value)}))} />
       <Button variant="outline" onClick={() => setOpen(true)}>패널 미리보기</Button>
     </div>
     <p className="react-studio-caption"><code>{'size={560}'}</code>처럼 픽셀 값을 직접 지정할 수도 있습니다.</p>
