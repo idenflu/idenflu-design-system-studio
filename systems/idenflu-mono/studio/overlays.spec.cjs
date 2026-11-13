@@ -23,7 +23,7 @@ test.beforeAll(async () => {
             <Dialog open={open} onOpenChange={setOpen} aria-label="중첩 팝업 회귀">
               <h2>중첩 팝업</h2>
               <Button variant="outline" onClick={() => setOpen(false)}>모달 닫기</Button>
-              <Popover trigger="설정 팝업" label="설정 메뉴">
+              <Popover trigger={<Button variant="outline">설정 팝업</Button>} label="설정 메뉴">
                 <label>임시 입력<input aria-label="임시 입력" className="text-input" value={draft}
                   onChange={event => setDraft(event.target.value)}
                   onKeyDown={event => {
@@ -33,7 +33,7 @@ test.beforeAll(async () => {
                   }} /></label>
                 <Select label="팀" options={[{label:'디자인',value:'design'},{label:'개발',value:'engineering'}]} />
                 <DatePicker label="날짜" defaultValue="2026-11-02" />
-                <Popover trigger="더보기" label="추가 설정"><Button>내부 동작</Button></Popover>
+                <Popover trigger={<Button variant="outline">더보기</Button>} label="추가 설정"><Button>내부 동작</Button></Popover>
               </Popover>
             </Dialog>
           </main>;

@@ -104,7 +104,7 @@ export function AlignedPopover() {
   const [open, setOpen] = useState(false);
   const [showDescription, setShowDescription] = useState(true);
 
-  return <Popover trigger="표시 설정" label="목록 표시 설정"
+  return <Popover trigger={<Button variant="outline">표시 설정</Button>} label="목록 표시 설정"
     align="end" open={open} onOpenChange={setOpen}>
     <strong>표시 설정</strong>
     <Checkbox label="설명 표시" checked={showDescription}

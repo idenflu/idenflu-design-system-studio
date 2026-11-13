@@ -50,7 +50,31 @@ test('DataState loads, filters results and allows clearing the query', async () 
 
 test('package components render on the server without browser-only side effects', () => {
   assert.match(renderToString(h(TextField, { label: '이름', defaultValue: 'mono' })), /mono/);
-  assert.match(renderToString(h(Popover, { trigger: '열기' }, '내용')), /aria-expanded="false"/);
+  assert.match(renderToString(h(Popover, { trigger:h('button', {type:'button'}, '열기') }, '내용')), /aria-expanded="false"/);
+});
+
+test('popover preserves trigger ref and click handler, including prevented clicks', async () => {
+  const f = fixture(), ref = React.createRef();
+  let clicks = 0, prevent = false;
+  try {
+    const trigger = h('button', { ref, type:'button', className:'custom-trigger', onClick:event => { clicks++; if (prevent) event.preventDefault(); } }, '설정');
+    await f.render(h(Popover, { trigger, label:'설정' }, h('button', null, '적용')));
+    const button = f.node.querySelector('.custom-trigger');
+    assert.equal(ref.current, button);
+    assert.equal(f.node.querySelectorAll('.popover-wrap > button').length, 1);
+    await click(button);
+    assert.equal(clicks, 1);
+    assert.equal(button.getAttribute('aria-expanded'), 'true');
+    assert.equal(f.node.querySelector('[role=region]').id, button.getAttribute('aria-controls'));
+    await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', { key:'Escape', bubbles:true, cancelable:true })));
+    assert.equal(button.getAttribute('aria-expanded'), 'false');
+    assert.equal(document.activeElement, button);
+    prevent = true;
+    await click(button);
+    assert.equal(clicks, 2);
+    assert.equal(button.getAttribute('aria-expanded'), 'false');
+  } finally { await f.dispose(); }
+  assert.equal(ref.current, null);
 });
 
 test('dropdown selection and Escape return focus to its trigger', async () => {
@@ -130,7 +154,7 @@ const escape = async element => act(async () => element.dispatchEvent(new Keyboa
 test('nested initially open popovers dismiss one layer per Escape and restore the matching trigger', async () => {
   const f = fixture();
   try {
-    await f.render(h(Popover, {trigger:'외부', defaultOpen:true}, h(Popover, {trigger:'내부', defaultOpen:true}, h('button', null, '내부 동작'))));
+    await f.render(h(Popover, {trigger:h('button', {type:'button'}, '외부'), defaultOpen:true}, h(Popover, {trigger:h('button', {type:'button'}, '내부'), defaultOpen:true}, h('button', null, '내부 동작'))));
     const [outer, inner] = f.node.querySelectorAll('[aria-expanded]');
     f.node.querySelector('.popover-content .popover-content button').focus();
     await escape(document.activeElement);
@@ -147,8 +171,8 @@ test('Escape follows opening order across siblings and callback rerenders do not
   const f = fixture();
   try {
     const view = revision => h('div', null,
-      h(Popover, {trigger:'첫 번째', onOpenChange:() => revision}, '첫 번째 내용'),
-      h(Popover, {trigger:'두 번째', onOpenChange:() => revision}, '두 번째 내용'));
+      h(Popover, {trigger:h('button', {type:'button'}, '첫 번째'), onOpenChange:() => revision}, '첫 번째 내용'),
+      h(Popover, {trigger:h('button', {type:'button'}, '두 번째'), onOpenChange:() => revision}, '두 번째 내용'));
     await f.render(view(0));
     const [first, second] = f.node.querySelectorAll('[aria-expanded]');
     await click(second);
@@ -165,7 +189,7 @@ test('Escape follows opening order across siblings and callback rerenders do not
 test('inner keyboard handling can consume Escape without dismissing a popover', async () => {
   const f = fixture();
   try {
-    await f.render(h(Popover, {trigger:'외부', defaultOpen:true}, h('input', {'aria-label':'편집', onKeyDown:event => event.preventDefault()})));
+    await f.render(h(Popover, {trigger:h('button', {type:'button'}, '외부'), defaultOpen:true}, h('input', {'aria-label':'편집', onKeyDown:event => event.preventDefault()})));
     await escape(f.node.querySelector('input'));
     assert.equal(f.node.querySelector('[aria-expanded]').getAttribute('aria-expanded'), 'true');
     await escape(document);
@@ -182,7 +206,7 @@ test('menus, selects and calendars close before the containing popover', async (
       h(DatePicker, {label:'날짜', defaultValue:'2026-11-02'}),
     ];
     for (let index = 0; index < children.length; index++) {
-      await f.render(h(Popover, {key:index, trigger:'외부', defaultOpen:true}, children[index]));
+      await f.render(h(Popover, {key:index, trigger:h('button', {type:'button'}, '외부'), defaultOpen:true}, children[index]));
       const [outer, inner] = f.node.querySelectorAll('[aria-expanded]');
       await click(inner);
       assert.equal(inner.getAttribute('aria-expanded'), 'true');
@@ -206,7 +230,7 @@ test('native modal cancellation leaves the dialog open while an inner layer is a
   try {
     function Example() {
       const [open,setOpen] = React.useState(true);
-      return h(Dialog, {open,onOpenChange:value => { requests++; setOpen(value); }}, h(Popover, {trigger:'내부',defaultOpen:true}, h('button',null,'동작')));
+      return h(Dialog, {open,onOpenChange:value => { requests++; setOpen(value); }}, h(Popover, {trigger:h('button', {type:'button'}, '내부'),defaultOpen:true}, h('button',null,'동작')));
     }
     await f.render(h(Example));
     const dialog = f.node.querySelector('dialog'), trigger = f.node.querySelector('[aria-expanded]');

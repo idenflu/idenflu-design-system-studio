@@ -233,7 +233,7 @@ import '@idenflu/mono-react/styles.css';
 export function ToolbarPopups() {
   const [view, setView] = useState('list');
   return <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-    <Popover trigger="표시 설정" label="표시 설정" align="end">
+    <Popover trigger={<Button variant="outline">표시 설정</Button>} label="표시 설정" align="end">
       <strong>표시 설정</strong>
       <p>목록의 추가 정보를 확인합니다.</p>
     </Popover>
@@ -246,7 +246,7 @@ export function ToolbarPopups() {
 }
 ```
 
-`DropdownMenu`의 `trigger`는 버튼 요소입니다. 커스텀 컴포넌트는 전달받은 props와 ref를 실제 버튼에 전달해야 합니다. 항목은 `DropdownMenuItem` children으로 지정하며, 아이콘은 장식용입니다.
+`Popover`와 `DropdownMenu`의 `trigger`는 버튼 요소입니다. Popover의 아이콘 전용 트리거에는 접근 가능한 이름을 지정하세요. 커스텀 컴포넌트는 전달받은 props와 ref를 실제 버튼에 전달해야 합니다. 항목은 `DropdownMenuItem` children으로 지정하며, 아이콘은 장식용입니다.
 
 ## TimePicker
 

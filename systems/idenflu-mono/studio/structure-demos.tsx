@@ -117,7 +117,7 @@ export function MenuDemos() {
 
 export function PopoverDemos() {
   const [open, setOpen] = React.useState(false), [description, setDescription] = React.useState(true), [status, setStatus] = React.useState(true), [message, setMessage] = React.useState('설명과 상태 표시 중');
-  return <><Section title="설정 팝오버" description="현재 화면에서 간단한 설정을 바꾸고 적용 결과를 확인합니다."><div className="react-studio-row"><Popover trigger={<span className="react-studio-icon-label"><Icon name="settings" />표시 설정</span>} label="표시 설정" open={open} onOpenChange={setOpen}>
+  return <><Section title="설정 팝오버" description="현재 화면에서 간단한 설정을 바꾸고 적용 결과를 확인합니다."><div className="react-studio-row"><Popover trigger={<Button variant="outline"><span className="react-studio-icon-label"><Icon name="settings" />표시 설정</span></Button>} label="표시 설정" open={open} onOpenChange={setOpen}>
     <div className="react-studio-popover-body">
       <div className="react-studio-popover-heading"><strong>표시 설정</strong><p>목록에서 볼 정보를 선택하세요.</p></div>
       <div className="react-studio-popover-options"><Checkbox label="설명" checked={description} onChange={event => setDescription(event.target.checked)} /><Checkbox label="상태" checked={status} onChange={event => setStatus(event.target.checked)} /></div>

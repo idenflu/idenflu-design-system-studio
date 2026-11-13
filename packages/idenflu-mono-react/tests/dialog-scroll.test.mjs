@@ -88,7 +88,7 @@ test('Escape closes a nonmodal dialog only after its nested popup', async () => 
   const f = fixture();
   function Example() {
     const [open,setOpen] = React.useState(true);
-    return h(Dialog, {open,onOpenChange:setOpen,modal:false}, h(Popover,{trigger:'내부 설정',defaultOpen:true},h('button',null,'적용')));
+    return h(Dialog, {open,onOpenChange:setOpen,modal:false}, h(Popover,{trigger:h('button', {type:'button'}, '내부 설정'),defaultOpen:true},h('button',null,'적용')));
   }
   try {
     await f.render(h(Example));

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button } from '../button/Button';
+import { IconButton } from '../icon-button/IconButton';
 import { Checkbox } from '../selection/Selection';
 import { Icon } from '../icon/Icon';
 import { Pagination } from '../pagination/Pagination';
@@ -462,7 +463,7 @@ export function DataGrid<T>({
         <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
       </Button>
     </Tooltip>,
-    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<Icon name="grid" />} triggerLabel="표시 열" iconOnly label={`${label} 표시 열`}>
+    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열"><Icon name="grid" /></IconButton>} label={`${label} 표시 열`}>
       <div className="data-grid-column-options" data-size="md"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
         const checked = visibleColumns.some(item => item.id === column.id);
         return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;

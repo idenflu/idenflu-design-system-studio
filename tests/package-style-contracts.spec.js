@@ -131,7 +131,7 @@ test('standalone calendar disabled days and controls inside Popover retain their
       const h=React.createElement;
       createRoot(document.getElementById('interactive')).render(h(React.Fragment,null,
         h(DatePicker,{label:'선택 가능 일자',defaultValue:'2026-11-12',min:'2026-11-12',max:'2026-11-20'}),
-        h(Popover,{trigger:'검색 설정',label:'검색 설정',defaultOpen:true},
+        h(Popover,{trigger:h('button', {type:'button'}, '검색 설정'),label:'검색 설정',defaultOpen:true},
           h(TextField,{label:'프로젝트 검색',action:h(Button,{iconOnly:true,'aria-label':'검색 실행'},h(Icon,{name:'search'}))})),
         h(Grid,{columns:2,gap:4},h(GridItem,null,'첫 열'),h(GridItem,null,'둘째 열'))
       ));`,resolveDir:resolve(__dirname,'..'),loader:'js'},

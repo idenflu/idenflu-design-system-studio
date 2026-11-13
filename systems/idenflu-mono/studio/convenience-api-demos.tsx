@@ -63,7 +63,7 @@ function AlignedPopover({ align }: { align: PopupAlignment }) {
   const [open, setOpen] = React.useState(false);
   const [showDescription, setShowDescription] = React.useState(true);
 
-  return <Popover trigger={align} label={`${align} 표시 설정`} align={align} open={open} onOpenChange={setOpen}>
+  return <Popover trigger={<Button variant="outline">{align}</Button>} label={`${align} 표시 설정`} align={align} open={open} onOpenChange={setOpen}>
     <div className="react-studio-popover-body">
       <div className="react-studio-popover-heading"><strong>표시 설정</strong><p>트리거의 {align === 'start' ? '시작점' : align === 'center' ? '가운데' : '끝점'}에 맞춥니다.</p></div>
       <Checkbox label="설명 표시" checked={showDescription} onChange={event => setShowDescription(event.target.checked)} />
