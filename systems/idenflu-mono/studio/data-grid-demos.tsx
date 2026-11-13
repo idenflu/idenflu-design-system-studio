@@ -86,6 +86,7 @@ export function DataGridDemos() {
   const [notice,setNotice] = React.useState('셀의 편집 버튼으로 값을 수정할 수 있습니다.');
   const [state,setState] = React.useState('loading');
   const [previewWidth,setPreviewWidth] = React.useState('fluid');
+  const [heightRowCount,setHeightRowCount] = React.useState('3');
   const [virtualRows,setVirtualRows] = React.useState(virtualProjects);
   const [virtualCount,setVirtualCount] = React.useState(10000);
   const [virtualDensity,setVirtualDensity] = React.useState<'default'|'compact'>('default');
@@ -110,6 +111,31 @@ export function DataGridDemos() {
       <p className="react-studio-caption">행 또는 체크박스를 클릭해 선택합니다. 전체 선택은 현재 페이지에 적용하며 다른 페이지와 검색 결과에서도 선택을 유지합니다. CSV와 Excel(.xlsx)은 표시 중인 열을 사용하며 검색 결과 전체와 선택한 행을 구분해 내려받습니다. Excel 버튼에는 엑셀 아이콘을 사용합니다.</p>
     </Section>
     <DataGridStatusDemos />
+    <Section id="data-grid-height-demo" title="고정 높이와 flex 배치" description="그리드 높이가 행보다 클 때의 본문과 스크롤을 확인합니다.">
+      <div className="react-studio-row"><Segmented label="높이 예시 행 수" size="sm" value={heightRowCount} onValueChange={setHeightRowCount} options={[{value:'3',label:'3개'},{value:'20',label:'20개'}]} /></div>
+      <div className="studio-grid-height-examples">
+        <div><h3>고정 높이</h3><DataGrid className="studio-grid-height-fixed" label="고정 높이 데이터그리드"
+          rows={projects.slice(0,Number(heightRowCount))} columns={responsiveColumns.slice(0,2)} getRowId={row=>row.id}
+          searchable={false} showColumnVisibility={false} pagination={false} /></div>
+        <div><h3>Flex로 남은 높이 채우기</h3><div className="studio-grid-height-flex-container">
+          <p className="react-studio-caption">상위 영역</p>
+          <DataGrid className="studio-grid-height-flex" label="Flex 높이 데이터그리드"
+            rows={projects.slice(0,Number(heightRowCount))} columns={responsiveColumns.slice(0,2)} getRowId={row=>row.id}
+            searchable={false} showColumnVisibility={false} pagination={false} />
+        </div></div>
+      </div>
+      <p className="react-studio-caption">데이터 행은 내용에 맞는 높이를 유지하므로 행이 적으면 본문 아래에 빈 공간이 남습니다. 행이 많으면 본문 안에서 스크롤합니다. maxHeight는 전체 그리드가 아닌 표 뷰포트의 최대 높이입니다.</p>
+      <div className="react-studio-code studio-grid-reference-code" role="region" aria-label="고정 높이와 flex 배치 코드" tabIndex={0}><pre><code>{`/* 고정 높이 */
+.fixed-grid { height: 480px; }
+/* 부모 높이가 정해진 flex 배치 */
+.grid-container { height: 520px; display: flex; flex-direction: column; min-height: 0; }
+.flex-grid { flex: 1 1 0; }
+
+<DataGrid className="fixed-grid" label="고정 높이 목록" rows={rows} columns={columns} getRowId={row => row.id} />
+<div className="grid-container">
+  <DataGrid className="flex-grid" label="Flex 목록" rows={rows} columns={columns} getRowId={row => row.id} />
+</div>`}</code></pre></div>
+    </Section>
     <DataGridMultiFilterDemo />
     <DataGridFooterDemo />
     <Section title="셀 편집과 값 바인딩" description="텍스트·숫자 편집, 입력 검증과 읽기 전용 행을 비교합니다. 저장한 값은 React 상태에 반영되어 다시 검색·정렬할 수 있습니다.">

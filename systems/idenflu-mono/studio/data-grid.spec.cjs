@@ -291,8 +291,7 @@ async function expectStateFillsViewport(grid) {
 
 async function expandGrid(grid) {
   await grid.evaluate(element=>{
-    Object.assign(element.style,{height:'800px',width:'min(100%, 360px)',display:'flex',flexDirection:'column',minHeight:'0'});
-    Object.assign(element.querySelector('.data-grid-viewport').style,{flex:'1 1 0%',minHeight:'0'});
+    Object.assign(element.style,{height:'800px',width:'min(100%, 360px)'});
   });
 }
 
@@ -320,8 +319,7 @@ test('expanded loading, empty and error states fill the area below the headers w
   expect(await row.evaluate(element=>element.getBoundingClientRect().height)).toBeCloseTo(naturalRowHeight,0);
   await controls.getByRole('button',{name:'로딩',exact:true}).click();
   await grid.evaluate(element=>{
-    element.style.removeProperty('height');element.style.removeProperty('display');element.style.removeProperty('flex-direction');element.style.removeProperty('min-height');
-    const viewport=element.querySelector('.data-grid-viewport');viewport.style.removeProperty('flex');viewport.style.removeProperty('min-height');
+    element.style.removeProperty('height');
   });
   expect(await grid.locator('.data-grid-state').evaluate(element=>element.getBoundingClientRect().height)).toBeCloseTo(naturalStateHeight,0);
 });

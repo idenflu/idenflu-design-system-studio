@@ -282,6 +282,11 @@
 }
 .studio-grid-edit-example { width:100%; max-width:800px; }
 .studio-grid-state-example { width:100%; max-width:560px; }
+.studio-grid-height-examples { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 320px),1fr)); gap:var(--space-4); }
+.studio-grid-height-examples > div { min-width:0; }
+.studio-grid-height-fixed { height:480px; }
+.studio-grid-height-flex-container { height:520px; display:flex; flex-direction:column; min-height:0; }
+.studio-grid-height-flex { flex:1 1 0; }
 .studio-grid-virtual-toolbar { display:flex; align-items:flex-end; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap; }
 .studio-grid-virtual-toolbar > div:first-child { min-width:160px; }
 @media(max-width:600px) {

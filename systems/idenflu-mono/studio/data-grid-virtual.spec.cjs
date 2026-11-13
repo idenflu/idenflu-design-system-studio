@@ -61,9 +61,12 @@ test('10,000 virtual rows stay bounded while middle and final records remain rea
   await expect.poll(async()=>Number((await records(grid).first().getAttribute('data-grid-row-id')).slice(4))).toBeGreaterThan(3000);
   expect(Number((await records(grid).first().getAttribute('data-grid-row-id')).slice(4))).toBeLessThan(7000);
   await expectBounded(grid);
+  const spacer=grid.locator('.data-grid-virtual-spacer td').first();
+  await expect(spacer).toHaveCSS('border-bottom-width','0px');
   await jump(grid,1);
   const last=rowFor(grid,'ROW-10000');
   await expect(last).toHaveCount(1);
+  await expect(last.locator('td').first()).toHaveCSS('border-bottom-width','1px');
   await expect.poll(async()=>{
     const end=await last.boundingBox();
     const viewport=await grid.locator('.data-grid-scroll').boundingBox();
