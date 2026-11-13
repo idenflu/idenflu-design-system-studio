@@ -1,6 +1,6 @@
 import { PopupAlignDemos } from './convenience-api-demos';
 import * as React from 'react';
-import { Grid, Badge, Button, Checkbox, Chip, DropdownMenu, Icon, Popover, Radio, SelectableList, SelectableListItem, Stepper, Switch, TextArea, TextField, Tree } from '@idenflu/mono-react';
+import { Grid, Badge, Button, Checkbox, Chip, DropdownMenu, DropdownMenuItem, Icon, Popover, Radio, SelectableList, SelectableListItem, Stepper, Switch, TextArea, TextField, Tree } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 export { TableDemos } from './table-demos';
 
@@ -112,7 +112,7 @@ export function StepperDemos() {
 
 export function MenuDemos() {
   const [feedback, setFeedback] = React.useState('');
-  return <><Section title="작업 메뉴" description="관련 동작을 아이콘과 함께 메뉴에 묶습니다. 방향키로 이동하고 Enter로 선택하거나 Escape로 닫을 수 있습니다."><div className="react-studio-row"><DropdownMenu trigger="더보기" label="작업 메뉴" items={[{value:'수정',label:'수정',icon:<Icon name="settings" />},{value:'복사',label:'복사',icon:<Icon name="copy" />},{value:'공유',label:'공유',disabled:true,icon:<Icon name="link" />},{value:'삭제',label:'삭제',icon:<Icon name="trash" />}]} onSelect={value => setFeedback(`${value} 동작을 선택했습니다.`)} /></div><p role="status" className="component-helper">{feedback}</p></Section><PopupAlignDemos kind="menu" /></>;
+  return <><Section title="작업 메뉴" description="관련 동작을 아이콘과 함께 메뉴에 묶습니다. 방향키로 이동하고 Enter로 선택하거나 Escape로 닫을 수 있습니다."><div className="react-studio-row"><DropdownMenu trigger={<Button>더보기</Button>} label="작업 메뉴" onSelect={value => setFeedback(`${value} 동작을 선택했습니다.`)}><DropdownMenuItem value="수정" icon={<Icon name="settings" />}>수정</DropdownMenuItem><DropdownMenuItem value="복사" icon={<Icon name="copy" />}>복사</DropdownMenuItem><DropdownMenuItem value="공유" disabled icon={<Icon name="link" />}>공유</DropdownMenuItem><DropdownMenuItem value="삭제" icon={<Icon name="trash" />}>삭제</DropdownMenuItem></DropdownMenu></div><p role="status" className="component-helper">{feedback}</p></Section><PopupAlignDemos kind="menu" /></>;
 }
 
 export function PopoverDemos() {

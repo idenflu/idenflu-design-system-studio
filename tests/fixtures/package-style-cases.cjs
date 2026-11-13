@@ -37,7 +37,7 @@ function createCases() {
     ['stepper', '.stepper', h(C.Stepper,{steps:['기본 정보','검토'],currentStep:0})],
     ['tooltip', '.tooltip-wrap', h(C.Tooltip,{content:'안내'},h(C.Button,null,'안내'))],
     ['popover', '.popover-wrap', h(C.Popover,{trigger:'상세',label:'상세 정보',defaultOpen:true},h('p',null,'프로젝트 정보'))],
-    ['dropdown-menu', '.action-menu', h(C.DropdownMenu,{trigger:'작업',items:options,onSelect:noop})],
+    ['dropdown-menu', '.action-menu', h(C.DropdownMenu,{trigger:h('button',{className:'button button--outline button-inline'},'작업'),onSelect:noop},options.map(item => h(C.DropdownMenuItem,{key:item.value,value:item.value,disabled:item.disabled},item.label)))],
     ['slider', '.range-input', h(C.Slider,{'aria-label':'진행률',defaultValue:50})],
     ['file-upload', '.upload-area', h(C.FileUpload,{label:'첨부 파일'})],
     ['toast', '.toast', h(C.Toast,{onDismiss:noop},'변경사항을 저장했습니다.')],

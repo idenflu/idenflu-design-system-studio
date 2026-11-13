@@ -114,20 +114,18 @@ export function AlignedPopover() {
 }`;
 
 const menuAlignCode = `import { useState } from 'react';
-import { DropdownMenu, Icon } from '@idenflu/mono-react';
+import { Button, DropdownMenu, DropdownMenuItem, Icon } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function AlignedMenu() {
   const [selected, setSelected] = useState('list');
 
   return <div>
-    <DropdownMenu trigger="보기 방식" label="보기 방식 선택" align="end"
-      items={[
-        { value: 'list', label: '목록 보기', icon: <Icon name="list" /> },
-        { value: 'grid', label: '격자 보기', icon: <Icon name="grid" /> },
-        { value: 'calendar', label: '캘린더 보기', icon: <Icon name="calendar" /> },
-      ]}
-      onSelect={setSelected} />
+    <DropdownMenu trigger={<Button variant="outline">보기 방식</Button>} label="보기 방식 선택" align="end" onSelect={setSelected}>
+      <DropdownMenuItem value="list" icon={<Icon name="list" />}>목록 보기</DropdownMenuItem>
+      <DropdownMenuItem value="grid" icon={<Icon name="grid" />}>격자 보기</DropdownMenuItem>
+      <DropdownMenuItem value="calendar" icon={<Icon name="calendar" />}>캘린더 보기</DropdownMenuItem>
+    </DropdownMenu>
     <p role="status">선택한 보기: {selected}</p>
   </div>;
 }`;

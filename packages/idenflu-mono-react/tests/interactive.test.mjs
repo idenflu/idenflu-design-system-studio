@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
-const { DropdownMenu, Popover, Slider, Slides, TextField, Toast, FileUpload, DataState, Select, DatePicker, Dialog } = await import('../dist/index.js');
+const { DropdownMenu, DropdownMenuItem, Popover, Slider, Slides, TextField, Toast, FileUpload, DataState, Select, DatePicker, Dialog } = await import('../dist/index.js');
 const { act, createElement: h } = React;
 const fixture = () => { const node = document.createElement('div'); document.body.append(node); const root = createRoot(node); return { node, render: async element => act(async () => root.render(element)), dispose: async () => { await act(async () => root.unmount()); node.remove(); } }; };
 const click = async element => { assert.ok(element); await act(async () => element.click()); };
@@ -56,7 +56,7 @@ test('package components render on the server without browser-only side effects'
 test('dropdown selection and Escape return focus to its trigger', async () => {
   const f = fixture(), selected = [];
   try {
-    await f.render(h(DropdownMenu, { trigger: '메뉴', label: '작업', items: [{ label: '편집', value: 'edit' }, { label: '삭제', value: 'delete', disabled: true }], onSelect: value => selected.push(value) }));
+    await f.render(h(DropdownMenu, { trigger: h('button', null, '메뉴'), label: '작업', onSelect: value => selected.push(value) }, h(DropdownMenuItem, {value:'edit'}, '편집'), h(DropdownMenuItem, {value:'delete', disabled:true}, '삭제')));
     const trigger = f.node.querySelector('[aria-haspopup=menu]');
     await click(trigger);
     assert.equal(trigger.getAttribute('aria-expanded'), 'true');
@@ -75,7 +75,7 @@ test('dropdown selection and Escape return focus to its trigger', async () => {
 test('dropdown focuses the first enabled item and closes when focus leaves', async () => {
   const f = fixture();
   try {
-    await f.render(h('div', null, h(DropdownMenu, { trigger: '메뉴', label: '작업', items: [{ label: '비활성', value: 'off', disabled: true }, { label: '편집', value: 'edit' }, { label: '복사', value: 'copy' }], onSelect() {} }), h('button', { type: 'button' }, '다음')));
+    await f.render(h('div', null, h(DropdownMenu, { trigger: h('button', null, '메뉴'), label: '작업', onSelect() {} }, h(DropdownMenuItem, {value:'off', disabled:true}, '비활성'), h(DropdownMenuItem, {value:'edit'}, '편집'), h(DropdownMenuItem, {value:'copy'}, '복사')), h('button', { type: 'button' }, '다음')));
     const trigger = f.node.querySelector('[aria-haspopup=menu]');
     await click(trigger);
     const items = f.node.querySelectorAll('[role=menuitem]');
@@ -177,7 +177,7 @@ test('menus, selects and calendars close before the containing popover', async (
   const f = fixture();
   try {
     const children = [
-      h(DropdownMenu, {trigger:'메뉴', items:[{label:'편집',value:'edit'}], onSelect() {}}),
+      h(DropdownMenu, {trigger:h('button', null, '메뉴'), onSelect() {}}, h(DropdownMenuItem, {value:'edit'}, '편집')),
       h(Select, {label:'팀', options:[{label:'디자인',value:'design'}]}),
       h(DatePicker, {label:'날짜', defaultValue:'2026-11-02'}),
     ];
@@ -224,4 +224,27 @@ test('native modal cancellation leaves the dialog open while an inner layer is a
     if (showModal) prototype.showModal = showModal; else delete prototype.showModal;
     if (close) prototype.close = close; else delete prototype.close;
   }
+});
+
+test('dropdown uses the supplied button and preserves its ref and handlers', async () => {
+  const f = fixture(), ref = React.createRef();
+  let clicks = 0, keys = 0;
+  try {
+    await f.render(h(DropdownMenu, {
+      trigger: h('button', { ref, className:'custom-trigger', onClick:() => clicks++, onKeyDown:() => keys++ }, '열기'),
+      onSelect() {},
+    }, h(DropdownMenuItem, { value:'edit' }, '편집')));
+    const trigger = f.node.querySelector('[aria-haspopup=menu]');
+    assert.equal(ref.current, trigger);
+    assert.equal(trigger.className, 'custom-trigger');
+    assert.equal(trigger.querySelector('button'), null);
+    await click(trigger);
+    assert.equal(clicks, 1);
+    assert.equal(trigger.getAttribute('aria-expanded'), 'true');
+    await click(f.node.querySelector('[role=menuitem]'));
+    await act(async () => trigger.dispatchEvent(new KeyboardEvent('keydown', {key:'ArrowDown', bubbles:true, cancelable:true})));
+    assert.equal(keys, 1);
+    assert.equal(document.activeElement, f.node.querySelector('[role=menuitem]'));
+  } finally { await f.dispose(); }
+  assert.equal(ref.current, null);
 });

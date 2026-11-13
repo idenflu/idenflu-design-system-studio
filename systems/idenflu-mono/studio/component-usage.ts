@@ -41,10 +41,10 @@ export function VerticalTabsExample() {
   return <Tabs label="세로 설정 분류" orientation="vertical" items={items} />;
 }`,
   'components/dropdown-menu': `import { useState } from 'react';
-import { DropdownMenu, Icon, type MenuItem } from '@idenflu/mono-react';
+import { Button, DropdownMenu, DropdownMenuItem, Icon } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
-const items: MenuItem[] = [
+const items = [
   { value: 'edit', label: '수정', icon: <Icon name="settings" /> },
   { value: 'copy', label: '복사', icon: <Icon name="copy" /> },
   { value: 'share', label: '공유', disabled: true, icon: <Icon name="link" /> },
@@ -53,8 +53,9 @@ const items: MenuItem[] = [
 export function MenuExample() {
   const [action, setAction] = useState('');
   return <>
-    <DropdownMenu trigger="더보기" label="프로젝트 작업" align="end"
-                  items={items} onSelect={setAction} />
+    <DropdownMenu trigger={<Button variant="outline">더보기</Button>} label="프로젝트 작업" align="end" onSelect={setAction}>
+      {items.map(item => <DropdownMenuItem key={item.value} value={item.value} icon={item.icon} disabled={item.disabled}>{item.label}</DropdownMenuItem>)}
+    </DropdownMenu>
     <p role="status">{action === 'edit' ? '수정을 선택했습니다.' :
                       action === 'copy' ? '복사를 선택했습니다.' : ''}</p>
   </>;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Button, Checkbox, DropdownMenu, Icon, MultiSelect, Popover, SearchSelect, Select, TextField } from '@idenflu/mono-react';
+import { Grid, Button, Checkbox, DropdownMenu, DropdownMenuItem, Icon, MultiSelect, Popover, SearchSelect, Select, TextField } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import { HiddenLabelReference, PopupAlignReference } from './convenience-api-reference';
 
@@ -86,7 +86,7 @@ export function PopupAlignDemos({ kind = 'popover' }: { kind?: 'popover' | 'menu
       <Checkbox label="RTL 방향으로 확인" checked={rtl} onChange={event => setRtl(event.target.checked)} />
       <div className="studio-convenience-align-grid" dir={rtl ? 'rtl' : 'ltr'}>{alignments.map(align => <div key={align} className="studio-convenience-align-example">
         <h3 className="react-studio-example-title"><code>align="{align}"</code></h3>
-        {kind === 'popover' ? <AlignedPopover align={align} /> : <DropdownMenu trigger={align} label={`${align} 보기 방식`} align={align} items={menuItems} onSelect={setView} />}
+        {kind === 'popover' ? <AlignedPopover align={align} /> : <DropdownMenu trigger={<Button variant="outline">{align}</Button>} label={`${align} 보기 방식`} align={align} onSelect={setView}>{menuItems.map(item => <DropdownMenuItem key={item.value} value={item.value} icon={item.icon}>{item.label}</DropdownMenuItem>)}</DropdownMenu>}
       </div>)}</div>
       {kind === 'menu' && <p role="status" className="component-helper">선택한 보기: {view}</p>}
     </Section>

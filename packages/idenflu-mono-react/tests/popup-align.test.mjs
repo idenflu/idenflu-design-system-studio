@@ -8,7 +8,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
-const { Popover, DropdownMenu } = await import('../dist/index.js');
+const { Popover, DropdownMenu, DropdownMenuItem } = await import('../dist/index.js');
 const { act, createElement:h } = React;
 
 let layout;
@@ -43,7 +43,7 @@ function fixture(direction = 'ltr') {
   };
 }
 const menuItems = [{ label:'편집', value:'edit' }, { label:'사용 안 함', value:'disabled', disabled:true }, { label:'복사', value:'copy' }];
-const view = (Component, props = {}) => h(Component, { trigger:'열기', ...(Component === Popover ? { defaultOpen:true } : { items:menuItems, onSelect() {} }), ...props }, Component === Popover ? '내용' : undefined);
+const view = (Component, props = {}) => h(Component, { trigger:Component === Popover ? '열기' : h('button', null, '열기'), ...(Component === Popover ? { defaultOpen:true } : { onSelect() {} }), ...props }, Component === Popover ? '내용' : menuItems.map(item => h(DropdownMenuItem, { key:item.value, value:item.value, disabled:item.disabled }, item.label)));
 const click = element => act(async () => element.click());
 const key = (element, value) => act(async () => element.dispatchEvent(new KeyboardEvent('keydown', { key:value, bubbles:true, cancelable:true })));
 const popup = node => node.querySelector('.popover-content,.action-options');

@@ -2,12 +2,19 @@ import * as React from 'react';
 import { type PopupAlign, usePopupPosition } from '../../shared/popup-position';
 import { useEscapeLayer } from '../../shared/escape-layer';
 
-/** Menu item icons are decorative; label supplies the accessible name. */
-export type MenuItem = { label: string; value: string; disabled?: boolean; icon?: React.ReactNode };
+type TriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>;
+export type DropdownMenuProps = { trigger: React.ReactElement<TriggerProps>; children: React.ReactNode; onSelect: (value: string) => void; label?: string; align?: PopupAlign };
+export type DropdownMenuItemProps = { value: string; children: React.ReactNode; disabled?: boolean; icon?: React.ReactNode };
 
-export type DropdownMenuProps = { trigger: React.ReactNode; items: MenuItem[]; onSelect: (value: string) => void; label?: string; align?: PopupAlign };
+const MenuContext = React.createContext<((value: string) => void) | null>(null);
 
-export function DropdownMenu({ trigger, items, onSelect, label, align = 'start' }: DropdownMenuProps) {
+/** Item icons are decorative; children provide the accessible name. */
+export function DropdownMenuItem({ value, children, disabled, icon }: DropdownMenuItemProps) {
+  const select = React.useContext(MenuContext);
+  return <button type="button" role="menuitem" tabIndex={-1} className="action-option" disabled={disabled} onClick={() => select?.(value)}>{icon && <span className="action-option-icon" aria-hidden="true">{icon}</span>}{children}</button>;
+}
+
+export function DropdownMenu({ trigger, children, onSelect, label, align = 'start' }: DropdownMenuProps) {
   const [open, setOpen] = React.useState(false);
   const wrap = React.useRef<HTMLDivElement>(null);
   const button = React.useRef<HTMLButtonElement>(null);
@@ -16,7 +23,7 @@ export function DropdownMenu({ trigger, items, onSelect, label, align = 'start' 
   const initialFocus = React.useRef<'first' | 'last'>('first');
   useEscapeLayer(open, wrap, () => { setOpen(false); button.current?.focus(); });
   const id = React.useId();
-  const focusItem = (index: number) => { const all = menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'); if (all?.length) all[(index + all.length) % all.length].focus(); };
+  const focusItem = (index: number) => { const all = menu.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)'); if (all?.length) all[(index + all.length) % all.length].focus(); };
   React.useEffect(() => {
     if (!open) return;
     focusItem(initialFocus.current === 'last' ? -1 : 0);
@@ -24,10 +31,25 @@ export function DropdownMenu({ trigger, items, onSelect, label, align = 'start' 
     document.addEventListener('pointerdown', outside);
     return () => { document.removeEventListener('pointerdown', outside); };
   }, [open]);
-  return <div className="action-menu" ref={wrap} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}><button ref={button} type="button" className="button button--outline button-inline" aria-haspopup="menu" aria-expanded={open} aria-controls={id}
-    onClick={() => { initialFocus.current = 'first'; setOpen(!open); }} onKeyDown={(event) => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); initialFocus.current = event.key === 'ArrowDown' ? 'first' : 'last'; if (open) focusItem(initialFocus.current === 'first' ? 0 : -1); else setOpen(true); } }}>{trigger}</button>
+  // React 18 stores ref on the element; React 19 exposes it as a prop.
+  const triggerRef = Number.parseInt(React.version, 10) >= 19 ? trigger.props.ref : (trigger as unknown as { ref?: React.Ref<HTMLButtonElement> }).ref;
+  const refCleanup = React.useRef<(() => void) | void>(undefined);
+  const setTriggerRef = React.useCallback((node: HTMLButtonElement | null) => {
+    (button as React.MutableRefObject<HTMLButtonElement | null>).current = node;
+    if (typeof triggerRef === 'function') {
+      if (node) refCleanup.current = triggerRef(node);
+      else if (refCleanup.current) { refCleanup.current(); refCleanup.current = undefined; }
+      else triggerRef(null);
+    } else if (triggerRef) (triggerRef as React.MutableRefObject<HTMLButtonElement | null>).current = node;
+  }, [triggerRef]);
+  const triggerElement = React.cloneElement(trigger, {
+    ref: setTriggerRef, 'aria-haspopup': 'menu', 'aria-expanded': open, 'aria-controls': id,
+    onClick: event => { trigger.props.onClick?.(event); if (!event.defaultPrevented) { initialFocus.current = 'first'; setOpen(value => !value); } },
+    onKeyDown: event => { trigger.props.onKeyDown?.(event); if (!event.defaultPrevented && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) { event.preventDefault(); initialFocus.current = event.key === 'ArrowDown' ? 'first' : 'last'; if (open) focusItem(initialFocus.current === 'first' ? 0 : -1); else setOpen(true); } },
+  });
+  return <div className="action-menu" ref={wrap} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}>{triggerElement}
     <div ref={menu} id={id} role="menu" aria-label={label} className="action-options" data-align={align} hidden={!open} onKeyDown={(event) => {
-      const all = [...(menu.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') || [])]; const index = all.indexOf(document.activeElement as HTMLButtonElement);
+      const all = [...(menu.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)') || [])]; const index = all.indexOf(document.activeElement as HTMLButtonElement);
       if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) { event.preventDefault(); focusItem(event.key === 'Home' ? 0 : event.key === 'End' ? -1 : index + (event.key === 'ArrowDown' ? 1 : -1)); }
-    }}>{items.map((item) => <button key={item.value} type="button" role="menuitem" tabIndex={-1} className="action-option" disabled={item.disabled} onClick={() => { setOpen(false); onSelect(item.value); button.current?.focus(); }}>{item.icon && <span className="action-option-icon" aria-hidden="true">{item.icon}</span>}{item.label}</button>)}</div></div>;
+    }}><MenuContext.Provider value={value => { setOpen(false); onSelect(value); button.current?.focus(); }}>{children}</MenuContext.Provider></div></div>;
 }

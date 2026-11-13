@@ -227,7 +227,7 @@ export function BookmarkButton() {
 
 ```tsx
 import { useState } from 'react';
-import { DropdownMenu, Popover } from '@idenflu/mono-react';
+import { Button, DropdownMenu, DropdownMenuItem, Popover } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 export function ToolbarPopups() {
@@ -237,15 +237,16 @@ export function ToolbarPopups() {
       <strong>표시 설정</strong>
       <p>목록의 추가 정보를 확인합니다.</p>
     </Popover>
-    <DropdownMenu trigger="보기 방식" label="보기 방식" align="center"
-      items={[
-        { value: 'list', label: '목록 보기' },
-        { value: 'grid', label: '격자 보기' },
-      ]} onSelect={setView} />
+    <DropdownMenu trigger={<Button variant="outline">보기 방식</Button>} label="보기 방식" align="center" onSelect={setView}>
+      <DropdownMenuItem value="list">목록 보기</DropdownMenuItem>
+      <DropdownMenuItem value="grid">격자 보기</DropdownMenuItem>
+    </DropdownMenu>
     <p role="status">선택한 보기: {view}</p>
   </div>;
 }
 ```
+
+`DropdownMenu`의 `trigger`는 버튼 요소입니다. 커스텀 컴포넌트는 전달받은 props와 ref를 실제 버튼에 전달해야 합니다. 항목은 `DropdownMenuItem` children으로 지정하며, 아이콘은 장식용입니다.
 
 ## TimePicker
 
@@ -541,7 +542,7 @@ function ProjectForm() {
 
 외부 `error`는 부모가 관리하므로 값 변경·폼 초기화 시 부모 오류 상태도 함께 갱신합니다. `form.reset()`은 비제어 선택값과 내부 필수 선택 오류를 초기화합니다. 외부 오류 표시는 앱의 제출 검증과 함께 사용하며, 네이티브 `required` 검증은 기존대로 유지됩니다. 위 예제는 `noValidate`로 부모 검증과 포커스 이동을 직접 처리합니다.
 
-`Select`, `SearchSelect`, `MultiSelect`에 `prefixIcon`을 지정하면 선택값 앞에 고정 아이콘을 표시합니다. 옵션에는 `description`과 `icon`을 지정할 수 있고, `DropdownMenu` 항목에도 `icon`을 지정할 수 있습니다. 아이콘은 장식으로 처리하므로 의미는 `label`로 전달합니다.
+`Select`, `SearchSelect`, `MultiSelect`에 `prefixIcon`을 지정하면 선택값 앞에 고정 아이콘을 표시합니다. 옵션에는 `description`과 `icon`을 지정할 수 있고, `DropdownMenu` 항목에도 `icon`을 지정할 수 있습니다. 아이콘은 장식으로 처리하므로 의미는 선택 옵션의 `label` 또는 메뉴 항목의 children으로 전달합니다.
 
 `MultiSelect`의 `maxVisibleLabels`에 양의 정수를 지정하면 기본 표시에서 나머지 선택값을 `외 N개`로 요약합니다. 생략하면 모든 라벨을 표시하며, 접근 가능한 이름에는 항상 전체 선택값을 유지합니다. 태그형(`presentation="inline"`)에는 적용하지 않습니다. DataGrid 복수 필터는 `maxVisibleLabels={1}`을 사용해 높이를 유지합니다.
 

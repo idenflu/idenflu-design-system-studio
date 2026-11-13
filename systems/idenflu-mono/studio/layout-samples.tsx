@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { version as packageVersion } from '@idenflu/mono-react/package.json';
-import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DropdownMenu, Icon, IconButton, Popover, Tabs, TextField, Tree, type TreeNode } from '@idenflu/mono-react';
+import { Avatar, Button, Dialog, DialogHeader, DialogBody, DialogFooter, Drawer, DropdownMenu, DropdownMenuItem, Icon, IconButton, Popover, Tabs, TextField, Tree, type TreeNode } from '@idenflu/mono-react';
 import { StudioSettings, ThemeControl } from './controls';
 import { initialWorkspaceRoles, type WorkspaceRole } from './layout-role-data';
 import { RoleManagementPage } from './layout-role-management';
@@ -71,7 +71,7 @@ function WorkspaceTabsToolbar({workspaceRef,items,onSelect}: {workspaceRef:React
   const move=(direction:number)=>{const list=workspaceRef.current?.querySelector<HTMLElement>('.layout-workspace-tabs > .tab-list');if(list)list.scrollBy({left:direction*Math.max(160,list.clientWidth*.7),behavior:'auto'});};
   return <div ref={toolbar} className="layout-tabs-toolbar" data-overflow={scroll.overflow?'true':undefined}>
     {scroll.overflow&&<div className="layout-tabs-scroll-controls"><IconButton size="sm" className="layout-tabs-scroll-button" label="이전 탭 보기" disabled={!scroll.previous} onClick={()=>move(-1)}><Icon name="keyboard-arrow-left"/></IconButton><IconButton size="sm" className="layout-tabs-scroll-button" label="다음 탭 보기" disabled={!scroll.next} onClick={()=>move(1)}><Icon name="keyboard-arrow-right"/></IconButton></div>}
-    <DropdownMenu align="end" label="열린 탭과 탭 관리" trigger={<><span className="layout-tabs-trigger-icon"><Icon name="keyboard-arrow-down"/></span><span className="layout-tabs-trigger-label" aria-hidden="true">열린 탭</span><span className="sr-only">열린 탭 메뉴</span></>} items={items} onSelect={onSelect}/>
+    <DropdownMenu align="end" label="열린 탭과 탭 관리" trigger={<Button variant="outline"><span className="layout-tabs-trigger-icon"><Icon name="keyboard-arrow-down"/></span><span className="layout-tabs-trigger-label" aria-hidden="true">열린 탭</span><span className="sr-only">열린 탭 메뉴</span></Button>} onSelect={onSelect}>{items.map(item=><DropdownMenuItem key={item.value} value={item.value} disabled={item.disabled}>{item.label}</DropdownMenuItem>)}</DropdownMenu>
   </div>;
 }
 
@@ -260,7 +260,7 @@ export function SidebarLayoutSample() {
             </button>
           </Popover>
         </div>
-        <div className="layout-account-menu"><DropdownMenu align="end" label="사용자 메뉴" trigger={<><Avatar size="sm" shape="circle" variant="neutral" aria-hidden="true">{Array.from(currentMember.name)[0]}</Avatar><span className="layout-account-name">{currentMember.name}</span><span className="sr-only"> 사용자 메뉴</span><Icon name="caret"/></>} items={[{value:'account',label:'내 프로필',icon:<Icon name="person"/>},{value:'settings',label:'워크스페이스 설정',icon:<Icon name="settings"/>},{value:'notifications',label:'알림 설정',icon:<Icon name="bell"/>}]} onSelect={value=>{if(value==='account')setAccountOpen(true);else openPage(value as WorkspacePage);}}/></div>
+        <div className="layout-account-menu"><DropdownMenu align="end" label="사용자 메뉴" trigger={<Button variant="outline"><Avatar size="sm" shape="circle" variant="neutral" aria-hidden="true">{Array.from(currentMember.name)[0]}</Avatar><span className="layout-account-name">{currentMember.name}</span><span className="sr-only"> 사용자 메뉴</span><Icon name="caret"/></Button>} onSelect={value=>{if(value==='account')setAccountOpen(true);else openPage(value as WorkspacePage);}}><DropdownMenuItem value="account" icon={<Icon name="person"/>}>내 프로필</DropdownMenuItem><DropdownMenuItem value="settings" icon={<Icon name="settings"/>}>워크스페이스 설정</DropdownMenuItem><DropdownMenuItem value="notifications" icon={<Icon name="bell"/>}>알림 설정</DropdownMenuItem></DropdownMenu></div>
       </div>
     </header>
     <main ref={workspaceRef} className="layout-workspace-content" id="workspace-content" aria-label="콘텐츠 영역"><WorkspaceTabsToolbar workspaceRef={workspaceRef} items={tabMenuItems} onSelect={value=>{if(value.startsWith('tab:')){activate(value.slice(4));return;}if(value==='all'){setTabs([{key:'home',page:'home'}]);setActive('home');}else setTabs(values=>values.filter(tab=>tab.page==='home'||tab.key===active));}}/>
