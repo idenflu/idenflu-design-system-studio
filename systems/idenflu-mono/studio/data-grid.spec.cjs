@@ -54,6 +54,7 @@ test('density and selection actions share a stable, accessible top toolbar',{tag
   await toolbar.getByRole('button',{name:'선택 해제',exact:true}).press('Enter');
   await expect(toolbar.locator('.data-grid-selection-count')).toHaveCount(0);
   await expect(grid.getByRole('checkbox',{name:'현재 페이지 전체 선택',exact:true})).toBeFocused();
+  expect(await toolbar.evaluate(el=>el.getBoundingClientRect().height)).toBeCloseTo(height,0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
 });
 

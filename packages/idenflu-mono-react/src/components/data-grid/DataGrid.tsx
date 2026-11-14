@@ -445,13 +445,15 @@ export function DataGrid<T>({
 
   const toolbarItems: Record<DataGridToolbarItem, React.ReactNode> = {
     search: searchable && <TextField hideLabel containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="x" /></button> : undefined} />,
-    selection: selectable && selectedSet.size > 0 && <div className="data-grid-selection">
+    selection: selectable && (selectedSet.size > 0 ? <div className="data-grid-selection">
       <div className="data-grid-selection-actions">
         {selectionActions}
         {enabledExportFormats.map(format=><Tooltip key={format} content={`선택한 행 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="ghost" iconOnly aria-label={format==='xlsx'?'선택한 행 Excel 내보내기':'선택한 행 내보내기'} disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,rows.filter(row => selectedSet.has(getRowId(row))),dataGridFileName(exportFileName,format).replace(/\.(csv|xlsx)$/i,`-selected.${format}`))}><Icon name={format==='xlsx'?'excel':'download'} /></Button></Tooltip>)}
         <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="x" /></Button></Tooltip>
       </div>
-    </div>,
+    </div> : <div className="data-grid-selection-space" aria-hidden="true">
+      {Array.from({length:enabledExportFormats.length + 1}, (_, index) => <span key={index} />)}
+    </div>),
     columnFilters: showColumnFilterToggle && anyFilters && <Tooltip content={filtersEnabled ? '컬럼 필터 끄기' : '컬럼 필터 켜기'}>
       <Button variant={filtersEnabled ? 'default' : 'outline'} iconOnly aria-label="컬럼 필터" aria-pressed={filtersEnabled} aria-controls={filterRowVisible ? `${id}-filters` : undefined} disabled={blocked} onClick={() => {
         setColumnFiltersEnabled(!filtersEnabled);

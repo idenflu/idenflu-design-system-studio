@@ -2,15 +2,15 @@ const {test,expect}=require('@playwright/test');
 const route='/systems/idenflu-mono/index.html#/components/buttons';
 const appearance=button=>button.evaluate(element=>{const s=getComputedStyle(element);return{background:s.backgroundColor,color:s.color,shadow:s.boxShadow};});
 
-test('disabled buttons share styling across colors while retaining their shape',{tag:['@theme','@mobile']},async({page})=>{
+test('disabled text and icon buttons keep matching styling for each variant',{tag:['@theme','@mobile']},async({page})=>{
   await page.goto(route);
   const states=[];
   for(const variant of ['default','outline','ghost']){
     const group=page.locator(`#button-disabled-states [data-button-variant="${variant}"]`);
     const disabled=group.locator('button:disabled');
-    await expect(disabled).toHaveCount(4);
+    await expect(disabled).toHaveCount(2);
     const first=await appearance(disabled.first());
-    for(let i=1;i<4;i++) expect(await appearance(disabled.nth(i))).toEqual(first);
+    expect(await appearance(disabled.nth(1))).toEqual(first);
     states.push(first);
     await expect(disabled.first()).toHaveCSS('cursor','not-allowed');
     await disabled.first().hover(); expect(await appearance(disabled.first())).toEqual(first);

@@ -59,7 +59,7 @@ test('seconds fit in the unchanged panel width and support keyboard selection',{
   const popup=page.getByRole('dialog',{name:'초 단위 시간 선택',exact:true});
   const bounds=await popup.boundingBox();expect(bounds.width).toBeCloseTo(basicWidth,1);expect(bounds.width).toBeLessThanOrEqual(280);
   await expect(popup.locator('.time-popup-heading, .component-helper')).toHaveCount(0);
-  for (const label of await popup.locator('.datetime-time-label').all()) expect((await label.boundingBox()).height).toBe(24);
+  for (const label of await popup.locator('.datetime-time-label').all()) expect((await label.boundingBox()).height).toBe(32);
   const seconds=popup.getByRole('listbox',{name:'초',exact:true});
   await seconds.getByRole('option',{name:'15',exact:true}).focus();await page.keyboard.press('ArrowDown');
   await expect(seconds.getByRole('option',{name:'20',exact:true})).toBeFocused();

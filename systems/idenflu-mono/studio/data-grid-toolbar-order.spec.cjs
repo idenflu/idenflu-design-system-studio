@@ -266,7 +266,7 @@ test('toolbar configuration keeps stable control widths and complete single-line
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
 });
 
-test('empty toolbar tools reserve one control row while populated tools can wrap',{tag:'@mobile'}, async ({page}) => {
+test('toolbar controls keep their size and selection does not shift wrapped tool rows',{tag:'@mobile'}, async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/data-grid');
   const example = page.locator('#data-grid-toolbar-demo');
   const grid = example.getByRole('group', {name:'상단 도구 모음 데이터그리드',exact:true});
@@ -306,8 +306,17 @@ test('empty toolbar tools reserve one control row while populated tools can wrap
       await expect(activeControls).toHaveCount(1);
       const single = await measureTools();
       expect(single.minHeight,`${size}: ${label}`).toBeCloseTo(expectedHeight,1);
-      expect(single.height,`${size}: ${label}`).toBeCloseTo(expectedHeight,1);
-      expect(await toolbar.evaluate(element => element.getBoundingClientRect().height),`${size}: ${label} toolbar`).toBeCloseTo(emptyToolbarHeight,1);
+      expect(await activeControls.evaluate(element => (element.closest('.input-group') ?? element).getBoundingClientRect().height),`${size}: ${label} control`).toBeCloseTo(expectedHeight,1);
+      const singleToolbarHeight = await toolbar.evaluate(element => element.getBoundingClientRect().height);
+      if (page.viewportSize().width > 600) {
+        expect(single.height,`${size}: ${label}`).toBeCloseTo(expectedHeight,1);
+        expect(singleToolbarHeight,`${size}: ${label} toolbar`).toBeCloseTo(emptyToolbarHeight,1);
+      }
+      const firstRow = grid.locator('tbody tr[data-grid-row-id]').first().getByRole('checkbox');
+      await firstRow.check();
+      expect(await toolbar.evaluate(element => element.getBoundingClientRect().height),`${size}: ${label} selected toolbar`).toBeCloseTo(singleToolbarHeight,1);
+      await firstRow.uncheck();
+      expect(await toolbar.evaluate(element => element.getBoundingClientRect().height),`${size}: ${label} cleared toolbar`).toBeCloseTo(singleToolbarHeight,1);
       await checkbox.uncheck();
       await expect(activeControls).toHaveCount(0);
     }

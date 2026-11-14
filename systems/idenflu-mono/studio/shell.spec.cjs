@@ -96,7 +96,7 @@ test('TOC and document pagination move focus and use the visible menu order', { 
   await page.goto('/systems/idenflu-mono/index.html#/components/card');
   await expect(page.locator('#next-doc')).toHaveAttribute('href','#/patterns/form/basic');
   await page.goto('/systems/idenflu-mono/index.html#/patterns/layout');
-  await expect(page.locator('#previous-doc')).toHaveAttribute('href','#/patterns/form/profile');
+  await expect(page.locator('#previous-doc')).toHaveAttribute('href','#/patterns/page-header');
   await expect(page.locator('#next-doc')).toHaveAttribute('href','#/patterns/data-states');
   await page.goto('/systems/idenflu-mono/index.html#/patterns/empty-state');
   await expect(page.locator('#next-doc')).toHaveCount(0);

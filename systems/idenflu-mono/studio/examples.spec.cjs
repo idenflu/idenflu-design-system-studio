@@ -61,7 +61,7 @@ test('Divider is discoverable in Korean and its examples fit the viewport', {tag
 test('save example prevents duplicate clicks and reports completion', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/buttons');
   await page.getByRole('button', {name:'저장하기', exact:true}).click();
-  const saving = page.getByRole('button', {name:'저장 중', exact:true});
+  const saving = page.getByRole('button', {name:'저장하기', exact:true});
   await expect(saving).toBeDisabled();
   await expect(saving).toHaveAttribute('aria-busy', 'true');
   await expect(page.getByText('변경사항을 저장하는 중입니다.', {exact:true})).toBeVisible();

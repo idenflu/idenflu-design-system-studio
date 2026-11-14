@@ -17,6 +17,7 @@
 .data-grid-column-options > p { color:var(--text-secondary); font-size:var(--font-size-caption); }
 .data-grid-column-options .choice { margin:0; min-height:32px; }
 .data-grid-selection { display:flex; align-items:center; flex:none; gap:var(--space-2); max-width:100%; padding-inline-end:var(--space-2); border-inline-end:1px solid var(--divider); }
+.data-grid-selection-space { display:none; }
 .data-grid-heading > .data-grid-selection-count { color:var(--text); font-size:var(--font-size-caption); font-weight:var(--font-weight-medium); white-space:nowrap; }
 .data-grid-density-icon { display:block; width:var(--icon-size); height:var(--icon-size); }
 .data-grid-scroll { max-width:100%; overflow:auto; border-block:1px solid var(--border); }
@@ -117,6 +118,9 @@
 .data-grid-tools { width:100%; column-gap:var(--space-1); }
 .data-grid-selection { padding-inline-end:0; border-inline-end:0; }
 .data-grid-selection-actions { column-gap:var(--space-1); }
+/* Reserve only built-in controls; custom selection actions mount when selected. */
+.data-grid-selection-space { display:flex; flex:none; gap:var(--space-1); }
+.data-grid-selection-space > span { flex:none; width:var(--control-height); height:var(--control-height); }
 .data-grid-search { flex:1 1 100%; width:100%; min-width:0; }
 .data-grid-tools .popover-wrap { flex:none; }
 .data-grid-footer { align-items:flex-start; }
