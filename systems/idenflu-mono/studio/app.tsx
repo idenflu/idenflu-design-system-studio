@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import { Button, Icon, Segmented, Tabs, TextField, type IconName } from '@idenflu/mono-react';
+import { Button, Dialog, Icon, Segmented, Tabs, TextField, type IconName } from '@idenflu/mono-react';
 import * as generatedIcons from '@idenflu/mono-react/icons';
 import { Section } from './demo-layout';
 import { ColorDemos } from './color-demos';
@@ -244,14 +244,43 @@ function CodeContent({ code }: { code:string }) {
 function CodeExample({ code, complete = false }: { code:string; complete?:boolean }) {
   return <Section title="React 사용 예시" description={complete ? "현재 화면의 데이터·상태·이벤트와 예제용 배치를 포함한 전체 TSX 코드입니다. 복사 후 내보낸 컴포넌트를 렌더링하세요." : "패키지에서 컴포넌트를 가져와 사용합니다."}><CodeContent code={code} /></Section>;
 }
+const iconCategories = [
+  { label: '탐색·화살표', pattern: /^(arrow|keyboard|chevrons|home|menu|external-link|panel|search|zoom)/ },
+  { label: '파일·편집', pattern: /^(file|folder|clipboard|copy|edit|pen|save|trash|archive|attachment|upload|download|printer|undo|redo|crop|text|line-height)/ },
+  { label: '사용자·보안', pattern: /^(user|shield|lock|unlock|key$|login|logout|hierarchy)/ },
+  { label: '데이터·화면', pattern: /^(chart|table|list|grid|columns|dashboard|database|sort|filter|sliders|settings|tree|maximize|minimize)/ },
+  { label: '소통·미디어', pattern: /^(bell|chat|message|mail|inbox|send|image|camera|play|pause|heart|star|bookmark|share|link|plug|wifi|scan)/ },
+];
 function FoundationIcons() {
   const [query, setQuery] = React.useState('');
+  const [category, setCategory] = React.useState('전체');
+  const [size, setSize] = React.useState('24');
+  const [selected, setSelected] = React.useState<string | null>(null);
   const term = query.trim().toLowerCase();
-  const visible = componentIcons.filter(item => item.name.includes(term) || item.component.toLowerCase().includes(term));
-  return <><TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: bookmark, search" /><p className="component-helper" role="status">{visible.length}개 아이콘</p><ul className="react-studio-icons">{visible.map(({name, component}) => <li key={name}><Icon name={name as IconName} /><span>{name}</span><small>{component}</small></li>)}</ul></>;
+  const categoryOf = (name: string) => iconCategories.find(item => item.pattern.test(name))?.label ?? '상태·기타';
+  const visible = componentIcons.filter(item => (category === '전체' || categoryOf(item.name) === category) &&
+    `${item.name} ${item.component} ${categoryOf(item.name)}`.toLowerCase().includes(term));
+  const chosen = componentIcons.find(item => item.name === selected);
+  return <div className="studio-icon-browser">
+    <div className="studio-icon-toolbar">
+      <TextField type="search" label="아이콘 검색" value={query} onChange={event => setQuery(event.target.value)} placeholder="이름, 컴포넌트 또는 분류 검색" />
+      <Segmented label="목록 아이콘 크기" value={size} onValueChange={setSize} options={[14, 16, 20, 24, 32].map(value => ({value: String(value), label: `${value}px`}))} />
+    </div>
+    <div className="studio-icon-filters" role="group" aria-label="아이콘 분류">{['전체', ...iconCategories.map(item => item.label), '상태·기타'].map(label => <Button key={label} size="sm" variant="outline" aria-pressed={category === label} onClick={() => setCategory(label)}>{label}</Button>)}</div>
+    <p className="component-helper" role="status">전체 {componentIcons.length}개 중 {visible.length}개 · 아이콘을 선택하면 사용 코드를 확인할 수 있습니다.</p>
+    <Dialog open={!!chosen} onOpenChange={open => { if (!open) setSelected(null); }} closeOnBackdrop aria-label="아이콘 사용 코드" className="studio-icon-dialog">{chosen && <div className="studio-icon-detail">
+      <div className="react-studio-row"><Icon name={chosen.name as IconName} /><strong>{chosen.name}</strong><Button size="sm" variant="outline" onClick={() => setSelected(null)}>선택 닫기</Button></div>
+      <CodeContent key={chosen.name} code={`import { Icon } from '@idenflu/mono-react';\nimport { ${chosen.component} } from '@idenflu/mono-react/icons';\n\n<${chosen.component} size={${size}} />\n// name으로 사용\n<Icon name="${chosen.name}" />`} />
+    </div>}</Dialog>
+    {visible.length ? <ul className="react-studio-icons" style={{'--catalog-icon-size': `${size}px`} as React.CSSProperties}>{visible.map(({name, component}) => <li key={name}>
+      <button type="button" className="studio-icon-card" aria-label={`${name} 사용 코드`} aria-pressed={selected === name} onClick={() => setSelected(name)}>
+        <Icon name={name as IconName} /><span>{name}</span><small>{component}</small>
+      </button>
+    </li>)}</ul> : <div className="studio-icon-empty"><strong>검색 결과가 없습니다.</strong><p>다른 이름이나 분류로 검색해 보세요.</p><Button variant="outline" onClick={() => {setQuery(''); setCategory('전체');}}>검색 초기화</Button></div>}
+  </div>;
 }
 function IconsPage() {
-  return <><IconDemos /><Section title="아이콘 목록" description="이름 또는 컴포넌트 이름으로 아이콘을 찾아보세요."><FoundationIcons /></Section>
+  return <><Section title="아이콘 목록" description="이름 또는 컴포넌트 이름으로 아이콘을 찾아보세요."><FoundationIcons /></Section><IconDemos />
     <Section title="React 사용 예시" description="name 기반 Icon과 개별 아이콘 컴포넌트를 사용할 수 있습니다.">
       <h3>Icon</h3><CodeContent code={snippets['foundations/icons']} />
       <h3>개별 아이콘 컴포넌트</h3><CodeContent code={componentIconExample} />

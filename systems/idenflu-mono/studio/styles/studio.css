@@ -778,24 +778,23 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.react-studio-icons {
-  list-style: none;
-  padding: 0;
-}
-.react-studio-icons > li {
-  display: flex;
-  align-items: center;
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--divider);
-  overflow-wrap: anywhere;
-}
-.react-studio-icons .ui-icon {
-  --icon-size: 24px;
-  flex: none;
-}
-.react-studio-icons svg {
-  flex: none;
-}
+.studio-icon-browser { display: grid; gap: var(--space-4); }
+.studio-icon-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: var(--space-4); }
+.studio-icon-toolbar > :first-child { flex: 1 1 280px; min-width: 0; }
+.studio-icon-filters { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.studio-icon-filters button.button { color: var(--text-secondary); border-color: var(--border); }
+.studio-icon-filters [aria-pressed="true"] { border-color: var(--primary); color: var(--primary); }
+.react-studio-icons { list-style: none; padding: 0; margin: 0; grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: var(--space-2); }
+.react-studio-icons > li { display: block; min-width: 0; }
+.studio-icon-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2); width: 100%; min-height: 144px; padding: var(--space-3); border: 1px solid var(--divider); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.studio-icon-card:hover, .studio-icon-card[aria-pressed="true"] { border-color: var(--primary); }
+.studio-icon-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.react-studio-icons .ui-icon { --icon-size: var(--catalog-icon-size, 24px); flex: none; margin-bottom: var(--space-2); }
+.studio-icon-card > span, .studio-icon-card > small { max-width: 100%; overflow-wrap: anywhere; text-align: center; }
+.studio-icon-card > small { color: var(--text-secondary); font-size: 11px; }
+.studio-icon-detail, .studio-icon-empty { padding: var(--space-4); border: 1px solid var(--border); background: var(--surface); }
+.studio-icon-detail { display: grid; gap: var(--space-3); }
+.studio-icon-empty { text-align: center; }
 .react-studio-icon-pairs {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
@@ -1314,3 +1313,7 @@
     gap: var(--space-2);
   }
 }
+
+.studio-icon-dialog { width: min(560px, calc(100% - 32px)); padding: var(--space-4); }
+.studio-icon-dialog .studio-icon-detail { padding: 0; border: 0; background: transparent; }
+.studio-icon-dialog .react-studio-code { max-width: 100%; overflow: auto; }
