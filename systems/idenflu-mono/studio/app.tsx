@@ -248,7 +248,7 @@ const iconCategories = [
   { label: '탐색·화살표', pattern: /^(arrow|keyboard|chevrons|home|menu|external-link|panel|search|zoom)/ },
   { label: '파일·편집', pattern: /^(file|folder|clipboard|copy|edit|pen|save|trash|archive|attachment|upload|download|printer|undo|redo|crop|text|line-height)/ },
   { label: '사용자·보안', pattern: /^(user|shield|lock|unlock|key$|login|logout|hierarchy)/ },
-  { label: '데이터·화면', pattern: /^(chart|table|list|grid|columns|dashboard|database|sort|filter|sliders|settings|tree|maximize|minimize)/ },
+  { label: '데이터·화면', pattern: /^(chart|table|list|grid|columns|rows|dashboard|database|sort|filter|sliders|settings|tree|maximize|minimize)/ },
   { label: '소통·미디어', pattern: /^(bell|chat|message|mail|inbox|send|image|camera|play|pause|heart|star|bookmark|share|link|plug|wifi|scan)/ },
 ];
 function FoundationIcons() {

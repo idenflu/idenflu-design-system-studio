@@ -462,10 +462,10 @@ export function DataGrid<T>({
     </Tooltip>,
     density: showDensityToggle && (controlledDensity === undefined || !!onDensityChange) && <Tooltip content={density === 'compact' ? '기본 행 간격으로 전환' : '촘촘한 행 간격으로 전환'}>
       <Button variant={density === 'compact' ? 'default' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
-        <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
+        <Icon name={density === 'compact' ? 'rows-compact' : 'rows-comfortable'} />
       </Button>
     </Tooltip>,
-    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열"><Icon name="grid" /></IconButton>} label={`${label} 표시 열`}>
+    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열"><Icon name="columns" /></IconButton>} label={`${label} 표시 열`}>
       <div className="data-grid-column-options" data-size="md"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
         const checked = visibleColumns.some(item => item.id === column.id);
         return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;

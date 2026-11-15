@@ -19,7 +19,6 @@
 .data-grid-selection { display:flex; align-items:center; flex:none; gap:var(--space-2); max-width:100%; padding-inline-end:var(--space-2); border-inline-end:1px solid var(--divider); }
 .data-grid-selection-space { display:none; }
 .data-grid-heading > .data-grid-selection-count { color:var(--text); font-size:var(--font-size-caption); font-weight:var(--font-weight-medium); white-space:nowrap; }
-.data-grid-density-icon { display:block; width:var(--icon-size); height:var(--icon-size); }
 .data-grid-scroll { max-width:100%; overflow:auto; border-block:1px solid var(--border); }
 .data-grid-viewport { display:grid; flex:1 1 auto; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:minmax(0,1fr) auto; min-width:0; min-height:0; }
 .data-grid-viewport > .data-grid-scroll { grid-area:1 / 1; min-width:0; min-height:0; }

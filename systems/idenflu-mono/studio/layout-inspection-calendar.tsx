@@ -131,7 +131,7 @@ export function InspectionCalendarPage({active=true,conveyors,inspections,reques
       <div className="inspection-filters">
         <Select label="대상 설비 필터" hideLabel value={conveyorFilter} onValueChange={setConveyorFilter} options={[{value:'all',label:'전체 설비'},...conveyors.map(item=>({value:item.id,label:`${item.code} · ${item.name}`}))]} popupStrategy="fixed"/>
         <Select label="진행 상태 필터" hideLabel value={statusFilter} onValueChange={setStatusFilter} options={[{value:'all',label:'전체 상태'},...Object.entries(inspectionStatusLabels).map(([value,label])=>({value,label}))]} popupStrategy="fixed"/>
-        {hasFilters&&<Button variant="ghost" onClick={()=>{setConveyorFilter('all');setStatusFilter('all');}}><Icon name="rotate"/>필터 초기화</Button>}
+        {hasFilters&&<Button variant="ghost" onClick={()=>{setConveyorFilter('all');setStatusFilter('all');}}><Icon name="filter-clear"/>필터 초기화</Button>}
         <p role="status">{view==='month'?'이번 달':'이번 주'} <strong>{countItems.length}</strong>건<span aria-hidden="true"> · </span>완료 <strong>{countItems.filter(item=>item.status==='completed').length}</strong>건</p>
       </div>
       <div className="inspection-layout" data-view={view}>

@@ -26,7 +26,7 @@ export const pageInfo:Record<WorkspacePage,{title:string; group:string; parent:W
   'master-detail':{title:'마스터-디테일',group:'프로젝트 관리',parent:'project-menu',icon:'grid',description:'프로젝트 목록과 선택한 항목의 상세 정보를 함께 확인하세요.'},
   members:{title:'멤버 관리',group:'조직 관리',parent:'team-menu',icon:'user',description:'함께 일하는 팀원을 찾고 역할을 관리하세요.'},
   'role-management':{title:'역할 관리',group:'조직 관리',parent:'team-menu',icon:'shield-check',description:'역할별 사용 권한과 수신할 알림을 설정하세요.'},
-  conveyors:{title:'컨베이어',group:'설비 관리',parent:'equipment-menu',icon:'archive',description:'설비 상태와 하위 유닛 구성을 카드로 확인하고 관리하세요.'},
+  conveyors:{title:'컨베이어',group:'설비 관리',parent:'equipment-menu',icon:'conveyor',description:'설비 상태와 하위 유닛 구성을 카드로 확인하고 관리하세요.'},
   'conveyor-registration':{title:'컨베이어 등록',group:'설비 관리',parent:'equipment-menu',icon:'plus',description:'기본 정보와 하위 유닛을 입력하고 검토한 뒤 설비를 등록하세요.'},
   inspections:{title:'점검 일정',group:'설비 관리',parent:'equipment-menu',icon:'calendar',description:'월·주 캘린더에서 설비 점검을 예약하고 결과를 확인하세요.'},
   settings:{title:'워크스페이스 설정',group:'환경 설정',parent:'settings-menu',icon:'settings',description:'워크스페이스의 기본 정보와 표시 기준을 설정하세요.'},
