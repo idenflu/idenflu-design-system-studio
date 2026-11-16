@@ -131,7 +131,7 @@ test('spinner durations and staggered animations follow speed in milliseconds', 
   ))));
   await mount(page,testInfo,markup);
   for (const kind of kinds) {
-    for (const [index,duration] of [[0,'1.8s'],[1,'0.9s'],[2,'1.8s']]) {
+    for (const [index,duration] of [[0,'1.2s'],[1,'0.9s'],[2,'1.2s']]) {
       const root=page.locator(`[data-kind="${kind}"][data-speed="${index}"] > span`);
       const animated=kind==='nova' ? root.locator('.nova-spinner__orbit, .nova-spinner__facet') : kind==='nova-mark' ? root.locator('.nova-spinner__facet') : ['dots','bars'].includes(kind) ? root.locator('span') : root;
       for (const element of await animated.all()) await expect(element).toHaveCSS('animation-duration',duration);

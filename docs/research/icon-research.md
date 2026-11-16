@@ -1,5 +1,12 @@
 # 아이콘 확장 근거
 
+현재는 `icons.svg`를 단일 원본으로 하는 **Outline 145종**을 제공합니다.
+Filled와 기존 별칭은 제공하지 않습니다. 현재 사용법과 이름 정책은
+[아이콘 참조](../reference/icons.md), 형태 기준은
+[아이콘 디자인 원칙](../reference/icon-design-principles.md)을 따릅니다.
+아래 2026-11-02·04 조사 내용은 당시의 선정 근거를 보존한 기록이며,
+Filled·별칭·선 끝 처리에 대한 설명도 당시 정책입니다.
+
 조사일: 2026-11-02. MUI·Material Symbols·Ant Design·Heroicons·Lucide의 공식 문서와 카탈로그를 비교했다. 아래 선정은 여러 라이브러리에 반복해서 등장하는 개념과 이 스튜디오의 탐색·폼·데이터·커머스 용도를 기준으로 한다. 다운로드 수나 실제 제품 사용 빈도의 순위를 측정한 결과는 아니다.
 
 ## 공식 자료에서 확인한 내용
@@ -29,7 +36,7 @@ Ant Design과 Heroicons의 웹 카탈로그는 조사 시 HTTP 403을 반환해 
 
 신규 Filled는 `home`, `folder`, `bell`, `chat`, `heart`, `star`, `bookmark`, `image`, `users`, `shield-check`, `dashboard`, `cart`, `credit-card`, `receipt`, `tag`, `briefcase`, `camera`, `location`, `send`, `help-circle`의 20종이다. 파일과 React 이름에는 `-fill`을 붙인다.
 
-2026-11-02 확장 당시에는 기존 47종에 Outline 32종·Filled 20종을 더한 **99종**이었다. 이후 애플리케이션 1종, 업무 24종, 상태 6종, 권한·역할 10종을 더해 현재는 **140종(Outline 106종·Filled 34종)**이다. 모두 공개 React `Icon`과 공통 CSS 마스크로 사용할 수 있다. 기존 `plus`·`email` 같은 별칭은 유지한다.
+2026-11-02 확장 당시에는 기존 47종에 Outline 32종·Filled 20종을 더한 **99종**이었다. 이후 애플리케이션 1종, 업무 24종, 상태 6종, 권한·역할 10종을 더한 시점에는 **140종(Outline 106종·Filled 34종)**이었다. 당시에는 공개 React `Icon`과 공통 CSS 마스크로 사용할 수 있었고, 기존 `plus`·`email` 같은 별칭도 유지했다.
 
 ## 업무·데이터 확장 · 2026-11-04
 
@@ -78,9 +85,23 @@ user-settings, 접근 허용은 기존 shield-check, 거부는 shield-off로 표
 선 두께·끝·연결을 조정하고 인물·프레임·점의 크기는 기존 시스템에 맞췄다.
 나머지는 기존 도형의 조합·반전이며 출처와 변경 내역은 자산의 [SOURCE.md](../../packages/idenflu-mono-react/assets/icons/idenflu/SOURCE.md)에 기록한다.
 
-## 사용 기준
+## 당시 사용 기준
 
 - 일반 동작·보조 정보는 Outline을 기본으로 고려한다. 선택·즐겨찾기·저장 상태나 강조가 필요한 곳은 대응 Filled를 사용할 수 있다. 이는 이 스튜디오의 적용 기준이다.
 - 화살표·편집·정렬처럼 채워도 상태 구분의 이점이 적은 개념은 Outline으로 유지한다. 모든 아이콘의 Filled를 기계적으로 만들지 않는다.
 - 상태는 아이콘 형태 외에 `aria-pressed`·선택 속성·텍스트로도 전달한다. 아이콘만 있는 버튼의 이름은 버튼에 지정한다. [Lucide 접근성 안내](https://lucide.dev/how-to/accessibility)와 [MUI 접근성 안내](https://mui.com/material-ui/icons/#accessibility)를 참고했다.
 - 신규 도형은 기존의 24×24·1.5px·butt·miter 규칙에 맞춰 이 스튜디오용으로 작성했다. 외부 라이브러리를 런타임 의존성으로 추가하거나 원본 47종을 교체하지 않는다. 출처 구분은 [SOURCE.md](../../packages/idenflu-mono-react/assets/icons/idenflu/SOURCE.md)에 기록한다.
+
+## 행 간격·설비 확장 · 2026-11-15
+
+외부 카탈로그의 사용 빈도가 아닌 현재 컴포넌트와 화면의 용도를 기준으로 선정했다.
+
+| 추가 이름 | 선정 근거 |
+| --- | --- |
+| `rows-compact`, `rows-comfortable` | 데이터그리드에서 직접 그리던 두 행 간격 SVG를 공통 자산으로 옮긴다. |
+| `conveyor` | 컨베이어 메뉴에서 사용하던 보관함 `archive`를 설비 모티프로 구분한다. |
+| `wrench` | 설비 점검·정비를 일반 설정과 구분한다. |
+
+4종 모두 24×24·1.5px·square·miter 규칙을 따른다. 컨베이어의 곡선은
+순환 벨트와 롤러를 식별하는 요소이며, 지지대 접합부에만 butt를 적용한다.
+기존 `columns`와 `filter-clear`도 표시 열·필터 초기화 동작에 재사용한다.

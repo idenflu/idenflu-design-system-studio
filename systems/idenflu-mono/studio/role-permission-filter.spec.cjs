@@ -29,7 +29,9 @@ test('permission search matches names, descriptions and groups without changing 
   await openRoles(page,isMobile);
   const rows=detail(page).locator('.layout-role-option');
   const groups=detail(page).locator('.layout-role-permission-group');
-  await expect(detail(page).locator('.layout-role-header-actions').getByRole('button',{name:'역할 삭제',exact:true})).toHaveClass(/button--danger.*button--appearance-outline/);
+  const remove=detail(page).locator('.layout-role-header-actions').getByRole('button',{name:'역할 삭제',exact:true});
+  await expect(remove).toHaveClass(/button--outline/);
+  await expect(remove).toHaveClass(/button-color--danger/);
   await expect(rows).toHaveCount(9);
   await expect(results(page)).toHaveText('전체 9개');
   await search(page).fill('  초대  ');

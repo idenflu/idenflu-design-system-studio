@@ -445,13 +445,15 @@ export function DataGrid<T>({
 
   const toolbarItems: Record<DataGridToolbarItem, React.ReactNode> = {
     search: searchable && <TextField hideLabel containerClassName="data-grid-search" label={searchLabel} type="search" placeholder="검색어를 입력하세요" value={query} onChange={event => changeQuery(event.target.value)} prefix={<Icon name="search" />} prefixDecorative action={query ? <button className="input-action" type="button" aria-label="검색 초기화" onClick={() => changeQuery('')}><Icon name="x" /></button> : undefined} />,
-    selection: selectable && selectedSet.size > 0 && <div className="data-grid-selection">
+    selection: selectable && (selectedSet.size > 0 ? <div className="data-grid-selection">
       <div className="data-grid-selection-actions">
         {selectionActions}
         {enabledExportFormats.map(format=><Tooltip key={format} content={`선택한 행 ${format==='xlsx'?'Excel (.xlsx)':'CSV'} 내보내기`}><Button variant="ghost" iconOnly aria-label={format==='xlsx'?'선택한 행 Excel 내보내기':'선택한 행 내보내기'} disabled={blocked || exporting} aria-busy={exporting || undefined} onClick={() => exportFile(format,rows.filter(row => selectedSet.has(getRowId(row))),dataGridFileName(exportFileName,format).replace(/\.(csv|xlsx)$/i,`-selected.${format}`))}><Icon name={format==='xlsx'?'excel':'download'} /></Button></Tooltip>)}
         <Tooltip content="선택 해제"><Button variant="ghost" iconOnly aria-label="선택 해제" onClick={clearSelection}><Icon name="x" /></Button></Tooltip>
       </div>
-    </div>,
+    </div> : <div className="data-grid-selection-space" aria-hidden="true">
+      {Array.from({length:enabledExportFormats.length + 1}, (_, index) => <span key={index} />)}
+    </div>),
     columnFilters: showColumnFilterToggle && anyFilters && <Tooltip content={filtersEnabled ? '컬럼 필터 끄기' : '컬럼 필터 켜기'}>
       <Button variant={filtersEnabled ? 'default' : 'outline'} iconOnly aria-label="컬럼 필터" aria-pressed={filtersEnabled} aria-controls={filterRowVisible ? `${id}-filters` : undefined} disabled={blocked} onClick={() => {
         setColumnFiltersEnabled(!filtersEnabled);
@@ -460,10 +462,10 @@ export function DataGrid<T>({
     </Tooltip>,
     density: showDensityToggle && (controlledDensity === undefined || !!onDensityChange) && <Tooltip content={density === 'compact' ? '기본 행 간격으로 전환' : '촘촘한 행 간격으로 전환'}>
       <Button variant={density === 'compact' ? 'default' : 'outline'} iconOnly aria-label="촘촘한 행 간격" aria-pressed={density === 'compact'} disabled={blocked} onClick={() => setDensity(density === 'compact' ? 'default' : 'compact')}>
-        <svg className="data-grid-density-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" focusable="false"><path d={density === 'compact' ? 'M4 8h16M4 12h16M4 16h16' : 'M4 4h16M4 12h16M4 20h16'} /></svg>
+        <Icon name={density === 'compact' ? 'rows-compact' : 'rows-comfortable'} />
       </Button>
     </Tooltip>,
-    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열"><Icon name="grid" /></IconButton>} label={`${label} 표시 열`}>
+    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열"><Icon name="columns" /></IconButton>} label={`${label} 표시 열`}>
       <div className="data-grid-column-options" data-size="md"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
         const checked = visibleColumns.some(item => item.id === column.id);
         return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;

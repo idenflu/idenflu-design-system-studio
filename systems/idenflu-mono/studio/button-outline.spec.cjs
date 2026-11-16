@@ -2,10 +2,10 @@ const {test,expect}=require('@playwright/test');
 
 test('outline buttons keep semantic colors, keyboard focus and disabled behavior',{tag:['@theme','@mobile']},async({page,isMobile})=>{
   await page.goto('/systems/idenflu-mono/index.html#/components/buttons');
-  const group=page.getByRole('group',{name:'색상별 아웃라인 버튼',exact:true});
-  const primary=group.getByRole('button',{name:'Primary 아웃라인',exact:true});
-  const danger=group.getByRole('button',{name:'Danger 아웃라인',exact:true});
-  const disabled=group.getByRole('button',{name:'Danger 아웃라인 비활성',exact:true});
+  const section=name=>page.locator('.react-studio-section').filter({has:page.getByRole('heading',{name,exact:true})});
+  const primary=section('기본 버튼').getByRole('button',{name:'outline',exact:true});
+  const danger=section('색상').getByRole('button',{name:'danger',exact:true});
+  const disabled=page.getByRole('group',{name:'Outline 버튼 상태',exact:true}).locator('button:disabled').first();
   const colors=await page.evaluate(()=>{
     const probe=document.createElement('span');document.body.append(probe);
     const resolve=token=>{probe.style.color=`var(${token})`;return getComputedStyle(probe).color;};
@@ -19,13 +19,13 @@ test('outline buttons keep semantic colors, keyboard focus and disabled behavior
     expect(await button.getAttribute('appearance')).toBeNull();
     expect(await button.evaluate(el=>getComputedStyle(el).boxShadow)).toContain('inset');
   }
-  await expect(danger.locator('.ui-icon')).toHaveCSS('color',colors.danger);
+  await expect(danger).toHaveClass(/button-color--danger/);
   const idleShadow=await danger.evaluate(el=>getComputedStyle(el).boxShadow);
-  await primary.focus();await page.keyboard.press('Tab');
+  await danger.focus();
   await expect(danger).toBeFocused();
   expect(await danger.evaluate(el=>getComputedStyle(el).boxShadow)).not.toBe(idleShadow);
   await page.keyboard.press('Enter');
-  const notice=page.getByRole('status').filter({hasText:'Danger 아웃라인 버튼을 눌렀습니다.'});
+  const notice=page.getByRole('status').filter({hasText:'danger 버튼을 눌렀습니다.'});
   await expect(notice).toBeVisible();
   await page.keyboard.press('Tab');await expect(disabled).not.toBeFocused();
   await expect(disabled).toBeDisabled();

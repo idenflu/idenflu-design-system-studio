@@ -14,7 +14,9 @@ test('status semantics stay consistent across badge, toast and data grid example
     }
   }
   const work=page.getByRole('group',{name:'업무 상태별 배지',exact:true});
-  await expect(work.locator('.icon-pause-circle')).toBeVisible();await expect(work.locator('.icon-minus-circle')).toBeVisible();await expect(work.locator('.icon-ban')).toBeVisible();
+  await expect(work.locator('.icon-pause-circle')).toBeVisible();await expect(work.locator('.icon-minus-circle')).toBeVisible();
+  await expect(work.locator('.icon-ban')).toHaveCount(2);
+  for (const icon of await work.locator('.icon-ban').all()) await expect(icon).toBeVisible();
   await page.goto(base+'components/overlays');
   await page.getByRole('button',{name:'오류 알림 표시',exact:true}).click();
   await expect(page.locator('.toast[role="alert"] .icon-x-circle')).toBeVisible();

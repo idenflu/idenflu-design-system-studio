@@ -84,10 +84,10 @@ test('previous defaults migrate to 36px while an explicit new 38px preference su
   expect((await metrics(page)).inputHeight).toBe(38);
 });
 
-test('size tokens render matching button, input and select heights at 30, 36 and 42px', async ({page}) => {
+test('size tokens render matching button, input and select heights at 32, 36 and 40px', async ({page}) => {
   await openApp(page,'foundations/sizes');
   const sizes = await page.locator('.route-sizes .react-studio-size-grid > section').evaluateAll(cards => cards.map(card => ['.button','.text-input','.select-trigger'].map(selector => card.querySelector(selector).getBoundingClientRect().height)));
-  expect(sizes).toEqual([[30,30,30],[36,36,36],[42,42,42]]);
+  expect(sizes).toEqual([[32,32,32],[36,36,36],[40,40,40]]);
 });
 
 test('live adjustments change rendered controls, persist on reload and copy current CSS', async ({ page }) => {

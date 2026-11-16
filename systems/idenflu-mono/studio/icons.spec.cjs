@@ -13,7 +13,7 @@ test('workflow icons retain readable size previews and stay within narrow pages'
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
   const search=page.getByRole('searchbox',{name:'아이콘 검색',exact:true});
-  await search.fill('pin');await expect(page.locator('.react-studio-icons li > span:nth-child(2)')).toHaveText(['pin','pin-off']);
+  await search.fill('pin');await expect(page.locator('.react-studio-icons button > span:nth-child(2)')).toHaveText(['pin','pin-off']);
   await search.fill('sun');await expect(page.locator('.react-studio-icons .icon-sun')).toHaveCount(1);
 });
 

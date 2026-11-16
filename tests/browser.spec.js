@@ -111,7 +111,7 @@ for (const prefix of ['', '/dist']) {
     await search.fill('BookmarkIcon');
     await expect(page.locator('.react-studio-icons li')).toHaveCount(1);
     await expect(page.locator('.react-studio-icons li')).toContainText('bookmark');
-    await expect(page.getByText('<Icon name="save" />', {exact:false})).toBeVisible();
+    await expect(page.getByText('<Icon name="save" />', {exact:true})).toBeVisible();
     await expect(page.getByText('<SaveIcon />', {exact:false}).first()).toBeVisible();
     expect(failures).toEqual([]);
   });

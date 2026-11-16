@@ -47,7 +47,7 @@ export function Tooltip({ content, children, position: placement = 'top', enterD
   }, [dismissed]);
   const existing = children.props['aria-describedby'];
   return <span ref={wrap} data-position={placement} className={`tooltip-wrap${open && !dismissed ? ' tooltip-open' : ''}`}
-    onMouseEnter={() => { hovered.current = true; position(); setDismissed(false); if (!wrap.current?.contains(document.activeElement)) schedule(true, enterDelay); }}
+    onMouseEnter={() => { hovered.current = true; position(); setDismissed(false); schedule(true, enterDelay); }}
     onMouseLeave={() => { hovered.current = false; if (!wrap.current?.contains(document.activeElement)) schedule(false, leaveDelay); }}
     onFocus={event => { position(); if (!event.currentTarget.contains(event.relatedTarget)) { setDismissed(false); schedule(true, 0); } }}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget) && !hovered.current) schedule(false, leaveDelay); }}

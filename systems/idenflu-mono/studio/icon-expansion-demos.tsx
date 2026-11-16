@@ -11,6 +11,12 @@ const groups:readonly {label:string;description:string;names:readonly IconName[]
   {label:'설정·화면',description:'상세 설정, 화면 확대·복원과 테마 전환',names:['sliders','maximize','minimize','sun','moon']},
 ];
 const previewSizes=[14,16,18,20] as const;
+const equipmentIcons:readonly {name:IconName;label:string}[]=[
+  {name:'rows-compact',label:'촘촘한 행 간격'},
+  {name:'rows-comfortable',label:'기본 행 간격'},
+  {name:'conveyor',label:'컨베이어 설비'},
+  {name:'wrench',label:'점검·정비'},
+];
 
 export function IconExpansionDemos() {
   const [size,setSize]=React.useState('18');
@@ -18,6 +24,10 @@ export function IconExpansionDemos() {
   const [pinned,setPinned]=React.useState(false);
   const [message,setMessage]=React.useState('');
   return <>
+    <Section id="icon-equipment-additions" title="행 간격·설비 아이콘 4종" description="데이터그리드의 행 간격과 컨베이어·점검 작업을 구분합니다.">
+      <Segmented label="행 간격·설비 아이콘 미리보기 크기" value={size} onValueChange={setSize} options={previewSizes.map(value=>({value:String(value),label:`${value}px`}))} />
+      <ul className="studio-icon-expansion-list" style={{'--preview-icon-size':`${size}px`} as React.CSSProperties}>{equipmentIcons.map(item=><li key={item.name}><Icon name={item.name} /><code>{item.name}</code><span className="react-studio-caption">{item.label}</span></li>)}</ul>
+    </Section>
     <Section id="icon-workflow-additions" title="업무·데이터 아이콘 24종" description="정렬·열 관리·문서·권한에 필요한 아이콘입니다. 작은 크기에서도 의미를 구분할 수 있도록 같은 그리드와 선 두께로 구성했습니다.">
       <Segmented label="아이콘 미리보기 크기" value={size} onValueChange={setSize} options={previewSizes.map(value=>({value:String(value),label:`${value}px`}))} />
       <div className="studio-icon-expansion-groups" style={{'--preview-icon-size':`${size}px`} as React.CSSProperties}>
