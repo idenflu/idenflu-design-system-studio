@@ -2,7 +2,15 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
-## 0.6.1 — 게시 예정
+## 0.6.2 — 게시 예정
+
+### 수정
+
+- `bell-dot`과 `bell-check`의 상태 표시를 종 우상단으로 이동하고 외곽과의 간격을 조정
+
+## 0.6.1 — 2026-11-17
+
+[게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/43998758744)
 
 ### 추가
 
