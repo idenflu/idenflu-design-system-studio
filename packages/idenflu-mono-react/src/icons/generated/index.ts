@@ -9,6 +9,8 @@ export { ArrowUpIcon } from './ArrowUpIcon';
 export { AsteriskSquareIcon } from './AsteriskSquareIcon';
 export { AttachmentIcon } from './AttachmentIcon';
 export { BanIcon } from './BanIcon';
+export { BellCheckIcon } from './BellCheckIcon';
+export { BellDotIcon } from './BellDotIcon';
 export { BellIcon } from './BellIcon';
 export { BellOffIcon } from './BellOffIcon';
 export { BookmarkIcon } from './BookmarkIcon';
