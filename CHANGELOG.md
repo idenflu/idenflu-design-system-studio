@@ -2,10 +2,11 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
-## 미배포
+## 0.6.1 — 게시 예정
 
 ### 추가
 
+- 알림 상태를 구분하는 `bell-dot`, `bell-check` 아이콘 추가
 - 행 간격·설비 아이콘 `rows-compact`, `rows-comfortable`, `conveyor`, `wrench` 4종과 크기별 미리보기 추가
 
 ### 수정
