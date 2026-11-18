@@ -168,6 +168,13 @@
     "searchTerms": "구분선 디바이더 분리 경계 가로 세로 점선 divider separator"
   },
   {
+    "route": "components/box",
+    "title": "Box",
+    "group": "Components",
+    "description": "여백, 크기, 배치, 배경 같은 스타일을 prop으로 지정하는 컨테이너입니다.",
+    "searchTerms": "박스 컨테이너 스타일 여백 배치 배경 padding margin flex grid"
+  },
+  {
     "route": "components/grid",
     "title": "Grid",
     "group": "Components",

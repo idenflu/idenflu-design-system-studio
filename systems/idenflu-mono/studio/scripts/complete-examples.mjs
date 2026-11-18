@@ -4,6 +4,7 @@ import {packageRequire,studioRoot} from './runtime.mjs';
 
 const ts=packageRequire('typescript');
 export const completeExampleEntries = {
+  'components/box':['box-demos.tsx','ProjectInfoBox','BoxExample'],
   'patterns/page-header':['page-header-demos.tsx','PageHeaderExample','PageHeaderUsageExample'],
   'components/table':['table-demos.tsx','TableDemos','TableExample'],
   'components/chips':['structure-demos.tsx','ChipDemos','ChipsExample'],

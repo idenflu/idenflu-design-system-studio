@@ -17,6 +17,7 @@ import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from
 import { DocumentShell, Overview, notFoundRouteId, useDocumentRoute } from './shell';
 import { DocumentNotFound, LayoutNotFound } from './not-found';
 import { DividerDemos } from './divider-demos';
+import { BoxDemos } from './box-demos';
 import { GridDemos, gridUsage } from './grid-demos';
 import { patternPages, patternSnippets } from './patterns';
 import { componentUsage } from './component-usage';
@@ -317,6 +318,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/chips': return <ChipDemos />;
     case 'components/list': return <ListDemos />;
     case 'components/divider': return <DividerDemos />;
+    case 'components/box': return <BoxDemos />;
     case 'components/grid': return <GridDemos />;
     case 'components/slider': return <SliderDemos />;
     case 'components/tooltip': return <TooltipDemos />;
