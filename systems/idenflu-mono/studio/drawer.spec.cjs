@@ -51,12 +51,13 @@ test('drawer edges and preset or pixel sizes fit the viewport', {tag:'@mobile'},
 });
 
 test('drawer keeps its header and actions fixed and closes nested layers one at a time', {tag:'@mobile'}, async ({page}) => {
+  await page.setViewportSize({width: page.viewportSize().width, height: 740});
   await page.goto(url);
   const opener = page.getByRole('button', {name:'알림 설정 열기', exact:true});
   await opener.click();
   const drawer = page.getByRole('dialog', {name:'알림 설정', exact:true});
   await settle(drawer);
-  const body = drawer.locator('.drawer-body'), header = drawer.locator('.drawer-header'), footer = drawer.locator('.drawer-footer');
+  const header = drawer.locator('.drawer-header'), footer = drawer.locator('.drawer-footer');
   const headerBefore = await header.boundingBox(), footerBefore = await footer.boundingBox();
   await drawer.getByRole('button', {name:'달력 열기', exact:true}).click();
   await expect(page.getByRole('dialog', {name:'날짜 선택 달력', exact:true})).toBeVisible();
@@ -64,20 +65,23 @@ test('drawer keeps its header and actions fixed and closes nested layers one at 
   await expect(page.getByRole('dialog', {name:'날짜 선택 달력', exact:true})).toBeHidden();
   await expect(drawer).toBeVisible();
   await expect(drawer.getByRole('button', {name:'달력 열기', exact:true})).toBeFocused();
-  await body.focus();
-  await body.press('End');
-  await expect.poll(() => body.evaluate(element => element.scrollTop > 0 && Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) < 1)).toBe(true);
+  const apply = footer.getByRole('button', {name:'설정 적용', exact:true});
+  await apply.focus();
+  await page.keyboard.press('End');
+  await expect.poll(() => drawer.evaluate(element => {
+    const maxScrollTop = element.scrollHeight - element.clientHeight;
+    return {overflowing: maxScrollTop > 1, atEnd: Math.abs(maxScrollTop - element.scrollTop) <= 1};
+  })).toEqual({overflowing: true, atEnd: true});
   expect((await header.boundingBox()).y).toBeCloseTo(headerBefore.y, 0);
   expect((await footer.boundingBox()).y).toBeCloseTo(footerBefore.y, 0);
-  const scrollTop = await body.evaluate(element => element.scrollTop);
-  const apply = footer.getByRole('button', {name:'설정 적용', exact:true});
+  const scrollTop = await drawer.evaluate(element => element.scrollTop);
   await apply.click();
   const confirm = page.getByRole('dialog', {name:'알림 설정 적용', exact:true});
   await expect(confirm).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(confirm).toBeHidden();
   await expect(apply).toBeFocused();
-  expect(await body.evaluate(element => element.scrollTop)).toBe(scrollTop);
+  expect(await drawer.evaluate(element => element.scrollTop)).toBe(scrollTop);
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflowY)).toBe('hidden');
   await apply.click();
   await confirm.getByRole('button', {name:'적용', exact:true}).click();

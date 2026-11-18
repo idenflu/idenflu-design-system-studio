@@ -18,8 +18,21 @@ export type DialogProps = DismissibleProps & {
   initialFocusRef?: React.RefObject<HTMLElement | null>;
 } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>;
 
+function revealDividedDialogFocus(dialog: HTMLDialogElement, target: HTMLElement) {
+  const body = target.closest('.dialog-body');
+  if (body?.parentElement !== dialog || target === body || target.closest('dialog, [popover]') !== dialog) return;
+  const header = dialog.querySelector(':scope > .dialog-header');
+  const footer = dialog.querySelector(':scope > .dialog-footer');
+  const bounds = dialog.getBoundingClientRect();
+  const top = header?.getBoundingClientRect().bottom ?? bounds.top;
+  const bottom = footer?.getBoundingClientRect().top ?? bounds.bottom;
+  const field = target.getBoundingClientRect();
+  if (field.top < top) dialog.scrollTop -= top - field.top;
+  else if (field.bottom > bottom) dialog.scrollTop += field.bottom - bottom;
+}
+
 /** Native dialog with modal focus wrapping and shared Escape-layer ordering. */
-export function Dialog({ open, onOpenChange, children, className = '', modal = true, closeOnBackdrop = false, variant = 'default', size, style, initialFocusRef, onClick, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
+export function Dialog({ open, onOpenChange, children, className = '', modal = true, closeOnBackdrop = false, variant = 'default', size, style, initialFocusRef, onClick, onFocus, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
   const customSize = typeof size === 'number' ? { '--dialog-size': `${size}px` } : undefined;
   const ref = React.useRef<HTMLDialogElement>(null);
   const openedAsModal = React.useRef<boolean | null>(null);
@@ -50,7 +63,10 @@ export function Dialog({ open, onOpenChange, children, className = '', modal = t
     const bounds = event.currentTarget.getBoundingClientRect();
     return event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
   };
-  return <dialog {...props} aria-modal={props['aria-modal'] ?? (activeModal ? undefined : false)} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} data-dialog-size={typeof size === 'string' ? size : undefined} style={customSize ? { ...customSize, ...style } : style} onPointerDownCapture={event => {
+  return <dialog {...props} aria-modal={props['aria-modal'] ?? (activeModal ? undefined : false)} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} data-dialog-size={typeof size === 'string' ? size : undefined} style={customSize ? { ...customSize, ...style } : style} onFocus={event => {
+    if (variant === 'divided') revealDividedDialogFocus(event.currentTarget, event.target);
+    onFocus?.(event);
+  }} onPointerDownCapture={event => {
     backdropPointerDown.current = closeOnBackdrop && event.isPrimary && event.button === 0 && isBackdrop(event);
     onPointerDownCapture?.(event);
     if (event.defaultPrevented) backdropPointerDown.current = false;
@@ -70,8 +86,8 @@ export const DialogHeader = React.forwardRef<HTMLElement, React.HTMLAttributes<H
   return <header {...props} ref={ref} className={`dialog-header${className ? ` ${className}` : ''}`} />;
 });
 
-export const DialogBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function DialogBody({className = '', tabIndex = 0, ...props}, ref) {
-  return <div {...props} ref={ref} tabIndex={tabIndex} className={`dialog-body${className ? ` ${className}` : ''}`} />;
+export const DialogBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function DialogBody({className = '', ...props}, ref) {
+  return <div {...props} ref={ref} className={`dialog-body${className ? ` ${className}` : ''}`} />;
 });
 
 export const DialogFooter = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement>>(function DialogFooter({className = '', ...props}, ref) {

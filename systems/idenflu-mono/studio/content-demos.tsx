@@ -100,7 +100,7 @@ function DialogWidthDemo() {
     <Button variant="outline" onClick={() => { setSize('md'); setOpen(true); }}>너비 미리보기 열기</Button>
     <Dialog size={size} open={open} onOpenChange={setOpen} aria-labelledby={titleId}>
       <DialogHeader><h2 id={titleId}>다이얼로그 너비 비교</h2></DialogHeader>
-      <DialogBody tabIndex={-1}>
+      <DialogBody>
         <div className="react-studio-stack">
           <div className="react-studio-row" role="group" aria-label="최대 너비">
             {dialogWidths.map(({value, label}) => <Button key={value} variant={size === value ? 'default' : 'outline'}
@@ -154,12 +154,12 @@ export function OverlayDemos() {
       <Dialog open={dialog === 'info'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-info-dialog-title" aria-describedby="studio-info-dialog-description">
         <button className="icon-button dialog-close" type="button" aria-label="안내 닫기" onClick={() => setDialog(null)}><Icon name="x" /></button>
         <DialogHeader><h2 id="studio-info-dialog-title">공유 범위 안내</h2></DialogHeader>
-        <DialogBody tabIndex={-1}><p id="studio-info-dialog-description">초대한 팀원만 프로젝트를 볼 수 있습니다. 공유 범위는 프로젝트 설정에서 변경할 수 있습니다.</p></DialogBody>
+        <DialogBody><p id="studio-info-dialog-description">초대한 팀원만 프로젝트를 볼 수 있습니다. 공유 범위는 프로젝트 설정에서 변경할 수 있습니다.</p></DialogBody>
         <DialogFooter><Button ref={infoConfirm} onClick={() => setDialog(null)}>확인</Button></DialogFooter>
       </Dialog>
       <Dialog open={dialog === 'delete'} onOpenChange={closeDialog} aria-labelledby="studio-delete-dialog-title" aria-describedby="studio-delete-dialog-description">
         <DialogHeader><h2 id="studio-delete-dialog-title">프로젝트를 삭제할까요?</h2></DialogHeader>
-        <DialogBody tabIndex={-1}><p id="studio-delete-dialog-description">샘플 프로젝트를 목록에서 삭제합니다. 이 예시에서는 삭제 후 다시 추가할 수 있습니다.</p>
+        <DialogBody><p id="studio-delete-dialog-description">샘플 프로젝트를 목록에서 삭제합니다. 이 예시에서는 삭제 후 다시 추가할 수 있습니다.</p>
           <div className="react-studio-dialog-detail"><strong>샘플 프로젝트</strong><span className="react-studio-caption">디자인 팀 · 문서 3개</span></div>
         </DialogBody>
         <DialogFooter><Button ref={deleteCancel} variant="outline" onClick={() => setDialog(null)}>취소</Button><Button color="danger" onClick={() => { setDeleted(true); setFeedback('샘플 프로젝트를 삭제했습니다.'); setDialog(null); }}>삭제</Button></DialogFooter>
@@ -167,7 +167,7 @@ export function OverlayDemos() {
       <Dialog open={dialog === 'form'} onOpenChange={closeDialog} closeOnBackdrop aria-labelledby="studio-project-dialog-title" aria-describedby="studio-project-dialog-description">
         <button className="icon-button dialog-close" type="button" aria-label="다이얼로그 닫기" onClick={() => setDialog(null)}><Icon name="x" /></button>
         <DialogHeader><h2 id="studio-project-dialog-title">새 프로젝트</h2></DialogHeader>
-        <DialogBody tabIndex={-1}><p id="studio-project-dialog-description">함께 시작할 프로젝트의 이름을 정해주세요.</p>
+        <DialogBody><p id="studio-project-dialog-description">함께 시작할 프로젝트의 이름을 정해주세요.</p>
         <form id={projectFormId} noValidate onSubmit={event => {
           event.preventDefault();
           const value = name.trim();

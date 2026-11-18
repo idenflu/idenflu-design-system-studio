@@ -19,7 +19,7 @@
 .dialog.drawer[data-side="top"] { inset:0 0 auto; border-bottom:1px solid var(--border); }
 .dialog.drawer[data-side="bottom"] { inset:auto 0 0; border-top:1px solid var(--border); }
 .drawer[open] { animation:drawer-enter var(--motion-normal) var(--motion-easing); }
-.dialog.drawer.dialog--divided { padding:0; overflow:hidden; }
+.dialog.drawer.dialog--divided { padding:0; }
 .drawer.dialog--divided > :is(.dialog-header, .dialog-body, .dialog-footer) { min-width:0; }
 .drawer.dialog--divided > .dialog-header { padding-top:max(var(--space-5), env(safe-area-inset-top)); }
 .drawer.dialog--divided > .dialog-header h2 { overflow-wrap:anywhere; }
