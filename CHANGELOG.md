@@ -4,6 +4,21 @@
 
 ## 미배포
 
+## 0.10.0
+
+### 추가
+
+- `DropdownMenuDivider`로 메뉴 항목을 구분할 수 있습니다. 방향키 탐색은 구분선을 건너뜁니다.
+- `DropdownMenuItem`에 `color="danger"`를 지정하면 삭제 같은 작업의 텍스트와 아이콘을 위험 색상으로 표시합니다.
+
+### 수정
+
+- `DialogBody`와 `DrawerBody`의 기본 Tab 정지점을 제거했습니다. 구분선형의 긴 본문은 키보드로 스크롤할 수 있으며 헤더와 하단 영역은 고정됩니다.
+
+### 호환성
+
+- 구분선형 `Dialog`와 `Drawer`의 스크롤은 루트에서 처리합니다. 본문의 `onScroll`을 사용하던 호출부는 `Dialog` 또는 `Drawer`로 옮겨야 합니다.
+
 ## 0.9.0 — 2026-11-18
 
 [게시 소스 `7d06eff`](https://github.com/idenflu/idenflu-design-system-studio/commit/7d06eff6863afa992ae92a66f7e692b0a738a515) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44276480184)
