@@ -126,7 +126,7 @@ export function IconExample() {
   'components/text-fields':`import { Icon, TextField } from '@idenflu/mono-react';
 
 <TextField
-  label={<>이름 <span className="form-pattern-required">필수</span></>}
+  label="이름"
   required prefix={<Icon name="user" />} prefixDecorative
   placeholder="이름을 입력해주세요"
 />

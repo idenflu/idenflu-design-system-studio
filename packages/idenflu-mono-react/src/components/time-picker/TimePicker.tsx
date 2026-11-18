@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RequiredMark } from '../../shared/RequiredMark';
 import { useEscapeLayer } from '../../shared/escape-layer';
 const useClientLayoutEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
@@ -217,7 +218,7 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
   const described = [describedBy, helperText != null && `${base}-help`, error && `${base}-error`].filter(Boolean).join(' ') || undefined;
 
   return <div className={className} data-size={size}>
-    <label className="field-label" htmlFor={base}>{label}</label>
+    <label className="field-label" htmlFor={base}>{label}{required && <RequiredMark />}</label>
     <div className="date-picker time-picker" ref={root} onBlur={event => {
       if (open && event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close();
     }}>

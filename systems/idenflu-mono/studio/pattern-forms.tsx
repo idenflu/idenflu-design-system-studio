@@ -11,8 +11,8 @@ function ContactForm({profile = false}:{profile?:boolean}) {
   }), profile ? '변경사항을 저장했습니다.' : '기본 정보를 확인했습니다.');
   return <form {...form.props}>
     <Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
-      <TextField label={fieldLabel('이름',true)} name="name" required autoComplete="name" maxLength={60} defaultValue={profile ? '김민수' : ''} placeholder="이름을 입력해주세요" prefix={<Icon name="user" />} prefixDecorative error={form.errors.name || undefined} />
-      <TextField label={fieldLabel('이메일',true)} name="email" required type="email" autoComplete="email" defaultValue={profile ? 'minsu@example.com' : ''} placeholder="name@example.com" prefix={<Icon name="mail" />} prefixDecorative error={form.errors.email || undefined} />
+      <TextField label="이름" name="name" required autoComplete="name" maxLength={60} defaultValue={profile ? '김민수' : ''} placeholder="이름을 입력해주세요" prefix={<Icon name="user" />} prefixDecorative error={form.errors.name || undefined} />
+      <TextField label="이메일" name="email" required type="email" autoComplete="email" defaultValue={profile ? 'minsu@example.com' : ''} placeholder="name@example.com" prefix={<Icon name="mail" />} prefixDecorative error={form.errors.email || undefined} />
       {profile ? <GridItem colSpan="full" className="form-pattern-field--wide"><Switch label="제품 소식 받기" name="updates" defaultChecked aria-describedby="profile-updates-help" /><p id="profile-updates-help" className="react-studio-caption">새로운 기능과 소식을 이메일로 받아요.</p></GridItem> : <>
         <TextField label={fieldLabel('회사명')} name="company" autoComplete="organization" placeholder="회사명을 입력해주세요" />
         <TextField label={fieldLabel('연락처')} name="phone" type="tel" autoComplete="tel-national" prefix="+82" placeholder="10-1234-5678" />
@@ -39,7 +39,7 @@ export function PreferencesPattern() {
 
 function PasswordField({label,name,error,helperText}:{label:string; name:string; error?:string; helperText?:string}) {
   const [visible,setVisible] = React.useState(false); const id = React.useId();
-  return <TextField id={id} label={fieldLabel(label,true)} name={name} required type={visible ? 'text' : 'password'} autoComplete={name === 'current' ? 'current-password' : 'new-password'} prefix={<Icon name="lock" />} prefixDecorative error={error || undefined} helperText={helperText} action={<button className="input-action" type="button" aria-controls={id} aria-label={`${label} ${visible ? '숨기기' : '표시'}`} aria-pressed={visible} onClick={() => setVisible(!visible)}><Icon name={visible ? 'visibility-off' : 'visibility'} /></button>} />;
+  return <TextField id={id} label={label} name={name} required type={visible ? 'text' : 'password'} autoComplete={name === 'current' ? 'current-password' : 'new-password'} prefix={<Icon name="lock" />} prefixDecorative error={error || undefined} helperText={helperText} action={<button className="input-action" type="button" aria-controls={id} aria-label={`${label} ${visible ? '숨기기' : '표시'}`} aria-pressed={visible} onClick={() => setVisible(!visible)}><Icon name={visible ? 'visibility-off' : 'visibility'} /></button>} />;
 }
 export function PasswordPattern() {
   const form = usePatternForm(data => {
@@ -59,7 +59,7 @@ export function InquiryPattern() {
   return <Section title="문의 내용" description="상세 내용을 작성하고 필요한 파일을 선택하세요."><form {...form.props} onReset={() => {form.props.onReset(); setCount(0);}}><Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
     <Select label="문의 유형" name="type" defaultValue="general" options={[{value:'general',label:'일반 문의'},{value:'feature',label:'기능 제안'},{value:'issue',label:'문제 신고'}]} onValueChange={form.clearResult} />
     <TextField label={fieldLabel('제목')} name="subject" maxLength={80} placeholder="문의 제목" />
-    <GridItem colSpan="full" className="form-pattern-field--wide"><TextArea label={fieldLabel('문의 내용',true)} name="message" required rows={5} minLength={10} maxLength={500} placeholder="문의 내용을 입력해주세요" onChange={event => setCount(event.target.value.length)} error={form.errors.message || undefined} helperText={<span className="react-studio-field-meta"><span>10자 이상 입력해주세요.</span><span>{count} / 500자</span></span>} /></GridItem>
+    <GridItem colSpan="full" className="form-pattern-field--wide"><TextArea label="문의 내용" name="message" required rows={5} minLength={10} maxLength={500} placeholder="문의 내용을 입력해주세요" onChange={event => setCount(event.target.value.length)} error={form.errors.message || undefined} helperText={<span className="react-studio-field-meta"><span>10자 이상 입력해주세요.</span><span>{count} / 500자</span></span>} /></GridItem>
     <GridItem colSpan="full" className="form-pattern-field--wide react-pattern-stack"><span className="field-label">{fieldLabel('첨부 파일')}</span><FileUpload name="attachment" label="파일 선택" onFilesChange={form.clearResult} /><p className="react-studio-caption">예제에서 선택한 파일은 전송되지 않습니다.</p></GridItem>
   </Grid><FormActions submit="내용 확인" /><FormResult values={form.values}>{form.result}</FormResult></form></Section>;
 }
@@ -69,9 +69,9 @@ export function ProjectPattern() {
   const form = usePatternForm(data => ({name:textValue(data,'name') ? '' : '프로젝트 이름을 입력해주세요.', slug:!textValue(data,'slug') ? '프로젝트 주소를 입력해주세요.' : /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(textValue(data,'slug')) ? '' : '영문 소문자, 숫자와 하이픈으로 입력해주세요.', budget:integerIssue(textValue(data,'budget'),0n,9007199254740991n)}), '입력 내용을 확인했습니다.');
   return <Section title="새 프로젝트" description="프로젝트 정보와 함께 작업할 팀을 설정하세요."><form {...form.props} onReset={() => {form.props.onReset(); setCount(0); setProgress(35);}}>
     <fieldset className="form-example-group"><legend>기본 정보</legend><Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
-      <TextField label={fieldLabel('프로젝트명',true)} name="name" required maxLength={60} placeholder="프로젝트 이름" prefix={<Icon name="grid" />} prefixDecorative error={form.errors.name || undefined} />
+      <TextField label="프로젝트명" name="name" required maxLength={60} placeholder="프로젝트 이름" prefix={<Icon name="grid" />} prefixDecorative error={form.errors.name || undefined} />
       <Select label="상태" name="status" defaultValue="planned" options={[{value:'planned',label:'준비 중'},{value:'progress',label:'진행 중'},{value:'done',label:'완료'}]} onValueChange={form.clearResult} />
-      <GridItem colSpan="full" className="form-pattern-field--wide"><TextField label={fieldLabel('프로젝트 주소',true)} name="slug" required prefix="idenflu.app /" placeholder="design-system" helperText="영문 소문자, 숫자와 하이픈을 사용하세요." error={form.errors.slug || undefined} /></GridItem>
+      <GridItem colSpan="full" className="form-pattern-field--wide"><TextField label="프로젝트 주소" name="slug" required prefix="idenflu.app /" placeholder="design-system" helperText="영문 소문자, 숫자와 하이픈을 사용하세요." error={form.errors.slug || undefined} /></GridItem>
       <GridItem colSpan="full" className="form-pattern-field--wide"><TextArea label={fieldLabel('설명')} name="description" rows={3} maxLength={300} onChange={event => setCount(event.target.value.length)} helperText={<span className="react-studio-field-meta"><span>최대 300자</span><span>{count} / 300자</span></span>} /></GridItem>
     </Grid></fieldset>
     <fieldset className="form-example-group"><legend>팀과 진행 정보</legend><Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
@@ -90,10 +90,10 @@ export function BookingPattern() {
   const form = usePatternForm(data => ({date:!textValue(data,'date') ? '예약 날짜를 입력해주세요.' : validDate(textValue(data,'date')) ? '' : '올바른 날짜를 입력해주세요.', attendees:integerIssue(textValue(data,'attendees'),1n,20n,true), format:data.get('format') ? '' : '참석 방식을 선택해주세요.'}), '입력 내용을 확인했습니다.');
   return <Section title="미팅 예약" description="날짜와 참석 정보를 선택하세요."><form {...form.props}>
     <fieldset className="form-example-group"><legend>일정</legend><Grid columns={{base:1,sm:2}} gap={5} columnGap={6} className="form-pattern-grid">
-      <DatePicker label={fieldLabel('날짜',true)} name="date" required helperText="YYYY-MM-DD 또는 숫자 8자리로 입력해주세요." error={form.errors.date || undefined} onValueChange={form.afterChange} />
+      <DatePicker label="날짜" name="date" required helperText="YYYY-MM-DD 또는 숫자 8자리로 입력해주세요." error={form.errors.date || undefined} onValueChange={form.afterChange} />
       <Select label="시작 시간" name="time" defaultValue="1000" options={[{value:'0900',label:'오전 9:00'},{value:'1000',label:'오전 10:00'},{value:'1400',label:'오후 2:00'},{value:'1600',label:'오후 4:00'}]} onValueChange={form.clearResult} />
       <Select label="미팅 길이" name="duration" defaultValue="60" options={[{value:'30',label:'30분'},{value:'60',label:'1시간'},{value:'90',label:'1시간 30분'}]} onValueChange={form.clearResult} />
-      <NumberField label={fieldLabel('참석 인원',true)} name="attendees" required defaultValue="1" min="1" max="20" unit="명" error={form.errors.attendees || undefined} onValueChange={form.afterChange} />
+      <NumberField label="참석 인원" name="attendees" required defaultValue="1" min="1" max="20" unit="명" error={form.errors.attendees || undefined} onValueChange={form.afterChange} />
     </Grid></fieldset>
     <fieldset className="form-pattern-choices"><legend>{fieldLabel('참석 방식',true)}</legend><Radio label="온라인 · 화상 회의로 참여합니다." name="format" value="online" required aria-invalid={!!form.errors.format || undefined} aria-describedby={form.errors.format ? 'booking-format-error' : undefined} /><Radio label="오프라인 · 회의실에 직접 방문합니다." name="format" value="offline" required aria-invalid={!!form.errors.format || undefined} aria-describedby={form.errors.format ? 'booking-format-error' : undefined} /><GroupError id="booking-format-error">{form.errors.format}</GroupError></fieldset>
     <Switch label="시작 전 알림" name="reminder" defaultChecked /><p className="react-studio-caption">시작 10분 전에 알림을 받습니다.</p>

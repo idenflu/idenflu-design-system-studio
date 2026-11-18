@@ -113,9 +113,9 @@ function FormExample() {
     <p className="react-studio-caption">name으로 FormData에 연결합니다. 필수값과 날짜 검증을 통과하면 제출값과 API용 UTC 데이터를 보여줍니다. 실제 요청은 보내지 않습니다.</p>
     <form className="react-studio-stack" onSubmit={submit} onReset={clearResult} onChange={clearResult}>
       <div className="react-studio-stack" style={{ maxWidth: 720 }}>
-        <TextField label={<>일정명 <span className="form-pattern-required">필수</span></>} name="title" required defaultValue="디자인 시스템 리뷰" />
+        <TextField label="일정명" name="title" required defaultValue="디자인 시스템 리뷰" />
         <DateTimePicker id="datetime-form-reminder" name="reminderAt" label="알림 일시" defaultValue="2026-11-12T08:30" minuteStep={15} onValueChange={clearResult} />
-        <DateTimeRangePicker id="datetime-form-range" name="booking" label={<>예약 기간 <span className="form-pattern-required">필수</span></>}
+        <DateTimeRangePicker id="datetime-form-range" name="booking" label="예약 기간"
           startLabel="예약 시작 일시" endLabel="예약 종료 일시" required minuteStep={15}
           defaultValue={['2026-11-12T09:00', '2026-11-12T17:30']} onValueChange={clearResult} />
       </div>

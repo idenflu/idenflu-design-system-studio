@@ -60,7 +60,7 @@ test('password form checks length, confirmation and reset visibility', async ({p
 
 test('inquiry form validates content and resets its count and attachment', async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/patterns/form/inquiry');
-  const message = page.getByRole('textbox',{name:'문의 내용 필수',exact:true});
+  const message = page.getByRole('textbox',{name:'문의 내용',exact:true});
   await message.fill('짧은 문의');
   await page.getByRole('button',{name:'내용 확인',exact:true}).click();
   await expect(message).toBeFocused();
@@ -77,8 +77,8 @@ test('inquiry form validates content and resets its count and attachment', async
 
 test('project form validates slug and exact budget and resets selected teams and progress', async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/patterns/form/project');
-  await page.getByRole('textbox',{name:'프로젝트명 필수',exact:true}).fill('프로젝트');
-  const slug = page.getByRole('textbox',{name:'프로젝트 주소 필수',exact:true});
+  await page.getByRole('textbox',{name:'프로젝트명',exact:true}).fill('프로젝트');
+  const slug = page.getByRole('textbox',{name:'프로젝트 주소',exact:true});
   await slug.fill('Wrong Address');
   const budget = page.getByRole('spinbutton',{name:'예산 선택',exact:true});
   await budget.fill('1e3');
@@ -109,14 +109,14 @@ test('project form validates slug and exact budget and resets selected teams and
 
 test('booking form validates dates, attendee bounds and attendance format', async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/patterns/form/booking');
-  const date = page.getByRole('textbox',{name:'날짜 필수',exact:true});
+  const date = page.getByRole('textbox',{name:'날짜',exact:true});
   await page.getByRole('button',{name:'입력 확인',exact:true}).click();
   await expect(date).toBeFocused(); await expect(date).toHaveAttribute('aria-invalid','true');
   await date.fill('2026-02-30'); await date.blur();
   await expect(date).toHaveAttribute('aria-invalid','true');
   await date.fill('20261102'); await date.blur();
   await expect(date).toHaveValue('2026-11-02');
-  const attendees = page.getByRole('spinbutton',{name:'참석 인원 필수',exact:true});
+  const attendees = page.getByRole('spinbutton',{name:'참석 인원',exact:true});
   await attendees.fill('0');
   await page.getByRole('button',{name:'입력 확인',exact:true}).click();
   await expect(attendees).toBeFocused();
@@ -131,7 +131,7 @@ test('booking form validates dates, attendee bounds and attendance format', asyn
 
 test('profile saves edited data and readonly patterns expose their original states', async ({page}) => {
   await page.goto('/systems/idenflu-mono/index.html#/patterns/form/profile');
-  const name = page.getByRole('textbox',{name:'이름 필수',exact:true});
+  const name = page.getByRole('textbox',{name:'이름',exact:true});
   await expect(name).toHaveValue('김민수'); await name.fill('');
   await page.getByRole('button',{name:'변경사항 저장',exact:true}).click(); await expect(name).toBeFocused();
   await name.fill('김다인'); await page.getByRole('button',{name:'변경사항 저장',exact:true}).click();

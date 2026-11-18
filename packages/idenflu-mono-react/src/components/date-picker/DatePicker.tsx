@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RequiredMark } from '../../shared/RequiredMark';
 import { useClientLayoutEffect } from '../../shared/use-client-layout-effect';
 import { type BaseField } from '../../shared/field-types';
 import { useEscapeLayer } from '../../shared/escape-layer';
@@ -153,7 +154,7 @@ function DateWidget({ label, id, name, disabled, readOnly, required, size, helpe
   const input = (index: 0 | 1) => <input ref={index ? endRef : startRef} id={range ? `${base}-${index ? 'end' : 'start'}` : base} className={`date-text${range ? ' date-range-input' : ''}`} type="text" inputMode="numeric" placeholder="YYYY-MM-DD" name={name ? range ? `${name}-${index ? 'end' : 'start'}` : name : undefined} value={draft[index]} disabled={disabled} readOnly={readOnly} required={required} aria-invalid={invalid || ariaInvalid} aria-describedby={described} onChange={event => { const next: [string, string] = [...draft]; next[index] = event.target.value; setDraft(next); if (error) setError(''); }} onBlur={() => publish(draft)} onKeyDown={event => { if (event.key === 'Enter' && !event.nativeEvent.isComposing) { event.preventDefault(); publish(draft); } }} />;
   const trigger = <button ref={triggerRef} className="date-trigger" type="button" disabled={disabled || readOnly} aria-label="달력 열기" aria-haspopup="dialog" aria-expanded={open} aria-controls={`${base}-calendar`} onClick={() => { if (open) close(true); else { setCursor(clampCursor(parsed[0] || parsed[1] || new Date())); setOpen(true); } }}><span className="ui-icon icon-calendar" aria-hidden="true" /></button>;
   return <div className={className} data-size={size}>
-    {range ? <span className="field-label" id={`${base}-label`}>{label}</span> : <label className="field-label" htmlFor={base}>{label}</label>}
+    {range ? <span className="field-label" id={`${base}-label`}>{label}{required && <RequiredMark />}</span> : <label className="field-label" htmlFor={base}>{label}{required && <RequiredMark />}</label>}
     <div className="date-picker" ref={pickerRef}>
       {range ? <div className={`date-range-fields${invalid ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}><label className="sr-only" htmlFor={`${base}-start`}>{startLabel}</label>{input(0)}<span className="date-range-separator" aria-hidden="true">–</span><label className="sr-only" htmlFor={`${base}-end`}>{endLabel}</label>{input(1)}{trigger}</div> : <div className={`date-field${invalid ? ' has-error' : ''}`}>{input(0)}{trigger}</div>}
       {open && <div className="date-popup" ref={popupRef} id={`${base}-calendar`} role="dialog" popover="manual" aria-label={range ? '기간 선택 달력' : '날짜 선택 달력'} style={{ position: 'fixed', margin: 0, top: position?.top ?? 0, bottom: 'auto', left: position?.left ?? 0, right: 'auto', maxWidth: position?.maxWidth, maxHeight: position?.maxHeight, visibility: position ? 'visible' : 'hidden' }}>

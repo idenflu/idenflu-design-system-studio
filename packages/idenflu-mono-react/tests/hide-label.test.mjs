@@ -43,18 +43,22 @@ test('TextField hides only its label and removes the horizontal label column', a
   const f = fixture(), ref = React.createRef();
   try {
     const render = hideLabel => h(TextField, {
-      id: 'email', ref, label: h('span', null, '이메일'), hideLabel,
+      id: 'email', ref, label: h('span', null, '이메일'), hideLabel, required: true,
       type: 'email', labelPosition: 'left', containerClassName: 'email-field',
       defaultValue: 'mono@example.com', prefix: '@', helperText: '업무 이메일',
       error: '주소를 확인해주세요', 'aria-describedby': 'external-help',
     });
     await f.render(render(undefined));
     const input = f.container.querySelector('input');
-    assert.equal(linkedLabel(f.container, input, false).textContent, '이메일');
+    const label = linkedLabel(f.container, input, false);
+    const mark = label.querySelector('.field-required');
+    assert.equal(mark?.textContent.trim(), '필수');
+    assert.equal(mark?.getAttribute('aria-hidden'), 'true');
     assert.ok(f.container.querySelector('.field-horizontal'));
 
     await f.render(render(true));
-    linkedLabel(f.container, input, true);
+    assert.equal(linkedLabel(f.container, input, true).textContent, '이메일');
+    assert.equal(input.required, true);
     assert.equal(ref.current, input);
     assert.equal(input.type, 'email');
     assert.equal(input.value, 'mono@example.com');
@@ -112,10 +116,10 @@ for (const [name, Component, variant] of selectVariants) {
       }));
       await f.render(render(undefined));
       const control = f.container.querySelector('[role=combobox]');
-      linkedLabel(f.container, control, false);
+      assert.equal(linkedLabel(f.container, control, false).querySelector('.field-required')?.textContent.trim(), '필수');
 
       await f.render(render(true));
-      linkedLabel(f.container, control, true);
+      assert.equal(linkedLabel(f.container, control, true).textContent, '팀');
       assert.equal(control.getAttribute('aria-required'), 'true');
       assert.equal(control.getAttribute('aria-describedby'), 'team-help');
       assert.equal(control.getAttribute('aria-label'), Component === SearchSelect ? '팀' : '팀: 디자인');

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RequiredMark } from '../../shared/RequiredMark';
 import { type BaseField } from '../../shared/field-types';
 
 type Parsed = { value?: bigint; error?: string; empty?: boolean; digits?: number };
@@ -121,7 +122,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
   };
   const described = [describedBy, helperText != null && `${inputId}-help`, unit && `${inputId}-unit`, error && `${inputId}-error`].filter(Boolean).join(' ') || undefined;
   return <div className={className}>
-    <label htmlFor={inputId} className="field-label">{label}</label>
+    <label htmlFor={inputId} className="field-label">{label}{required && <RequiredMark />}</label>
     <div className={`number-field${invalid ? ' is-invalid' : ''}`} data-size={size}>
       {prefixIcon != null && <span className="number-field-prefix" aria-hidden="true" onClick={() => { if (!disabled) inputRef.current?.focus(); }}>{prefixIcon}</span>}
       <input ref={inputRef} id={inputId} name={name} type="text" role="spinbutton" inputMode={places ? 'decimal' : 'numeric'} className="number-field-input" value={draft} disabled={disabled} readOnly={readOnly} required={required}

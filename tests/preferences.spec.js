@@ -184,10 +184,10 @@ test('reset restores defaults without losing theme, form edits or validation sta
   await openApp(page, 'patterns/form/profile');
   await page.locator('.theme-toggle').click();
   const theme = await page.evaluate(() => ({ current: document.documentElement.dataset.theme, saved: localStorage.getItem('idenflu-mono-theme') }));
-  await page.getByRole('textbox', {name:'이름 필수',exact:true}).fill('편집 중인 사용자');
-  await page.getByRole('textbox', {name:'이메일 필수',exact:true}).fill('invalid-email');
+  await page.getByRole('textbox', {name:'이름',exact:true}).fill('편집 중인 사용자');
+  await page.getByRole('textbox', {name:'이메일',exact:true}).fill('invalid-email');
   await page.locator('.route-profile form button[type="submit"]').click();
-  await expect(page.getByRole('textbox', {name:'이메일 필수',exact:true})).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByRole('textbox', {name:'이메일',exact:true})).toHaveAttribute('aria-invalid', 'true');
   await page.evaluate((value) => window.IdenfluPreferences.set(value), custom);
   await openSettings(page);
   await page.locator('#studio-settings-dialog').getByRole('button', {name:'초기화',exact:true}).click();
@@ -196,9 +196,9 @@ test('reset restores defaults without losing theme, form edits or validation sta
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--font-size-base').trim())).toBe('14px');
   expect(await page.evaluate((key) => localStorage.getItem(key), storageKey)).toBeNull();
   expect(await page.evaluate(() => ({ current: document.documentElement.dataset.theme, saved: localStorage.getItem('idenflu-mono-theme') }))).toEqual(theme);
-  await expect(page.getByRole('textbox', {name:'이름 필수',exact:true})).toHaveValue('편집 중인 사용자');
-  await expect(page.getByRole('textbox', {name:'이메일 필수',exact:true})).toHaveValue('invalid-email');
-  await expect(page.getByRole('textbox', {name:'이메일 필수',exact:true})).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.getByRole('textbox', {name:'이름',exact:true})).toHaveValue('편집 중인 사용자');
+  await expect(page.getByRole('textbox', {name:'이메일',exact:true})).toHaveValue('invalid-email');
+  await expect(page.getByRole('textbox', {name:'이메일',exact:true})).toHaveAttribute('aria-invalid', 'true');
   await page.locator('#studio-preferences-close').click();
   await page.reload();
   await page.waitForFunction(() => Boolean(window.IdenfluPreferences));

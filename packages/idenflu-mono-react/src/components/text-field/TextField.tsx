@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RequiredMark } from '../../shared/RequiredMark';
 import { classes } from '../../shared/classes';
 import { type Size, type Alignment } from '../../shared/types';
 
@@ -64,7 +65,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
   const suffixId = `${inputId}-suffix`;
   const effectiveLabelPosition = hideLabel ? 'top' : labelPosition;
   const described = [describedBy, prefix != null && !prefixDecorative && prefixId, suffix != null && !suffixDecorative && suffixId, helperText != null && helperId, error != null && errorId].filter(Boolean).join(' ') || undefined;
-  const labelElement = <label className={classes('field-label', hideLabel && 'sr-only', effectiveLabelPosition === 'left' && 'field-horizontal__label')} htmlFor={inputId}>{label}</label>;
+  const labelElement = <label className={classes('field-label', hideLabel && 'sr-only', effectiveLabelPosition === 'left' && 'field-horizontal__label')} htmlFor={inputId}>{label}{props.required && !hideLabel && <RequiredMark />}</label>;
   const input = <input {...props} ref={inputRef} onChange={automaticClear ? event => { setSearchValue(event.target.value); props.onChange?.(event); } : props.onChange} id={inputId} aria-invalid={error != null ? true : ariaInvalid} aria-describedby={described} className={classes(alignment && `text-align-${alignment}`, className, props.type === 'search' && 'text-field-search', prefix == null && suffix == null && fieldAction == null && 'text-input')} />;
   const body = <div className={effectiveLabelPosition === 'left' ? 'field-horizontal__body' : undefined}>
     {prefix != null || suffix != null || fieldAction != null ? <div className="input-group" data-size={size}>

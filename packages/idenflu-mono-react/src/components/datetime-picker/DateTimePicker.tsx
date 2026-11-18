@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RequiredMark } from '../../shared/RequiredMark';
 import { useEscapeLayer } from '../../shared/escape-layer';
 
 export type DateTimeValue = string | null;
@@ -306,7 +307,7 @@ function DateTimeWidget({ label, id, name, size, disabled, readOnly, required, h
   const previewBounds = preview && previewAnchor ? [previewAnchor, preview].sort() : null;
 
   return <div className={className} data-size={size}>
-    {range ? <span className="field-label" id={`${base}-label`}>{label}</span> : <label className="field-label" htmlFor={base}>{label}</label>}
+    {range ? <span className="field-label" id={`${base}-label`}>{label}{required && <RequiredMark />}</span> : <label className="field-label" htmlFor={base}>{label}{required && <RequiredMark />}</label>}
     <div className="date-picker datetime-picker" ref={pickerRef} onBlur={event => { if (open && !event.currentTarget.contains(event.relatedTarget as Node | null)) queueMicrotask(() => { const picker = pickerRef.current; if (picker && !picker.contains(picker.ownerDocument.activeElement)) close(); }); }}>
       {range ? <div className={`date-range-fields datetime-range-fields${invalid ? ' has-error' : ''}`} role="group" aria-labelledby={`${base}-label`}>
         <label className="sr-only" htmlFor={`${base}-start`}>{startLabel}</label>{input(0)}<span className="date-range-separator" aria-hidden="true">–</span><label className="sr-only" htmlFor={`${base}-end`}>{endLabel}</label>{input(1)}{trigger}

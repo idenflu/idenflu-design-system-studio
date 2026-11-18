@@ -1,11 +1,17 @@
 const { test, expect } = require('@playwright/test');
 
-test('text fields mark required and optional labels and validate only the required input', async ({ page }) => {
+test('text fields mark required and optional labels and validate only the required input', {tag:['@mobile','@theme']}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const form = page.locator('form').filter({has:page.getByRole('button', {name:'입력 확인', exact:true})});
-  const name = form.getByRole('textbox', {name:'이름 필수', exact:true});
+  const name = form.getByRole('textbox', {name:'이름', exact:true});
   const company = form.getByRole('textbox', {name:'회사명 선택', exact:true});
+  const mark = form.locator('.field-label .field-required');
+  await expect(mark).toHaveCount(1);
+  await expect(mark).toBeVisible();
+  await expect(mark).toHaveText('필수');
+  await expect(mark).toHaveAttribute('aria-hidden', 'true');
   await expect(name).toHaveJSProperty('required', true);
+  expect(await name.evaluate(input => input.validity.valueMissing)).toBe(true);
   await expect(company).toHaveJSProperty('required', false);
   await name.fill('   ');
   await form.getByRole('button', {name:'입력 확인', exact:true}).click();
@@ -72,12 +78,12 @@ test('save example prevents duplicate clicks and reports completion', async ({ p
 test('required team selection validates, submits and resets', async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/select');
   const form = page.locator('form').filter({has:page.getByRole('button', {name:'선택 확인', exact:true})});
-  const team = form.getByRole('combobox', {name:/^필수 담당 팀:/});
+  const team = form.getByRole('combobox', {name:/^담당 팀:/});
   await form.getByRole('button', {name:'선택 확인', exact:true}).click();
   await expect(team).toBeFocused();
   await expect(form.getByRole('alert')).toHaveText('항목을 선택해주세요.');
   await team.click();
-  await form.getByRole('listbox', {name:'필수 담당 팀', exact:true}).getByRole('option', {name:'디자인', exact:true}).click();
+  await form.getByRole('listbox', {name:'담당 팀', exact:true}).getByRole('option', {name:'디자인', exact:true}).click();
   await form.getByRole('button', {name:'선택 확인', exact:true}).click();
   await expect(form.getByRole('status')).toHaveText('담당 팀을 확인했습니다.');
   await form.getByRole('button', {name:'선택 초기화', exact:true}).click();

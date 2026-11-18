@@ -8,7 +8,7 @@ export function ProjectForm({id,onCreate}: {id:string;onCreate:(draft:ProjectDra
   const [due,setDue]=React.useState<DateValue>('2026-11-20'),[error,setError]=React.useState('');
   const input=React.useRef<HTMLInputElement>(null);
   return <form id={id} className="layout-project-form" noValidate onSubmit={event=>{event.preventDefault();if(!name.trim()){setError('프로젝트 이름을 입력해주세요.');input.current?.focus();return;}if(!event.currentTarget.reportValidity())return;onCreate({name:name.trim(),team,description:description.trim(),due:due??'미정'});}}>
-    <TextField ref={input} label={<>프로젝트 이름 <span className="form-pattern-required" aria-hidden="true">필수</span></>} prefix={<Icon name="folder"/>} prefixDecorative value={name} onChange={event=>{setName(event.target.value);setError('');}} required error={error||undefined} placeholder="예: 고객 경험 개선" maxLength={60}/>
+    <TextField ref={input} label="프로젝트 이름" prefix={<Icon name="folder"/>} prefixDecorative value={name} onChange={event=>{setName(event.target.value);setError('');}} required error={error||undefined} placeholder="예: 고객 경험 개선" maxLength={60}/>
     <TextArea label="프로젝트 설명" rows={3} value={description} onChange={event=>setDescription(event.target.value)} placeholder="목표와 작업 범위를 간단히 적어주세요."/>
     <div className="layout-project-form-row"><Select label="담당 팀" prefixIcon={<Icon name="users"/>} value={team} options={teams} onValueChange={setTeam} popupStrategy="fixed"/><DatePicker label="목표 마감일" value={due} onValueChange={setDue}/></div>
   </form>;

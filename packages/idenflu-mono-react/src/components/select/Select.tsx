@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { RequiredMark } from '../../shared/RequiredMark';
 import { type Size } from '../../shared/types';
 import { useClientLayoutEffect } from '../../shared/use-client-layout-effect';
 import { useValue } from '../../shared/use-value';
@@ -195,7 +196,7 @@ function SelectCore({options, label, hideLabel = false, name, disabled, readOnly
     {!visible.length && <p className="search-select-empty" role="status">검색 결과가 없습니다.</p>}
   </div>;
   return <div>
-    <label className={`field-label${hideLabel ? ' sr-only' : ''}`} htmlFor={`${id}-trigger`}>{label}</label>
+    <label className={`field-label${hideLabel ? ' sr-only' : ''}`} htmlFor={`${id}-trigger`}>{label}{required && !hideLabel && <RequiredMark />}</label>
     <div ref={root} className={`custom-select${searchable && !multiple ? ' search-select' : ''}${open ? ' is-open' : ''}${invalid ? ' is-invalid' : ''}${className ? ` ${className}` : ''}`} data-size={size} data-multiselect={multiple ? '' : undefined} data-readonly={readOnly ? '' : undefined}>
     <select ref={native} className="sr-only" aria-hidden="true" tabIndex={-1} name={name} multiple={multiple} required={required && !readOnly} disabled={disabled} value={multiple ? validSelected : validSelected[0] ?? ''} onChange={() => {}} onInvalid={event => { event.preventDefault(); setAttempted(true); const control = event.currentTarget; const firstInvalid = control.form && Array.from(control.form.elements).find(element => { const candidate = element as HTMLInputElement; return candidate.willValidate && !candidate.validity.valid; }); if (!firstInvalid || firstInvalid === control) (searchable && !multiple ? search : trigger).current?.focus(); }}>
       {!multiple && <option value="">{placeholder}</option>}

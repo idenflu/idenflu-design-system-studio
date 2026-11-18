@@ -113,6 +113,10 @@ export function StatusBadges() {
 }
 ```
 
+## 필수 입력 표시
+
+`TextField`, `TextArea`, `NumberField`, `Select`, `SearchSelect`, `MultiSelect`와 날짜·시간 입력은 `required`를 지정하면 라벨 옆에 `필수`를 표시합니다. `label`에는 필드 이름을 전달하세요. `hideLabel`을 사용하는 필드는 라벨과 표시를 함께 숨깁니다.
+
 ## 숨김 라벨
 
 `TextField type="search"`는 값이 있을 때 공통 `.input-action` 스타일의
