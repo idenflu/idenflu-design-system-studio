@@ -132,6 +132,7 @@ test('IconButton sizes remain square and tooltips respond to hover, focus and Es
   await expect(bookmark).toHaveAttribute('aria-pressed', 'false');
   const details = states.getByRole('button', { name: '자세히 보기', exact: true });
   await expect(details).not.toHaveAttribute('aria-describedby');
+  await expect(states.getByRole('tooltip', { name: '자세히 보기', exact: true, includeHidden: true })).toHaveCount(0);
   await details.press('Enter');
   await expect(details).toHaveAttribute('aria-expanded', 'true');
   await details.press('Tab');
@@ -139,6 +140,29 @@ test('IconButton sizes remain square and tooltips respond to hover, focus and Es
   await expect(states.getByRole('button', { name: '삭제할 항목 없음', exact: true })).toBeDisabled();
   await states.getByRole('button', { name: '북마크로 포커스', exact: true }).press('Enter');
   await expect(bookmark).toBeFocused();
+});
+
+test('IconButton applies tooltip placement and pointer delays', async ({ page }) => {
+  await page.clock.install();
+  await page.goto(route('buttons'));
+  const button = page.getByRole('button', { name: '지연 툴팁 설정', exact: true });
+  const tooltip = button.locator('..').getByRole('tooltip', { includeHidden: true });
+  await expect(button.locator('..')).toHaveAttribute('data-position', 'bottom');
+  await button.scrollIntoViewIfNeeded();
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+  await button.hover({ force: true });
+  await page.clock.runFor(499);
+  await expect(tooltip).toBeHidden();
+  await page.clock.runFor(1);
+  await expect(tooltip).toBeVisible();
+  expect((await tooltip.boundingBox()).y).toBeGreaterThan((await button.boundingBox()).y);
+  await page.mouse.move(0, 0);
+  await page.clock.runFor(299);
+  await expect(tooltip).toBeVisible();
+  await page.clock.runFor(1);
+  await expect(tooltip).toBeHidden();
+  await button.focus();
+  await expect(tooltip).toBeVisible();
 });
 
 for (const kind of ['popover', 'menu']) {

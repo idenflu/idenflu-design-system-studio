@@ -2,6 +2,12 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
+## 미배포
+
+### 변경
+
+- `IconButton` 툴팁은 `tooltip`에 내용을 지정하면 표시됩니다. 기존 `label` 문구를 툴팁에 표시하려면 같은 값을 `tooltip`에도 전달합니다. `tooltipEnterDelay`와 `tooltipLeaveDelay`로 포인터 표시·숨김 지연을 밀리초 단위로 설정할 수 있습니다.
+
 ## 0.8.0 — 2026-11-18
 
 [게시 소스 `14ce01f`](https://github.com/idenflu/idenflu-design-system-studio/commit/14ce01f1d3c1d331d28b68ae94cc20def649f1cc) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44256279306)

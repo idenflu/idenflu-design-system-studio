@@ -465,7 +465,7 @@ export function DataGrid<T>({
         <Icon name={density === 'compact' ? 'rows-compact' : 'rows-comfortable'} />
       </Button>
     </Tooltip>,
-    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열"><Icon name="columns" /></IconButton>} label={`${label} 표시 열`}>
+    columns: showColumnVisibility && columns.length > 1 && <Popover align="end" trigger={<IconButton variant="outline" color="primary" label="표시 열" tooltip="표시 열"><Icon name="columns" /></IconButton>} label={`${label} 표시 열`}>
       <div className="data-grid-column-options" data-size="md"><strong>표시할 열</strong><p>최소 한 개의 열을 표시합니다.</p>{columns.map(column => {
         const checked = visibleColumns.some(item => item.id === column.id);
         return <Checkbox key={column.id} label={column.header} checked={checked} disabled={checked && visibleColumns.length === 1} onChange={() => setHidden(checked ? [...hidden, column.id] : hidden.filter(value => value !== column.id))} />;

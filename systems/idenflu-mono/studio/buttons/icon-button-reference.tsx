@@ -3,12 +3,14 @@ import { Section } from '../demo-layout';
 import { ApiTable, CodeExample, type PropertyRow } from '../convenience-api-reference';
 
 const iconButtonProps: readonly PropertyRow[] = [
-  ['label', 'string', '필수', '버튼의 접근 가능한 이름이자 기본 툴팁입니다. 동작이 드러나는 짧은 이름을 지정합니다.'],
+  ['label', 'string', '필수', '버튼의 접근 가능한 이름입니다. 동작이 드러나는 짧은 이름을 지정합니다.'],
   ['children', 'ReactNode', '필수', '버튼 안에 표시할 아이콘입니다. Icon은 장식으로 처리하고 의미는 label로 전달합니다.'],
-  ['tooltip', 'ReactNode | false', 'label', '기본 툴팁을 다른 내용으로 바꿉니다. false이면 툴팁을 제거하며 버튼 이름은 유지합니다.'],
+  ['tooltip', 'ReactNode | false', 'undefined', '툴팁에 표시할 내용입니다. 생략하거나 false를 지정하면 툴팁을 렌더링하지 않습니다.'],
   ['variant', "'default' | 'outline' | 'ghost'", "'ghost'", '버튼의 형태를 지정합니다.'],
   ['color', "'primary' | 'secondary' | 'danger'", "'secondary'", '버튼의 색상을 지정합니다.'],
   ['tooltipPosition', "'top' | 'bottom' | 'left' | 'right'", "'top'", '툴팁의 위치를 지정합니다.'],
+  ['tooltipEnterDelay', 'number', '0', '포인터가 들어온 뒤 툴팁을 표시하기까지의 시간(ms)입니다. 키보드 포커스에서는 즉시 표시합니다.'],
+  ['tooltipLeaveDelay', 'number', '0', '포인터가 떠난 뒤 툴팁을 숨기기까지의 시간(ms)입니다.'],
   ['loading', 'boolean', 'false', '아이콘 대신 스피너를 표시하고 동작을 비활성화합니다.'],
   ['size', "'sm' | 'md' | 'lg'", '기본 컨트롤 크기', 'Button과 같은 크기 체계를 따릅니다.'],
   ['disabled', 'boolean', 'false', '동작을 비활성화하고 키보드 탐색에서 제외합니다.'],
@@ -33,10 +35,11 @@ export function BookmarkActions() {
         <Icon name="bookmark" />
       </IconButton>
       <IconButton label="북마크 초기화" tooltip="저장한 북마크를 해제합니다."
+        tooltipPosition="bottom" tooltipEnterDelay={500} tooltipLeaveDelay={300}
         onClick={() => setBookmarked(false)}>
         <Icon name="rotate" />
       </IconButton>
-      <IconButton label="자세히 보기" tooltip={false}
+      <IconButton label="자세히 보기"
         aria-expanded={details} aria-controls="bookmark-details"
         onClick={() => setDetails(value => !value)}>
         <Icon name="info" />
@@ -53,7 +56,7 @@ export function BookmarkActions() {
 }`;
 
 export function IconButtonReference() {
-  return <Section id="icon-button-api" title="IconButton API" description="label 하나로 접근 가능한 이름과 기본 툴팁을 함께 제공합니다. 텍스트가 함께 보이는 버튼은 Button을 사용합니다.">
+  return <Section id="icon-button-api" title="IconButton API" description="label은 접근 가능한 이름을 지정합니다. 툴팁이 필요한 버튼에는 tooltip을 지정합니다.">
     <ApiTable title="아이콘 버튼 속성" rows={iconButtonProps} />
     <CodeExample title="접근 가능한 북마크와 도구 버튼">{iconButtonCode}</CodeExample>
   </Section>;

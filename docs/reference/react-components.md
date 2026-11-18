@@ -195,13 +195,16 @@ export function ProjectFilters() {
 
 ## IconButton
 
-`IconButton`은 아이콘 전용 `Button`이며 기본 스타일은 `ghost`입니다. 필수 `label`을 접근 가능한 이름과 기본 툴팁에 함께 사용합니다. `tooltip`을 전달하면 안내 내용만 바꾸고, `tooltip={false}`로 툴팁을 제거해도 버튼 이름은 유지합니다. `Button`의 `variant`, `size`, `disabled`, 네이티브 이벤트와 실제 버튼을 가리키는 `ref`를 지원합니다.
+`IconButton`은 아이콘 전용 `Button`이며 기본 스타일은 `ghost`입니다. 필수 `label`은 접근 가능한 이름입니다. 툴팁이 필요한 버튼에 `tooltip`으로 내용을 전달합니다. `Button`의 `variant`, `size`, `disabled`, 네이티브 이벤트와 실제 버튼을 가리키는 `ref`를 지원합니다.
 
 | 속성 | 타입 | 기본값 | 설명 |
 | --- | --- | --- | --- |
-| `label` | `string` | 필수 | 접근 가능한 이름과 기본 툴팁입니다. |
+| `label` | `string` | 필수 | 버튼의 접근 가능한 이름입니다. |
 | `children` | `ReactNode` | 필수 | 표시할 아이콘입니다. |
-| `tooltip` | `ReactNode \| false` | `label` | 툴팁 내용을 바꾸거나 제거합니다. |
+| `tooltip` | `ReactNode \| false` | `undefined` | 툴팁 내용입니다. 생략하거나 `false`를 지정하면 툴팁을 렌더링하지 않습니다. |
+| `tooltipPosition` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | 툴팁의 위치입니다. |
+| `tooltipEnterDelay` | `number` | `0` | 포인터가 들어온 뒤 툴팁이 표시되기까지의 시간(ms)입니다. 키보드 포커스에서는 즉시 표시합니다. |
+| `tooltipLeaveDelay` | `number` | `0` | 포인터가 떠난 뒤 툴팁이 숨겨지기까지의 시간(ms)입니다. |
 | `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'danger'` | `'ghost'` | `Button`과 같은 스타일입니다. |
 | `size` | `'sm' \| 'md' \| 'lg'` | 기본 컨트롤 크기 | `Button`과 같은 크기입니다. |
 
@@ -213,6 +216,8 @@ import '@idenflu/mono-react/styles.css';
 export function BookmarkButton() {
   const [bookmarked, setBookmarked] = useState(false);
   return <IconButton label="북마크" variant="outline" size="md"
+    tooltip="북마크 저장 상태를 전환합니다." tooltipPosition="bottom"
+    tooltipEnterDelay={500} tooltipLeaveDelay={300}
     aria-pressed={bookmarked} onClick={() => setBookmarked(value => !value)}>
     <Icon name="bookmark" />
   </IconButton>;

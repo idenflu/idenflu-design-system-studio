@@ -27,13 +27,14 @@ function fixture() {
 const icon = () => h('svg', { 'data-icon': 'settings', role: 'img', 'aria-label': '장식 아이콘', viewBox: '0 0 16 16' }, h('path', { d: 'M2 8h12' }));
 const tooltipText = (container, button) => button.getAttribute('aria-describedby')?.split(' ').map(id => container.querySelector(`[id="${id}"]`)?.textContent).filter(Boolean);
 
-test('IconButton supplies its name, default tooltip and button semantics while forwarding refs and native props', async () => {
+test('IconButton supplies its name and button semantics without a default tooltip while forwarding refs and native props', async () => {
   const f = fixture(), ref = React.createRef(); let clicks = 0;
   try {
     await f.render(h(IconButton, {
       ref, id: 'settings-button', label: '설정', name: 'action', value: 'settings',
       className: 'custom-action', 'data-action': 'settings', 'aria-label': '다른 이름',
-      iconOnly: false, onClick: () => clicks++,
+      iconOnly: false, tooltipPosition: 'bottom', tooltipEnterDelay: 500, tooltipLeaveDelay: 300,
+      onClick: () => clicks++,
     }, icon()));
     const button = f.container.querySelector('button');
     assert.equal(ref.current, button);
@@ -47,9 +48,14 @@ test('IconButton supplies its name, default tooltip and button semantics while f
     assert.equal(button.classList.contains('button--icon'), true);
     assert.equal(button.classList.contains('custom-action'), true);
     assert.ok(button.querySelector('[data-icon]').closest('[aria-hidden="true"]'));
-    assert.deepEqual(tooltipText(f.container, button), ['설정']);
+    assert.equal(button.getAttribute('aria-describedby'), null);
+    assert.equal(f.container.querySelector('[role=tooltip]'), null);
+    assert.equal(f.container.querySelector('.tooltip-wrap'), null);
     assert.equal(button.hasAttribute('label'), false);
     assert.equal(button.hasAttribute('tooltip'), false);
+    assert.equal(button.hasAttribute('tooltipposition'), false);
+    assert.equal(button.hasAttribute('tooltipenterdelay'), false);
+    assert.equal(button.hasAttribute('tooltipleavedelay'), false);
     assert.equal(button.hasAttribute('icononly'), false);
     await act(async () => button.click());
     assert.equal(clicks, 1);
@@ -115,7 +121,8 @@ test('IconButton merges custom tooltip descriptions, updates its label and can o
     await f.render(render({ label: '검색' }));
     button = f.container.querySelector('button');
     assert.equal(button.getAttribute('aria-label'), '검색');
-    assert.deepEqual(tooltipText(f.container, button), ['사용자 설명', '검색']);
+    assert.equal(button.getAttribute('aria-describedby'), 'action-help');
+    assert.equal(f.container.querySelector('[role=tooltip]'), null);
 
     await f.render(render({ label: '닫기', tooltip: false }));
     button = f.container.querySelector('button');
@@ -137,7 +144,6 @@ test('IconButton default names and custom or omitted tooltips are present in ser
   const buttons = [...container.querySelectorAll('button')];
   assert.deepEqual(buttons.map(button => button.getAttribute('aria-label')), ['설정', '다운로드', '닫기']);
   assert.deepEqual(buttons.map(button => button.type), ['button', 'button', 'button']);
-  assert.equal(container.querySelectorAll('[role=tooltip]').length, 2);
-  assert.deepEqual([...container.querySelectorAll('[role=tooltip]')].map(element => element.textContent), ['설정', '파일 받기']);
+  assert.deepEqual([...container.querySelectorAll('[role=tooltip]')].map(element => element.textContent), ['파일 받기']);
   for (const button of buttons) assert.ok(button.querySelector('[data-icon]').closest('[aria-hidden="true"]'));
 });

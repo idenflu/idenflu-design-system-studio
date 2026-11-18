@@ -19,7 +19,7 @@ test('Button exposes the chosen CVA classes and preserves its label while loadin
 });
 
 test('IconButton forwards the tooltip position and keeps its accessible name while loading', () => {
-  const doc = new JSDOM(renderToStaticMarkup(React.createElement(IconButton, {label:'설정', tooltipPosition:'left', loading:true}, 'icon'))).window.document;
+  const doc = new JSDOM(renderToStaticMarkup(React.createElement(IconButton, {label:'설정', tooltip:'설정 열기', tooltipPosition:'left', loading:true}, 'icon'))).window.document;
   assert.equal(doc.querySelector('.tooltip-wrap').dataset.position,'left');
   assert.equal(doc.querySelector('button').getAttribute('aria-label'),'설정');
   assert.equal(doc.querySelector('button').disabled,true);
