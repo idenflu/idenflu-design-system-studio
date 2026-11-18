@@ -2,6 +2,20 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
+## 0.7.0 — 게시 예정
+
+### 추가
+
+- `TableHeader`·`TableBody`·`TableFooter`와 `TableRow`·`TableHeaderCell`·`TableCell`을 공개합니다. 각 컴포넌트는 네이티브 표 요소의 의미와 속성을 유지하고 `className`과 `ref`를 지원합니다.
+
+### 변경
+
+- Table 스타일을 클래스 선택자로 전환하고 DataGrid와 Studio 예제를 새 컴포넌트로 옮겼습니다.
+
+### 호환성
+
+- Table 스타일을 적용하는 기존 HTML 표의 섹션·행·셀을 새 컴포넌트로 교체하거나 해당 클래스를 지정해야 합니다. [Table 사용 및 이전 방법](docs/reference/react-components.md#table)을 참고하세요.
+
 ## 0.6.2 — 2026-11-17
 
 [게시 소스 `033bccf`](https://github.com/idenflu/idenflu-design-system-studio/commit/033bccf7354b1433c0126c94668df90acddefb86) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44001391173)
