@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Badge, Table, TableContainer } from '@idenflu/mono-react';
+import { Grid, Badge, Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import { StatusBadge } from './status-definitions';
 
@@ -28,8 +28,8 @@ export function BadgeSizeDemos() {
       <TableContainer label="Badge 기본 크기">
         <Table>
           <caption className="sr-only">기본 설정에서의 배지 크기, 단위 px</caption>
-          <thead><tr><th scope="col">크기</th><th scope="col">높이</th><th scope="col">글자</th><th scope="col">행간</th><th scope="col">아이콘</th><th scope="col">좌우 여백</th></tr></thead>
-          <tbody>{sizes.map(({size,height,font,line,icon,padding}) => <tr key={size}><th scope="row"><code>{size}</code></th><td>{height}px</td><td>{font}px</td><td>{line}px</td><td>{icon}px</td><td>{padding}px</td></tr>)}</tbody>
+          <TableHeader><TableRow><TableHeaderCell scope="col">크기</TableHeaderCell><TableHeaderCell scope="col">높이</TableHeaderCell><TableHeaderCell scope="col">글자</TableHeaderCell><TableHeaderCell scope="col">행간</TableHeaderCell><TableHeaderCell scope="col">아이콘</TableHeaderCell><TableHeaderCell scope="col">좌우 여백</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{sizes.map(({size,height,font,line,icon,padding}) => <TableRow key={size}><TableHeaderCell scope="row"><code>{size}</code></TableHeaderCell><TableCell>{height}px</TableCell><TableCell>{font}px</TableCell><TableCell>{line}px</TableCell><TableCell>{icon}px</TableCell><TableCell>{padding}px</TableCell></TableRow>)}</TableBody>
         </Table>
       </TableContainer>
       <p className="react-studio-caption">표는 기본 설정 기준입니다. 문서와 설치한 패키지는 같은 크기 규칙을 사용합니다. 사용자 글자 크기·행간 설정에 따라 글자와 높이가 커져도 내용이 잘리지 않도록 여유를 유지합니다.</p>
@@ -39,8 +39,8 @@ export function BadgeSizeDemos() {
       <TableContainer label="Compact 표의 배지 크기">
         <Table density="compact">
           <caption className="sr-only">Compact 표에서 기본 SM과 명시한 MD·LG 배지 비교</caption>
-          <thead><tr><th scope="col">크기 생략</th><th scope="col">size="md"</th><th scope="col">size="lg"</th></tr></thead>
-          <tbody><tr><td><StatusBadge status="success">SM 상속</StatusBadge></td><td><StatusBadge status="success" size="md">MD 지정</StatusBadge></td><td><StatusBadge status="success" size="lg">LG 지정</StatusBadge></td></tr></tbody>
+          <TableHeader><TableRow><TableHeaderCell scope="col">크기 생략</TableHeaderCell><TableHeaderCell scope="col">size="md"</TableHeaderCell><TableHeaderCell scope="col">size="lg"</TableHeaderCell></TableRow></TableHeader>
+          <TableBody><TableRow><TableCell><StatusBadge status="success">SM 상속</StatusBadge></TableCell><TableCell><StatusBadge status="success" size="md">MD 지정</StatusBadge></TableCell><TableCell><StatusBadge status="success" size="lg">LG 지정</StatusBadge></TableCell></TableRow></TableBody>
         </Table>
       </TableContainer>
     </Section>
@@ -48,8 +48,8 @@ export function BadgeSizeDemos() {
       <TableContainer label="Badge 속성">
         <Table>
           <caption className="sr-only">Badge 속성, 타입과 기본값</caption>
-          <thead><tr><th scope="col">속성</th><th scope="col">타입 · 기본값</th><th scope="col">설명</th></tr></thead>
-          <tbody>{props.map(([name,type,description]) => <tr key={name}><th scope="row"><code>{name}</code></th><td><code>{type}</code></td><td>{description}</td></tr>)}</tbody>
+          <TableHeader><TableRow><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">타입 · 기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{props.map(([name,type,description]) => <TableRow key={name}><TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell><code>{type}</code></TableCell><TableCell>{description}</TableCell></TableRow>)}</TableBody>
         </Table>
       </TableContainer>
       <p className="react-studio-caption">크기는 <code>size</code>로 선택하고, 세부 조정은 <code>className</code> 범위에서 CSS 변수를 재정의합니다. <code>--badge-font-size</code>는 글자, <code>--badge-line-height</code>는 행간, <code>--badge-height</code>는 높이, <code>--badge-icon-size</code>는 아이콘, <code>--badge-padding-inline</code>은 좌우 여백, <code>--badge-gap</code>은 아이콘과 문구 사이 간격입니다. 글자나 행간을 바꾸면 높이도 함께 조정하세요.</p>

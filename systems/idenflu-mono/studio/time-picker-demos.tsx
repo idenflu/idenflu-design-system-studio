@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Button, Table, TableContainer, TimePicker, type TimeValue } from '@idenflu/mono-react';
+import { Grid, Button, Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell, TimePicker, type TimeValue } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import {publicAPIType, publicAPINote, type APIContracts} from './public-api';
 import {TemporalFieldFormExample} from './temporal-field-form-example';
@@ -25,8 +25,8 @@ const props = [
 function ReferenceTable({label, rows, contracts}: {label:string; rows:readonly (readonly [string,string,string])[]; contracts?:APIContracts}) {
   return <TableContainer label={label} className="studio-time-reference-table"><Table>
     <caption className="sr-only">{label}</caption>
-    <thead><tr><th scope="col">항목</th><th scope="col">{contracts ? '타입' : '타입 · 기본값'}</th>{contracts && <th scope="col">기본값</th>}<th scope="col">설명</th></tr></thead>
-    <tbody>{rows.map(([name,typeOrInitial,description])=><tr key={name}><th scope="row"><code>{name}</code></th><td><code>{contracts ? publicAPIType(contracts,name) : typeOrInitial}</code></td>{contracts && <td><code>{typeOrInitial}</code></td>}<td>{description}</td></tr>)}</tbody>
+    <TableHeader><TableRow><TableHeaderCell scope="col">항목</TableHeaderCell><TableHeaderCell scope="col">{contracts ? '타입' : '타입 · 기본값'}</TableHeaderCell>{contracts && <TableHeaderCell scope="col">기본값</TableHeaderCell>}<TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+    <TableBody>{rows.map(([name,typeOrInitial,description])=><TableRow key={name}><TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell><code>{contracts ? publicAPIType(contracts,name) : typeOrInitial}</code></TableCell>{contracts && <TableCell><code>{typeOrInitial}</code></TableCell>}<TableCell>{description}</TableCell></TableRow>)}</TableBody>
   </Table></TableContainer>;
 }
 

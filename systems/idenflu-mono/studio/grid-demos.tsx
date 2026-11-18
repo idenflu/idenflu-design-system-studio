@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Badge, Button, Card, CardTitle, CardDescription, Grid, GridItem, Icon, Progress, Select, TextArea, TextField } from '@idenflu/mono-react';
+import { Table, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell, Alert, Badge, Button, Card, CardTitle, CardDescription, Grid, GridItem, Icon, Progress, Select, TextArea, TextField } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 
 const projects = [
@@ -83,13 +83,13 @@ function DashboardGrid() {
 export function GridDemos() {
   return <><ResponsiveCards /><FormGrid /><SpacingGrid /><DashboardGrid />
     <Section id="grid-reference" title="사용 기준" description="Grid는 콘텐츠 배치, GridItem은 개별 항목의 병합과 정렬을 담당합니다. div의 일반 HTML 속성·className·style·ref를 전달하며 별도 ARIA 역할을 부여하지 않습니다.">
-      <div className="table-scroll"><table className="data-table"><thead><tr><th scope="col">컴포넌트</th><th scope="col">속성</th><th scope="col">기본값과 용도</th></tr></thead><tbody>
-        <tr><th scope="row">Grid</th><td><code>columns</code></td><td>기본 1열. 양의 정수로 열 수를 지정합니다.</td></tr>
-        <tr><th scope="row">Grid</th><td><code>gap / rowGap / columnGap</code></td><td>gap 기본 6. 토큰 0~8·10·12를 사용하며 기본 여백에서 6은 24px입니다.</td></tr>
-        <tr><th scope="row">Grid</th><td><code>alignItems / justifyItems</code></td><td>기본 stretch. 세로·가로 방향의 항목 정렬입니다.</td></tr>
-        <tr><th scope="row">GridItem</th><td><code>colSpan / rowSpan</code></td><td>기본 1. colSpan="full"은 현재 Grid의 전체 열을 사용합니다.</td></tr>
-        <tr><th scope="row">GridItem</th><td><code>alignSelf / justifySelf</code></td><td>개별 항목의 세로·가로 정렬을 지정합니다.</td></tr>
-      </tbody></table></div>
+      <div className="table-scroll"><Table><TableHeader><TableRow><TableHeaderCell scope="col">컴포넌트</TableHeaderCell><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">기본값과 용도</TableHeaderCell></TableRow></TableHeader><TableBody>
+        <TableRow><TableHeaderCell scope="row">Grid</TableHeaderCell><TableCell><code>columns</code></TableCell><TableCell>기본 1열. 양의 정수로 열 수를 지정합니다.</TableCell></TableRow>
+        <TableRow><TableHeaderCell scope="row">Grid</TableHeaderCell><TableCell><code>gap / rowGap / columnGap</code></TableCell><TableCell>gap 기본 6. 토큰 0~8·10·12를 사용하며 기본 여백에서 6은 24px입니다.</TableCell></TableRow>
+        <TableRow><TableHeaderCell scope="row">Grid</TableHeaderCell><TableCell><code>alignItems / justifyItems</code></TableCell><TableCell>기본 stretch. 세로·가로 방향의 항목 정렬입니다.</TableCell></TableRow>
+        <TableRow><TableHeaderCell scope="row">GridItem</TableHeaderCell><TableCell><code>colSpan / rowSpan</code></TableCell><TableCell>기본 1. colSpan="full"은 현재 Grid의 전체 열을 사용합니다.</TableCell></TableRow>
+        <TableRow><TableHeaderCell scope="row">GridItem</TableHeaderCell><TableCell><code>alignSelf / justifySelf</code></TableCell><TableCell>개별 항목의 세로·가로 정렬을 지정합니다.</TableCell></TableRow>
+      </TableBody></Table></div>
       <p className="react-studio-caption">배치 속성은 단일 값 또는 <code>{'{ base, sm, md, lg, xl }'}</code> 객체를 받습니다. sm 600px·md 900px·lg 1200px·xl 1440px부터 적용하며 생략한 구간은 앞 구간의 값을 이어받습니다. 숫자 열 병합은 현재 Grid의 열 수 안으로 제한합니다.</p>
       <p className="react-studio-caption">문서 순서와 키보드 탐색 순서를 같은 흐름으로 유지하세요. 시각적 배치를 위해 항목의 순서를 바꾸지 않습니다. 검색·정렬·선택 등 표 기능이 필요한 경우 DataGrid를 사용합니다.</p>
     </Section>

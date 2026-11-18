@@ -1,13 +1,13 @@
 import * as React from 'react';
-import {Table, TableContainer} from '@idenflu/mono-react';
+import { Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import {Section} from './demo-layout';
 import {publicAPIType, publicAPINote, type APIContracts, type APIPropertyRow} from './public-api';
 
 function ReferenceTable({label, contracts, rows}: {label:string; contracts:APIContracts; rows:readonly APIPropertyRow[]}) {
   return <TableContainer label={label} className="studio-time-reference-table"><Table>
     <caption className="sr-only">{label}: 타입, 기본값과 사용 방법</caption>
-    <thead><tr><th scope="col">속성</th><th scope="col">타입</th><th scope="col">기본값</th><th scope="col">설명</th></tr></thead>
-    <tbody>{rows.map(([name,initial,description])=><tr key={name}><th scope="row"><code>{name}</code></th><td><code>{publicAPIType(contracts,name)}</code></td><td><code>{initial}</code></td><td>{description}</td></tr>)}</tbody>
+    <TableHeader><TableRow><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">타입</TableHeaderCell><TableHeaderCell scope="col">기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+    <TableBody>{rows.map(([name,initial,description])=><TableRow key={name}><TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell><code>{publicAPIType(contracts,name)}</code></TableCell><TableCell><code>{initial}</code></TableCell><TableCell>{description}</TableCell></TableRow>)}</TableBody>
   </Table></TableContainer>;
 }
 

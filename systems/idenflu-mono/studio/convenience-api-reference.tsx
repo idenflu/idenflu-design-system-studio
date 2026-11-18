@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Table, TableContainer } from '@idenflu/mono-react';
+import { Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 
 export type PropertyRow = readonly [name: string, type: string, initial: string, description: string];
@@ -8,10 +8,10 @@ export function ApiTable({ title, rows }: { title: string; rows: readonly Proper
   return <TableContainer label={title} className="studio-convenience-api-table">
     <Table density="compact">
       <caption className="sr-only">{title}: 속성, 타입, 기본값과 설명</caption>
-      <thead><tr><th scope="col">속성</th><th scope="col">타입</th><th scope="col">기본값</th><th scope="col">설명</th></tr></thead>
-      <tbody>{rows.map(([name, type, initial, description]) => <tr key={name}>
-        <th scope="row"><code>{name}</code></th><td><code>{type}</code></td><td><code>{initial}</code></td><td>{description}</td>
-      </tr>)}</tbody>
+      <TableHeader><TableRow><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">타입</TableHeaderCell><TableHeaderCell scope="col">기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+      <TableBody>{rows.map(([name, type, initial, description]) => <TableRow key={name}>
+        <TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell><code>{type}</code></TableCell><TableCell><code>{initial}</code></TableCell><TableCell>{description}</TableCell>
+      </TableRow>)}</TableBody>
     </Table>
   </TableContainer>;
 }

@@ -762,6 +762,10 @@ export function ProjectForm() {
 
 ## Table
 
+`TableHeader`, `TableBody`, `TableFooter`는 각각 `thead`, `tbody`, `tfoot`으로 렌더링합니다. 각 섹션 안에 `TableRow`를 배치하고, 열·행 제목에는 `TableHeaderCell`, 데이터에는 `TableCell`을 사용합니다. 표 제목과 열 너비는 기본 HTML 요소인 `caption`과 `colgroup`으로 지정합니다.
+
+기존 HTML 마크업에 패키지의 표 스타일을 적용하려면 각 요소에 `table-header`, `table-body`, `table-footer`, `table-row`, `table-cell`을 지정하세요. `th`에는 `table-cell table-header-cell`을 함께 지정합니다.
+
 `Table`은 기본 밀도인 `density="default"`와 행 간격을 줄인 `density="compact"`를 지원합니다. 글자 크기는 두 밀도 모두 본문 기준을 유지하며 첫·마지막 셀까지 같은 좌우 패딩을 적용합니다. 헤더는 배경 없이 위·아래 진한 구분선으로 표시하고, 행 사이는 연한 구분선, 마지막 행과 합계 행(`tfoot`)은 진한 구분선으로 마감합니다. 열 너비는 데이터에 맞게 `colgroup`으로 정의합니다. `TableContainer`는 좁은 화면에서 표 영역만 가로로 스크롤하도록 감쌉니다.
 
 표 전체에 고정폭 숫자를 적용합니다. 숫자 열은 `table-numeric`(끝 정렬), 날짜는 `table-date`, 두 줄 셀은 `table-primary`·`table-secondary`, 빈 값 안내는 `table-muted` 클래스를 사용합니다. compact에서는 배지 높이를 20px로 맞추고, 표 안의 체크박스는 행 높이를 늘리지 않습니다.
@@ -770,7 +774,7 @@ export function ProjectForm() {
 
 ```tsx
 import { useState } from 'react';
-import { Checkbox, Table, TableContainer } from '@idenflu/mono-react';
+import { Checkbox, Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 const files = [
@@ -790,19 +794,19 @@ export function FileTableExample() {
   return <TableContainer label="공유 파일 목록">
     <Table interactive density="compact">
       <caption className="sr-only">공유 파일과 선택 상태</caption>
-      <thead><tr>
-        <th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>}
+      <TableHeader><TableRow>
+        <TableHeaderCell scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>}
           checked={allSelected} indeterminate={selected.size > 0 && !allSelected}
-          onChange={() => setSelected(allSelected ? new Set() : new Set(files.map(file => file.id)))} /></th>
-        <th scope="col">파일</th><th scope="col" className="table-numeric">크기</th>
-      </tr></thead>
-      <tbody>{files.map(file => <tr key={file.id}
+          onChange={() => setSelected(allSelected ? new Set() : new Set(files.map(file => file.id)))} /></TableHeaderCell>
+        <TableHeaderCell scope="col">파일</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">크기</TableHeaderCell>
+      </TableRow></TableHeader>
+      <TableBody>{files.map(file => <TableRow key={file.id}
         data-selected={selected.has(file.id) || undefined}
         onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggle(file.id); }}>
-        <td><Checkbox label={<span className="sr-only">{file.name} 선택</span>}
-          checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></td>
-        <td>{file.name}</td><td className="table-numeric">{file.size}MB</td>
-      </tr>)}</tbody>
+        <TableCell><Checkbox label={<span className="sr-only">{file.name} 선택</span>}
+          checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></TableCell>
+        <TableCell>{file.name}</TableCell><TableCell className="table-numeric">{file.size}MB</TableCell>
+      </TableRow>)}</TableBody>
     </Table>
   </TableContainer>;
 }

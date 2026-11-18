@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Table, TableContainer } from '@idenflu/mono-react';
+import { Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import {publicAPIType, publicAPINote, type APIContracts, type APIPropertyRow} from './public-api';
 
@@ -14,10 +14,10 @@ function PropertyTable({ title, rows, contracts }: { title: string; rows: readon
       <Table density="compact" className="studio-grid-property-table">
         <colgroup><col style={{width:'23%'}} /><col style={{width:'27%'}} /><col style={{width:'15%'}} /><col style={{width:'35%'}} /></colgroup>
         <caption className="sr-only">{title}의 타입, 기본값과 사용 방법</caption>
-        <thead><tr><th scope="col">속성</th><th scope="col">타입</th><th scope="col">기본값</th><th scope="col">설명</th></tr></thead>
-        <tbody>{rows.map(([name, initial, description]) => <tr key={name}>
-          <th scope="row"><code>{name}</code></th><td><code>{publicAPIType(contracts,name)}</code></td><td><code>{initial}</code></td><td>{description}</td>
-        </tr>)}</tbody>
+        <TableHeader><TableRow><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">타입</TableHeaderCell><TableHeaderCell scope="col">기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+        <TableBody>{rows.map(([name, initial, description]) => <TableRow key={name}>
+          <TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell><code>{publicAPIType(contracts,name)}</code></TableCell><TableCell><code>{initial}</code></TableCell><TableCell>{description}</TableCell>
+        </TableRow>)}</TableBody>
       </Table>
     </TableContainer>
   </div>;
@@ -27,8 +27,8 @@ function DetailTable({ title, rows }: { title: string; rows: readonly DetailRow[
   return <TableContainer label={title} className="studio-grid-reference-table">
     <Table density="compact">
       <caption className="sr-only">{title}</caption>
-      <thead><tr><th scope="col">항목</th><th scope="col">설명</th></tr></thead>
-      <tbody>{rows.map(([name, description]) => <tr key={name}><th scope="row"><code>{name}</code></th><td>{description}</td></tr>)}</tbody>
+      <TableHeader><TableRow><TableHeaderCell scope="col">항목</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+      <TableBody>{rows.map(([name, description]) => <TableRow key={name}><TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell>{description}</TableCell></TableRow>)}</TableBody>
     </Table>
   </TableContainer>;
 }
@@ -37,8 +37,8 @@ function EventTable({contracts,rows}:{contracts:APIContracts;rows:readonly Event
   return <TableContainer label="데이터그리드 이벤트 콜백" className="studio-grid-reference-table">
     <Table density="compact">
       <caption className="sr-only">콜백 타입, 발생 시점과 부모 상태 연결 방법</caption>
-      <thead><tr><th scope="col">콜백 · 타입</th><th scope="col">발생 시점</th><th scope="col">부모에서 연결할 동작</th></tr></thead>
-      <tbody>{rows.map(([name,timing,connection])=><tr key={name}><th scope="row"><code>{name}: {publicAPIType(contracts,name)}</code></th><td>{timing}</td><td>{connection}</td></tr>)}</tbody>
+      <TableHeader><TableRow><TableHeaderCell scope="col">콜백 · 타입</TableHeaderCell><TableHeaderCell scope="col">발생 시점</TableHeaderCell><TableHeaderCell scope="col">부모에서 연결할 동작</TableHeaderCell></TableRow></TableHeader>
+      <TableBody>{rows.map(([name,timing,connection])=><TableRow key={name}><TableHeaderCell scope="row"><code>{name}: {publicAPIType(contracts,name)}</code></TableHeaderCell><TableCell>{timing}</TableCell><TableCell>{connection}</TableCell></TableRow>)}</TableBody>
     </Table>
   </TableContainer>;
 }

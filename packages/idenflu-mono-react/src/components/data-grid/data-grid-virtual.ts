@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { defaultRangeExtractor, measureElement, observeElementOffset, useVirtualizer, type Range, type Virtualizer } from '@tanstack/react-virtual';
+import { TableBody } from '../table/Table';
 import type { DataGridPrepareScrollRef } from './DataGridScrollbar';
 
 export interface DataGridVirtualizationOptions {
@@ -179,5 +180,5 @@ export function DataGridBody<T>({columnCount, emptyContent, renderRow, onFocusCa
     }
     if (virtual.totalSize > offset) rendered.push(spacer(virtual.totalSize - offset, 'spacer-end'));
   } else options.rows.forEach((row,index) => rendered.push(renderRow(row,index)));
-  return React.createElement('tbody', {onFocusCapture, onBlurCapture}, rendered);
+  return React.createElement(TableBody, {onFocusCapture, onBlurCapture}, rendered);
 }

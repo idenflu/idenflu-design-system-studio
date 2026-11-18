@@ -5,7 +5,7 @@ import { Checkbox } from '../selection/Selection';
 import { Icon } from '../icon/Icon';
 import { Pagination } from '../pagination/Pagination';
 import { Spinner } from '../spinner/Spinner';
-import { Table } from '../table/Table';
+import { Table, TableHeader, TableRow, TableHeaderCell, TableCell } from '../table/Table';
 import { TextField } from '../text-field/TextField';
 import { Popover } from '../popover/Popover';
 import { Tooltip } from '../tooltip/Tooltip';
@@ -408,7 +408,7 @@ export function DataGrid<T>({
   const renderRow = (row:T, rowIndex:number, measure?: (element:HTMLTableRowElement | null) => void) => {
           const rowId = getRowId(row);
           const rowClickable = selectable && selectOnRowClick && (!isRowSelectable || isRowSelectable(row));
-          return <tr key={rowId} ref={measure} data-index={virtualEnabled ? rowIndex : undefined} data-grid-row-id={rowId} aria-rowindex={virtualEnabled ? (paginated ? (page - 1) * size : 0) + rowIndex + headerRows + 1 : undefined} data-selected={selectable && selectedSet.has(rowId) || undefined} data-row-selectable={rowClickable || undefined} onClick={rowClickable ? event => {
+          return <TableRow key={rowId} ref={measure} data-index={virtualEnabled ? rowIndex : undefined} data-grid-row-id={rowId} aria-rowindex={virtualEnabled ? (paginated ? (page - 1) * size : 0) + rowIndex + headerRows + 1 : undefined} data-selected={selectable && selectedSet.has(rowId) || undefined} data-row-selectable={rowClickable || undefined} onClick={rowClickable ? event => {
             if (event.defaultPrevented || event.button !== 0) return;
             const target = event.target as Element;
             if (target.closest('button,a[href],input,select,textarea,label,summary,[role="button"],[role="link"],[role="checkbox"],[role="combobox"],[role="switch"],[role="slider"],[role="spinbutton"],[contenteditable]:not([contenteditable="false"]),[data-grid-ignore-row-click]')) return;
@@ -417,13 +417,13 @@ export function DataGrid<T>({
             toggleRow(rowId);
             event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]')?.focus({preventScroll:true});
           } : undefined}>
-            {selectable && <td className="data-grid-select-cell"><Checkbox label={<span className="sr-only">{getRowLabel ? getRowLabel(row) : rowId} 선택</span>} checked={selectedSet.has(rowId)} disabled={!!isRowSelectable && !isRowSelectable(row)} onChange={() => toggleRow(rowId)} /></td>}
+            {selectable && <TableCell className="data-grid-select-cell"><Checkbox label={<span className="sr-only">{getRowLabel ? getRowLabel(row) : rowId} 선택</span>} checked={selectedSet.has(rowId)} disabled={!!isRowSelectable && !isRowSelectable(row)} onChange={() => toggleRow(rowId)} /></TableCell>}
             {visibleColumns.map(column => {
               const editValue = editing?.rowId === rowId && editing.columnId === column.id;
               const editable = !!onCellEdit && (typeof column.editable === 'function' ? column.editable(row) : !!column.editable);
-              return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{editValue ? <DataGridCellEditor value={String(column.accessor(row) ?? '')} label={column.header} type={column.editor} validate={column.validate ? value => column.validate!(value, row) : undefined} onCommit={value => finishEditing(row, column, value)} onCancel={() => finishEditing(row, column)} /> : <div className="data-grid-cell-content"><span>{column.cell ? column.cell(row) : column.accessor(row) ?? <span className="table-muted">—</span>}</span>{editable && <button type="button" className="icon-button data-grid-edit-button" data-grid-edit={JSON.stringify([rowId,column.id])} aria-label={`${getRowLabel ? getRowLabel(row) : rowId} ${column.header} 편집`} onClick={() => setEditing({rowId,columnId:column.id})}><Icon name="edit" /></button>}</div>}</td>;
+              return <TableCell key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{editValue ? <DataGridCellEditor value={String(column.accessor(row) ?? '')} label={column.header} type={column.editor} validate={column.validate ? value => column.validate!(value, row) : undefined} onCommit={value => finishEditing(row, column, value)} onCancel={() => finishEditing(row, column)} /> : <div className="data-grid-cell-content"><span>{column.cell ? column.cell(row) : column.accessor(row) ?? <span className="table-muted">—</span>}</span>{editable && <button type="button" className="icon-button data-grid-edit-button" data-grid-edit={JSON.stringify([rowId,column.id])} aria-label={`${getRowLabel ? getRowLabel(row) : rowId} ${column.header} 편집`} onClick={() => setEditing({rowId,columnId:column.id})}><Icon name="edit" /></button>}</div>}</TableCell>;
             })}
-          </tr>;
+          </TableRow>;
 
   };
   const columnCount = Math.max(1, visibleColumns.length + (selectable ? 1 : 0));
@@ -492,12 +492,12 @@ export function DataGrid<T>({
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>
         <caption className="sr-only">{label}</caption>
         <colgroup>{selectable && <col className="data-grid-select-column" />}{visibleColumns.map(column => <col key={column.id} style={{width:columnWidth(column)}} />)}</colgroup>
-        <thead ref={header}><tr aria-rowindex={virtualEnabled ? 1 : undefined}>
-          {selectable && <th scope="col" className="data-grid-select-cell"><Checkbox label={<span className="sr-only">{paginated ? '현재 페이지 전체 선택' : '검색 결과 전체 선택'}</span>} checked={allOnPage} indeterminate={selectedOnPage > 0 && !allOnPage} disabled={blocked || !selectableIds.length} onChange={togglePage} /></th>}
+        <TableHeader ref={header}><TableRow aria-rowindex={virtualEnabled ? 1 : undefined}>
+          {selectable && <TableHeaderCell scope="col" className="data-grid-select-cell"><Checkbox label={<span className="sr-only">{paginated ? '현재 페이지 전체 선택' : '검색 결과 전체 선택'}</span>} checked={allOnPage} indeterminate={selectedOnPage > 0 && !allOnPage} disabled={blocked || !selectableIds.length} onChange={togglePage} /></TableHeaderCell>}
           {visibleColumns.map((column, columnIndex) => {
             const sortIndex = sorting.findIndex(item => item.columnId === column.id);
             const currentSort = sorting[sortIndex];
-            return <th key={column.id} scope="col" className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)} aria-sort={column.sortable === false || sortIndex > 0 ? undefined : currentSort ? currentSort.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
+            return <TableHeaderCell key={column.id} scope="col" className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)} aria-sort={column.sortable === false || sortIndex > 0 ? undefined : currentSort ? currentSort.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
             {column.sortable === false ? column.header : <><button className="data-grid-sort" type="button" disabled={blocked} aria-describedby={`${id}-sort-help ${id}-sort-${columnIndex}`} onClick={event => changeSort(column.id, event.shiftKey)}><span>{column.header}</span>{currentSort && <span className="data-grid-sort-icon is-active" aria-hidden="true"><Icon name={currentSort.direction === 'asc' ? 'arrow-up' : 'arrow-down'} />{sorting.length > 1 && <span className="data-grid-sort-priority">{sortIndex + 1}</span>}</span>}</button><span className="sr-only" id={`${id}-sort-${columnIndex}`}>{currentSort ? `${sortIndex + 1}순위 ${currentSort.direction === 'asc' ? '오름차순' : '내림차순'}` : '정렬 안 함'}</span></>}
             {column.resizable !== false && <span className="data-grid-resize" role="separator" aria-label={`${column.header} 열 너비`} aria-orientation="vertical" aria-valuenow={columnWidth(column)} aria-valuemin={widthBounds(column).min} aria-valuemax={widthBounds(column).max} aria-describedby={`${id}-resize-help`} title="드래그·방향키로 조절 · 더블클릭·Enter로 원래 너비 복구" tabIndex={0} onDoubleClick={() => resetWidth(column)} onKeyDown={event => {
               if (event.key === 'Enter') {
@@ -513,12 +513,12 @@ export function DataGrid<T>({
               event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture?.(event.pointerId);
               drag.current = {id:column.id, startX:event.clientX, startWidth:columnWidth(column), direction:event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget).direction === 'rtl' ? -1 : 1};
             }} onPointerMove={event => { if (drag.current?.id === column.id) resize(column, drag.current.startWidth + (event.clientX - drag.current.startX) * drag.current.direction); }} onPointerUp={event => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }} />}
-          </th>; })}
-        </tr>{filterRowVisible && <tr id={`${id}-filters`} className="data-grid-filter-row" data-size={toolbarSize} aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <td className="data-grid-select-cell" />}{visibleColumns.map(column => {
+          </TableHeaderCell>; })}
+        </TableRow>{filterRowVisible && <TableRow id={`${id}-filters`} className="data-grid-filter-row" data-size={toolbarSize} aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <TableCell className="data-grid-select-cell" />}{visibleColumns.map(column => {
           const filter = filters[column.id];
           const numericFilter = typeof filter === 'object' && filter !== null && !Array.isArray(filter) ? filter : undefined;
-          return <td key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select hideLabel label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'multi-select' ? <MultiSelect hideLabel searchable maxVisibleLabels={1} label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={Array.isArray(filter) ? filter.map(value => `option:${value}`) : []} onValueChange={values => changeFilter(column.id, values.map(value => value.slice(7)))} options={(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={numericFilter?.min ?? ''} onChange={event => changeFilter(column.id, {...numericFilter, min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={numericFilter?.max ?? ''} onChange={event => changeFilter(column.id, {...numericFilter, max:event.target.value})} /></div> : null}</td>;
-        })}</tr>}</thead>
+          return <TableCell key={column.id} className={column.pinned === 'start' ? 'data-grid-pinned' : undefined} style={cellStyle(column)}>{column.filter === 'text' ? <input className="text-input" aria-label={`${column.header} 필터`} placeholder="포함하는 값" value={typeof filter === 'string' ? filter : ''} onChange={event => changeFilter(column.id, event.target.value)} /> : column.filter === 'select' ? <Select hideLabel label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={typeof filter === 'string' && filter ? `option:${filter}` : 'all'} onValueChange={value => changeFilter(column.id, value === 'all' ? '' : value.slice(7))} options={[{value:'all',label:'전체'}, ...(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))]} /> : column.filter === 'multi-select' ? <MultiSelect hideLabel searchable maxVisibleLabels={1} label={`${column.header} 필터`} placeholder="전체" popupStrategy="fixed" value={Array.isArray(filter) ? filter.map(value => `option:${value}`) : []} onValueChange={values => changeFilter(column.id, values.map(value => value.slice(7)))} options={(column.filterOptions || []).map(option => ({...option,value:`option:${option.value}`}))} /> : column.filter === 'number' ? <div className="data-grid-number-filter"><input className="text-input" type="number" step="any" aria-label={`${column.header} 최솟값`} placeholder="최소" value={numericFilter?.min ?? ''} onChange={event => changeFilter(column.id, {...numericFilter, min:event.target.value})} /><span aria-hidden="true">–</span><input className="text-input" type="number" step="any" aria-label={`${column.header} 최댓값`} placeholder="최대" value={numericFilter?.max ?? ''} onChange={event => changeFilter(column.id, {...numericFilter, max:event.target.value})} /></div> : null}</TableCell>;
+        })}</TableRow>}</TableHeader>
         <DataGridBody enabled={virtualEnabled && !blocked && count > 0}
           rows={shownRows} getRowId={getRowId} scrollRef={scroll} headerRef={header} prepareScrollRef={prepareScroll}
           keepRowIds={keepRowIds} options={typeof virtualized === 'object' ? virtualized : undefined}
@@ -530,9 +530,9 @@ export function DataGrid<T>({
           if (row?.dataset.gridRowId) setFocusedRowId(row.dataset.gridRowId);
         }} onBlurCapture={event => {
           if (!event.relatedTarget || !event.currentTarget.contains(event.relatedTarget as Node)) setFocusedRowId(null);
-        }} emptyContent={blocked || !count ? <tr key="state" aria-rowindex={virtualEnabled ? headerRows + 1 : undefined}><td className="data-grid-state-cell" colSpan={Math.max(1, visibleColumns.length + (selectable ? 1 : 0))}>
+        }} emptyContent={blocked || !count ? <TableRow key="state" aria-rowindex={virtualEnabled ? headerRows + 1 : undefined}><TableCell className="data-grid-state-cell" colSpan={Math.max(1, visibleColumns.length + (selectable ? 1 : 0))}>
           <div className="data-grid-state" style={{width:viewportWidth ?? '100%'}}>{loading ? <><Spinner aria-hidden="true" /><p>데이터를 불러오는 중입니다.</p></> : hasError ? <><p>{error}</p>{onRetry && <Button variant="outline" onClick={onRetry}>다시 시도</Button>}</> : rows.length && (needle || activeFilters) ? <><Icon name="search" /><strong>검색 결과가 없습니다.</strong><p>검색어나 필터를 바꾸거나 초기화해주세요.</p><Button variant="outline" onClick={() => { setQuery(''); setFilters({}); resetPageFor('', sorting, {}); }}>조건 초기화</Button></> : <><Icon name="grid" /><p>{emptyMessage}</p></>}</div>
-        </td></tr> : undefined} />
+        </TableCell></TableRow> : undefined} />
       </Table>
     </div>
     <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} viewportWidth={viewportWidth} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />

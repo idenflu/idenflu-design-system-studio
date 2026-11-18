@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Button, Icon, Select, Spinner, Switch, Table, TableContainer, TextField } from '@idenflu/mono-react';
+import { Grid, Button, Icon, Select, Spinner, Switch, Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell, TextField } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import { SaveIcon } from '@idenflu/mono-react/icons';
 import { IconExpansionDemos } from './icon-expansion-demos';
@@ -99,8 +99,8 @@ export function SizeDemos() {
     <Section title="사이즈 토큰" description="sm·md·lg에 같은 크기 규칙을 적용합니다. 표의 수치는 기본 설정 기준이며 화면 조정 값에 따라 실제 크기가 달라집니다.">
       <TableContainer label="사이즈 토큰">
         <Table>
-          <thead><tr><th scope="col">Size</th><th scope="col">높이</th><th scope="col">좌우 패딩</th><th scope="col">아이콘</th><th scope="col">스위치 트랙</th></tr></thead>
-          <tbody>{sizes.map(size => <tr key={size.value}><td>{size.value}{size.value === 'md' ? ' · 기본' : ''}</td><td>{size.height}px</td><td>{size.padding}px</td><td>{size.icon}px</td><td>{size.switchTrack}px</td></tr>)}</tbody>
+          <TableHeader><TableRow><TableHeaderCell scope="col">Size</TableHeaderCell><TableHeaderCell scope="col">높이</TableHeaderCell><TableHeaderCell scope="col">좌우 패딩</TableHeaderCell><TableHeaderCell scope="col">아이콘</TableHeaderCell><TableHeaderCell scope="col">스위치 트랙</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{sizes.map(size => <TableRow key={size.value}><TableCell>{size.value}{size.value === 'md' ? ' · 기본' : ''}</TableCell><TableCell>{size.height}px</TableCell><TableCell>{size.padding}px</TableCell><TableCell>{size.icon}px</TableCell><TableCell>{size.switchTrack}px</TableCell></TableRow>)}</TableBody>
         </Table>
       </TableContainer>
     </Section>

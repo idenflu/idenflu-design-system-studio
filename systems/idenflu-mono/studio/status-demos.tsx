@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {DataGrid,Icon,Segmented,Table,TableContainer,type DataGridColumn} from '@idenflu/mono-react';
+import {DataGrid,Icon,Segmented,Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell,type DataGridColumn} from '@idenflu/mono-react';
 import {Section} from './demo-layout';
 import {StatusBadge,statusDefinitions,type DemoStatus} from './status-definitions';
 
@@ -12,13 +12,13 @@ export function StatusIconDemos() {
     <Segmented label="상태 아이콘 크기" value={size} onValueChange={setSize} options={[14,16,18,20].map(value=>({value:String(value),label:`${value}px`}))} />
     <TableContainer label="상태 아이콘 사용 기준" className="studio-status-table"><Table density="compact">
       <caption className="sr-only">상태별 기본·강조 아이콘과 배지, 사용 기준</caption>
-      <thead><tr><th scope="col">상태</th><th scope="col">기본</th><th scope="col">강조</th><th scope="col">배지</th><th scope="col">사용 기준</th></tr></thead>
-      <tbody>{statuses.map(status=>{const item=statusDefinitions[status];return <tr key={status} data-status={status}>
-        <th scope="row">{item.label}</th>
-        <td><div className="studio-status-icon-sample"><Icon name={item.icon} style={{'--icon-size':`${size}px`} as React.CSSProperties} /><code>{item.icon}</code></div></td>
-        <td><div className="studio-status-icon-sample"><Icon name={item.solidIcon} style={{'--icon-size':`${size}px`} as React.CSSProperties} /><code>{item.solidIcon===item.icon?'기본형 유지':item.solidIcon}</code></div></td>
-        <td><StatusBadge status={status} /></td><td>{item.description}</td>
-      </tr>;})}</tbody>
+      <TableHeader><TableRow><TableHeaderCell scope="col">상태</TableHeaderCell><TableHeaderCell scope="col">기본</TableHeaderCell><TableHeaderCell scope="col">강조</TableHeaderCell><TableHeaderCell scope="col">배지</TableHeaderCell><TableHeaderCell scope="col">사용 기준</TableHeaderCell></TableRow></TableHeader>
+      <TableBody>{statuses.map(status=>{const item=statusDefinitions[status];return <TableRow key={status} data-status={status}>
+        <TableHeaderCell scope="row">{item.label}</TableHeaderCell>
+        <TableCell><div className="studio-status-icon-sample"><Icon name={item.icon} style={{'--icon-size':`${size}px`} as React.CSSProperties} /><code>{item.icon}</code></div></TableCell>
+        <TableCell><div className="studio-status-icon-sample"><Icon name={item.solidIcon} style={{'--icon-size':`${size}px`} as React.CSSProperties} /><code>{item.solidIcon===item.icon?'기본형 유지':item.solidIcon}</code></div></TableCell>
+        <TableCell><StatusBadge status={status} /></TableCell><TableCell>{item.description}</TableCell>
+      </TableRow>;})}</TableBody>
     </Table></TableContainer>
     <p className="react-studio-caption">진행 상태의 점은 정지형입니다. 처리 중인 요청에는 Spinner를 사용하고, 취소·차단·오류는 상태 문구와 사유를 함께 표시하세요.</p>
   </Section>;

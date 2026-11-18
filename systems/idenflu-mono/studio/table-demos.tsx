@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, Checkbox, Pagination, Segmented, Table, TableContainer } from '@idenflu/mono-react';
+import { Avatar, Badge, Button, Checkbox, Pagination, Segmented, Table, TableContainer, TableHeader, TableBody, TableFooter, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import {ProjectStatusBadge} from './status-definitions';
 
@@ -75,8 +75,8 @@ export function TableDemos() {
         <Table density={density} className="react-studio-table react-studio-table--projects">
           <caption className="sr-only">프로젝트별 담당 팀·담당자와 진행 상태</caption>
           <colgroup><col className="table-col-project" /><col className="table-col-team" /><col className="table-col-owner" /><col className="table-col-status" /></colgroup>
-          <thead><tr><th scope="col">프로젝트</th><th scope="col">담당 팀</th><th scope="col">담당자</th><th scope="col">상태</th></tr></thead>
-          <tbody>{visible.map(row => <tr key={row.name}><td>{row.name}</td><td>{row.team}</td><td>{row.owner ?? <span className="table-muted">미지정</span>}</td><td><ProjectStatusBadge value={row.status} /></td></tr>)}</tbody>
+          <TableHeader><TableRow><TableHeaderCell scope="col">프로젝트</TableHeaderCell><TableHeaderCell scope="col">담당 팀</TableHeaderCell><TableHeaderCell scope="col">담당자</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{visible.map(row => <TableRow key={row.name}><TableCell>{row.name}</TableCell><TableCell>{row.team}</TableCell><TableCell>{row.owner ?? <span className="table-muted">미지정</span>}</TableCell><TableCell><ProjectStatusBadge value={row.status} /></TableCell></TableRow>)}</TableBody>
         </Table>
       </TableContainer>
       <div className="react-studio-table-footer">
@@ -90,8 +90,8 @@ export function TableDemos() {
         <Table className="react-studio-table react-studio-table--members">
           <caption className="sr-only">워크스페이스 멤버의 이메일·팀·가입일과 계정 상태</caption>
           <colgroup><col className="table-col-member" /><col className="table-col-team" /><col className="table-col-date" /><col className="table-col-status" /></colgroup>
-          <thead><tr><th scope="col">멤버</th><th scope="col">소속 팀</th><th scope="col">가입일</th><th scope="col">상태</th></tr></thead>
-          <tbody>{members.map(member => <tr key={member.email}><td><div className="react-studio-table-person"><Avatar size="sm" shape="circle" variant={member.status === '활성' ? 'primary' : 'neutral'} aria-hidden="true">{member.name.slice(0, 1)}</Avatar><div><span className="table-primary">{member.name}</span><span className="table-secondary">{member.email}</span></div></div></td><td>{member.team ?? <span className="table-muted">미지정</span>}</td><td className="table-date">{member.joined ? <time dateTime={member.joined}>{formatDate(member.joined)}</time> : <span className="table-muted">가입 전</span>}</td><td><Badge variant={member.variant}>{member.status}</Badge></td></tr>)}</tbody>
+          <TableHeader><TableRow><TableHeaderCell scope="col">멤버</TableHeaderCell><TableHeaderCell scope="col">소속 팀</TableHeaderCell><TableHeaderCell scope="col">가입일</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{members.map(member => <TableRow key={member.email}><TableCell><div className="react-studio-table-person"><Avatar size="sm" shape="circle" variant={member.status === '활성' ? 'primary' : 'neutral'} aria-hidden="true">{member.name.slice(0, 1)}</Avatar><div><span className="table-primary">{member.name}</span><span className="table-secondary">{member.email}</span></div></div></TableCell><TableCell>{member.team ?? <span className="table-muted">미지정</span>}</TableCell><TableCell className="table-date">{member.joined ? <time dateTime={member.joined}>{formatDate(member.joined)}</time> : <span className="table-muted">가입 전</span>}</TableCell><TableCell><Badge variant={member.variant}>{member.status}</Badge></TableCell></TableRow>)}</TableBody>
         </Table>
       </TableContainer>
       <p className="react-studio-caption">전체 6명 · 활성 3명 · 초대 중 2명 · 비활성 1명</p>
@@ -102,9 +102,9 @@ export function TableDemos() {
         <Table density="compact" className="react-studio-table react-studio-table--billing">
           <caption className="sr-only">2026년 11월 이용 요금·수량·청구 금액과 결제 상태</caption>
           <colgroup><col className="table-col-invoice" /><col className="table-col-date" /><col className="table-col-quantity" /><col className="table-col-amount" /><col className="table-col-status" /></colgroup>
-          <thead><tr><th scope="col">청구 항목</th><th scope="col">청구일</th><th scope="col" className="table-numeric">수량</th><th scope="col" className="table-numeric">금액</th><th scope="col">상태</th></tr></thead>
-          <tbody>{invoices.map(invoice => <tr key={invoice.id}><td><span className="table-primary">{invoice.name}</span><span className="table-secondary">{invoice.id}</span></td><td className="table-date"><time dateTime={invoice.date}>{formatDate(invoice.date)}</time></td><td className="table-numeric">{formatNumber.format(invoice.quantity)}</td><td className="table-numeric">{formatNumber.format(invoice.amount)}원</td><td><Badge variant={invoice.variant}>{invoice.status}</Badge></td></tr>)}</tbody>
-          <tfoot><tr><th scope="row" colSpan={3}>합계</th><td className="table-numeric">{formatNumber.format(invoiceTotal)}원</td><td>5건</td></tr></tfoot>
+          <TableHeader><TableRow><TableHeaderCell scope="col">청구 항목</TableHeaderCell><TableHeaderCell scope="col">청구일</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">수량</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">금액</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{invoices.map(invoice => <TableRow key={invoice.id}><TableCell><span className="table-primary">{invoice.name}</span><span className="table-secondary">{invoice.id}</span></TableCell><TableCell className="table-date"><time dateTime={invoice.date}>{formatDate(invoice.date)}</time></TableCell><TableCell className="table-numeric">{formatNumber.format(invoice.quantity)}</TableCell><TableCell className="table-numeric">{formatNumber.format(invoice.amount)}원</TableCell><TableCell><Badge variant={invoice.variant}>{invoice.status}</Badge></TableCell></TableRow>)}</TableBody>
+          <TableFooter><TableRow><TableHeaderCell scope="row" colSpan={3}>합계</TableHeaderCell><TableCell className="table-numeric">{formatNumber.format(invoiceTotal)}원</TableCell><TableCell>5건</TableCell></TableRow></TableFooter>
         </Table>
       </TableContainer>
       <p className="react-studio-caption">통화: KRW · 음수 금액은 환불 또는 크레딧을 의미합니다. 좁은 화면에서는 각 표를 가로로 스크롤하세요.</p>
@@ -119,11 +119,11 @@ export function TableDemos() {
         <Table interactive className="react-studio-table react-studio-table--files">
           <caption className="sr-only">공유 파일의 소유자·크기·수정일과 선택 상태</caption>
           <colgroup><col className="table-col-select" /><col className="table-col-file" /><col className="table-col-owner" /><col className="table-col-size" /><col className="table-col-date" /></colgroup>
-          <thead><tr><th scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allFilesSelected} indeterminate={selectedFiles.size > 0 && !allFilesSelected} onChange={() => setSelectedFiles(allFilesSelected ? new Set() : new Set(files.map(file => file.id)))} /></th><th scope="col">파일</th><th scope="col">소유자</th><th scope="col" className="table-numeric">크기</th><th scope="col">수정일</th></tr></thead>
-          <tbody>{files.map(file => {
+          <TableHeader><TableRow><TableHeaderCell scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allFilesSelected} indeterminate={selectedFiles.size > 0 && !allFilesSelected} onChange={() => setSelectedFiles(allFilesSelected ? new Set() : new Set(files.map(file => file.id)))} /></TableHeaderCell><TableHeaderCell scope="col">파일</TableHeaderCell><TableHeaderCell scope="col">소유자</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">크기</TableHeaderCell><TableHeaderCell scope="col">수정일</TableHeaderCell></TableRow></TableHeader>
+          <TableBody>{files.map(file => {
             const selected = selectedFiles.has(file.id);
-            return <tr key={file.id} data-selected={selected || undefined} onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggleFile(file.id); }}><td><Checkbox label={<span className="sr-only">{file.name} 선택</span>} checked={selected} onChange={() => toggleFile(file.id)} /></td><td>{file.name}</td><td>{file.owner ?? <span className="table-muted">미지정</span>}</td><td className="table-numeric">{formatSize.format(file.size)}MB</td><td className="table-date"><time dateTime={file.updated}>{formatDate(file.updated)}</time></td></tr>;
-          })}</tbody>
+            return <TableRow key={file.id} data-selected={selected || undefined} onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggleFile(file.id); }}><TableCell><Checkbox label={<span className="sr-only">{file.name} 선택</span>} checked={selected} onChange={() => toggleFile(file.id)} /></TableCell><TableCell>{file.name}</TableCell><TableCell>{file.owner ?? <span className="table-muted">미지정</span>}</TableCell><TableCell className="table-numeric">{formatSize.format(file.size)}MB</TableCell><TableCell className="table-date"><time dateTime={file.updated}>{formatDate(file.updated)}</time></TableCell></TableRow>;
+          })}</TableBody>
         </Table>
       </TableContainer>
     </Section>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Table,TableContainer} from '@idenflu/mono-react';
+import { Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import {Section} from './demo-layout';
 import {MultiSelectTagReference} from './convenience-api-reference';
 import {publicAPIType, publicAPINote, type APIContracts, type APIPropertyRow} from './public-api';
@@ -13,8 +13,8 @@ function ReferenceTable(props:ReferenceTableProps) {
   const rows:readonly Row[]=props.contracts === undefined ? props.rows : props.rows.map(([name,initial,description])=>[name,publicAPIType(props.contracts!,name),initial,description]);
   return <TableContainer label={label} className="studio-convenience-api-table"><Table density="compact">
     <caption className="sr-only">{label}: 항목, 타입, 기본값과 사용 방법</caption>
-    <thead><tr><th scope="col">항목</th><th scope="col">타입</th><th scope="col">기본값</th><th scope="col">설명</th></tr></thead>
-    <tbody>{rows.map(([name,type,initial,description])=><tr key={name}><th scope="row"><code>{name}</code></th><td><code>{type}</code></td><td><code>{initial}</code></td><td>{description}</td></tr>)}</tbody>
+    <TableHeader><TableRow><TableHeaderCell scope="col">항목</TableHeaderCell><TableHeaderCell scope="col">타입</TableHeaderCell><TableHeaderCell scope="col">기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader>
+    <TableBody>{rows.map(([name,type,initial,description])=><TableRow key={name}><TableHeaderCell scope="row"><code>{name}</code></TableHeaderCell><TableCell><code>{type}</code></TableCell><TableCell><code>{initial}</code></TableCell><TableCell>{description}</TableCell></TableRow>)}</TableBody>
   </Table></TableContainer>;
 }
 const fieldProps:readonly APIPropertyRow[]=[

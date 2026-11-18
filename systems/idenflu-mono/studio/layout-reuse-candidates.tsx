@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Table, TableContainer } from '@idenflu/mono-react';
+import { Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 
 const candidates = [
@@ -17,8 +17,8 @@ export function LayoutReuseCandidates() {
   return <Section id="layout-reuse-candidates" title="재사용 후보" description="PageHeader는 프로젝트에서 정의하는 제목 영역 패턴입니다. 나머지는 현재 업무 샘플에서 추출을 검토할 후보입니다.">
     <TableContainer label="업무 화면 재사용 후보">
       <Table density="compact">
-        <thead><tr><th scope="col" style={{whiteSpace:'nowrap'}}>우선</th><th scope="col">후보</th><th scope="col">현재 구현</th><th scope="col">추출 범위</th><th scope="col">적용·분리 기준</th></tr></thead>
-        <tbody>{candidates.map(([priority, name, current, scope, boundary]) => <tr key={name}><td>{priority}</td><th scope="row">{name === 'PageHeader' ? <a href="#/patterns/page-header">{name}</a> : name}</th><td>{current}</td><td>{scope}</td><td>{boundary}</td></tr>)}</tbody>
+        <TableHeader><TableRow><TableHeaderCell scope="col" style={{whiteSpace:'nowrap'}}>우선</TableHeaderCell><TableHeaderCell scope="col">후보</TableHeaderCell><TableHeaderCell scope="col">현재 구현</TableHeaderCell><TableHeaderCell scope="col">추출 범위</TableHeaderCell><TableHeaderCell scope="col">적용·분리 기준</TableHeaderCell></TableRow></TableHeader>
+        <TableBody>{candidates.map(([priority, name, current, scope, boundary]) => <TableRow key={name}><TableCell>{priority}</TableCell><TableHeaderCell scope="row">{name === 'PageHeader' ? <a href="#/patterns/page-header">{name}</a> : name}</TableHeaderCell><TableCell>{current}</TableCell><TableCell>{scope}</TableCell><TableCell>{boundary}</TableCell></TableRow>)}</TableBody>
       </Table>
     </TableContainer>
     <p className="component-helper">컴포넌트 추출 후보는 FilterBar·MasterDetail입니다. 권한 편집·프로젝트 상태 전환·초대 같은 업무 규칙은 화면별로 유지합니다.</p>

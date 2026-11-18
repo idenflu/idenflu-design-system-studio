@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table, Icon } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table, TableHeader, TableBody, TableFooter, TableRow, TableHeaderCell, TableCell, Icon } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -553,9 +553,36 @@ test('Tree category roots share selection and expansion with the default tree st
   } finally { await f.dispose(); }
 });
 
+test('Table sections, rows, and cells preserve native semantics and compose classes', async () => {
+  const f = fixture();
+  const headerRef = React.createRef(), footerRef = React.createRef();
+  try {
+    await f.render(h(Table, null,
+      h(TableHeader, { ref: headerRef, className: 'custom-header' },
+        h(TableRow, null, h(TableHeaderCell, { scope: 'col', colSpan: 2 }, '프로젝트'))),
+      h(TableBody, null, h(TableRow, null, h(TableCell, { className: 'custom-cell' }, '디자인 시스템'))),
+      h(TableFooter, { ref: footerRef }, h(TableRow, null, h(TableCell, null, '합계')))
+    ));
+    const table = f.container.querySelector('table');
+    assert.equal(headerRef.current, table.tHead);
+    assert.equal(footerRef.current, table.tFoot);
+    assert.equal(table.tHead.className, 'table-header custom-header');
+    assert.equal(table.tBodies[0].className, 'table-body');
+    assert.equal(table.tFoot.className, 'table-footer');
+    assert.equal(table.rows[0].className, 'table-row');
+    const headerCell = table.rows[0].cells[0];
+    assert.equal(headerCell.tagName, 'TH');
+    assert.equal(headerCell.className, 'table-cell table-header-cell');
+    assert.equal(headerCell.scope, 'col');
+    assert.equal(headerCell.colSpan, 2);
+    assert.equal(table.rows[1].cells[0].tagName, 'TD');
+    assert.equal(table.rows[1].cells[0].className, 'table-cell custom-cell');
+  } finally { await f.dispose(); }
+});
+
 test('Table enables row hover only when interactive and keeps selected rows marked', async () => {
   const f = fixture(), ref = React.createRef();
-  const body = h('tbody', null, h('tr', { 'data-selected': true }, h('td', null, '디자인 시스템')));
+  const body = h(TableBody, null, h(TableRow, { 'data-selected': true }, h(TableCell, null, '디자인 시스템')));
   try {
     await f.render(h(Table, { ref, className: 'project-table' }, body));
     const table = f.container.querySelector('table');

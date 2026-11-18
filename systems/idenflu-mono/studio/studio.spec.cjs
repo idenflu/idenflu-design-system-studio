@@ -163,6 +163,30 @@ test('table density preserves data while pagination changes rows and stepper mov
   await expect(page.getByRole('list', { name: '프로젝트 생성 단계' }).locator('[aria-current="step"]')).toContainText('팀원 초대');
 });
 
+test('table sections retain their rules and the scroll region is keyboard focusable', {tag:['@theme','@mobile']}, async ({ page, isMobile }) => {
+  await page.goto('/systems/idenflu-mono/index.html#/components/table');
+  const billing = page.getByRole('region', { name: '11월 청구 내역' });
+  const header = billing.locator('.table-header .table-header-cell').first();
+  const bodyRows = billing.locator('.table-body .table-row');
+  const footer = billing.locator('.table-footer .table-header-cell');
+  await expect(header).toHaveCSS('border-top-width', '1px');
+  await expect(footer).toHaveText('합계');
+  await expect(footer).toHaveCSS('border-top-width', '1px');
+  const sectionRule = await header.evaluate(cell => getComputedStyle(cell).borderBottomColor);
+  await expect(bodyRows.last().locator('.table-cell').first()).toHaveCSS('border-bottom-color', sectionRule);
+  await expect(bodyRows.first().locator('.table-cell').first()).not.toHaveCSS('border-bottom-color', sectionRule);
+  await expect(footer).toHaveCSS('border-top-color', sectionRule);
+
+  await billing.focus();
+  await expect(billing).toBeFocused();
+  await expect(billing).not.toHaveCSS('box-shadow', 'none');
+  if (isMobile) {
+    expect(await billing.evaluate(region => region.scrollWidth)).toBeGreaterThan(await billing.evaluate(region => region.clientWidth));
+    await billing.evaluate(region => { region.scrollLeft = 40; });
+    expect(await billing.evaluate(region => region.scrollLeft)).toBeGreaterThan(0);
+  }
+});
+
 test('table rows highlight only in interactive tables and selection marks the chosen rows', {tag:['@theme','@mobile']}, async ({ page, isMobile }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/table');
   const transparent = 'rgba(0, 0, 0, 0)';
