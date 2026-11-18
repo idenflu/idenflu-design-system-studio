@@ -2,7 +2,9 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
-## 0.7.0 — 게시 예정
+## 0.7.0 — 2026-11-18
+
+[게시 소스 `1c20665`](https://github.com/idenflu/idenflu-design-system-studio/commit/1c20665d3ee506ffc9d34ba63708695afebbc340) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44245517372)
 
 ### 추가
 
