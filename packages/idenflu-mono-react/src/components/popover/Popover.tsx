@@ -13,7 +13,6 @@ export function Popover({ trigger, children, label, align = 'start', open: contr
   const wrap = React.useRef<HTMLDivElement>(null);
   const button = React.useRef<HTMLButtonElement>(null);
   const content = React.useRef<HTMLDivElement>(null);
-  usePopupPosition(open, align, button, content);
   const id = React.useId();
   useEscapeLayer(open, wrap, () => { setOpen(false); button.current?.focus(); });
   const previouslyOpen = React.useRef(open);
@@ -21,6 +20,7 @@ export function Popover({ trigger, children, label, align = 'start', open: contr
     if (previouslyOpen.current && !open && wrap.current?.contains(document.activeElement)) button.current?.focus();
     previouslyOpen.current = open;
   }, [open]);
+  usePopupPosition(open, align, button, content);
   React.useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => { if (!wrap.current?.contains(event.target as Node)) setOpen(false); };

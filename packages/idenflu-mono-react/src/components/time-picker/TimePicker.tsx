@@ -151,8 +151,8 @@ export const TimePicker = React.forwardRef<HTMLInputElement, TimePickerProps>(fu
           leftEdge = Math.max(leftEdge, rect.left + parent.clientLeft);
           rightEdge = Math.min(rightEdge, rect.left + parent.clientLeft + parent.clientWidth);
         }
-        // A native modal is independent of a locked body's clipping bounds.
-        if (parent.tagName === 'DIALOG' && parent.hasAttribute('open')) break;
+        // A containing top layer escapes clipping from any ancestors above it.
+        if ((shownAsPopover && parent.matches(':popover-open')) || parent.matches('dialog[open]')) break;
       }
       if (anchor.bottom <= edge || anchor.top >= height - edge || anchor.right <= edge || anchor.left >= width - edge) { setOpen(false); return; }
       const below = Math.max(0, height - anchor.bottom - gap - edge), above = Math.max(0, anchor.top - gap - edge);

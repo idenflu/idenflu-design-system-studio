@@ -51,7 +51,7 @@ npm run test:react-compat -- --react=19.2.0
 
 ## 브라우저 엔진과 React 호환성
 
-`npm run test:compat`는 Chromium·Firefox·WebKit에서 핵심 시나리오 4개씩, 총 12개를 실행합니다. 범위는 네이티브 Dialog 안의 선택·달력·중첩 팝업 닫기와 포커스 복원, Select 폼 초기화, 일시 선택 확정·취소, 역전된 일시 범위 검증입니다. 전체 Studio 검사는 Chromium에서 계속 실행합니다.
+`npm run test:compat`는 Chromium·Firefox·WebKit에서 핵심 시나리오 5개씩, 총 15개를 실행합니다. 범위는 네이티브 Dialog 안의 선택·달력·시간·중첩 팝업 닫기와 포커스 복원, 스크롤 컨테이너와 모달 안의 팝업 가려짐, Select 폼 초기화, 일시 선택 확정·취소, 역전된 일시 범위 검증입니다. 전체 Studio 검사는 Chromium에서 계속 실행합니다.
 
 macOS 27에서 번들 Firefox가 `Could not find profile folder`로 시작하지 못하면 [Playwright의 Firefox 앱 데이터 경로 이슈](https://github.com/microsoft/playwright/issues/42768)를 확인합니다. 로컬 재현 환경에서는 새 임시 디렉터리를 `CFFIXED_USER_HOME`으로 지정하는 우회를 검토할 수 있습니다. 기존 사용자 프로필을 변경하지 않고 실행 OS·Playwright 버전·우회 적용 여부를 검증 기록에 함께 남깁니다.
 

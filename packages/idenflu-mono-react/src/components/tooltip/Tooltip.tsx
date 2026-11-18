@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { useClientLayoutEffect } from '../../shared/use-client-layout-effect';
+import { clampPopupPosition, popupViewport, useAnchoredPopup } from '../../shared/popup-position';
+
+type TooltipSide = 'top' | 'bottom' | 'left' | 'right';
+const oppositeSide: Record<TooltipSide, TooltipSide> = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
 
 /** Tooltip content is exposed as the trigger's accessible description. */
-export function Tooltip({ content, children, position: placement = 'top', enterDelay = 0, leaveDelay = 0 }: { content: React.ReactNode; position?: 'top' | 'bottom' | 'left' | 'right'; enterDelay?: number; leaveDelay?: number; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
+export function Tooltip({ content, children, position: placement = 'top', enterDelay = 0, leaveDelay = 0 }: { content: React.ReactNode; position?: TooltipSide; enterDelay?: number; leaveDelay?: number; children: React.ReactElement<{ 'aria-describedby'?: string }> }) {
   const id = React.useId();
   const [dismissed, setDismissed] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -17,24 +20,37 @@ export function Tooltip({ content, children, position: placement = 'top', enterD
     else setOpen(visible);
   };
   React.useEffect(() => () => clearTimeout(timer.current), []);
-  const position = React.useCallback(() => {
-    const element = bubble.current;
-    if (!element?.getClientRects().length) return;
-    element.style.transform = '';
+  const position = React.useCallback((anchor: HTMLElement, element: HTMLElement, view: Window, topLayer: boolean) => {
+    const viewport = popupViewport(element, view);
+    if (!topLayer) {
+      element.style.transform = '';
+      const bounds = element.getBoundingClientRect();
+      const left = clampPopupPosition(bounds.left, viewport.left, viewport.right, bounds.width);
+      element.style.transform = left === bounds.left ? '' : `translateX(${left - bounds.left}px)`;
+      return;
+    }
+
     const bounds = element.getBoundingClientRect();
-    const width = element.ownerDocument.documentElement.clientWidth;
-    const shift = Math.max(12 - bounds.left, Math.min(0, width - 12 - bounds.right));
-    element.style.transform = shift ? `translateX(${shift}px)` : '';
-  }, []);
-  useClientLayoutEffect(() => {
-    position();
-    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(position);
-    if (wrap.current) observer?.observe(wrap.current);
-    if (bubble.current) observer?.observe(bubble.current);
-    window.addEventListener('resize', position);
-    window.addEventListener('scroll', position, true);
-    return () => { observer?.disconnect(); window.removeEventListener('resize', position); window.removeEventListener('scroll', position, true); };
-  }, [position, content]);
+    const trigger = anchor.getBoundingClientRect();
+    const gap = Number.parseFloat(view.getComputedStyle(element).paddingTop);
+    const available = {
+      top: trigger.top - viewport.top, bottom: viewport.bottom - trigger.bottom,
+      left: trigger.left - viewport.left, right: viewport.right - trigger.right,
+    };
+    const size = placement === 'top' || placement === 'bottom' ? bounds.height : bounds.width;
+    const opposite = oppositeSide[placement];
+    const side = available[placement] < size + gap && available[opposite] > available[placement] ? opposite : placement;
+    const icon = anchor.querySelector('.icon-button, .button--icon');
+    const left = side === 'left' ? trigger.left - gap - bounds.width
+      : side === 'right' ? trigger.right + gap
+      : icon ? trigger.right - bounds.width : trigger.left;
+    const top = side === 'top' ? trigger.top - gap - bounds.height
+      : side === 'bottom' ? trigger.bottom + gap : trigger.top + (trigger.height - bounds.height) / 2;
+    element.dataset.side = side;
+    element.style.left = `${clampPopupPosition(left, viewport.left, viewport.right, bounds.width)}px`;
+    element.style.top = `${clampPopupPosition(top, viewport.top, viewport.bottom, bounds.height)}px`;
+  }, [placement]);
+  useAnchoredPopup(open && !dismissed, wrap, bubble, position);
   React.useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || dismissed || !wrap.current || !(wrap.current.matches(':hover') || wrap.current.contains(document.activeElement))) return;
@@ -47,9 +63,9 @@ export function Tooltip({ content, children, position: placement = 'top', enterD
   }, [dismissed]);
   const existing = children.props['aria-describedby'];
   return <span ref={wrap} data-position={placement} className={`tooltip-wrap${open && !dismissed ? ' tooltip-open' : ''}`}
-    onMouseEnter={() => { hovered.current = true; position(); setDismissed(false); schedule(true, enterDelay); }}
+    onMouseEnter={() => { hovered.current = true; setDismissed(false); schedule(true, enterDelay); }}
     onMouseLeave={() => { hovered.current = false; if (!wrap.current?.contains(document.activeElement)) schedule(false, leaveDelay); }}
-    onFocus={event => { position(); if (!event.currentTarget.contains(event.relatedTarget)) { setDismissed(false); schedule(true, 0); } }}
+    onFocus={event => { if (!event.currentTarget.contains(event.relatedTarget)) { setDismissed(false); schedule(true, 0); } }}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget) && !hovered.current) schedule(false, leaveDelay); }}
     onClickCapture={() => { cancelTimer(); setOpen(false); setDismissed(true); }}>
     {React.cloneElement(children, { 'aria-describedby': [existing, id].filter(Boolean).join(' ') })}

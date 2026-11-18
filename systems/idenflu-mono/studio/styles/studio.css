@@ -22,15 +22,6 @@
 .react-studio .docs-topbar-tools {
   gap: 12px;
 }
-.react-studio .docs-topbar .tooltip-content {
-  top: calc(100% + var(--space-2));
-  right: 0;
-  bottom: auto;
-  left: auto;
-}
-.react-studio .docs-topbar .tooltip-content::after {
-  inset: auto 0 100%;
-}
 .react-studio .docs-navigation > .nav-group {
   margin-top: var(--space-2);
 }

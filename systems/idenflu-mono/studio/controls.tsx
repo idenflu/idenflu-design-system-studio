@@ -64,7 +64,7 @@ export function usePreferences() {
   }, []);
   return values;
 }
-export function StudioSettings() {
+export function StudioSettings({ tooltipPosition }: { tooltipPosition?: 'bottom' } = {}) {
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState(() => window.IdenfluPreferences.get());
   const [message, setMessage] = React.useState('');
@@ -96,7 +96,7 @@ export function StudioSettings() {
   }, [open]);
   const fields: [PreferenceKey, string][] = [['fontSize','글자 크기'],['lineHeight','행간'],['spacing','여백'],['controlHeight','컨트롤 높이'],['radius','모서리']];
   return <>
-    <Tooltip content="화면 조정"><button ref={trigger} type="button" className="icon-button studio-settings-open" aria-label="화면 조정" aria-haspopup="dialog" aria-expanded={open} aria-controls="studio-settings-dialog" onClick={() => open ? close() : setOpen(true)}><Icon name="settings" /></button></Tooltip>
+    <Tooltip content="화면 조정" position={tooltipPosition}><button ref={trigger} type="button" className="icon-button studio-settings-open" aria-label="화면 조정" aria-haspopup="dialog" aria-expanded={open} aria-controls="studio-settings-dialog" onClick={() => open ? close() : setOpen(true)}><Icon name="settings" /></button></Tooltip>
     {createPortal(<Dialog id="studio-settings-dialog" open={open} modal={false} onOpenChange={next => next ? setOpen(true) : close()} aria-labelledby="react-settings-title" aria-describedby="react-settings-description">
       <header className="studio-preferences-header"><div><h2 id="react-settings-title">화면 조정</h2><p id="react-settings-description">변경사항은 이 브라우저에 자동 저장됩니다.</p></div><button type="button" id="studio-preferences-close" className="icon-button" aria-label="화면 조정 닫기" onClick={close}><Icon name="x" /></button></header>
       <div className="studio-preferences-body" ref={body}>
@@ -137,7 +137,7 @@ export function StudioSettings() {
     </Dialog>, document.body)}
   </>;
 }
-export function ThemeControl() {
+export function ThemeControl({ tooltipPosition }: { tooltipPosition?: 'bottom' } = {}) {
   const [theme, setTheme] = React.useState(() => document.documentElement.dataset.theme || 'light');
   React.useEffect(() => {
     const observer = new MutationObserver(() => setTheme(window.IdenfluTheme.get()));
@@ -145,7 +145,7 @@ export function ThemeControl() {
     return () => observer.disconnect();
   }, []);
   const label = `${theme === 'dark' ? '라이트' : '다크'} 모드로 전환`;
-  return <Tooltip content={label}><button type="button" className="icon-button theme-toggle" aria-label={label} aria-pressed={theme === 'dark'} onClick={() => selectTheme(theme === 'dark' ? 'light' : 'dark')}>
+  return <Tooltip content={label} position={tooltipPosition}><button type="button" className="icon-button theme-toggle" aria-label={label} aria-pressed={theme === 'dark'} onClick={() => selectTheme(theme === 'dark' ? 'light' : 'dark')}>
     <Icon name="moon" className="theme-icon-moon" />
     <Icon name="sun" className="theme-icon-sun" />
   </button></Tooltip>;
