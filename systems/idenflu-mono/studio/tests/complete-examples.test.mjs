@@ -49,7 +49,7 @@ function button(node,text) {return [...node.querySelectorAll('button')].find(ite
 async function submit(node) {await React.act(async()=>node.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));}
 
 test('all complete examples typecheck against public package declarations and have no private imports',()=>{
-  assert.equal(checkCompleteExamples(examples),14);
+  assert.equal(checkCompleteExamples(examples),15);
   for(const code of Object.values(examples)) {
     assert.doesNotMatch(code,/from\s+['"]\./);
     assert.match(code,/import '@idenflu\/mono-react\/styles.css'/);
@@ -59,7 +59,14 @@ test('all complete examples typecheck against public package declarations and ha
 });
 
 test('every copied example mounts using only the package and its included local styles',async()=>{
-  for(const route of components.keys()) {const f=await mount(route);try {assert.ok(f.container.querySelector('.mono-copy-example style'),route);assert.ok(f.container.querySelector('input,button,table'),route);}finally{await f.dispose();}}
+  for(const route of components.keys()) {
+    const f=await mount(route);
+    try {
+      assert.ok(f.container.querySelector('.mono-copy-example style'),route);
+      const content=route==='components/box' ? 'section[aria-label="프로젝트 정보"]' : 'input,button,table';
+      assert.ok(f.container.querySelector(content),route);
+    }finally{await f.dispose();}
+  }
 });
 
 test('copied Table supports selection, all selection and pagination without missing handlers',async()=>{
