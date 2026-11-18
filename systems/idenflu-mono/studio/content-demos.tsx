@@ -84,6 +84,36 @@ export function AccordionDemos() {
   </Section>;
 }
 
+const dialogWidths = [
+  {value: 'sm', label: 'SM · 360px'},
+  {value: 'md', label: 'MD · 640px'},
+  {value: 'lg', label: 'LG · 800px'},
+  {value: 720, label: '직접 지정 · 720px'},
+] as const;
+
+function DialogWidthDemo() {
+  const [size, setSize] = React.useState<(typeof dialogWidths)[number]['value']>('md');
+  const [open, setOpen] = React.useState(false);
+  const titleId = React.useId();
+
+  return <Section title="다이얼로그 너비 비교" description="미리보기 안에서 최대 너비를 바꿔보세요. 기본값은 MD이며, 좁은 화면에서는 좌우 여백을 남기도록 줄어듭니다.">
+    <Button variant="outline" onClick={() => { setSize('md'); setOpen(true); }}>너비 미리보기 열기</Button>
+    <Dialog size={size} open={open} onOpenChange={setOpen} aria-labelledby={titleId}>
+      <DialogHeader><h2 id={titleId}>다이얼로그 너비 비교</h2></DialogHeader>
+      <DialogBody tabIndex={-1}>
+        <div className="react-studio-stack">
+          <div className="react-studio-row" role="group" aria-label="최대 너비">
+            {dialogWidths.map(({value, label}) => <Button key={value} variant={size === value ? 'default' : 'outline'}
+              aria-pressed={size === value} onClick={() => setSize(value)}>{label}</Button>)}
+          </div>
+          <p className="react-studio-caption"><code>{typeof size === 'number' ? `size={${size}}` : `size="${size}"`}</code></p>
+        </div>
+      </DialogBody>
+      <DialogFooter><Button variant="outline" onClick={() => setOpen(false)}>닫기</Button></DialogFooter>
+    </Dialog>
+  </Section>;
+}
+
 export function OverlayDemos() {
   const [dialog, setDialog] = React.useState<'info' | 'delete' | 'form' | 'divided' | 'divided-scroll' | null>(null);
   const [dividedFeedback, setDividedFeedback] = React.useState('');
@@ -154,6 +184,7 @@ export function OverlayDemos() {
       </Dialog>
       <p className="react-studio-caption">다이얼로그 안에서는 Tab으로 이동하고 Escape로 취소할 수 있습니다. 취소하면 실행 버튼으로 돌아갑니다.</p>
     </Section>
+    <DialogWidthDemo />
     <ProcessingDialogDemo />
     <Section title="구분선이 있는 다이얼로그" description="헤더·본문·하단을 회색 구분선으로 나눕니다. 긴 내용은 본문 안에서만 스크롤되며, 제목과 하단 버튼은 계속 표시됩니다.">
       <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">

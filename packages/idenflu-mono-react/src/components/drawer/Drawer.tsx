@@ -5,7 +5,7 @@ export type DrawerSide = 'right' | 'left' | 'top' | 'bottom';
 
 export type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
 
-export type DrawerProps = DialogProps & {
+export type DrawerProps = Omit<DialogProps, 'size'> & {
   /** Physical edge from which the panel opens. */
   side?: DrawerSide;
   /** Width for left/right, height for top/bottom. Numbers are pixels. */

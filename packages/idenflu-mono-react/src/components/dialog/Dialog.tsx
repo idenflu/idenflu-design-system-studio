@@ -5,17 +5,22 @@ import { useEscapeLayer } from '../../shared/escape-layer';
 
 type DismissibleProps = { open: boolean; onOpenChange: (open: boolean) => void };
 
+export type DialogSize = 'sm' | 'md' | 'lg';
+
 export type DialogProps = DismissibleProps & {
   /** Use modal scroll locking and wrapped focus. Changes while open apply on the next opening. */
   modal?: boolean;
   closeOnBackdrop?: boolean;
   variant?: 'default' | 'divided';
+  /** Maximum width. Defaults to md (640px). Numbers are pixels. */
+  size?: DialogSize | number;
   /** Focus this descendant after the native dialog opens. */
   initialFocusRef?: React.RefObject<HTMLElement | null>;
 } & Omit<React.DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose'>;
 
 /** Native dialog with modal focus wrapping and shared Escape-layer ordering. */
-export function Dialog({ open, onOpenChange, children, className = '', modal = true, closeOnBackdrop = false, variant = 'default', initialFocusRef, onClick, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
+export function Dialog({ open, onOpenChange, children, className = '', modal = true, closeOnBackdrop = false, variant = 'default', size, style, initialFocusRef, onClick, onKeyDown, onPointerDownCapture, onPointerCancelCapture, ...props }: DialogProps) {
+  const customSize = typeof size === 'number' ? { '--dialog-size': `${size}px` } : undefined;
   const ref = React.useRef<HTMLDialogElement>(null);
   const openedAsModal = React.useRef<boolean | null>(null);
   const activeModal = openedAsModal.current ?? modal;
@@ -45,7 +50,7 @@ export function Dialog({ open, onOpenChange, children, className = '', modal = t
     const bounds = event.currentTarget.getBoundingClientRect();
     return event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
   };
-  return <dialog {...props} aria-modal={props['aria-modal'] ?? (activeModal ? undefined : false)} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} onPointerDownCapture={event => {
+  return <dialog {...props} aria-modal={props['aria-modal'] ?? (activeModal ? undefined : false)} ref={ref} className={`dialog${variant === 'divided' ? ' dialog--divided' : ''}${className ? ` ${className}` : ''}`} data-dialog-size={typeof size === 'string' ? size : undefined} style={customSize ? { ...customSize, ...style } : style} onPointerDownCapture={event => {
     backdropPointerDown.current = closeOnBackdrop && event.isPrimary && event.button === 0 && isBackdrop(event);
     onPointerDownCapture?.(event);
     if (event.defaultPrevented) backdropPointerDown.current = false;

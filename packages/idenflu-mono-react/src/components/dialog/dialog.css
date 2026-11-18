@@ -1,4 +1,7 @@
-.dialog { position: fixed; width: min(440px, calc(100% - 48px)); max-height: calc(100% - 48px); padding: var(--space-8); border: 1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); overflow: auto; overscroll-behavior: contain; box-shadow:var(--shadow-dialog); }
+.dialog { --dialog-size: 640px; position: fixed; width: min(var(--dialog-size), calc(100% - 48px)); max-height: calc(100% - 48px); padding: var(--space-8); border: 1px solid var(--border); border-radius:var(--radius-control); background:var(--field-background); color: var(--text); overflow: auto; overscroll-behavior: contain; box-shadow:var(--shadow-dialog); }
+.dialog:where(:not(.drawer)) { box-sizing: border-box; }
+.dialog[data-dialog-size="sm"] { --dialog-size: 360px; }
+.dialog[data-dialog-size="lg"] { --dialog-size: 800px; }
 .dialog::backdrop { background: var(--overlay-backdrop); }
 .dialog h2 { margin: 0; padding-right: var(--space-8); font-size:var(--font-size-heading); line-height:var(--line-height-heading); font-weight:var(--font-weight-semibold); letter-spacing: -.6px; }
 .dialog > p { margin-top: var(--space-2); color: var(--text-secondary); }
@@ -34,7 +37,7 @@
 .dialog--divided > .dialog-footer { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--space-2); padding: var(--space-4) var(--dialog-section-padding); border-top: 1px solid var(--divider); }
 .dialog--divided > .dialog-footer > .button { width: auto; min-width: min(84px, 100%); max-width: 100%; }
 @media (max-width: 600px) {
-.dialog.dialog--divided { --dialog-section-padding: var(--space-4); width: min(440px, calc(100% - 32px)); max-height: calc(100dvh - 32px); }
+.dialog.dialog--divided { --dialog-section-padding: var(--space-4); width: min(var(--dialog-size), calc(100% - 32px)); max-height: calc(100dvh - 32px); }
 .dialog--divided > .dialog-header { padding-block: var(--space-4); }
 .dialog { padding: var(--space-7) var(--space-6); }
 .dialog > p { max-width: 240px; }
