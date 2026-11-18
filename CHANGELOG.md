@@ -2,6 +2,21 @@
 
 게시 버전의 날짜는 GitHub Packages 게시일(KST) 기준입니다. 게시 이후의 저장소 변경은 미배포 항목에 기록하고, 0.2.0은 기존 개발 기록을 유지합니다.
 
+## 0.8.0 — 게시 예정
+
+### 추가
+
+- `Table`에 기본 가로 스크롤 영역과 접근성 이름을 지정하는 `scrollLabel`을 추가했습니다.
+- `fillHeight`를 지정하면 세로 flex 레이아웃의 남은 높이를 표가 채웁니다. 헤더와 푸터를 고정하고 넘치는 본문을 세로로 스크롤할 수 있습니다. Studio에 행 추가 예제를 제공합니다.
+
+### 변경
+
+- `TableFooter` 셀의 전용 글자색과 굵기를 제거했습니다. 푸터 셀은 기본 텍스트 스타일을 사용합니다.
+
+### 호환성
+
+- 단독으로 사용하는 `Table`은 `table`을 스크롤 영역으로 감쌉니다. 기존 `TableContainer`는 기본 가로 스크롤을 계속 담당하며, `fillHeight` 사용 시에는 `Table`을 세로 flex 컨테이너의 직접 자식으로 배치합니다. [Table 사용 문서](docs/reference/react-components.md#table)를 참고하세요.
+
 ## 0.7.0 — 2026-11-18
 
 [게시 소스 `1c20665`](https://github.com/idenflu/idenflu-design-system-studio/commit/1c20665d3ee506ffc9d34ba63708695afebbc340) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44245517372)
