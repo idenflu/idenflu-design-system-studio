@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Avatar, Badge, Button, Checkbox, Pagination, Segmented, Table, TableContainer, TableHeader, TableBody, TableFooter, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
+import { Avatar, Badge, Button, Checkbox, Pagination, Segmented, Table, TableHeader, TableBody, TableFooter, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import { Section } from './demo-layout';
 import {ProjectStatusBadge} from './status-definitions';
 
@@ -51,6 +51,32 @@ const formatNumber = new Intl.NumberFormat('ko-KR');
 const formatSize = new Intl.NumberFormat('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const formatDate = (date: string) => date.replace(/-/g, '.');
 
+function FillHeightTableDemo() {
+  const [rowCount, setRowCount] = React.useState(2);
+
+  return <Section title="남은 높이 채우기" description="행을 추가해 보세요. 헤더와 푸터는 위아래에 고정되고, 넘치는 행은 본문에서 스크롤합니다.">
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'min(300px, 60vh)', gap: 'var(--space-3)' }}>
+      <div className="react-studio-table-toolbar">
+        <Button size="sm" variant="outline" disabled={rowCount >= projects.length} onClick={() => setRowCount(count => Math.min(count + 1, projects.length))}>행 추가</Button>
+      </div>
+      <Table fillHeight scrollLabel="프로젝트 표 스크롤" density="compact" className="react-studio-table">
+        <caption className="sr-only">프로젝트별 담당 팀과 상태</caption>
+        <TableHeader>
+          <TableRow><TableHeaderCell scope="col">프로젝트</TableHeaderCell><TableHeaderCell scope="col">담당 팀</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow>
+        </TableHeader>
+        <TableBody>
+          {projects.slice(0, rowCount).map(project => <TableRow key={project.name}>
+            <TableCell>{project.name}</TableCell><TableCell>{project.team}</TableCell><TableCell><ProjectStatusBadge value={project.status} /></TableCell>
+          </TableRow>)}
+        </TableBody>
+        <TableFooter>
+          <TableRow><TableHeaderCell scope="row" colSpan={2}>표시된 프로젝트</TableHeaderCell><TableCell>{rowCount}개</TableCell></TableRow>
+        </TableFooter>
+      </Table>
+    </div>
+  </Section>;
+}
+
 export function TableDemos() {
   const [page, setPage] = React.useState(1);
   const [density, setDensity] = React.useState<'default' | 'compact'>('default');
@@ -71,42 +97,38 @@ export function TableDemos() {
         <p className="react-studio-caption">기본은 여유 있게, compact는 더 많은 행을 한 화면에 표시합니다.</p>
         <Segmented label="프로젝트 테이블 밀도" size="sm" value={density} options={[{ value: 'default', label: 'Default' }, { value: 'compact', label: 'Compact' }]} onValueChange={value => setDensity(value === 'compact' ? 'compact' : 'default')} />
       </div>
-      <TableContainer label="프로젝트 목록">
-        <Table density={density} className="react-studio-table react-studio-table--projects">
-          <caption className="sr-only">프로젝트별 담당 팀·담당자와 진행 상태</caption>
-          <colgroup><col className="table-col-project" /><col className="table-col-team" /><col className="table-col-owner" /><col className="table-col-status" /></colgroup>
-          <TableHeader><TableRow><TableHeaderCell scope="col">프로젝트</TableHeaderCell><TableHeaderCell scope="col">담당 팀</TableHeaderCell><TableHeaderCell scope="col">담당자</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
-          <TableBody>{visible.map(row => <TableRow key={row.name}><TableCell>{row.name}</TableCell><TableCell>{row.team}</TableCell><TableCell>{row.owner ?? <span className="table-muted">미지정</span>}</TableCell><TableCell><ProjectStatusBadge value={row.status} /></TableCell></TableRow>)}</TableBody>
-        </Table>
-      </TableContainer>
+      <Table scrollLabel="프로젝트 목록" density={density} className="react-studio-table react-studio-table--projects">
+        <caption className="sr-only">프로젝트별 담당 팀·담당자와 진행 상태</caption>
+        <colgroup><col className="table-col-project" /><col className="table-col-team" /><col className="table-col-owner" /><col className="table-col-status" /></colgroup>
+        <TableHeader><TableRow><TableHeaderCell scope="col">프로젝트</TableHeaderCell><TableHeaderCell scope="col">담당 팀</TableHeaderCell><TableHeaderCell scope="col">담당자</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
+        <TableBody>{visible.map(row => <TableRow key={row.name}><TableCell>{row.name}</TableCell><TableCell>{row.team}</TableCell><TableCell>{row.owner ?? <span className="table-muted">미지정</span>}</TableCell><TableCell><ProjectStatusBadge value={row.status} /></TableCell></TableRow>)}</TableBody>
+      </Table>
       <div className="react-studio-table-footer">
         <p role="status" className="component-helper">{(page - 1) * pageSize + 1}–{Math.min(page * pageSize, projects.length)} / {projects.length}개 프로젝트</p>
         <Pagination page={page} pageCount={Math.ceil(projects.length / pageSize)} onPageChange={setPage} />
       </div>
     </Section>
 
+    <FillHeightTableDemo />
+
     <Section title="멤버와 보조 정보" description="아바타와 이름·이메일을 함께 표시하고, 긴 영문 주소와 미지정 항목을 처리합니다. 활성 멤버가 아니면 아바타를 Neutral로 표시하고, 빈 값에는 의미가 분명한 문구를 사용합니다.">
-      <TableContainer label="워크스페이스 멤버 목록">
-        <Table className="react-studio-table react-studio-table--members">
-          <caption className="sr-only">워크스페이스 멤버의 이메일·팀·가입일과 계정 상태</caption>
-          <colgroup><col className="table-col-member" /><col className="table-col-team" /><col className="table-col-date" /><col className="table-col-status" /></colgroup>
-          <TableHeader><TableRow><TableHeaderCell scope="col">멤버</TableHeaderCell><TableHeaderCell scope="col">소속 팀</TableHeaderCell><TableHeaderCell scope="col">가입일</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
-          <TableBody>{members.map(member => <TableRow key={member.email}><TableCell><div className="react-studio-table-person"><Avatar size="sm" shape="circle" variant={member.status === '활성' ? 'primary' : 'neutral'} aria-hidden="true">{member.name.slice(0, 1)}</Avatar><div><span className="table-primary">{member.name}</span><span className="table-secondary">{member.email}</span></div></div></TableCell><TableCell>{member.team ?? <span className="table-muted">미지정</span>}</TableCell><TableCell className="table-date">{member.joined ? <time dateTime={member.joined}>{formatDate(member.joined)}</time> : <span className="table-muted">가입 전</span>}</TableCell><TableCell><Badge variant={member.variant}>{member.status}</Badge></TableCell></TableRow>)}</TableBody>
-        </Table>
-      </TableContainer>
+      <Table scrollLabel="워크스페이스 멤버 목록" className="react-studio-table react-studio-table--members">
+        <caption className="sr-only">워크스페이스 멤버의 이메일·팀·가입일과 계정 상태</caption>
+        <colgroup><col className="table-col-member" /><col className="table-col-team" /><col className="table-col-date" /><col className="table-col-status" /></colgroup>
+        <TableHeader><TableRow><TableHeaderCell scope="col">멤버</TableHeaderCell><TableHeaderCell scope="col">소속 팀</TableHeaderCell><TableHeaderCell scope="col">가입일</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
+        <TableBody>{members.map(member => <TableRow key={member.email}><TableCell><div className="react-studio-table-person"><Avatar size="sm" shape="circle" variant={member.status === '활성' ? 'primary' : 'neutral'} aria-hidden="true">{member.name.slice(0, 1)}</Avatar><div><span className="table-primary">{member.name}</span><span className="table-secondary">{member.email}</span></div></div></TableCell><TableCell>{member.team ?? <span className="table-muted">미지정</span>}</TableCell><TableCell className="table-date">{member.joined ? <time dateTime={member.joined}>{formatDate(member.joined)}</time> : <span className="table-muted">가입 전</span>}</TableCell><TableCell><Badge variant={member.variant}>{member.status}</Badge></TableCell></TableRow>)}</TableBody>
+      </Table>
       <p className="react-studio-caption">전체 6명 · 활성 3명 · 초대 중 2명 · 비활성 1명</p>
     </Section>
 
     <Section title="금액과 날짜 · Compact" description="숫자는 오른쪽에 정렬하고, 날짜와 금액은 자릿수 폭을 맞춥니다. 0원·환불 금액과 합계 행을 포함한 정산 예시입니다.">
-      <TableContainer label="11월 청구 내역">
-        <Table density="compact" className="react-studio-table react-studio-table--billing">
-          <caption className="sr-only">2026년 11월 이용 요금·수량·청구 금액과 결제 상태</caption>
-          <colgroup><col className="table-col-invoice" /><col className="table-col-date" /><col className="table-col-quantity" /><col className="table-col-amount" /><col className="table-col-status" /></colgroup>
-          <TableHeader><TableRow><TableHeaderCell scope="col">청구 항목</TableHeaderCell><TableHeaderCell scope="col">청구일</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">수량</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">금액</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
-          <TableBody>{invoices.map(invoice => <TableRow key={invoice.id}><TableCell><span className="table-primary">{invoice.name}</span><span className="table-secondary">{invoice.id}</span></TableCell><TableCell className="table-date"><time dateTime={invoice.date}>{formatDate(invoice.date)}</time></TableCell><TableCell className="table-numeric">{formatNumber.format(invoice.quantity)}</TableCell><TableCell className="table-numeric">{formatNumber.format(invoice.amount)}원</TableCell><TableCell><Badge variant={invoice.variant}>{invoice.status}</Badge></TableCell></TableRow>)}</TableBody>
-          <TableFooter><TableRow><TableHeaderCell scope="row" colSpan={3}>합계</TableHeaderCell><TableCell className="table-numeric">{formatNumber.format(invoiceTotal)}원</TableCell><TableCell>5건</TableCell></TableRow></TableFooter>
-        </Table>
-      </TableContainer>
+      <Table scrollLabel="11월 청구 내역" density="compact" className="react-studio-table react-studio-table--billing">
+        <caption className="sr-only">2026년 11월 이용 요금·수량·청구 금액과 결제 상태</caption>
+        <colgroup><col className="table-col-invoice" /><col className="table-col-date" /><col className="table-col-quantity" /><col className="table-col-amount" /><col className="table-col-status" /></colgroup>
+        <TableHeader><TableRow><TableHeaderCell scope="col">청구 항목</TableHeaderCell><TableHeaderCell scope="col">청구일</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">수량</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">금액</TableHeaderCell><TableHeaderCell scope="col">상태</TableHeaderCell></TableRow></TableHeader>
+        <TableBody>{invoices.map(invoice => <TableRow key={invoice.id}><TableCell><span className="table-primary">{invoice.name}</span><span className="table-secondary">{invoice.id}</span></TableCell><TableCell className="table-date"><time dateTime={invoice.date}>{formatDate(invoice.date)}</time></TableCell><TableCell className="table-numeric">{formatNumber.format(invoice.quantity)}</TableCell><TableCell className="table-numeric">{formatNumber.format(invoice.amount)}원</TableCell><TableCell><Badge variant={invoice.variant}>{invoice.status}</Badge></TableCell></TableRow>)}</TableBody>
+        <TableFooter><TableRow><TableHeaderCell scope="row" colSpan={3}>합계</TableHeaderCell><TableCell className="table-numeric">{formatNumber.format(invoiceTotal)}원</TableCell><TableCell>5건</TableCell></TableRow></TableFooter>
+      </Table>
       <p className="react-studio-caption">통화: KRW · 음수 금액은 환불 또는 크레딧을 의미합니다. 좁은 화면에서는 각 표를 가로로 스크롤하세요.</p>
     </Section>
 
@@ -115,17 +137,15 @@ export function TableDemos() {
         <p role="status" className="react-studio-caption">{selectedFiles.size ? `${selectedFiles.size}개 파일 선택` : '선택한 파일 없음'}</p>
         <Button size="sm" variant="outline" disabled={!selectedFiles.size} onClick={() => setSelectedFiles(new Set())}>선택 해제</Button>
       </div>
-      <TableContainer label="공유 파일 목록">
-        <Table interactive className="react-studio-table react-studio-table--files">
-          <caption className="sr-only">공유 파일의 소유자·크기·수정일과 선택 상태</caption>
-          <colgroup><col className="table-col-select" /><col className="table-col-file" /><col className="table-col-owner" /><col className="table-col-size" /><col className="table-col-date" /></colgroup>
-          <TableHeader><TableRow><TableHeaderCell scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allFilesSelected} indeterminate={selectedFiles.size > 0 && !allFilesSelected} onChange={() => setSelectedFiles(allFilesSelected ? new Set() : new Set(files.map(file => file.id)))} /></TableHeaderCell><TableHeaderCell scope="col">파일</TableHeaderCell><TableHeaderCell scope="col">소유자</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">크기</TableHeaderCell><TableHeaderCell scope="col">수정일</TableHeaderCell></TableRow></TableHeader>
-          <TableBody>{files.map(file => {
-            const selected = selectedFiles.has(file.id);
-            return <TableRow key={file.id} data-selected={selected || undefined} onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggleFile(file.id); }}><TableCell><Checkbox label={<span className="sr-only">{file.name} 선택</span>} checked={selected} onChange={() => toggleFile(file.id)} /></TableCell><TableCell>{file.name}</TableCell><TableCell>{file.owner ?? <span className="table-muted">미지정</span>}</TableCell><TableCell className="table-numeric">{formatSize.format(file.size)}MB</TableCell><TableCell className="table-date"><time dateTime={file.updated}>{formatDate(file.updated)}</time></TableCell></TableRow>;
-          })}</TableBody>
-        </Table>
-      </TableContainer>
+      <Table scrollLabel="공유 파일 목록" interactive className="react-studio-table react-studio-table--files">
+        <caption className="sr-only">공유 파일의 소유자·크기·수정일과 선택 상태</caption>
+        <colgroup><col className="table-col-select" /><col className="table-col-file" /><col className="table-col-owner" /><col className="table-col-size" /><col className="table-col-date" /></colgroup>
+        <TableHeader><TableRow><TableHeaderCell scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>} checked={allFilesSelected} indeterminate={selectedFiles.size > 0 && !allFilesSelected} onChange={() => setSelectedFiles(allFilesSelected ? new Set() : new Set(files.map(file => file.id)))} /></TableHeaderCell><TableHeaderCell scope="col">파일</TableHeaderCell><TableHeaderCell scope="col">소유자</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">크기</TableHeaderCell><TableHeaderCell scope="col">수정일</TableHeaderCell></TableRow></TableHeader>
+        <TableBody>{files.map(file => {
+          const selected = selectedFiles.has(file.id);
+          return <TableRow key={file.id} data-selected={selected || undefined} onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggleFile(file.id); }}><TableCell><Checkbox label={<span className="sr-only">{file.name} 선택</span>} checked={selected} onChange={() => toggleFile(file.id)} /></TableCell><TableCell>{file.name}</TableCell><TableCell>{file.owner ?? <span className="table-muted">미지정</span>}</TableCell><TableCell className="table-numeric">{formatSize.format(file.size)}MB</TableCell><TableCell className="table-date"><time dateTime={file.updated}>{formatDate(file.updated)}</time></TableCell></TableRow>;
+        })}</TableBody>
+      </Table>
     </Section>
   </>;
 }

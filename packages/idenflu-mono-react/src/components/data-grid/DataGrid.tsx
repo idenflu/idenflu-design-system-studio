@@ -5,7 +5,7 @@ import { Checkbox } from '../selection/Selection';
 import { Icon } from '../icon/Icon';
 import { Pagination } from '../pagination/Pagination';
 import { Spinner } from '../spinner/Spinner';
-import { Table, TableHeader, TableRow, TableHeaderCell, TableCell } from '../table/Table';
+import { Table, TableContainer, TableHeader, TableRow, TableHeaderCell, TableCell } from '../table/Table';
 import { TextField } from '../text-field/TextField';
 import { Popover } from '../popover/Popover';
 import { Tooltip } from '../tooltip/Tooltip';
@@ -488,7 +488,7 @@ export function DataGrid<T>({
     </div>
 
     <div className="data-grid-viewport" style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight} : undefined}>
-    <div id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" role="region" aria-label={`${label} 표`} aria-busy={loading} tabIndex={0} style={virtualEnabled ? {overflowAnchor:'none'} : undefined}>
+    <TableContainer id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" label={`${label} 표`} aria-busy={loading} style={virtualEnabled ? {overflowAnchor:'none'} : undefined}>
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>
         <caption className="sr-only">{label}</caption>
         <colgroup>{selectable && <col className="data-grid-select-column" />}{visibleColumns.map(column => <col key={column.id} style={{width:columnWidth(column)}} />)}</colgroup>
@@ -534,7 +534,7 @@ export function DataGrid<T>({
           <div className="data-grid-state" style={{width:viewportWidth ?? '100%'}}>{loading ? <><Spinner aria-hidden="true" /><p>데이터를 불러오는 중입니다.</p></> : hasError ? <><p>{error}</p>{onRetry && <Button variant="outline" onClick={onRetry}>다시 시도</Button>}</> : rows.length && (needle || activeFilters) ? <><Icon name="search" /><strong>검색 결과가 없습니다.</strong><p>검색어나 필터를 바꾸거나 초기화해주세요.</p><Button variant="outline" onClick={() => { setQuery(''); setFilters({}); resetPageFor('', sorting, {}); }}>조건 초기화</Button></> : <><Icon name="grid" /><p>{emptyMessage}</p></>}</div>
         </TableCell></TableRow> : undefined} />
       </Table>
-    </div>
+    </TableContainer>
     <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} viewportWidth={viewportWidth} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
     </div>
     {footer !== undefined && footerStatus}

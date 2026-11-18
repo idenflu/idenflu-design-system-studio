@@ -176,6 +176,13 @@ test('table sections retain their rules and the scroll region is keyboard focusa
   await expect(bodyRows.last().locator('.table-cell').first()).toHaveCSS('border-bottom-color', sectionRule);
   await expect(bodyRows.first().locator('.table-cell').first()).not.toHaveCSS('border-bottom-color', sectionRule);
   await expect(footer).toHaveCSS('border-top-color', sectionRule);
+  const bodyText = await bodyRows.first().locator('.table-cell').first().evaluate(cell => ({
+    color: getComputedStyle(cell).color, weight: getComputedStyle(cell).fontWeight,
+  }));
+  for (const cell of await billing.locator('.table-footer .table-cell').all()) {
+    await expect(cell).toHaveCSS('color', bodyText.color);
+    await expect(cell).toHaveCSS('font-weight', bodyText.weight);
+  }
 
   await billing.focus();
   await expect(billing).toBeFocused();
@@ -185,6 +192,80 @@ test('table sections retain their rules and the scroll region is keyboard focusa
     await billing.evaluate(region => { region.scrollLeft = 40; });
     expect(await billing.evaluate(region => region.scrollLeft)).toBeGreaterThan(0);
   }
+});
+
+test('fill-height table keeps its header and footer at the viewport edges as rows grow', {tag:['@theme','@mobile']}, async ({ page, isMobile }) => {
+  await page.goto('/systems/idenflu-mono/index.html#/components/table');
+  const region = page.getByRole('region', { name: '프로젝트 표 스크롤', exact: true });
+  const addRow = page.getByRole('button', { name: '행 추가', exact: true });
+  const rows = region.locator('.table-body .table-row');
+  const layout = () => region.evaluate(viewport => {
+    const top = viewport.getBoundingClientRect().top;
+    const header = viewport.querySelector('.table-header').getBoundingClientRect();
+    const footer = viewport.querySelector('.table-footer').getBoundingClientRect();
+    const firstRow = viewport.querySelector('.table-body .table-row').getBoundingClientRect();
+    const lastRow = viewport.querySelector('.table-body .table-row:last-child').getBoundingClientRect();
+    return {
+      headerOffset: header.top - top, footerGap: top + viewport.clientHeight - footer.bottom,
+      gapAfterRows: footer.top - lastRow.bottom, firstRowHeight: firstRow.height,
+      height: viewport.clientHeight, scrollTop: viewport.scrollTop, scrollHeight: viewport.scrollHeight,
+    };
+  });
+
+  await expect(rows).toHaveCount(2);
+  const initial = await layout();
+  expect(initial.scrollHeight).toBe(initial.height);
+  expect(initial.gapAfterRows).toBeGreaterThan(0);
+  expect(initial.headerOffset).toBeCloseTo(0, 0);
+  expect(initial.footerGap).toBeCloseTo(0, 0);
+
+  for (let index = 0; index < 8; index++) await addRow.click();
+  await expect(rows).toHaveCount(10);
+  await expect(region.locator('.table-footer')).toContainText('10개');
+  const filled = await layout();
+  expect(filled.height).toBe(initial.height);
+  expect(filled.scrollHeight).toBeGreaterThan(filled.height);
+  expect(filled.firstRowHeight).toBeCloseTo(initial.firstRowHeight, 0);
+
+  await addRow.press('Tab');
+  await expect(region).toBeFocused();
+  await page.keyboard.press('End');
+  await expect.poll(async () => (await layout()).scrollTop).toBeGreaterThan(0);
+  const scrolled = await layout();
+  expect(scrolled.headerOffset).toBeCloseTo(0, 0);
+  expect(scrolled.footerGap).toBeCloseTo(0, 0);
+  await region.evaluate(viewport => { viewport.scrollTop = viewport.scrollHeight; });
+  expect((await layout()).gapAfterRows).toBeCloseTo(0, 0);
+
+  if (isMobile) {
+    const alignment = await region.evaluate(viewport => {
+      viewport.scrollLeft = 100;
+      const columnRight = section => viewport.querySelector(`${section} .table-cell:last-child`).getBoundingClientRect().right;
+      return { scrollLeft: viewport.scrollLeft, header: columnRight('.table-header'), body: columnRight('.table-body'), footer: columnRight('.table-footer') };
+    });
+    expect(alignment.scrollLeft).toBeGreaterThan(0);
+    expect(alignment.header).toBeCloseTo(alignment.body, 0);
+    expect(alignment.footer).toBeCloseTo(alignment.body, 0);
+  }
+
+  await page.setViewportSize({ width: page.viewportSize().width, height: 410 });
+  await expect.poll(async () => (await layout()).height).toBeLessThan(initial.height);
+  expect((await layout()).footerGap).toBeCloseTo(0, 0);
+
+  const firstCell = rows.first().locator('.table-cell').first();
+  await firstCell.evaluate(cell => {
+    const button = document.createElement('button');
+    button.textContent = '프로젝트 열기';
+    cell.replaceChildren(button);
+  });
+  const bodyButton = firstCell.getByRole('button');
+  await region.evaluate(viewport => { viewport.scrollTop = 35; viewport.scrollLeft = 0; });
+  await bodyButton.focus();
+  await expect(bodyButton).toBeFocused();
+  await expect.poll(() => bodyButton.evaluate(button => {
+    const header = button.closest('table').tHead;
+    return header.getBoundingClientRect().bottom - button.getBoundingClientRect().top;
+  })).toBeLessThan(1);
 });
 
 test('table rows highlight only in interactive tables and selection marks the chosen rows', {tag:['@theme','@mobile']}, async ({ page, isMobile }) => {

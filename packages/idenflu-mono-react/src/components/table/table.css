@@ -1,13 +1,19 @@
-.table-scroll { max-width: 100%; overflow-x: auto; }
+.table-scroll { min-width: 0; max-width: 100%; overflow-x: auto; }
 .table-scroll:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus-on-light); }
+.table-scroll[data-fill-height] { flex: 1; min-height: 0; overflow: auto; }
+.table-scroll[data-fill-height] > .data-table { min-height: 100%; border-collapse: separate; border-spacing: 0; }
+/* Give spare height to an empty row so content rows keep their intrinsic height. */
+.table-scroll[data-fill-height] > .data-table > :where(.table-body:not(:has(~ .table-body)))::after { content: ""; display: table-row; height: 100%; }
+.table-scroll[data-fill-height] > .data-table > :where(.table-header, .table-footer) { position: sticky; z-index: 1; background: var(--canvas); }
+.table-scroll[data-fill-height] > .data-table > :where(.table-header) { inset-block-start: 0; }
+.table-scroll[data-fill-height] > .data-table > :where(.table-footer) { inset-block-end: 0; }
 .data-table { --table-cell-padding-inline:var(--space-4); --table-cell-padding-block:calc(var(--space-unit) * 3.5); --table-header-padding-block:calc(var(--space-unit) * 2.5); --table-rule:var(--border); --table-divider:var(--divider); width: 100%; min-width: 420px; border-collapse: collapse; text-align: left; font-size:var(--font-size-body); line-height:var(--line-height-body); font-variant-numeric:tabular-nums; }
 .data-table[data-density="compact"] { --table-cell-padding-block:var(--space-2); --table-header-padding-block:var(--space-2); --badge-height:var(--badge-sm-height); --badge-font-size:var(--badge-sm-font-size); --badge-line-height:var(--badge-sm-line-height); --badge-icon-size:var(--badge-sm-icon-size); --badge-padding-inline:var(--badge-sm-padding-inline); }
 .data-table :where(.table-cell) { padding: var(--table-cell-padding-block) var(--table-cell-padding-inline); border-bottom: 1px solid var(--table-divider); vertical-align:middle; overflow-wrap:anywhere; }
 .data-table :where(.table-header-cell) { font-weight:var(--font-weight-medium); }
 .data-table > :where(.table-header) > :where(.table-row) > :where(.table-header-cell) { padding-block: var(--table-header-padding-block); border-block: 1px solid var(--table-rule); color: var(--text-secondary); }
 .data-table > :where(.table-body) > :where(.table-row):last-child > :where(.table-cell) { border-bottom-color: var(--table-rule); }
-.data-table > :where(.table-footer) > :where(.table-row) > :where(.table-cell) { border-block: 1px solid var(--table-rule); font-weight:var(--font-weight-semibold); }
-.data-table > :where(.table-footer) > :where(.table-row) > :where(.table-header-cell) { color: var(--text-secondary); font-weight:var(--font-weight-medium); }
+.data-table > :where(.table-footer) > :where(.table-row) > :where(.table-cell) { border-block: 1px solid var(--table-rule); font-weight: inherit; }
 .data-table[data-interactive] > :where(.table-body) > :where(.table-row) { cursor: pointer; }
 .data-table[data-interactive] > :where(.table-body) > :where(.table-row):where(:hover, :has(:focus-visible)) { background:var(--surface); }
 .data-table > :where(.table-body) > :where(.table-row)[data-selected="true"] { background:var(--selected-surface); }

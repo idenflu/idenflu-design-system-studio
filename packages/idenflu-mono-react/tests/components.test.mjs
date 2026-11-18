@@ -10,7 +10,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { act } = React;
-const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table, TableHeader, TableBody, TableFooter, TableRow, TableHeaderCell, TableCell, Icon } = await import('../dist/index.js');
+const { TextField, Checkbox, Switch, Select, SearchSelect, MultiSelect, Tabs, Tree, Segmented, Spinner, NovaSpinner, CircleProgress, SegmentedProgress, Toast, Divider, Tooltip, Chip, Table, TableContainer, TableHeader, TableBody, TableFooter, TableRow, TableHeaderCell, TableCell, Icon } = await import('../dist/index.js');
 const h = React.createElement;
 
 function fixture() {
@@ -577,6 +577,26 @@ test('Table sections, rows, and cells preserve native semantics and compose clas
     assert.equal(headerCell.colSpan, 2);
     assert.equal(table.rows[1].cells[0].tagName, 'TD');
     assert.equal(table.rows[1].cells[0].className, 'table-cell custom-cell');
+  } finally { await f.dispose(); }
+});
+
+test('Table provides a scroll region and shares the existing TableContainer when present', async () => {
+  const f = fixture();
+  const tableRef = React.createRef(), containerRef = React.createRef();
+  try {
+    await f.render(h(Table, { ref: tableRef, 'aria-label': '프로젝트', fillHeight: true, scrollLabel: '프로젝트 표 스크롤' }));
+    const region = f.container.querySelector('.table-scroll');
+    assert.equal(region.firstElementChild, tableRef.current);
+    assert.equal(region.getAttribute('role'), 'region');
+    assert.equal(region.getAttribute('aria-label'), '프로젝트 표 스크롤');
+    assert.equal(region.tabIndex, 0);
+    assert.equal(region.dataset.fillHeight, 'true');
+    assert.equal(tableRef.current.getAttribute('aria-label'), '프로젝트');
+    assert.equal(tableRef.current.hasAttribute('data-fill-height'), false);
+
+    await f.render(h(TableContainer, { ref: containerRef, label: '기존 컨테이너' }, h(Table, { ref: tableRef })));
+    assert.equal(f.container.querySelectorAll('.table-scroll').length, 1);
+    assert.equal(containerRef.current.firstElementChild, tableRef.current);
   } finally { await f.dispose(); }
 });
 

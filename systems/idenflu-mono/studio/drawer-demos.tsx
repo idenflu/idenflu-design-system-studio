@@ -83,13 +83,13 @@ function LongContentDrawer() {
 export function DrawerDemos() {
   return <><SettingsDrawer /><PlacementDrawer /><LongContentDrawer />
     <Section title="사용 기준" description="열기·닫기는 open과 onOpenChange로 제어합니다. 제목과 설명을 접근성 속성으로 연결하고, 본문 폼과 하단 제출 버튼은 form 속성으로 연결합니다.">
-      <div className="table-scroll"><Table><TableHeader><TableRow><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader><TableBody>
+      <Table scrollLabel="Drawer 사용 기준"><TableHeader><TableRow><TableHeaderCell scope="col">속성</TableHeaderCell><TableHeaderCell scope="col">기본값</TableHeaderCell><TableHeaderCell scope="col">설명</TableHeaderCell></TableRow></TableHeader><TableBody>
         <TableRow><TableHeaderCell scope="row"><code>side</code></TableHeaderCell><TableCell>right</TableCell><TableCell>right · left · top · bottom</TableCell></TableRow>
         <TableRow><TableHeaderCell scope="row"><code>size</code></TableHeaderCell><TableCell>md · 480px</TableCell><TableCell>sm · md · lg · full 또는 픽셀 숫자</TableCell></TableRow>
         <TableRow><TableHeaderCell scope="row"><code>variant</code></TableHeaderCell><TableCell>default</TableCell><TableCell>divided: DrawerHeader · DrawerBody · DrawerFooter를 직접 자식으로 배치합니다.</TableCell></TableRow>
         <TableRow><TableHeaderCell scope="row"><code>closeOnBackdrop</code></TableHeaderCell><TableCell>true</TableCell><TableCell>배경 클릭으로 닫기. false여도 Escape와 닫기 버튼은 사용할 수 있습니다.</TableCell></TableRow>
         <TableRow><TableHeaderCell scope="row"><code>initialFocusRef</code></TableHeaderCell><TableCell>자동</TableCell><TableCell>열린 직후 포커스를 받을 패널 내부 요소의 ref입니다.</TableCell></TableRow>
-      </TableBody></Table></div>
+      </TableBody></Table>
       <p className="react-studio-caption">열린 동안 배경 스크롤과 포커스 이동을 제한하고 닫으면 실행 버튼으로 돌아갑니다. Escape는 가장 위의 팝업부터 닫습니다. 움직임 줄이기 설정에서는 등장 애니메이션을 생략합니다.</p>
     </Section>
   </>;

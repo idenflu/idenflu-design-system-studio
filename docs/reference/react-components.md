@@ -766,7 +766,22 @@ export function ProjectForm() {
 
 기존 HTML 마크업에 패키지의 표 스타일을 적용하려면 각 요소에 `table-header`, `table-body`, `table-footer`, `table-row`, `table-cell`을 지정하세요. `th`에는 `table-cell table-header-cell`을 함께 지정합니다.
 
-`Table`은 기본 밀도인 `density="default"`와 행 간격을 줄인 `density="compact"`를 지원합니다. 글자 크기는 두 밀도 모두 본문 기준을 유지하며 첫·마지막 셀까지 같은 좌우 패딩을 적용합니다. 헤더는 배경 없이 위·아래 진한 구분선으로 표시하고, 행 사이는 연한 구분선, 마지막 행과 합계 행(`tfoot`)은 진한 구분선으로 마감합니다. 열 너비는 데이터에 맞게 `colgroup`으로 정의합니다. `TableContainer`는 좁은 화면에서 표 영역만 가로로 스크롤하도록 감쌉니다.
+`Table`은 기본 밀도인 `density="default"`와 행 간격을 줄인 `density="compact"`를 지원합니다. 글자 크기는 두 밀도 모두 본문 기준을 유지하며 첫·마지막 셀까지 같은 좌우 패딩을 적용합니다. 헤더는 배경 없이 위·아래 진한 구분선으로 표시하고, 행 사이는 연한 구분선, 마지막 행과 합계 행(`tfoot`)은 진한 구분선으로 마감합니다. 열 너비는 데이터에 맞게 `colgroup`으로 정의합니다.
+
+`Table`은 좁은 화면에서 가로로 스크롤할 수 있는 영역을 기본으로 제공합니다. 영역에 접근성 이름을 붙이려면 `scrollLabel`을 지정하세요. 기존 `TableContainer`를 사용하면 해당 컨테이너가 가로 스크롤을 담당합니다.
+
+높이가 정해진 세로 flex 레이아웃에서는 `Table`을 직접 자식으로 배치하고 `fillHeight`를 지정하세요. 표가 위쪽 도구 모음 아래 남은 높이를 채우고, 헤더와 푸터 사이에서 본문을 스크롤할 수 있습니다. 높이가 바깥쪽 flex 레이아웃에서 전달된다면 중간 flex 항목에도 `min-height: 0`을 지정하세요.
+
+```tsx
+<div style={{ display: 'flex', flexDirection: 'column', height: 280, gap: 8 }}>
+  <p>프로젝트 목록</p>
+  <Table fillHeight scrollLabel="프로젝트 표 스크롤">
+    <TableHeader><TableRow><TableHeaderCell scope="col">프로젝트</TableHeaderCell></TableRow></TableHeader>
+    <TableBody>{projects.map(project => <TableRow key={project.id}><TableCell>{project.name}</TableCell></TableRow>)}</TableBody>
+    <TableFooter><TableRow><TableCell>{projects.length}개 프로젝트</TableCell></TableRow></TableFooter>
+  </Table>
+</div>
+```
 
 표 전체에 고정폭 숫자를 적용합니다. 숫자 열은 `table-numeric`(끝 정렬), 날짜는 `table-date`, 두 줄 셀은 `table-primary`·`table-secondary`, 빈 값 안내는 `table-muted` 클래스를 사용합니다. compact에서는 배지 높이를 20px로 맞추고, 표 안의 체크박스는 행 높이를 늘리지 않습니다.
 
@@ -774,7 +789,7 @@ export function ProjectForm() {
 
 ```tsx
 import { useState } from 'react';
-import { Checkbox, Table, TableContainer, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
+import { Checkbox, Table, TableHeader, TableBody, TableRow, TableHeaderCell, TableCell } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 const files = [
@@ -791,23 +806,21 @@ export function FileTableExample() {
     if (next.has(id)) next.delete(id); else next.add(id);
     return next;
   });
-  return <TableContainer label="공유 파일 목록">
-    <Table interactive density="compact">
-      <caption className="sr-only">공유 파일과 선택 상태</caption>
-      <TableHeader><TableRow>
-        <TableHeaderCell scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>}
-          checked={allSelected} indeterminate={selected.size > 0 && !allSelected}
-          onChange={() => setSelected(allSelected ? new Set() : new Set(files.map(file => file.id)))} /></TableHeaderCell>
-        <TableHeaderCell scope="col">파일</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">크기</TableHeaderCell>
-      </TableRow></TableHeader>
-      <TableBody>{files.map(file => <TableRow key={file.id}
-        data-selected={selected.has(file.id) || undefined}
-        onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggle(file.id); }}>
-        <TableCell><Checkbox label={<span className="sr-only">{file.name} 선택</span>}
-          checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></TableCell>
-        <TableCell>{file.name}</TableCell><TableCell className="table-numeric">{file.size}MB</TableCell>
-      </TableRow>)}</TableBody>
-    </Table>
-  </TableContainer>;
+  return <Table scrollLabel="공유 파일 목록" interactive density="compact">
+    <caption className="sr-only">공유 파일과 선택 상태</caption>
+    <TableHeader><TableRow>
+      <TableHeaderCell scope="col"><Checkbox label={<span className="sr-only">모든 파일 선택</span>}
+        checked={allSelected} indeterminate={selected.size > 0 && !allSelected}
+        onChange={() => setSelected(allSelected ? new Set() : new Set(files.map(file => file.id)))} /></TableHeaderCell>
+      <TableHeaderCell scope="col">파일</TableHeaderCell><TableHeaderCell scope="col" className="table-numeric">크기</TableHeaderCell>
+    </TableRow></TableHeader>
+    <TableBody>{files.map(file => <TableRow key={file.id}
+      data-selected={selected.has(file.id) || undefined}
+      onClick={event => { if (!(event.target as Element).closest('label, input, button, a')) toggle(file.id); }}>
+      <TableCell><Checkbox label={<span className="sr-only">{file.name} 선택</span>}
+        checked={selected.has(file.id)} onChange={() => toggle(file.id)} /></TableCell>
+      <TableCell>{file.name}</TableCell><TableCell className="table-numeric">{file.size}MB</TableCell>
+    </TableRow>)}</TableBody>
+  </Table>;
 }
 ```
