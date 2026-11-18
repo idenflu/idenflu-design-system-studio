@@ -304,6 +304,7 @@ export function ChipDemos() {
   const [iconSelected, setIconSelected] = React.useState(false);
   const [componentSelected, setComponentSelected] = React.useState(false);
   const [roundSelected, setRoundSelected] = React.useState(false);
+  const [ghostSelected, setGhostSelected] = React.useState(false);
   const [selectedColors, setSelectedColors] = React.useState<string[]>(
     chipColors.map((item) => item.variant)
   );
@@ -436,6 +437,22 @@ export function ChipDemos() {
             </div>
           ))}
         </Grid>
+      </Section>
+      <Section
+        title="Ghost"
+        description="기본 상태에서 배경과 테두리가 투명합니다. 선택형은 호버와 선택 상태에 배경을 표시합니다."
+      >
+        <div className="react-studio-row">
+          <Chip variant="ghost" interactive={false}>문서</Chip>
+          <Chip
+            variant="ghost"
+            aria-pressed={ghostSelected}
+            onClick={() => setGhostSelected((current) => !current)}
+          >
+            문서 필터
+          </Chip>
+          <Chip variant="ghost" disabled>비활성 필터</Chip>
+        </div>
       </Section>
       <Section
         title="사이즈"

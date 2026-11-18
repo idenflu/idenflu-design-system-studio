@@ -2,7 +2,7 @@ import * as React from 'react';
 
 interface ChipAppearance {
   size?: 'sm' | 'md' | 'lg';
-  variant?: 'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  variant?: 'neutral' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost';
   rounded?: boolean;
 }
 export interface InteractiveChipProps extends ChipAppearance, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
@@ -25,7 +25,16 @@ interface ChipComponent {
 
 export const Chip = React.forwardRef<HTMLButtonElement | HTMLSpanElement, ChipProps>(function Chip(props, ref) {
   const { variant = 'neutral', rounded = false, className } = props;
-  const classes = ['chip', variant !== 'neutral' && `chip--colored chip--${variant}`, rounded && 'chip--rounded', props.interactive === false && 'chip--static', props.interactive === false && props.density === 'compact' && 'chip--compact', props.interactive === false && props.density === 'comfortable' && 'chip--comfortable', className].filter(Boolean).join(' ');
+  const classes = [
+    'chip',
+    variant !== 'neutral' && variant !== 'ghost' && 'chip--colored',
+    variant !== 'neutral' && `chip--${variant}`,
+    rounded && 'chip--rounded',
+    props.interactive === false && 'chip--static',
+    props.interactive === false && props.density === 'compact' && 'chip--compact',
+    props.interactive === false && props.density === 'comfortable' && 'chip--comfortable',
+    className,
+  ].filter(Boolean).join(' ');
   if (props.interactive === false) {
     const { interactive, density, size, variant, rounded, className, onClick, onClickCapture, tabIndex, 'aria-pressed': pressed, ...attributes } = props;
     return <span {...attributes} ref={ref as React.ForwardedRef<HTMLSpanElement>} data-size={size} className={classes} />;

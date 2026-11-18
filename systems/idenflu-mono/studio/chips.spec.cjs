@@ -24,6 +24,38 @@ test('display chips have no hover or focus behavior', async ({page}) => {
   await expect(page.locator('.docs-toc a').last()).toBeFocused();
 });
 
+test('ghost chips show a background only on hover or selection', {tag:'@theme'}, async ({page}) => {
+  await page.goto(url);
+  const examples = section(page, 'Ghost');
+  const display = examples.getByText('문서', {exact:true});
+  const filter = examples.getByRole('button', {name:'문서 필터'});
+  const disabled = examples.getByRole('button', {name:'비활성 필터'});
+  const transparent = 'rgba(0, 0, 0, 0)';
+
+  for (const chip of [display, filter, disabled]) {
+    await expect(chip).toHaveCSS('background-color', transparent);
+    await expect(chip).toHaveCSS('border-top-color', transparent);
+  }
+  await display.hover();
+  await expect(display).toHaveCSS('background-color', transparent);
+  await expect(disabled).toBeDisabled();
+  await disabled.hover();
+  await expect(disabled).toHaveCSS('background-color', transparent);
+
+  await filter.hover();
+  await expect(filter).not.toHaveCSS('background-color', transparent);
+  await page.mouse.move(0, 0);
+  await page.keyboard.press('Tab');
+  await filter.focus();
+  await expect(filter).toHaveCSS('outline-style', 'solid');
+  await filter.press('Space');
+  await expect(filter).toHaveAttribute('aria-pressed', 'true');
+  await expect(filter).toHaveCSS('background-color', await page.getByRole('button', {name:'디자인', exact:true}).evaluate(chip => getComputedStyle(chip).backgroundColor));
+  await filter.press('Enter');
+  await expect(filter).toHaveAttribute('aria-pressed', 'false');
+  await expect(filter).toHaveCSS('background-color', transparent);
+});
+
 test('rounded chips and all six colors retain keyboard selection and readable contrast', {tag:'@theme'}, async ({page}) => {
   await page.goto(url);
   const round = page.getByRole('button',{name:'라운드 선택',exact:true});

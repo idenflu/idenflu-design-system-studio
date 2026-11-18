@@ -674,6 +674,8 @@ import { Button, Drawer, DrawerHeader, DrawerBody, DrawerFooter, Icon } from '@i
 
 `Chip`은 기본적으로 선택·삭제 동작에 사용하는 버튼입니다. `interactive={false}`는 표시 전용 `span`을 렌더링하며 클릭·호버·Tab 포커스가 없습니다. `rounded`로 알약 형태를 선택하고 `variant="neutral | primary | secondary | success | warning | danger"`로 색상을 지정합니다. 색상과 함께 텍스트로 의미를 설명합니다. 표시용 칩은 `HTMLSpanElement`, 기본 칩은 `HTMLButtonElement` ref를 받습니다. 기본 크기는 표시용과 버튼 모두 SM·MD·LG에서 각각 최소 높이 24·26·30px입니다. 표시용의 `density="compact"`는 기본 크기와 같으며, `density="comfortable"`은 기존 컨트롤 높이를 따릅니다. 높이는 테마 설정과 내용에 따라 커질 수 있습니다.
 
+`variant="ghost"`는 표시용 칩과 선택형 칩에서 기본 배경과 테두리를 투명하게 표시합니다. 선택형 칩은 호버 시 배경을 표시하고, `aria-pressed="true"`일 때 기본 칩과 같은 선택 스타일을 사용합니다. 비활성 상태에서는 배경과 테두리가 투명하고 비활성 텍스트 색상이 적용됩니다.
+
 ```tsx
 import { useState } from 'react';
 import { Button, Chip, Icon } from '@idenflu/mono-react';
@@ -686,7 +688,8 @@ export function ChipExample() {
     <Chip interactive={false}>프론트엔드</Chip>
     <Chip interactive={false} density="comfortable" size="sm">목록 분류</Chip>
     <Chip interactive={false} rounded variant="success">완료</Chip>
-    <Chip rounded variant="primary" aria-pressed={selected}
+    <Chip interactive={false} variant="ghost">문서</Chip>
+    <Chip rounded variant="ghost" aria-pressed={selected}
       onClick={() => setSelected(value => !value)}>프로젝트 필터</Chip>
     {tags.map(tag => <Chip key={tag} aria-label={`${tag} 제거`}
       onClick={() => setTags(current => current.filter(item => item !== tag))}>
