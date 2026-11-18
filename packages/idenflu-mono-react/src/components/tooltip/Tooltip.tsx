@@ -53,7 +53,8 @@ export function Tooltip({ content, children, position: placement = 'top', enterD
   useAnchoredPopup(open && !dismissed, wrap, bubble, position);
   React.useEffect(() => {
     const escape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || dismissed || !wrap.current || !(wrap.current.matches(':hover') || wrap.current.contains(document.activeElement))) return;
+      if (event.key !== 'Escape' || dismissed || !wrap.current) return;
+      if (!wrap.current.matches(':hover') && !bubble.current?.matches(':hover') && !wrap.current.contains(document.activeElement)) return;
       const dialog = wrap.current.ownerDocument.querySelector('dialog[open]');
       if (dialog && !dialog.contains(wrap.current)) return;
       cancelTimer(); setOpen(false); setDismissed(true); event.preventDefault(); event.stopPropagation();
