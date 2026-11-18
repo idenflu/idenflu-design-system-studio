@@ -41,7 +41,7 @@ export function VerticalTabsExample() {
   return <Tabs label="세로 설정 분류" orientation="vertical" items={items} />;
 }`,
   'components/dropdown-menu': `import { useState } from 'react';
-import { Button, DropdownMenu, DropdownMenuItem, Icon } from '@idenflu/mono-react';
+import { Button, DropdownMenu, DropdownMenuDivider, DropdownMenuItem, Icon } from '@idenflu/mono-react';
 import '@idenflu/mono-react/styles.css';
 
 const items = [
@@ -55,9 +55,12 @@ export function MenuExample() {
   return <>
     <DropdownMenu trigger={<Button variant="outline">더보기</Button>} label="프로젝트 작업" align="end" onSelect={setAction}>
       {items.map(item => <DropdownMenuItem key={item.value} value={item.value} icon={item.icon} disabled={item.disabled}>{item.label}</DropdownMenuItem>)}
+      <DropdownMenuDivider />
+      <DropdownMenuItem value="delete" color="danger" icon={<Icon name="trash" />}>삭제</DropdownMenuItem>
     </DropdownMenu>
     <p role="status">{action === 'edit' ? '수정을 선택했습니다.' :
-                      action === 'copy' ? '복사를 선택했습니다.' : ''}</p>
+                      action === 'copy' ? '복사를 선택했습니다.' :
+                      action === 'delete' ? '삭제를 선택했습니다.' : ''}</p>
   </>;
 }`,
   'components/drawer': `import { useId, useRef, useState } from 'react';

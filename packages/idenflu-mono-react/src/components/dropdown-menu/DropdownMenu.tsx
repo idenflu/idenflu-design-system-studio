@@ -1,17 +1,29 @@
 import * as React from 'react';
 import { type PopupAlign, usePopupPosition } from '../../shared/popup-position';
 import { useEscapeLayer } from '../../shared/escape-layer';
+import { Divider } from '../divider/Divider';
 
 type TriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>;
 export type DropdownMenuProps = { trigger: React.ReactElement<TriggerProps>; children: React.ReactNode; onSelect: (value: string) => void; label?: string; align?: PopupAlign };
-export type DropdownMenuItemProps = { value: string; children: React.ReactNode; disabled?: boolean; icon?: React.ReactNode };
+export type DropdownMenuItemProps = {
+  value: string;
+  children: React.ReactNode;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+  color?: 'default' | 'danger';
+};
 
 const MenuContext = React.createContext<((value: string) => void) | null>(null);
 
 /** Item icons are decorative; children provide the accessible name. */
-export function DropdownMenuItem({ value, children, disabled, icon }: DropdownMenuItemProps) {
+export function DropdownMenuItem({ value, children, disabled, icon, color = 'default' }: DropdownMenuItemProps) {
   const select = React.useContext(MenuContext);
-  return <button type="button" role="menuitem" tabIndex={-1} className="action-option" disabled={disabled} onClick={() => select?.(value)}>{icon && <span className="action-option-icon" aria-hidden="true">{icon}</span>}{children}</button>;
+  const className = color === 'danger' ? 'action-option action-danger' : 'action-option';
+  return <button type="button" role="menuitem" tabIndex={-1} className={className} disabled={disabled} onClick={() => select?.(value)}>{icon && <span className="action-option-icon" aria-hidden="true">{icon}</span>}{children}</button>;
+}
+
+export function DropdownMenuDivider() {
+  return <Divider className="action-menu-divider" />;
 }
 
 export function DropdownMenu({ trigger, children, onSelect, label, align = 'start' }: DropdownMenuProps) {

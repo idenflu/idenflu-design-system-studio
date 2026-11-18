@@ -5,5 +5,8 @@
 .action-options button:hover, .action-options button:focus { background:var(--surface); outline:none; }
 .action-options button:focus-visible { box-shadow:inset 0 0 0 2px var(--focus-on-light); }
 .action-options .action-danger { color:var(--danger-text); }
+.action-options .action-danger:disabled { color:var(--disabled-text); }
+.action-menu-divider { margin-block:var(--space-1); }
 .action-option-icon { display:inline-flex; flex:none; align-items:center; justify-content:center; color:var(--text-secondary); }
+.action-danger .action-option-icon { color:inherit; }
 .action-option:has(.action-option-icon) { display:flex; align-items:center; gap:var(--space-2); }

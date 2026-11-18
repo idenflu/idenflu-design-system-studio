@@ -7,6 +7,7 @@ import {
   Checkbox,
   Chip,
   DropdownMenu,
+  DropdownMenuDivider,
   DropdownMenuItem,
   Icon,
   Popover,
@@ -762,7 +763,8 @@ export function MenuDemos() {
             <DropdownMenuItem value="수정" icon={<Icon name="settings" />}>수정</DropdownMenuItem>
             <DropdownMenuItem value="복사" icon={<Icon name="copy" />}>복사</DropdownMenuItem>
             <DropdownMenuItem value="공유" disabled icon={<Icon name="link" />}>공유</DropdownMenuItem>
-            <DropdownMenuItem value="삭제" icon={<Icon name="trash" />}>삭제</DropdownMenuItem>
+            <DropdownMenuDivider />
+            <DropdownMenuItem value="삭제" color="danger" icon={<Icon name="trash" />}>삭제</DropdownMenuItem>
           </DropdownMenu>
         </div>
         <p role="status" className="component-helper">

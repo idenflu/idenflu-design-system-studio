@@ -11,6 +11,7 @@
 - [Button 비활성 상태](#button-비활성-상태)
 - [IconButton](#iconbutton)
 - [Popover·DropdownMenu 정렬](#popoverdropdownmenu-정렬)
+- [DropdownMenu 구분선과 위험 항목](#dropdownmenu-구분선과-위험-항목)
 - [TimePicker](#timepicker)
 - [Tabs](#tabs)
 - [DataGrid](#datagrid)
@@ -258,6 +259,36 @@ export function ToolbarPopups() {
 ```
 
 `Popover`와 `DropdownMenu`의 `trigger`는 버튼 요소입니다. Popover의 아이콘 전용 트리거에는 접근 가능한 이름을 지정하세요. 커스텀 컴포넌트는 전달받은 props와 ref를 실제 버튼에 전달해야 합니다. 항목은 `DropdownMenuItem` children으로 지정하며, 아이콘은 장식용입니다.
+
+## DropdownMenu 구분선과 위험 항목
+
+`DropdownMenuDivider`를 일반 작업과 삭제 항목 사이에 배치합니다. `DropdownMenuItem`의 `color="danger"`는 텍스트와 아이콘을 강조하며, 생략 시 기본값은 `default`입니다. 방향키 탐색은 구분선을 건너뜁니다.
+
+이 예제는 `onSelect`가 받은 값을 메뉴 아래에 표시합니다.
+
+```tsx
+import { useState } from 'react';
+import { Button, DropdownMenu, DropdownMenuDivider, DropdownMenuItem, Icon } from '@idenflu/mono-react';
+import '@idenflu/mono-react/styles.css';
+
+export function ProjectMenu() {
+  const [selected, setSelected] = useState('');
+
+  return (
+    <>
+      <DropdownMenu trigger={<Button>더보기</Button>} label="프로젝트 작업" onSelect={setSelected}>
+        <DropdownMenuItem value="수정">수정</DropdownMenuItem>
+        <DropdownMenuItem value="복제">복제</DropdownMenuItem>
+        <DropdownMenuDivider />
+        <DropdownMenuItem value="삭제" color="danger" icon={<Icon name="trash" />}>
+          삭제
+        </DropdownMenuItem>
+      </DropdownMenu>
+      <p role="status">{selected && `선택한 작업: ${selected}`}</p>
+    </>
+  );
+}
+```
 
 ## TimePicker
 

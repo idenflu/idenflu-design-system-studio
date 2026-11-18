@@ -305,12 +305,40 @@ test('table rows highlight only in interactive tables and selection marks the ch
   await expect(section.getByRole('status')).toHaveText('선택한 파일 없음');
 });
 
-test('menu and popover apply actions report their result', {tag:'@mobile'}, async ({ page }) => {
+test('menu and popover apply actions report their result', {tag:['@mobile', '@theme']}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/dropdown-menu');
   const menu = page.locator('.react-studio-section').filter({ has: page.getByRole('heading', { level: 2, name: '작업 메뉴', exact: true }) });
-  await menu.getByRole('button', { name: '더보기' }).click();
+  const menuTrigger = menu.getByRole('button', { name: '더보기' });
+  await menuTrigger.click();
   await menu.getByRole('menuitem', { name: '수정' }).click();
   await expect(menu.getByRole('status')).toHaveText('수정 동작을 선택했습니다.');
+  await menuTrigger.press('ArrowUp');
+  const actions = menu.getByRole('menu', { name: '작업 메뉴' });
+  const divider = actions.getByRole('separator');
+  const deleteItem = actions.getByRole('menuitem', { name: '삭제' });
+  const copyItem = actions.getByRole('menuitem', { name: '복사' });
+  await expect(divider).toBeVisible();
+  expect(await divider.evaluate(element => getComputedStyle(element, '::before').borderTopWidth)).toBe('1px');
+  await expect(actions.getByRole('menuitem', { name: '공유' })).toBeDisabled();
+  await expect(deleteItem).toBeFocused();
+  const dangerColor = await deleteItem.evaluate(element => {
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--danger-text)';
+    element.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
+  await expect(deleteItem).toHaveCSS('color', dangerColor);
+  await expect(deleteItem.locator('.icon-trash')).toHaveCSS('background-color', dangerColor);
+  await expect(copyItem).not.toHaveCSS('color', dangerColor);
+  await page.keyboard.press('ArrowUp');
+  await expect(copyItem).toBeFocused();
+  await page.keyboard.press('ArrowDown');
+  await expect(deleteItem).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(menu.getByRole('status')).toHaveText('삭제 동작을 선택했습니다.');
+  await expect(menuTrigger).toBeFocused();
   await page.goto('/systems/idenflu-mono/index.html#/components/popover');
   const popover = page.locator('.react-studio-section').filter({ has: page.getByRole('heading', { level: 2, name: '설정 팝오버', exact: true }) });
   const trigger = popover.getByRole('button', { name: '표시 설정', exact: true });
