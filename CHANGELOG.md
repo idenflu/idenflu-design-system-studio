@@ -4,9 +4,26 @@
 
 ## 미배포
 
+## 0.9.0 — 게시 예정
+
+### 추가
+
+- 레이아웃용 `Box`와 `BoxProps`를 공개합니다. `as`로 HTML 요소를 선택하고 `display`, `gap`, `padding` 등의 스타일을 prop으로 지정할 수 있습니다.
+- `Dialog`의 `size`에 `sm`(360px), `md`(640px, 기본값), `lg`(800px) 또는 픽셀 단위 숫자를 지정할 수 있습니다.
+- `Chip`에 배경이 투명한 `ghost` 변형을 추가했습니다.
+- `TextField`, `TextArea`, `NumberField`, `Select` 계열과 날짜·시간·일시 선택기에서 `required`인 필드의 표시 라벨에 별표를 추가했습니다.
+
 ### 변경
 
-- `IconButton` 툴팁은 `tooltip`에 내용을 지정하면 표시됩니다. 기존 `label` 문구를 툴팁에 표시하려면 같은 값을 `tooltip`에도 전달합니다. `tooltipEnterDelay`와 `tooltipLeaveDelay`로 포인터 표시·숨김 지연을 밀리초 단위로 설정할 수 있습니다.
+- `IconButton`에 `tooltipEnterDelay`와 `tooltipLeaveDelay`를 추가했습니다. 포인터로 툴팁을 표시하거나 숨기는 데 걸리는 시간을 밀리초 단위로 지정할 수 있습니다.
+
+### 수정
+
+- `DropdownMenu`, `Popover`, `Tooltip`과 날짜·시간 선택 팝업이 스크롤 영역이나 모달 안에서 상위 요소에 가려지거나 잘리던 문제를 수정했습니다.
+
+### 호환성
+
+- `IconButton` 툴팁은 `tooltip`을 지정할 때 표시됩니다. 기존 `label` 문구를 툴팁에도 표시하려면 `<IconButton label="설정" tooltip="설정">…</IconButton>`처럼 두 prop에 같은 문구를 전달합니다. `label`은 계속 접근성 이름으로 쓰입니다.
 
 ## 0.8.0 — 2026-11-18
 
