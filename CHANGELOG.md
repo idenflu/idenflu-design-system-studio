@@ -4,6 +4,20 @@
 
 ## 미배포
 
+## 0.11.0
+
+### 추가
+
+- `CodeBlock`으로 JSON과 XML을 표시할 수 있습니다. `format="pretty"`로 코드를 정리하고 `indentSize`, `wrap`, `maxHeight`로 표시 방식을 조절할 수 있습니다.
+
+### 변경
+
+- `Chip`의 배경 스타일과 의미 색상을 독립적으로 지정할 수 있습니다. `variant`는 `default`, `fill`, `ghost`를 지원하고 `color`는 `neutral`, `primary`, `secondary`, `success`, `warning`, `danger`를 지원합니다.
+
+### 호환성
+
+- `Chip`에서 색상값을 지정하던 `variant`를 `color`로 옮깁니다. 예를 들어 `<Chip variant="primary">상태</Chip>`는 `<Chip color="primary">상태</Chip>`로 변경합니다. `variant="ghost"`는 계속 사용할 수 있습니다.
+
 ## 0.10.0 — 2026-11-19
 
 [게시 소스 `db3a9c8`](https://github.com/idenflu/idenflu-design-system-studio/commit/db3a9c8bacdab32371f4ee6c37615496547d5317) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44432337947)
