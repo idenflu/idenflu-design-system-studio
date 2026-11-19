@@ -4,7 +4,9 @@
 
 ## 미배포
 
-## 0.10.0
+## 0.10.0 — 2026-11-19
+
+[게시 소스 `db3a9c8`](https://github.com/idenflu/idenflu-design-system-studio/commit/db3a9c8bacdab32371f4ee6c37615496547d5317) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44432337947)
 
 ### 추가
 
