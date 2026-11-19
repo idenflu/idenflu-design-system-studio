@@ -159,6 +159,85 @@ test('ring and dual spinners rotate with continuous easing', async ({page},testI
   }
 });
 
+test('lists and tables size to their rows, cap overflow, or fill their flex parent', {tag:'@mobile'}, async ({page},testInfo) => {
+  const rows = Array.from({length:20}, (_, index) => `프로젝트 ${index + 1}`);
+  const tableRow = (Component, text) => h(C.TableRow, {key:text}, h(Component, null, text));
+  const components = [
+    ['list', (items, props) => h(C.List, props, items.map(item => h(C.ListItem, {key:item}, item)))],
+    ['selectable', (items, props) => h(C.SelectableList, props, items.map(item => h(C.SelectableListItem, {key:item}, item)))],
+    ['table', (items, props) => h(C.Table, props,
+      h(C.TableHeader, null, tableRow(C.TableHeaderCell, '프로젝트')),
+      h(C.TableBody, null, items.map(item => tableRow(C.TableCell, item))),
+      h(C.TableFooter, null, tableRow(C.TableCell, '합계')))],
+  ];
+  await mount(page, testInfo, components.map(([name, render]) => renderToStaticMarkup(h('section', {id:name},
+    h('div', {className:'natural'}, render(rows.slice(0, 1), {})),
+    h('div', {className:'short'}, render(rows.slice(0, 1), {maxHeight:160})),
+    h('div', {className:'long', style:{width:280}}, render(rows, {maxHeight:'160px'})),
+    h('div', {className:'fill', style:{display:'flex', flexDirection:'column', height:320}},
+      h('div', null, '상위 영역'), render(rows.slice(0, 1), {fillHeight:true})),
+  ))).join(''));
+
+  for (const [name] of components) {
+    const short = page.locator(`#${name} .short > *`);
+    const natural = page.locator(`#${name} .natural > *`);
+    const long = page.locator(`#${name} .long > *`);
+    const fill = page.locator(`#${name} .fill > :last-child`);
+    const height = element => element.getBoundingClientRect().height;
+    expect(await short.evaluate(height)).toBeLessThan(160);
+    expect(Math.abs(await short.evaluate(height) - await natural.evaluate(height))).toBeLessThanOrEqual(1);
+    await expect(long).toHaveCSS('height', '160px');
+    expect(await long.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+    expect(await fill.evaluate(height)).toBeGreaterThan(210);
+    expect(await fill.evaluate(element => element.scrollHeight)).toBe(await fill.evaluate(element => element.clientHeight));
+  }
+
+  const cappedTable = page.locator('#table .long > *');
+  const pinned = await cappedTable.evaluate(element => {
+    const header = element.querySelector('thead');
+    const footer = element.querySelector('tfoot');
+    const top = header.getBoundingClientRect().top;
+    const bottom = footer.getBoundingClientRect().bottom;
+    element.scrollTop = 240;
+    element.scrollLeft = 80;
+    return {x:element.scrollLeft, y:element.scrollTop, top:header.getBoundingClientRect().top - top, bottom:footer.getBoundingClientRect().bottom - bottom};
+  });
+  expect(pinned.x).toBeGreaterThan(0);
+  expect(pinned.y).toBeGreaterThan(0);
+  expect(pinned.top).toBeCloseTo(0, 0);
+  expect(pinned.bottom).toBeCloseTo(0, 0);
+
+  const list = page.locator('#list .long > *');
+  await list.press('End');
+  await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+});
+
+test('virtualized DataGrid fills a tall flex parent and can scroll to the final row', {tag:'@mobile'}, async ({page},testInfo) => {
+  await mount(page,testInfo,'<div id="grid-layout" style="display:flex;flex-direction:column;height:700px"><div>상위 영역</div><div id="mount-grid" style="display:contents"></div></div>');
+  const bundle = buildSync({
+    stdin:{contents:`import {createElement as h} from 'react';
+      import {createRoot} from 'react-dom/client';
+      import {DataGrid} from '@idenflu/mono-react';
+      const rows = Array.from({length:200}, (_, id) => ({id:String(id), name:'프로젝트 ' + (id + 1)}));
+      createRoot(document.getElementById('mount-grid')).render(h(DataGrid, {
+        label:'가상 프로젝트 목록', rows, columns:[{id:'name', header:'이름', accessor:row=>row.name}],
+        getRowId:row=>row.id, virtualized:true, fillHeight:true, searchable:false, showColumnVisibility:false
+      }));`,resolveDir:resolve(__dirname,'..'),loader:'js'},
+    bundle:true,write:false,platform:'browser',format:'iife',logLevel:'silent',
+    alias:{'@idenflu/mono-react':resolve(__dirname,'../packages/idenflu-mono-react/dist/index.js')},
+    nodePaths:[resolve(__dirname,'../packages/idenflu-mono-react/node_modules')],
+  });
+  await page.addScriptTag({content:bundle.outputFiles[0].text});
+  const grid = page.getByRole('group', {name:'가상 프로젝트 목록'});
+  const viewport = grid.locator('.data-grid-scroll');
+  await expect.poll(() => viewport.evaluate(element => element.clientHeight)).toBeGreaterThan(480);
+  expect(await grid.evaluate(element => Math.abs(element.getBoundingClientRect().bottom - element.closest('#grid-layout').getBoundingClientRect().bottom))).toBeLessThan(1);
+  await expect.poll(async () => {
+    await viewport.evaluate(element => { element.scrollTop = element.scrollHeight; });
+    return viewport.getByRole('cell', {name:'프로젝트 200',exact:true}).count();
+  }).toBe(1);
+});
+
 test('standalone calendar disabled days and controls inside Popover retain their styles', {tag:['@theme','@mobile']}, async ({page},testInfo) => {
   await mount(page,testInfo,'<div id="interactive"></div>');
   const bundle=buildSync({

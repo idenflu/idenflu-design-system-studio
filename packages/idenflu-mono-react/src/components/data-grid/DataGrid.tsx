@@ -120,7 +120,10 @@ export interface DataGridProps<T> {
   error?: React.ReactNode;
   onRetry?: () => void;
   emptyMessage?: React.ReactNode;
+  /** Caps the table viewport, excluding the toolbar and footer. Numbers are pixels. */
   maxHeight?: number | string;
+  /** Fills the remaining height of a bounded column flex layout. */
+  fillHeight?: boolean;
   /** Changing this value resets both scroll axes without changing grid state. */
   scrollResetKey?: string | number;
   className?: string;
@@ -164,7 +167,7 @@ export function DataGrid<T>({
   page: controlledPage, defaultPage = 1, onPageChange,
   pageSize: controlledPageSize, defaultPageSize = 10, onPageSizeChange, pageSizeOptions = [5, 10, 20, 50],
   density: controlledDensity, defaultDensity = 'default', onDensityChange, showDensityToggle = true, showColumnFilterToggle = false, showColumnVisibility = true, defaultHiddenColumnIds = [],
-  loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, scrollResetKey, className,
+  loading = false, error, onRetry, emptyMessage = '등록된 데이터가 없습니다.', maxHeight, fillHeight = false, scrollResetKey, className,
   exportable = false, exportFileName = 'data-grid.csv', exportFormats = ['csv'], onCellEdit,
   virtualized = false, pagination, footer,
 }: DataGridProps<T>) {
@@ -205,6 +208,7 @@ export function DataGrid<T>({
   const virtualMaxHeight = typeof maxHeight === 'number'
     ? Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : 480
     : typeof maxHeight === 'string' && maxHeight.trim() && !/^(none|initial|inherit|unset|revert|revert-layer)$/i.test(maxHeight.trim()) ? maxHeight : 480;
+  const viewportMaxHeight = virtualEnabled && (!fillHeight || maxHeight !== undefined) ? virtualMaxHeight : maxHeight;
   const paginated = pagination ?? !virtualEnabled;
   const size = positiveInteger(requestedPageSize, 10);
   const needle = searchable ? searchableText(query) : '';
@@ -476,7 +480,7 @@ export function DataGrid<T>({
     actions: toolbarActions != null && <div className="data-grid-toolbar-actions">{toolbarActions}</div>,
   };
 
-  return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} tabIndex={-1} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined}>
+  return <div ref={root} className={`data-grid${className ? ` ${className}` : ''}`} tabIndex={-1} role="group" aria-label={label} data-density={density} data-virtualized={virtualEnabled || undefined} data-fill-height={fillHeight || undefined}>
     <p className="sr-only" id={`${id}-sort-help`}>클릭하면 단일 정렬을 변경합니다. Shift 키를 누르고 클릭하면 정렬 조건을 추가하거나 변경합니다.</p>
     <p className="sr-only" id={`${id}-resize-help`}>방향키로 10px, Shift와 함께 1px 조절합니다. Home과 End로 최소·최대 너비를 선택하고 Enter 또는 더블클릭으로 원래 너비 설정을 복구합니다.</p>
     <div className="data-grid-toolbar">
@@ -487,7 +491,7 @@ export function DataGrid<T>({
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>
 
-    <div className="data-grid-viewport" style={maxHeight !== undefined || virtualEnabled ? {maxHeight:virtualEnabled ? virtualMaxHeight : maxHeight} : undefined}>
+    <div className="data-grid-viewport" style={viewportMaxHeight === undefined ? undefined : {maxHeight:viewportMaxHeight}}>
     <TableContainer id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" label={`${label} 표`} aria-busy={loading} style={virtualEnabled ? {overflowAnchor:'none'} : undefined}>
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>
         <caption className="sr-only">{label}</caption>

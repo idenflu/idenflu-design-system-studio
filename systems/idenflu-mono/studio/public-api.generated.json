@@ -887,6 +887,10 @@
         "type": "readonly DataGridExportFormat[] | undefined",
         "optional": true
       },
+      "fillHeight": {
+        "type": "boolean | undefined",
+        "optional": true
+      },
       "filters": {
         "type": "DataGridFilters | undefined",
         "optional": true

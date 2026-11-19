@@ -10,3 +10,6 @@
 .selectable-list small { margin-top:var(--space-1); color:var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .selectable-list button:disabled { color:var(--disabled-text); }
 .list-state { flex-shrink:0; font-size:var(--font-size-caption); }
+:is(.simple-list,.selectable-list)[data-scrollable] { min-height:0; overflow:auto; }
+:is(.simple-list,.selectable-list)[data-fill-height] { flex:1 1 0; }
+.simple-list[data-scrollable]:focus-visible { outline:none; box-shadow:inset 0 0 0 2px var(--focus-on-light); }

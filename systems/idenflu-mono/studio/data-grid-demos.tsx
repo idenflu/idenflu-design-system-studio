@@ -119,7 +119,7 @@ export function DataGridDemos() {
           searchable={false} showColumnVisibility={false} pagination={false} /></div>
         <div><h3>Flex로 남은 높이 채우기</h3><div className="studio-grid-height-flex-container">
           <p className="react-studio-caption">상위 영역</p>
-          <DataGrid className="studio-grid-height-flex" label="Flex 높이 데이터그리드"
+          <DataGrid fillHeight label="Flex 높이 데이터그리드"
             rows={projects.slice(0,Number(heightRowCount))} columns={responsiveColumns.slice(0,2)} getRowId={row=>row.id}
             searchable={false} showColumnVisibility={false} pagination={false} />
         </div></div>
@@ -129,11 +129,10 @@ export function DataGridDemos() {
 .fixed-grid { height: 480px; }
 /* 부모 높이가 정해진 flex 배치 */
 .grid-container { height: 520px; display: flex; flex-direction: column; min-height: 0; }
-.flex-grid { flex: 1 1 0; }
 
 <DataGrid className="fixed-grid" label="고정 높이 목록" rows={rows} columns={columns} getRowId={row => row.id} />
 <div className="grid-container">
-  <DataGrid className="flex-grid" label="Flex 목록" rows={rows} columns={columns} getRowId={row => row.id} />
+  <DataGrid fillHeight label="Flex 목록" rows={rows} columns={columns} getRowId={row => row.id} />
 </div>`}</code></pre></div>
     </Section>
     <DataGridMultiFilterDemo />

@@ -95,7 +95,8 @@ const displayProps: readonly PropertyRow[] = [
   ['toolbarSize',"'sm'",'상단 검색·내장 도구·추가 도구와 컬럼 필터(text·number·select·multi-select)의 공통 크기입니다. 기본 토큰에서 sm은 30px이며 화면 조정의 컨트롤 높이에 따라 변합니다. 자식의 명시적인 size가 우선하고 본문 행 밀도·푸터와 열 선택 팝업의 크기는 바꾸지 않습니다.'],
   ['toolbarOrder','기본 순서','지정한 도구를 먼저 배치하고 누락한 도구는 기본 순서로 뒤에 붙입니다. 중복·알 수 없는 키는 무시합니다. 표시 조건은 각 도구의 속성을 따르며 DOM과 Tab 순서도 함께 바뀝니다.'],
   ['toolbarActions','undefined','호출 측에서 직접 구현한 상시 작업의 UI입니다. 기본 위치는 내장 도구 뒤이며 toolbarOrder의 actions로 묶음을 이동합니다. loading·error에서도 자동으로 비활성화하지 않으므로 각 버튼의 disabled를 직접 지정하세요.'],
-  ['maxHeight','undefined','툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서는 생략·유효하지 않은 숫자·none 등의 해제 값 대신 480px을 사용합니다.'],
+  ['maxHeight','undefined','툴바·푸터를 제외한 표 뷰포트의 최대 높이입니다. 숫자는 px이며 문자열은 CSS 길이입니다. 가상화에서 fillHeight가 꺼져 있고 maxHeight를 생략하면 480px을 사용합니다. 유효하지 않은 숫자나 none 등의 해제 값에도 480px을 적용합니다.'],
+  ['fillHeight','false','높이가 정해진 세로 flex 컨테이너의 남은 높이를 채웁니다. maxHeight를 함께 지정하면 표 뷰포트에 상한을 적용합니다.'],
   ['virtualized','false','true 또는 옵션 객체로 세로 행 가상화를 켭니다. 화면 근처 행을 렌더링하고 실제 행 높이를 측정합니다.'],
   ['pagination','!virtualized','일반 표는 기본 true, 가상화는 기본 false입니다. 가상화와 함께 true를 지정하면 현재 페이지 안에서 가상화합니다.'],
   ['footer','undefined','기본 하단 전체(페이지 이동 포함)를 교체합니다. null·false 또는 이를 반환하는 콜백은 하단을 숨깁니다. 생략하면 기존 하단을 유지하며 조회·선택 상태의 스크린 리더 안내는 항상 제공합니다.'],
@@ -406,6 +407,7 @@ const filters: DataGridFilters = {
         ['className', '최상위 .data-grid에 클래스를 추가합니다. DataGridProps는 일반 div 속성을 상속하지 않으므로 style 대신 이 클래스에 CSS를 작성합니다.'],
         ['density / defaultDensity', '기본·compact의 행 간격을 선택합니다. 현재 밀도는 최상위 .data-grid와 내부 .data-grid-table의 data-density 속성에 표시됩니다.'],
         ['maxHeight', '표 뷰포트의 최대 높이입니다. 툴바와 푸터는 이 높이에 포함되지 않습니다.'],
+        ['fillHeight', '높이가 정해진 세로 flex 컨테이너의 남은 높이를 채웁니다.'],
         ['columns: width / flex / minWidth / maxWidth', '열 너비는 이 속성으로 계산합니다. 헤더·셀에 CSS width를 별도로 지정하기보다 열 정의를 변경하세요.'],
         ['columns: align / pinned / cell', '정렬·시작 고정·셀 표시를 설정합니다. cell에서 반환한 요소에는 자체 className을 지정할 수 있습니다.'],
       ]} />

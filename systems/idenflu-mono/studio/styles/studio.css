@@ -1244,9 +1244,6 @@
   flex-direction: column;
   min-height: 0;
 }
-.studio-grid-height-flex {
-  flex: 1 1 0;
-}
 .studio-grid-virtual-toolbar {
   display: flex;
   align-items: flex-end;

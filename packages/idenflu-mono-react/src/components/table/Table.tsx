@@ -38,25 +38,29 @@ export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> 
   interactive?: boolean;
   /** Fills the remaining height of a bounded column flex layout. */
   fillHeight?: boolean;
+  /** Caps the table viewport height, including the pinned header and footer. Numbers are pixels. */
+  maxHeight?: number | string;
   /** Accessible name of the built-in scroll region. */
   scrollLabel?: string;
 }
 
 export const Table = React.forwardRef<HTMLTableElement, TableProps>(function Table({
-  density = 'default', interactive = false, fillHeight = false, scrollLabel, className, ...props
+  density = 'default', interactive = false, fillHeight = false, maxHeight, scrollLabel, className, ...props
 }, ref) {
   const hasContainer = React.useContext(TableContainerContext);
   const viewportRef = React.useRef<HTMLDivElement>(null);
+  const scrollVertically = fillHeight || maxHeight !== undefined;
   React.useEffect(() => {
-    if (fillHeight && viewportRef.current) return keepStickySectionsClear(viewportRef.current);
-  }, [fillHeight]);
+    if (scrollVertically && viewportRef.current) return keepStickySectionsClear(viewportRef.current);
+  }, [scrollVertically]);
 
   const table = <table {...props} ref={ref} data-density={density} data-interactive={interactive || undefined} className={classes('data-table', className)} />;
   const contents = hasContainer ? <TableContainerContext.Provider value={false}>{table}</TableContainerContext.Provider> : table;
 
-  if (hasContainer && !fillHeight) return contents;
+  if (hasContainer && !scrollVertically) return contents;
 
   return <div ref={viewportRef} className="table-scroll" data-fill-height={fillHeight || undefined} tabIndex={0}
+    data-scroll-vertically={scrollVertically || undefined} style={maxHeight === undefined ? undefined : { maxHeight }}
     role={scrollLabel ? 'region' : undefined} aria-label={scrollLabel || undefined}>
     {contents}
   </div>;
