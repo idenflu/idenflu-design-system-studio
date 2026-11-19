@@ -8,10 +8,13 @@ test('Box renders the requested and default tags with token-based styles', { tag
   await expect(box).toHaveCSS('display', 'flex');
   await expect(box).toHaveCSS('flex-direction', 'column');
   await expect(box).toHaveCSS('gap', '8px');
-  await expect(box).toHaveCSS('padding', '16px');
+  await expect(box).toHaveCSS('padding', '8px 12px 12px 20px');
+  await expect(box).toHaveCSS('margin', '8px 8px 16px 6px');
   await expect(box).toHaveCSS('border-top-width', '1px');
-  await expect(box.locator('div')).toHaveText('프로젝트 이름과 공유 설정을 관리합니다.');
-  for (const name of ['as', 'display', 'gap', 'padding', 'border']) {
+  const content = box.locator('div');
+  await expect(content).toHaveText('프로젝트 이름과 공유 설정을 관리합니다.');
+  await expect(content).toHaveCSS('padding-top', '0px');
+  for (const name of ['as', 'display', 'gap', 'padding', 'margin', 'border', 'pt', 'pb', 'pr', 'pl', 'mt', 'mb', 'ml', 'mr']) {
     expect(await box.getAttribute(name)).toBeNull();
   }
 

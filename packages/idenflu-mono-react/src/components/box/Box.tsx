@@ -15,7 +15,21 @@ const stylePropNames = [
   'overflow', 'overflowX', 'overflowY',
 ] as const satisfies readonly (keyof React.CSSProperties)[];
 
-type BoxStyleProps = Pick<React.CSSProperties, (typeof stylePropNames)[number]>;
+const spacingAliases = {
+  pt: 'paddingTop',
+  pb: 'paddingBottom',
+  pr: 'paddingRight',
+  pl: 'paddingLeft',
+  mt: 'marginTop',
+  mb: 'marginBottom',
+  ml: 'marginLeft',
+  mr: 'marginRight',
+} as const satisfies Record<string, keyof React.CSSProperties>;
+
+type SpacingAlias = keyof typeof spacingAliases;
+type BoxStyleProps = Pick<React.CSSProperties, (typeof stylePropNames)[number]> & {
+  [Alias in SpacingAlias]?: React.CSSProperties[(typeof spacingAliases)[Alias]];
+};
 type BoxTag = keyof HTMLElementTagNameMap & keyof React.JSX.IntrinsicElements;
 
 export type BoxProps<Tag extends BoxTag = 'div'> =
@@ -29,11 +43,17 @@ export type BoxProps<Tag extends BoxTag = 'div'> =
  */
 export const Box = React.forwardRef<HTMLElement, React.HTMLAttributes<HTMLElement> & BoxStyleProps & { as?: BoxTag }>(
   function Box({ as: Tag = 'div', style, ...domProps }, ref) {
-    const boxStyle: BoxStyleProps = {};
+    const boxStyle: React.CSSProperties = {};
     for (const name of stylePropNames) {
       if (name in domProps) {
         Object.assign(boxStyle, { [name]: domProps[name] });
         delete domProps[name];
+      }
+    }
+    for (const alias of Object.keys(spacingAliases) as SpacingAlias[]) {
+      if (alias in domProps) {
+        boxStyle[spacingAliases[alias]] = domProps[alias];
+        delete domProps[alias];
       }
     }
     return React.createElement(Tag, { ...domProps, ref, style: { ...boxStyle, ...style } });
