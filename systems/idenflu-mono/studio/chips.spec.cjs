@@ -28,14 +28,18 @@ test('ghost chips show a background only on hover or selection', {tag:'@theme'},
   await page.goto(url);
   const examples = section(page, 'Ghost');
   const display = examples.getByText('문서', {exact:true});
+  const colored = examples.getByText('완료', {exact:true});
   const filter = examples.getByRole('button', {name:'문서 필터'});
   const disabled = examples.getByRole('button', {name:'비활성 필터'});
   const transparent = 'rgba(0, 0, 0, 0)';
 
-  for (const chip of [display, filter, disabled]) {
+  for (const chip of [display, colored, filter, disabled]) {
     await expect(chip).toHaveCSS('background-color', transparent);
     await expect(chip).toHaveCSS('border-top-color', transparent);
   }
+  const success = section(page, '색상').locator('.chip--static.chip--success').first();
+  await expect(colored).toHaveCSS('color', await success.evaluate(chip => getComputedStyle(chip).color));
+  await expect(colored).not.toHaveAttribute('color');
   await display.hover();
   await expect(display).toHaveCSS('background-color', transparent);
   await expect(disabled).toBeDisabled();
@@ -54,6 +58,45 @@ test('ghost chips show a background only on hover or selection', {tag:'@theme'},
   await filter.press('Enter');
   await expect(filter).toHaveAttribute('aria-pressed', 'false');
   await expect(filter).toHaveCSS('background-color', transparent);
+});
+
+test('fill chips use the color palette and show a keyboard-selected border', {tag:'@theme'}, async ({page}) => {
+  await page.goto(url);
+  const examples = section(page, 'Fill');
+  const palette = section(page, '색상');
+  const fills = await examples.locator('.chip--static').all();
+  const defaults = await palette.locator('.chip--static:not(.chip--rounded)').all();
+  expect(fills).toHaveLength(6);
+  for (const [index, chip] of fills.entries()) {
+    const fill = await selectedChipAppearance(chip);
+    const normal = await selectedChipAppearance(defaults[index]);
+    expect(fill.background).not.toBe(normal.background);
+    expect(chipContrast(fill.foreground, fill.background)).toBeGreaterThanOrEqual(4.5);
+  }
+
+  const filter = examples.getByRole('button', {name:'진행 중 필터'});
+  await expect(filter).not.toHaveAttribute('color');
+  await expect(filter).toHaveAttribute('aria-pressed', 'false');
+  const before = await selectedChipAppearance(filter);
+  await page.keyboard.press('Tab');
+  await filter.focus();
+  await filter.press('Space');
+  await expect(filter).toHaveAttribute('aria-pressed', 'true');
+  await expect(filter).toHaveCSS('border-top-color', before.foreground);
+  await expect(filter).toHaveCSS('background-color', before.background);
+  const selected = await selectedChipAppearance(filter);
+  expect(selected.shadow).toContain('inset');
+  expectVisibleChipFocus(selected, 'fill');
+  await filter.press('Enter');
+  await expect(filter).toHaveAttribute('aria-pressed', 'false');
+  await expect(filter).toHaveCSS('border-top-color', before.background);
+
+  const disabled = examples.getByRole('button', {name:'비활성 강조 필터'});
+  await expect(disabled).toBeDisabled();
+  await expect(disabled).not.toHaveCSS('background-color', before.background);
+  const disabledAppearance = await selectedChipAppearance(disabled);
+  await disabled.hover();
+  expect(await selectedChipAppearance(disabled)).toEqual(disabledAppearance);
 });
 
 test('rounded chips and all six colors retain keyboard selection and readable contrast', {tag:'@theme'}, async ({page}) => {
@@ -136,6 +179,7 @@ test('selected chips keep readable text and distinct focus through default and c
   await page.goto(url);
   const palette = section(page,'색상');
   const chips = palette.getByRole('button');
+  const fills = await section(page, 'Fill').locator('.chip--static').all();
   const overrides = [null, '#ffeb3b', '#ffffff', '#000000', '#777777'];
   for (const theme of ['light','dark']) {
     for (const color of overrides) {
@@ -144,6 +188,10 @@ test('selected chips keep readable text and distinct focus through default and c
         window.IdenfluTheme.set(theme);
         if (color) window.IdenfluPreferences.set({colors:{[theme]:{'--primary':color,'--success':color,'--warning':color,'--danger':color}}});
       }, {theme,color});
+      for (const chip of fills) {
+        const {foreground, background, label} = await selectedChipAppearance(chip);
+        expect(chipContrast(foreground, background), `${theme} ${color || 'default'} fill ${label}`).toBeGreaterThanOrEqual(4.5);
+      }
       for (const chip of await chips.all()) {
         await expect(chip).toHaveAttribute('aria-pressed','true');
         const label = `${theme} ${color || 'default'} ${await chip.getAttribute('aria-label')}`;

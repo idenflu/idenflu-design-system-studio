@@ -288,12 +288,12 @@ export function TreeDemos() {
 }
 
 const chipColors = [
-  { variant: "neutral", label: "기본", example: "문서" },
-  { variant: "primary", label: "강조", example: "진행 중" },
-  { variant: "secondary", label: "보조", example: "참고" },
-  { variant: "success", label: "성공", example: "완료" },
-  { variant: "warning", label: "주의", example: "검토 중" },
-  { variant: "danger", label: "위험", example: "오류" },
+  { color: "neutral", label: "기본", example: "문서" },
+  { color: "primary", label: "강조", example: "진행 중" },
+  { color: "secondary", label: "보조", example: "참고" },
+  { color: "success", label: "성공", example: "완료" },
+  { color: "warning", label: "주의", example: "검토 중" },
+  { color: "danger", label: "위험", example: "오류" },
 ] as const;
 export function ChipDemos() {
   const [selected, setSelected] = React.useState<string[]>(["디자인"]);
@@ -305,9 +305,10 @@ export function ChipDemos() {
   const [iconSelected, setIconSelected] = React.useState(false);
   const [componentSelected, setComponentSelected] = React.useState(false);
   const [roundSelected, setRoundSelected] = React.useState(false);
+  const [fillSelected, setFillSelected] = React.useState(false);
   const [ghostSelected, setGhostSelected] = React.useState(false);
   const [selectedColors, setSelectedColors] = React.useState<string[]>(
-    chipColors.map((item) => item.variant)
+    chipColors.map((item) => item.color)
   );
   return (
     <>
@@ -367,7 +368,7 @@ export function ChipDemos() {
             <h3 className="react-studio-example-title">기본</h3>
             <div className="react-studio-row">
               <Chip interactive={false}>기본 표시</Chip>
-              <Chip interactive={false} variant="primary">
+              <Chip interactive={false} color="primary">
                 강조 표시
               </Chip>
             </div>
@@ -380,7 +381,7 @@ export function ChipDemos() {
               </Chip>
               <Chip
                 rounded
-                variant="primary"
+                color="primary"
                 aria-pressed={roundSelected}
                 onClick={() => setRoundSelected(!roundSelected)}
               >
@@ -400,35 +401,35 @@ export function ChipDemos() {
           alignItems="start"
           className="react-studio-size-grid react-studio-chip-palette"
         >
-          {chipColors.map(({ variant, label, example }) => (
+          {chipColors.map(({ color, label, example }) => (
             <div
               className="react-studio-example react-studio-stack"
-              key={variant}
+              key={color}
             >
               <h3 className="react-studio-example-title">
                 {label}
-                <span className="react-studio-caption">{variant}</span>
+                <span className="react-studio-caption">{color}</span>
               </h3>
               <div className="react-studio-row">
-                <Chip interactive={false} variant={variant}>
+                <Chip interactive={false} color={color}>
                   {example}
                 </Chip>
               </div>
               <div className="react-studio-row">
-                <Chip interactive={false} variant={variant} rounded>
+                <Chip interactive={false} color={color} rounded>
                   {example}
                 </Chip>
               </div>
               <div className="react-studio-row">
                 <Chip
-                  variant={variant}
+                  color={color}
                   aria-label={`${label} 색상 선택`}
-                  aria-pressed={selectedColors.includes(variant)}
+                  aria-pressed={selectedColors.includes(color)}
                   onClick={() =>
                     setSelectedColors((current) =>
-                      current.includes(variant)
-                        ? current.filter((item) => item !== variant)
-                        : [...current, variant]
+                      current.includes(color)
+                        ? current.filter((item) => item !== color)
+                        : [...current, color]
                     )
                   }
                 >
@@ -440,11 +441,33 @@ export function ChipDemos() {
         </Grid>
       </Section>
       <Section
+        title="Fill"
+        description="강한 배경색으로 강조합니다. 선택형 칩은 선택 상태를 테두리로 표시합니다."
+      >
+        <div className="react-studio-row">
+          {chipColors.map(({ color, example }) => (
+            <Chip key={color} variant="fill" color={color} interactive={false}>
+              {example}
+            </Chip>
+          ))}
+          <Chip
+            variant="fill"
+            color="primary"
+            aria-pressed={fillSelected}
+            onClick={() => setFillSelected((current) => !current)}
+          >
+            진행 중 필터
+          </Chip>
+          <Chip variant="fill" color="primary" disabled>비활성 강조 필터</Chip>
+        </div>
+      </Section>
+      <Section
         title="Ghost"
         description="기본 상태에서 배경과 테두리가 투명합니다. 선택형은 호버와 선택 상태에 배경을 표시합니다."
       >
         <div className="react-studio-row">
           <Chip variant="ghost" interactive={false}>문서</Chip>
+          <Chip variant="ghost" color="success" interactive={false}>완료</Chip>
           <Chip
             variant="ghost"
             aria-pressed={ghostSelected}
@@ -474,7 +497,7 @@ export function ChipDemos() {
                 <Chip interactive={false} size={size}>
                   기본 표시
                 </Chip>
-                <Chip interactive={false} rounded variant="primary" size={size}>
+                <Chip interactive={false} rounded color="primary" size={size}>
                   라운드
                 </Chip>
                 <Chip size={size}>선택</Chip>
@@ -511,7 +534,7 @@ export function ChipDemos() {
                   interactive={false}
                   density="comfortable"
                   rounded
-                  variant="success"
+                  color="success"
                   size={size}
                 >
                   완료
@@ -519,7 +542,7 @@ export function ChipDemos() {
                 <Chip
                   interactive={false}
                   density="comfortable"
-                  variant="secondary"
+                  color="secondary"
                   size={size}
                 >
                   <Icon name="calendar" />

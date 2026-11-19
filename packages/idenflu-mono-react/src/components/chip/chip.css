@@ -1,10 +1,8 @@
-.chip { --chip-accent:var(--primary); --chip-background:var(--field-background); border-radius:var(--radius-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--control-gap); max-width:100%; min-height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--chip-border,var(--border)); background:var(--chip-background); color:var(--text); font-family:var(--font-family-body); font-size:var(--font-size-body); line-height:var(--line-height-control); overflow-wrap:anywhere; }
+.chip { --chip-accent:var(--primary); --chip-tint:var(--field-background); --chip-background:var(--chip-tint); --chip-color:var(--text); --chip-selection-ring:0 0 transparent; border-radius:var(--radius-control); display:inline-flex; align-items:center; justify-content:center; gap:var(--control-gap); max-width:100%; min-height:var(--control-height); padding:0 var(--control-px); border:1px solid var(--chip-border,var(--border)); background:var(--chip-background); color:var(--chip-color); font-family:var(--font-family-body); font-size:var(--font-size-body); line-height:var(--line-height-control); overflow-wrap:anywhere; }
 .chip:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) { background:var(--surface); }
 .chip:not(:disabled):not(.chip--static) { cursor:pointer; }
 .chip--rounded { border-radius:999px; }
 .chip--static { cursor:default; }
-.chip--ghost { --chip-background:transparent; --chip-border:transparent; }
-.chip--ghost:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) { background:var(--surface-hover); }
 .chip:not(.chip--comfortable) { --chip-compact-height: calc(var(--control-height) - 10px);
   --chip-compact-font: max(11px, calc(var(--font-size-body) - 1px));
   min-height: var(--chip-compact-height);
@@ -15,19 +13,45 @@
 .chip:not(.chip--comfortable)[data-size="sm"] { --chip-compact-height:calc(var(--control-height) - 8px); --chip-compact-font:max(11px, calc(var(--font-size-body) - 2px)); }
 .chip:not(.chip--comfortable)[data-size="lg"] { --chip-compact-height:calc(var(--control-height) - 10px); --chip-compact-font:var(--font-size-body); }
 .chip:not(.chip--comfortable) .ui-icon, .chip:not(.chip--comfortable) img { width: min(var(--icon-size), 1em); height: min(var(--icon-size), 1em); }
-@media (forced-colors:active) {
-.chip:focus-visible { box-shadow:none; }
+.chip--colored { --chip-border:color-mix(in srgb,var(--chip-accent) 22%,var(--chip-tint)); --chip-color:var(--chip-accent); }
+.chip--primary { --chip-selected-text:var(--chip-primary-selected-text, var(--canvas)); --chip-accent:var(--primary); --chip-tint:var(--info-surface); }
+.chip--secondary { --chip-border:var(--border); --chip-accent:var(--text); --chip-tint:var(--surface-hover); --chip-hover-background:var(--surface-pressed); --chip-selected-background:var(--surface-pressed); --chip-selected-text:var(--chip-secondary-selected-text, var(--text)); }
+.chip--success { --chip-selected-text:var(--chip-success-selected-text, var(--canvas)); --chip-accent:var(--success); --chip-tint:var(--success-surface); }
+.chip--warning { --chip-selected-text:var(--chip-warning-selected-text, var(--canvas)); --chip-accent:var(--warning); --chip-tint:var(--warning-surface); }
+.chip--danger { --chip-selected-text:var(--chip-danger-selected-text, var(--canvas)); --chip-accent:var(--danger-text); --chip-tint:var(--danger-surface); }
+.chip--colored:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) { background:var(--chip-hover-background,var(--chip-tint)); border-color:var(--chip-accent); }
+.chip[aria-pressed="true"]:where(:not(.chip--fill, :disabled)) { border-color:var(--primary); background:var(--info-surface); color:var(--chip-neutral-selected-text, var(--primary)); }
+.chip--colored[aria-pressed="true"]:where(:not(.chip--fill, :disabled)) { border-color:var(--chip-accent); background:var(--chip-selected-background,var(--chip-accent)); color:var(--chip-selected-text,var(--canvas)); }
+.chip--ghost { --chip-background:transparent; --chip-border:transparent; }
+.chip--ghost:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) {
+  background:var(--chip-hover-background,var(--chip-ghost-hover,var(--surface-hover)));
+  border-color:transparent;
 }
-.chip--colored { --chip-border:color-mix(in srgb,var(--chip-accent) 22%,var(--chip-background)); color:var(--chip-accent); }
-.chip--primary { --chip-selected-text:var(--chip-primary-selected-text, var(--canvas)); --chip-accent:var(--primary); --chip-background:var(--info-surface); }
-.chip--secondary { --chip-border:var(--border); --chip-accent:var(--text); --chip-background:var(--surface-hover); --chip-hover-background:var(--surface-pressed); --chip-selected-background:var(--surface-pressed); --chip-selected-text:var(--chip-secondary-selected-text, var(--text)); }
-.chip--success { --chip-selected-text:var(--chip-success-selected-text, var(--canvas)); --chip-accent:var(--success); --chip-background:var(--success-surface); }
-.chip--warning { --chip-selected-text:var(--chip-warning-selected-text, var(--canvas)); --chip-accent:var(--warning); --chip-background:var(--warning-surface); }
-.chip--danger { --chip-selected-text:var(--chip-danger-selected-text, var(--canvas)); --chip-accent:var(--danger-text); --chip-background:var(--danger-surface); }
-.chip--colored:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) { background:var(--chip-hover-background,var(--chip-background)); border-color:var(--chip-accent); }
-.chip[aria-pressed="true"] { border-color:var(--primary); background:var(--info-surface); color:var(--chip-neutral-selected-text, var(--primary)); }
-.chip--colored[aria-pressed="true"] { border-color:var(--chip-accent); background:var(--chip-selected-background,var(--chip-accent)); color:var(--chip-selected-text,var(--canvas)); }
-.chip:focus-visible { outline:2px solid #000; outline-offset:2px; box-shadow:0 0 0 2px #fff; }
+.chip--ghost.chip--colored { --chip-ghost-hover:var(--chip-tint); }
+
+.chip--fill {
+  --chip-background:var(--inverse-canvas);
+  --chip-color:var(--inverse-text);
+  --chip-border:var(--chip-background);
+}
+.chip--fill.chip--colored {
+  --chip-background:var(--chip-selected-background,var(--chip-accent));
+  --chip-color:var(--chip-selected-text,var(--canvas));
+}
+.chip--fill:hover:not(:disabled):not(.chip--static):not([aria-pressed="true"]) {
+  background:var(--chip-background);
+  border-color:currentColor;
+}
+.chip--fill:where([aria-pressed="true"]:not(:disabled)) {
+  --chip-selection-ring:inset 0 0 0 1px currentColor;
+  border-color:currentColor;
+  box-shadow:var(--chip-selection-ring);
+}
+
+.chip:focus-visible { outline:2px solid #000; outline-offset:2px; box-shadow:0 0 0 2px #fff,var(--chip-selection-ring); }
+@media (forced-colors:active) {
+  .chip:focus-visible { box-shadow:none; }
+}
 .chip:disabled { background:var(--surface); border-color:var(--border); color:var(--disabled-text); cursor:not-allowed; }
 .chip--ghost:disabled { background:transparent; border-color:transparent; }
 .chip img { width:var(--icon-size); height:var(--icon-size); }
