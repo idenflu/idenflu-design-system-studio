@@ -7,10 +7,10 @@ interface ChipAppearance {
   rounded?: boolean;
 }
 export interface InteractiveChipProps extends ChipAppearance, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size' | 'color'> {
-  interactive?: true;
+  interactive: true;
 }
 export interface StaticChipProps extends ChipAppearance, Omit<React.HTMLAttributes<HTMLSpanElement>, 'color' | 'onClick' | 'onClickCapture' | 'tabIndex' | 'aria-pressed'> {
-  interactive: false;
+  interactive?: false;
   density?: 'comfortable' | 'compact';
   onClick?: never;
   onClickCapture?: never;
@@ -26,18 +26,19 @@ interface ChipComponent {
 
 export const Chip = React.forwardRef<HTMLButtonElement | HTMLSpanElement, ChipProps>(function Chip(props, ref) {
   const { variant = 'default', color = 'neutral', rounded = false, className } = props;
+  const isStatic = props.interactive !== true;
   const classes = [
     'chip',
     variant !== 'default' && `chip--${variant}`,
     color !== 'neutral' && 'chip--colored',
     color !== 'neutral' && `chip--${color}`,
     rounded && 'chip--rounded',
-    props.interactive === false && 'chip--static',
-    props.interactive === false && props.density === 'compact' && 'chip--compact',
-    props.interactive === false && props.density === 'comfortable' && 'chip--comfortable',
+    isStatic && 'chip--static',
+    isStatic && props.density === 'compact' && 'chip--compact',
+    isStatic && props.density === 'comfortable' && 'chip--comfortable',
     className,
   ].filter(Boolean).join(' ');
-  if (props.interactive === false) {
+  if (isStatic) {
     const { interactive, density, size, variant, color, rounded, className, onClick, onClickCapture, tabIndex, 'aria-pressed': pressed, ...attributes } = props;
     return <span {...attributes} ref={ref as React.ForwardedRef<HTMLSpanElement>} data-size={size} className={classes} />;
   } else {

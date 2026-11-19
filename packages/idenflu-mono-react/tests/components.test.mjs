@@ -73,10 +73,12 @@ test('search clear respects controlled rejection, readonly, disabled and custom 
 test('display Chip uses a span, forwards its ref and ignores activation props', async () => {
   const f = fixture(), ref = React.createRef(); let clicks = 0;
   try {
-    await f.render(h(Chip,{interactive:false,ref,variant:'success',rounded:true,id:'saved-chip','data-project':'mono',onClick:() => clicks++,onClickCapture:() => clicks++,tabIndex:0,'aria-pressed':true},'완료'));
+    await f.render(h(Chip,{ref,color:'success',rounded:true,id:'saved-chip','data-project':'mono',onClick:() => clicks++,onClickCapture:() => clicks++,tabIndex:0,'aria-pressed':true},'완료'));
     const chip = f.container.querySelector('#saved-chip');
     assert.equal(chip.tagName,'SPAN');
     assert.equal(ref.current,chip);
+    assert.equal(chip.classList.contains('chip--static'),true);
+    assert.equal(chip.classList.contains('chip--success'),true);
     assert.equal(chip.getAttribute('data-project'),'mono');
     assert.equal(chip.hasAttribute('tabindex'),false);
     assert.equal(chip.hasAttribute('aria-pressed'),false);
@@ -92,7 +94,7 @@ test('compact Chip keeps display semantics and forwards size and refs without le
   const f = fixture(), ref = React.createRef();
   try {
     for (const size of ['sm', 'md', 'lg']) {
-      await f.render(h(Chip,{interactive:false,density:'compact',size,ref,rounded:true,'data-density-example':size},'문서'));
+      await f.render(h(Chip,{interactive:false,density:'compact',size,ref,color:'primary',rounded:true,'data-density-example':size},'문서'));
       const chip = f.container.querySelector('.chip');
       assert.equal(chip.tagName,'SPAN');
       assert.equal(ref.current,chip);
@@ -101,15 +103,16 @@ test('compact Chip keeps display semantics and forwards size and refs without le
       assert.equal(chip.classList.contains('chip--static'),true);
       assert.equal(chip.classList.contains('chip--compact'),true);
       assert.equal(chip.classList.contains('chip--rounded'),true);
+      assert.equal(chip.classList.contains('chip--primary'),true);
       assert.equal(chip.hasAttribute('density'),false);
       assert.equal(chip.tabIndex,-1);
       assert.equal(chip.hasAttribute('aria-pressed'),false);
     }
-    await f.render(h(Chip,{interactive:false,density:'comfortable',ref},'기본 표시'));
+    await f.render(h(Chip,{density:'comfortable',ref},'기본 표시'));
     assert.equal(ref.current.classList.contains('chip--comfortable'),true);
     await f.render(h(Chip,{interactive:false,ref},'기본 표시'));
     assert.equal(ref.current.classList.contains('chip--compact'),false);
-    await f.render(h(Chip,{ref,'aria-pressed':true},'필터'));
+    await f.render(h(Chip,{interactive:true,ref,'aria-pressed':true},'필터'));
     assert.equal(ref.current.tagName,'BUTTON');
     assert.equal(ref.current.classList.contains('chip--compact'),false);
     assert.equal(ref.current.getAttribute('aria-pressed'),'true');
@@ -119,7 +122,7 @@ test('compact Chip keeps display semantics and forwards size and refs without le
 test('interactive Chip keeps button refs, pressed state and disabled behavior', async () => {
   const f = fixture(), ref = React.createRef(); let clicks = 0;
   try {
-    const render = disabled => f.render(h(Chip,{ref,disabled,'aria-pressed':clicks > 0,onClick:() => clicks++},'필터'));
+    const render = disabled => f.render(h(Chip,{interactive:true,ref,disabled,'aria-pressed':clicks > 0,onClick:() => clicks++},'필터'));
     await render(false);
     const chip = f.container.querySelector('button');
     assert.equal(ref.current,chip);

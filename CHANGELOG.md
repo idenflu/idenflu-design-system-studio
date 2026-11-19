@@ -4,6 +4,10 @@
 
 ## 미배포
 
+### 호환성
+
+- `Chip`의 기본값이 표시용 라벨로 바뀝니다. 기존 선택·삭제 버튼에는 `interactive={true}`를 추가해야 합니다.
+
 ## 0.11.0 — 2026-11-19
 
 [게시 소스 `0866b84`](https://github.com/idenflu/idenflu-design-system-studio/commit/0866b8425b361f340b3cac162eae6e31469dd6e1) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44479559589)

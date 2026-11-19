@@ -317,9 +317,9 @@ export function ChipDemos() {
         description="분류와 속성을 텍스트로 표시합니다. 클릭·키보드 선택·호버 효과가 없으며 Tab 이동 대상에 포함되지 않습니다."
       >
         <div className="react-studio-row">
-          <Chip interactive={false}>프로젝트</Chip>
-          <Chip interactive={false}>디자인 시스템</Chip>
-          <Chip interactive={false}>
+          <Chip>프로젝트</Chip>
+          <Chip>디자인 시스템</Chip>
+          <Chip>
             <Icon name="calendar" />
             주간 일정
           </Chip>
@@ -332,6 +332,7 @@ export function ChipDemos() {
         <div className="react-studio-row">
           {["디자인", "개발", "마케팅"].map((name) => (
             <Chip
+              interactive={true}
               key={name}
               aria-pressed={selected.includes(name)}
               onClick={() =>
@@ -345,7 +346,7 @@ export function ChipDemos() {
               {name}
             </Chip>
           ))}
-          <Chip disabled>비활성</Chip>
+          <Chip interactive={true} disabled>비활성</Chip>
         </div>
         <p role="status" className="component-helper">
           {selected.length
@@ -367,8 +368,8 @@ export function ChipDemos() {
           <div className="react-studio-example">
             <h3 className="react-studio-example-title">기본</h3>
             <div className="react-studio-row">
-              <Chip interactive={false}>기본 표시</Chip>
-              <Chip interactive={false} color="primary">
+              <Chip>기본 표시</Chip>
+              <Chip color="primary">
                 강조 표시
               </Chip>
             </div>
@@ -376,10 +377,11 @@ export function ChipDemos() {
           <div className="react-studio-example">
             <h3 className="react-studio-example-title">라운드</h3>
             <div className="react-studio-row">
-              <Chip interactive={false} rounded>
+              <Chip rounded>
                 라운드 표시
               </Chip>
               <Chip
+                interactive={true}
                 rounded
                 color="primary"
                 aria-pressed={roundSelected}
@@ -411,17 +413,18 @@ export function ChipDemos() {
                 <span className="react-studio-caption">{color}</span>
               </h3>
               <div className="react-studio-row">
-                <Chip interactive={false} color={color}>
+                <Chip color={color}>
                   {example}
                 </Chip>
               </div>
               <div className="react-studio-row">
-                <Chip interactive={false} color={color} rounded>
+                <Chip color={color} rounded>
                   {example}
                 </Chip>
               </div>
               <div className="react-studio-row">
                 <Chip
+                  interactive={true}
                   color={color}
                   aria-label={`${label} 색상 선택`}
                   aria-pressed={selectedColors.includes(color)}
@@ -446,11 +449,12 @@ export function ChipDemos() {
       >
         <div className="react-studio-row">
           {chipColors.map(({ color, example }) => (
-            <Chip key={color} variant="fill" color={color} interactive={false}>
+            <Chip key={color} variant="fill" color={color}>
               {example}
             </Chip>
           ))}
           <Chip
+            interactive={true}
             variant="fill"
             color="primary"
             aria-pressed={fillSelected}
@@ -458,7 +462,7 @@ export function ChipDemos() {
           >
             진행 중 필터
           </Chip>
-          <Chip variant="fill" color="primary" disabled>비활성 강조 필터</Chip>
+          <Chip interactive={true} variant="fill" color="primary" disabled>비활성 강조 필터</Chip>
         </div>
       </Section>
       <Section
@@ -466,16 +470,17 @@ export function ChipDemos() {
         description="기본 상태에서 배경과 테두리가 투명합니다. 선택형은 호버와 선택 상태에 배경을 표시합니다."
       >
         <div className="react-studio-row">
-          <Chip variant="ghost" interactive={false}>문서</Chip>
-          <Chip variant="ghost" color="success" interactive={false}>완료</Chip>
+          <Chip variant="ghost">문서</Chip>
+          <Chip variant="ghost" color="success">완료</Chip>
           <Chip
+            interactive={true}
             variant="ghost"
             aria-pressed={ghostSelected}
             onClick={() => setGhostSelected((current) => !current)}
           >
             문서 필터
           </Chip>
-          <Chip variant="ghost" disabled>비활성 필터</Chip>
+          <Chip interactive={true} variant="ghost" disabled>비활성 필터</Chip>
         </div>
       </Section>
       <Section
@@ -494,14 +499,14 @@ export function ChipDemos() {
                 {size.toUpperCase()}
               </h3>
               <div className="react-studio-row">
-                <Chip interactive={false} size={size}>
+                <Chip size={size}>
                   기본 표시
                 </Chip>
-                <Chip interactive={false} rounded color="primary" size={size}>
+                <Chip rounded color="primary" size={size}>
                   라운드
                 </Chip>
-                <Chip size={size}>선택</Chip>
-                <Chip interactive={false} density="comfortable" size={size}>
+                <Chip interactive={true} size={size}>선택</Chip>
+                <Chip density="comfortable" size={size}>
                   여유 있는 표시
                 </Chip>
               </div>
@@ -527,11 +532,10 @@ export function ChipDemos() {
                 {size.toUpperCase()}
               </h3>
               <div className="react-studio-row">
-                <Chip interactive={false} density="comfortable" size={size}>
+                <Chip density="comfortable" size={size}>
                   문서
                 </Chip>
                 <Chip
-                  interactive={false}
                   density="comfortable"
                   rounded
                   color="success"
@@ -540,7 +544,6 @@ export function ChipDemos() {
                   완료
                 </Chip>
                 <Chip
-                  interactive={false}
                   density="comfortable"
                   color="secondary"
                   size={size}
@@ -560,6 +563,7 @@ export function ChipDemos() {
         <div className="react-studio-row">
           {removable.map((name) => (
             <Chip
+              interactive={true}
               key={name}
               rounded
               aria-label={`${name} 제거`}
@@ -594,6 +598,7 @@ export function ChipDemos() {
       >
         <div className="react-studio-row">
           <Chip
+            interactive={true}
             aria-pressed={iconSelected}
             onClick={() => setIconSelected(!iconSelected)}
           >
@@ -601,6 +606,7 @@ export function ChipDemos() {
             일정 필터
           </Chip>
           <Chip
+            interactive={true}
             aria-pressed={componentSelected}
             onClick={() => setComponentSelected(!componentSelected)}
           >
