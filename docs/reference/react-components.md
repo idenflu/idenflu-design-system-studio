@@ -264,6 +264,8 @@ export function ToolbarPopups() {
 
 `DropdownMenuDivider`를 일반 작업과 삭제 항목 사이에 배치합니다. `DropdownMenuItem`의 `color="danger"`는 텍스트와 아이콘을 강조하며, 생략 시 기본값은 `default`입니다. 방향키 탐색은 구분선을 건너뜁니다.
 
+클릭이나 Enter·Space로 메뉴를 열면 트리거에 포커스가 유지됩니다. 트리거에서 ↓를 누르면 첫 번째 활성 항목으로, ↑를 누르면 마지막 활성 항목으로 이동합니다. 메뉴가 닫혀 있으면 방향키로 열면서 해당 항목으로 이동합니다.
+
 이 예제는 `onSelect`가 받은 값을 메뉴 아래에 표시합니다.
 
 ```tsx

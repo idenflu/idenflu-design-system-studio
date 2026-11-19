@@ -32,13 +32,15 @@ export function DropdownMenu({ trigger, children, onSelect, label, align = 'star
   const button = React.useRef<HTMLButtonElement>(null);
   const menu = React.useRef<HTMLDivElement>(null);
   usePopupPosition(open, align, button, menu);
-  const initialFocus = React.useRef<'first' | 'last'>('first');
+  const pendingFocusIndex = React.useRef<number | null>(null);
   useEscapeLayer(open, wrap, () => { setOpen(false); button.current?.focus(); });
   const id = React.useId();
   const focusItem = (index: number) => { const all = menu.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)'); if (all?.length) all[(index + all.length) % all.length].focus(); };
   React.useEffect(() => {
     if (!open) return;
-    focusItem(initialFocus.current === 'last' ? -1 : 0);
+    const index = pendingFocusIndex.current;
+    pendingFocusIndex.current = null;
+    if (index !== null) focusItem(index);
     const outside = (event: PointerEvent) => { if (!wrap.current?.contains(event.target as Node)) setOpen(false); };
     document.addEventListener('pointerdown', outside);
     return () => { document.removeEventListener('pointerdown', outside); };
@@ -56,8 +58,25 @@ export function DropdownMenu({ trigger, children, onSelect, label, align = 'star
   }, [triggerRef]);
   const triggerElement = React.cloneElement(trigger, {
     ref: setTriggerRef, 'aria-haspopup': 'menu', 'aria-expanded': open, 'aria-controls': id,
-    onClick: event => { trigger.props.onClick?.(event); if (!event.defaultPrevented) { initialFocus.current = 'first'; setOpen(value => !value); } },
-    onKeyDown: event => { trigger.props.onKeyDown?.(event); if (!event.defaultPrevented && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) { event.preventDefault(); initialFocus.current = event.key === 'ArrowDown' ? 'first' : 'last'; if (open) focusItem(initialFocus.current === 'first' ? 0 : -1); else setOpen(true); } },
+    onClick: event => {
+      trigger.props.onClick?.(event);
+      if (event.defaultPrevented) return;
+      pendingFocusIndex.current = null;
+      if (!open) button.current?.focus();
+      setOpen(value => !value);
+    },
+    onKeyDown: event => {
+      trigger.props.onKeyDown?.(event);
+      if (event.defaultPrevented || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
+      event.preventDefault();
+      const index = event.key === 'ArrowDown' ? 0 : -1;
+      if (open) {
+        focusItem(index);
+      } else {
+        pendingFocusIndex.current = index;
+        setOpen(true);
+      }
+    },
   });
   return <div className="action-menu" ref={wrap} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false); }}>{triggerElement}
     <div ref={menu} id={id} role="menu" aria-label={label} className="action-options" data-align={align} hidden={!open} onKeyDown={(event) => {

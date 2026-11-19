@@ -96,13 +96,15 @@ test('dropdown selection and Escape return focus to its trigger', async () => {
   } finally { await f.dispose(); }
 });
 
-test('dropdown focuses the first enabled item and closes when focus leaves', async () => {
+test('dropdown keeps trigger focus on click, enters with an arrow key, and closes when focus leaves', async () => {
   const f = fixture();
   try {
     await f.render(h('div', null, h(DropdownMenu, { trigger: h('button', null, '메뉴'), label: '작업', onSelect() {} }, h(DropdownMenuItem, {value:'off', disabled:true}, '비활성'), h(DropdownMenuItem, {value:'edit'}, '편집'), h(DropdownMenuItem, {value:'copy'}, '복사')), h('button', { type: 'button' }, '다음')));
     const trigger = f.node.querySelector('[aria-haspopup=menu]');
     await click(trigger);
     const items = f.node.querySelectorAll('[role=menuitem]');
+    assert.equal(document.activeElement === trigger, true, 'trigger retains focus when opened by click');
+    await act(async () => trigger.dispatchEvent(new KeyboardEvent('keydown', {key:'ArrowDown', bubbles:true, cancelable:true})));
     assert.equal(document.activeElement, items[1]);
     assert.equal(items[1].tabIndex, -1);
     await act(async () => [...f.node.querySelectorAll('button')].find(element => element.textContent === '다음').focus());
