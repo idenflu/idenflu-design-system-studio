@@ -13,6 +13,7 @@ export function CodeBlockExample() {
     language="json"
     format="pretty"
     indentSize={4}
+    copy
     maxHeight={160}
     aria-label="스케줄 Payload JSON"
   />;
@@ -21,7 +22,7 @@ export function CodeBlockExample() {
 export function CodeBlockDemos() {
   return <>
     <Section title="JSON 포맷팅" description="공백 4칸으로 들여씁니다. 본문 높이가 160px을 넘으면 본문 안에서 스크롤합니다.">
-      <CodeBlock code={payload} language="json" format="pretty" indentSize={4} maxHeight={160} aria-label="스케줄 Payload JSON" />
+      <CodeBlock code={payload} language="json" format="pretty" indentSize={4} copy maxHeight={160} aria-label="스케줄 Payload JSON" />
     </Section>
     <Section title="XML 포맷팅" description="기본 들여쓰기는 공백 2칸입니다. wrap을 켜면 긴 줄을 본문 너비에 맞춰 표시합니다.">
       <CodeBlock code={settings} language="xml" format="pretty" wrap />
@@ -31,6 +32,7 @@ export function CodeBlockDemos() {
         <li><code>format="none"</code>이 기본값이며 원문을 표시합니다.</li>
         <li><code>format="pretty"</code>는 JSON과 XML을 정리합니다. 지원하지 않는 언어, 잘못된 입력, DOCTYPE이 있는 XML은 원문으로 표시합니다.</li>
         <li><code>indentSize={'{0}'}</code>은 줄바꿈만 적용합니다.</li>
+        <li><code>copy</code>를 켜면 오른쪽 상단 버튼으로 화면에 표시된 코드를 복사할 수 있습니다. 기본값은 <code>false</code>입니다.</li>
       </ul>
     </Section>
   </>;
