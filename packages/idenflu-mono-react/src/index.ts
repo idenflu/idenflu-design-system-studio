@@ -38,6 +38,7 @@ export * from './components/datetime-picker/DateTimePicker';
 export * from './components/time-picker/TimePicker';
 export * from './components/data-state/DataState';
 export * from './components/divider/Divider';
+export * from './components/code-block/CodeBlock';
 export * from './components/box/Box';
 export * from './components/grid/Grid';
 export * from './components/nova-spinner/NovaSpinner';

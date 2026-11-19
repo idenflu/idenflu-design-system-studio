@@ -45,6 +45,7 @@ export const componentStyles = [
   "src/components/data-state/data-state.css",
   "src/components/data-grid/data-grid.css",
   "src/components/divider/divider.css",
+  "src/components/code-block/code-block.css",
   "src/components/grid/grid.css",
   // Forced-color system overrides follow normal component declarations.
   "src/styles/shared.css",

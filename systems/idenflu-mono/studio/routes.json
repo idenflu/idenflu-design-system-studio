@@ -168,6 +168,13 @@
     "searchTerms": "구분선 디바이더 분리 경계 가로 세로 점선 divider separator"
   },
   {
+    "route": "components/code-block",
+    "title": "CodeBlock",
+    "group": "Components",
+    "description": "형식명과 함께 읽기 전용 코드를 표시하고 JSON과 XML의 들여쓰기를 정리합니다.",
+    "searchTerms": "코드 블록 본문 포맷팅 들여쓰기 code block json xml pretty print"
+  },
+  {
     "route": "components/box",
     "title": "Box",
     "group": "Components",

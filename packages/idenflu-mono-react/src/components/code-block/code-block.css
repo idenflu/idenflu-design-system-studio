@@ -1,0 +1,38 @@
+.code-block {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--divider);
+  background: var(--surface-subtle);
+  color: var(--text);
+}
+
+.code-block__language {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.code-block__body {
+  margin: 0;
+  overflow: auto;
+  padding: var(--space-3);
+  font: var(--font-size-caption) / 1.6 ui-monospace, SFMono-Regular, Consolas,
+    monospace;
+  white-space: pre;
+  tab-size: 2;
+}
+
+.code-block__body code {
+  font: inherit;
+}
+
+.code-block__body--wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.code-block__body:focus-visible {
+  outline: 2px solid var(--focus-on-light);
+  outline-offset: -2px;
+}

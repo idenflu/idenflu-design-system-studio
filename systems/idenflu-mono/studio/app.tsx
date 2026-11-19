@@ -17,6 +17,7 @@ import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from
 import { DocumentShell, Overview, notFoundRouteId, useDocumentRoute } from './shell';
 import { DocumentNotFound, LayoutNotFound } from './not-found';
 import { DividerDemos } from './divider-demos';
+import { CodeBlockDemos, codeBlockUsage } from './code-block-demos';
 import { BoxDemos } from './box-demos';
 import { GridDemos, gridUsage } from './grid-demos';
 import { patternPages, patternSnippets } from './patterns';
@@ -44,6 +45,7 @@ export function IconExample() {
 
 const snippets: Record<string, string> = {
   'components/grid': gridUsage,
+  'components/code-block': codeBlockUsage,
   'components/time-picker': timePickerUsage,
   'components/data-grid': dataGridUsage,
   'components/divider':`import { Divider } from '@idenflu/mono-react';
@@ -318,6 +320,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'components/chips': return <ChipDemos />;
     case 'components/list': return <ListDemos />;
     case 'components/divider': return <DividerDemos />;
+    case 'components/code-block': return <CodeBlockDemos />;
     case 'components/box': return <BoxDemos />;
     case 'components/grid': return <GridDemos />;
     case 'components/slider': return <SliderDemos />;
