@@ -39,3 +39,4 @@
 .input-group:has(input[readonly]:not(:disabled)) .input-action:hover { background:transparent; color:var(--disabled-text); }
 .input-group input:disabled { cursor: not-allowed; }
 .text-field-search::-webkit-search-cancel-button { appearance:none; display:none; }
+.text-field-password::-ms-reveal { display:none; }

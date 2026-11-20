@@ -11,7 +11,7 @@ export interface TextFieldProps extends Omit<React.InputHTMLAttributes<HTMLInput
   error?: React.ReactNode;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
-  /** Custom trailing action. Search fields otherwise provide a standard clear button. */
+  /** Custom trailing action. Replaces the search clear button and appears alongside the password visibility button. */
   action?: React.ReactNode;
   prefixDecorative?: boolean;
   suffixDecorative?: boolean;
@@ -27,6 +27,9 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
   const generated = React.useId();
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useImperativeHandle(ref, () => inputRef.current!);
+  const isPassword = props.type?.toLowerCase() === 'password';
+  const [passwordVisible, setPasswordVisible] = React.useState(false);
+  if (passwordVisible && (!isPassword || props.disabled)) setPasswordVisible(false);
   const automaticClear = props.type === 'search' && action == null;
   const [searchValue, setSearchValue] = React.useState(() => String(props.defaultValue ?? ''));
   const hasSearchValue = String(props.value === undefined ? searchValue : props.value ?? '').length > 0;
@@ -59,6 +62,12 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
     <span className="ui-icon icon-x" aria-hidden="true" />
   </button> : action;
   const inputId = id || `field-${generated}`;
+  const passwordToggle = isPassword && <button type="button" className="input-action" disabled={props.disabled}
+    aria-controls={inputId} aria-label={`${typeof label === 'string' ? label : '비밀번호'} ${passwordVisible ? '숨기기' : '표시'}`}
+    onMouseDown={event => event.preventDefault()} onClick={() => setPasswordVisible(visible => !visible)}>
+    <span className={classes('ui-icon', passwordVisible ? 'icon-visibility-off' : 'icon-visibility')} aria-hidden="true" />
+  </button>;
+  const grouped = prefix != null || suffix != null || fieldAction != null || isPassword;
   const helperId = `${inputId}-help`;
   const errorId = `${inputId}-error`;
   const prefixId = `${inputId}-prefix`;
@@ -66,13 +75,14 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(func
   const effectiveLabelPosition = hideLabel ? 'top' : labelPosition;
   const described = [describedBy, prefix != null && !prefixDecorative && prefixId, suffix != null && !suffixDecorative && suffixId, helperText != null && helperId, error != null && errorId].filter(Boolean).join(' ') || undefined;
   const labelElement = <label className={classes('field-label', hideLabel && 'sr-only', effectiveLabelPosition === 'left' && 'field-horizontal__label')} htmlFor={inputId}>{label}{props.required && !hideLabel && <RequiredMark />}</label>;
-  const input = <input {...props} ref={inputRef} onChange={automaticClear ? event => { setSearchValue(event.target.value); props.onChange?.(event); } : props.onChange} id={inputId} aria-invalid={error != null ? true : ariaInvalid} aria-describedby={described} className={classes(alignment && `text-align-${alignment}`, className, props.type === 'search' && 'text-field-search', prefix == null && suffix == null && fieldAction == null && 'text-input')} />;
+  const input = <input {...props} type={passwordVisible ? 'text' : props.type} ref={inputRef} onChange={automaticClear ? event => { setSearchValue(event.target.value); props.onChange?.(event); } : props.onChange} id={inputId} aria-invalid={error != null ? true : ariaInvalid} aria-describedby={described} className={classes(alignment && `text-align-${alignment}`, className, props.type === 'search' && 'text-field-search', isPassword && 'text-field-password', !grouped && 'text-input')} />;
   const body = <div className={effectiveLabelPosition === 'left' ? 'field-horizontal__body' : undefined}>
-    {prefix != null || suffix != null || fieldAction != null ? <div className="input-group" data-size={size}>
+    {grouped ? <div className="input-group" data-size={size}>
       {prefix != null && <span id={!prefixDecorative ? prefixId : undefined} aria-hidden={prefixDecorative || undefined} className={classes('input-prefix', prefixDecorative && 'input-prefix--icon')}>{prefix}</span>}
       {input}
       {suffix != null && <span id={!suffixDecorative ? suffixId : undefined} aria-hidden={suffixDecorative || undefined} className={classes('input-suffix', suffixDecorative && 'input-suffix--icon')}>{suffix}</span>}
       {fieldAction}
+      {passwordToggle}
     </div> : <div data-size={size}>{input}</div>}
     {helperText != null && <p className="component-helper" id={helperId} style={{ marginTop: 'var(--space-1)' }}>{helperText}</p>}
     {error != null && <p className="field-error" id={errorId}>{error}</p>}

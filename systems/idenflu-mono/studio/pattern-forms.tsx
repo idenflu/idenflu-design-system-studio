@@ -38,8 +38,7 @@ export function PreferencesPattern() {
 }
 
 function PasswordField({label,name,error,helperText}:{label:string; name:string; error?:string; helperText?:string}) {
-  const [visible,setVisible] = React.useState(false); const id = React.useId();
-  return <TextField id={id} label={label} name={name} required type={visible ? 'text' : 'password'} autoComplete={name === 'current' ? 'current-password' : 'new-password'} prefix={<Icon name="lock" />} prefixDecorative error={error || undefined} helperText={helperText} action={<button className="input-action" type="button" aria-controls={id} aria-label={`${label} ${visible ? '숨기기' : '표시'}`} aria-pressed={visible} onClick={() => setVisible(!visible)}><Icon name={visible ? 'visibility-off' : 'visibility'} /></button>} />;
+  return <TextField label={label} name={name} required type="password" autoComplete={name === 'current' ? 'current-password' : 'new-password'} prefix={<Icon name="lock" />} prefixDecorative error={error || undefined} helperText={helperText} />;
 }
 export function PasswordPattern() {
   const form = usePatternForm(data => {

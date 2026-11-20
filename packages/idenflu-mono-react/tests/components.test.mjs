@@ -262,6 +262,31 @@ test('loading and progress variants expose their status and actual value', async
   } finally { await f.dispose(); }
 });
 
+test('password TextField keeps its visibility button alongside a custom action when disabled', async () => {
+  const f = fixture();
+  try {
+    const render = (disabled) => h(TextField, {
+      label: '비밀번호', type: 'password', disabled, value: 'mono', onChange() {},
+      action: h('button', { type: 'button' }, '사용자 동작'),
+    });
+    await f.render(render(false));
+    const input = f.container.querySelector('input');
+    const toggle = f.container.querySelector('button[aria-controls]');
+    assert.equal(toggle.getAttribute('aria-controls'), input.id);
+    await act(async () => toggle.click());
+    assert.equal(input.type, 'text');
+    assert.equal(input.value, 'mono');
+
+    await f.render(render(true));
+    assert.equal(f.container.querySelector('button[aria-controls]'), toggle);
+    assert.equal(toggle.disabled, true);
+    assert.equal(input.type, 'password');
+    assert.equal(f.container.querySelector('button:not([aria-controls])').textContent, '사용자 동작');
+    await act(async () => toggle.click());
+    assert.equal(input.type, 'password');
+  } finally { await f.dispose(); }
+});
+
 test('TextField links its label and descriptions and reflects controlled value', async () => {
   const f = fixture();
   try {

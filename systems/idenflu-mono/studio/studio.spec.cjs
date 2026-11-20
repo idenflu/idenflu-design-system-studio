@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-test('React text field examples support search clearing and password visibility', async ({ page }) => {
+test('React text field examples support search clearing and password visibility', {tag:'@mobile'}, async ({ page }) => {
   await page.goto('/systems/idenflu-mono/index.html#/components/text-fields');
   const search = page.getByRole('searchbox', { name: '검색', exact: true });
   await search.fill('텍스트');
@@ -17,8 +17,20 @@ test('React text field examples support search clearing and password visibility'
   await expect(email).not.toHaveAttribute('aria-invalid', 'true');
   const password = page.getByLabel('비밀번호', { exact: true });
   await expect(password).toHaveAttribute('type', 'password');
-  await page.getByRole('button', { name: '비밀번호 표시' }).click();
+  const showPassword = page.getByRole('button', { name: '비밀번호 표시', exact: true });
+  await password.fill('');
+  await expect(showPassword).toBeVisible();
+  await password.fill('테스트 비밀번호');
+  await showPassword.click();
   await expect(password).toHaveAttribute('type', 'text');
+  await expect(password).toHaveValue('테스트 비밀번호');
+  await expect(password).toBeFocused();
+  const hidePassword = page.getByRole('button', { name: '비밀번호 숨기기', exact: true });
+  await password.press('Tab');
+  await expect(hidePassword).toBeFocused();
+  await hidePassword.press('Enter');
+  await expect(password).toHaveAttribute('type', 'password');
+  await expect(password).toHaveValue('테스트 비밀번호');
 });
 
 test('inline multi-select removes and clears selected values', {tag:'@mobile'}, async ({ page }) => {

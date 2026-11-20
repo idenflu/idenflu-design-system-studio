@@ -32,14 +32,13 @@ function TextFieldHelpers() {
   const [email, setEmail] = React.useState('minsu@idenflu.com');
   const [emailValid, setEmailValid] = React.useState(true), [emailTouched, setEmailTouched] = React.useState(false);
   const searchRef = React.useRef<HTMLInputElement>(null);
-  const [visible, setVisible] = React.useState(false);
   const [description, setDescription] = React.useState('');
   const validEmail = Boolean(email.trim()) && emailValid;
   const invalidEmail = emailTouched && Boolean(email.trim()) && !emailValid;
   return <Grid columns={{base:1,sm:2}} rowGap={6} columnGap={8} alignItems="start" className="react-studio-field-grid">
     <TextField ref={searchRef} label="검색" type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="컴포넌트 검색" prefixDecorative prefix={<span className="ui-icon icon-search" />} helperText={search ? `입력한 검색어: ${search}` : '검색 아이콘과 지우기 버튼을 함께 사용합니다.'} action={<button className="input-action" type="button" aria-label="검색어 지우기" disabled={!search} onClick={() => { setSearch(''); searchRef.current?.focus(); }}><span className="ui-icon icon-x" aria-hidden="true" /></button>} />
     <TextField label="이메일" type="email" value={email} onChange={event => { setEmail(event.target.value); setEmailValid(event.target.validity.valid); setEmailTouched(false); }} onBlur={() => setEmailTouched(true)} prefixDecorative prefix={<span className="ui-icon icon-email" />} helperText={!invalidEmail ? validEmail ? '올바른 이메일 형식입니다.' : '이메일 주소를 입력해주세요.' : undefined} error={invalidEmail ? '올바른 이메일 주소를 입력해주세요.' : undefined} action={validEmail && <span className="input-status" aria-hidden="true"><span className="ui-icon icon-check" /></span>} />
-    <GridItem colSpan="full" className="react-studio-field-wide"><TextField label="비밀번호" type={visible ? 'text' : 'password'} defaultValue="idenflu-mono" prefixDecorative prefix={<span className="ui-icon icon-lock" />} action={<button className="input-action" type="button" aria-label={visible ? '비밀번호 숨기기' : '비밀번호 표시'} aria-pressed={visible} onClick={() => setVisible(!visible)}><span className={`ui-icon ${visible ? 'icon-visibility-off' : 'icon-visibility'}`} aria-hidden="true" /></button>} /></GridItem>
+    <GridItem colSpan="full" className="react-studio-field-wide"><TextField label="비밀번호" type="password" defaultValue="idenflu-mono" prefixDecorative prefix={<span className="ui-icon icon-lock" />} /></GridItem>
     <GridItem colSpan="full" className="react-studio-field-wide"><TextArea label="설명" rows={3} maxLength={160} value={description} onChange={event => setDescription(event.target.value)} placeholder="프로젝트에 대해 간단히 적어주세요." helperText={<span className="react-studio-field-meta"><span>최대 160자</span><span>{description.length} / 160</span></span>} /></GridItem>
   </Grid>;
 }
