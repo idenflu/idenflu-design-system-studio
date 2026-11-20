@@ -149,7 +149,7 @@ export function ButtonDemos() {
         </div>
       </Section>
       <Section
-        title="버튼 그룹"
+        title="선택형 버튼"
         description="선택형 그룹은 같은 너비의 항목 중 하나를 선택합니다. 선택된 항목은 옅은 프라이머리 배경으로 구분합니다."
       >
         <div className="react-studio-row">
@@ -185,7 +185,7 @@ export function ButtonDemos() {
         </div>
       </Section>
       <Section
-        title="버튼 그룹 사이즈"
+        title="선택형 버튼 사이즈"
         description="버튼과 같은 sm 30px·md 36px·lg 42px 높이를 사용하며, 아이콘과 간격도 함께 조정됩니다."
       >
         <div className="react-studio-stack">
@@ -202,29 +202,6 @@ export function ButtonDemos() {
               />
             </div>
           ))}
-        </div>
-      </Section>
-      <Section
-        title="동작형 버튼 그룹"
-        description="복사·내보내기처럼 각각 실행하는 관련 행동은 구분선으로 묶습니다."
-      >
-        <div className="react-studio-row">
-          <div className="button-group" role="group" aria-label="파일 작업">
-            <Button
-              variant="outline"
-              onClick={() => setFeedback("복사를 선택했습니다.")}
-            >
-              <Icon name="copy" />
-              복사
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setFeedback("내보내기를 선택했습니다.")}
-            >
-              <Icon name="download" />
-              내보내기
-            </Button>
-          </div>
         </div>
       </Section>
       <p role="status" className="component-helper">

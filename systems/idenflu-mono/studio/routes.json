@@ -49,6 +49,13 @@
     "searchTerms": "버튼 저장 취소 액션 button"
   },
   {
+    "route": "components/button-group",
+    "title": "Button Group",
+    "group": "Components",
+    "description": "복사·내보내기처럼 각각 실행하는 관련 동작을 하나의 테두리로 묶습니다.",
+    "searchTerms": "버튼 그룹 동작형 액션 복사 내보내기 삭제 outline ButtonGroup"
+  },
+  {
     "route": "components/select",
     "title": "Select",
     "group": "Components",

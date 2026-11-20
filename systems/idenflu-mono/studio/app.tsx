@@ -11,6 +11,7 @@ import { DateTimeUsageExamples } from './datetime-usage-examples';
 import { IconDemos, TypographyDemos, SizeDemos, StateDemos } from './foundation-demos';
 import { TabsDemos, FeedbackDemos, AccordionDemos, OverlayDemos, TooltipDemos, CardDemos } from './content-demos';
 import { ButtonDemos } from './buttons/button-demos';
+import { ButtonGroupDemos, buttonGroupUsage } from './buttons/button-group-demos';
 import { buttonUsage } from './buttons/button-usage';
 import { SelectionDemos, TreeDemos, ChipDemos, TableDemos, ListDemos, StepperDemos, MenuDemos, PopoverDemos, DrawerDemos } from './structure-demos';
 import { SliderDemos, ProgressDemos, LoadingDemos, AvatarDemos, FileDemos } from './media-demos';
@@ -126,6 +127,7 @@ export function IconExample() {
   </>;
 }`,
   'components/buttons': buttonUsage,
+  'components/button-group': buttonGroupUsage,
   'components/text-fields':`import { Icon, TextField } from '@idenflu/mono-react';
 
 <TextField
@@ -300,6 +302,7 @@ function ComponentPage({ route }: { route:string }) {
     case 'foundations/icons': return <IconsPage />;
     case 'foundations/states': return <StateDemos />;
     case 'components/buttons': return <ButtonDemos />;
+    case 'components/button-group': return <ButtonGroupDemos />;
     case 'components/text-fields': return <TextFields />;
     case 'components/selection': return <SelectionDemos />;
     case 'components/select': return <SelectDemos />;
