@@ -4,6 +4,17 @@
 
 ## 미배포
 
+## 0.13.0
+
+### 추가
+
+- `ButtonGroup`으로 관련 동작 버튼을 공통 테두리와 구분선으로 묶습니다. 버튼의 `color`가 텍스트와 아이콘에 함께 적용되며, 그룹의 `size`로 내부 버튼 크기를 조정합니다.
+
+### 수정
+
+- `Table`과 `DataGrid`의 세로 스크롤바를 헤더와 푸터 사이의 본문에 맞춰 배치합니다.
+- `TextField`의 비밀번호 표시 토글을 입력값이 비어 있거나 사용자 지정 동작이 있는 경우에도 표시합니다.
+
 ## 0.12.1 — 2026-11-20
 
 [게시 소스 `dc511d5`](https://github.com/idenflu/idenflu-design-system-studio/commit/dc511d5353237a3c984f878e2016d80ae3a1731c) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/44652602164)
