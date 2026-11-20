@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { defaultRangeExtractor, measureElement, observeElementOffset, useVirtualizer, type Range, type Virtualizer } from '@tanstack/react-virtual';
 import { TableBody } from '../table/Table';
-import type { DataGridPrepareScrollRef } from './DataGridScrollbar';
+import type { PrepareTableScrollRef } from '../table/TableScrollbars';
 
 export interface DataGridVirtualizationOptions {
   /** Initial estimate only. Mounted rows are measured at their actual height. */
@@ -23,7 +23,7 @@ interface Options<T> {
   maxHeight?: number | string;
   resetKey: string;
   measureKey: string;
-  prepareScrollRef: DataGridPrepareScrollRef;
+  prepareScrollRef: PrepareTableScrollRef;
 }
 
 export function useDataGridVirtualization<T>({enabled, rows, getRowId, scrollRef, headerRef, keepRowIds, options, density, headerRows, maxHeight, resetKey, measureKey, prepareScrollRef}: Options<T>) {

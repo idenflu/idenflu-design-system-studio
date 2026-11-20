@@ -187,12 +187,14 @@ test('lists and tables size to their rows, cap overflow, or fill their flex pare
     expect(await short.evaluate(height)).toBeLessThan(160);
     expect(Math.abs(await short.evaluate(height) - await natural.evaluate(height))).toBeLessThanOrEqual(1);
     await expect(long).toHaveCSS('height', '160px');
-    expect(await long.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+    const longViewport = name === 'table' ? long.locator('.table-scroll') : long;
+    const fillViewport = name === 'table' ? fill.locator('.table-scroll') : fill;
+    expect(await longViewport.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
     expect(await fill.evaluate(height)).toBeGreaterThan(210);
-    expect(await fill.evaluate(element => element.scrollHeight)).toBe(await fill.evaluate(element => element.clientHeight));
+    expect(await fillViewport.evaluate(element => element.scrollHeight)).toBe(await fillViewport.evaluate(element => element.clientHeight));
   }
 
-  const cappedTable = page.locator('#table .long > *');
+  const cappedTable = page.locator('#table .long .table-scroll');
   const pinned = await cappedTable.evaluate(element => {
     const header = element.querySelector('thead');
     const footer = element.querySelector('tfoot');
@@ -210,6 +212,61 @@ test('lists and tables size to their rows, cap overflow, or fill their flex pare
   const list = page.locator('#list .long > *');
   await list.press('End');
   await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+});
+
+test('bounded tables keep the vertical scrollbar between the header and footer', {tag:'@mobile'}, async ({page},testInfo) => {
+  await mount(page,testInfo,'<div id="table-example" style="width:280px"></div>');
+  const bundle = buildSync({
+    stdin:{contents:`import {createElement as h, useState} from 'react';
+      import {createRoot} from 'react-dom/client';
+      import {Table, TableHeader, TableBody, TableFooter, TableRow, TableCell, TableHeaderCell} from '@idenflu/mono-react';
+      function Example() {
+        const [expanded, setExpanded] = useState(false);
+        return h('div', {style:{display:'flex', flexDirection:'column', height:280}},
+          h('button', {onClick:() => setExpanded(!expanded)}, '행 수 변경'),
+          h(Table, {fillHeight:true, maxHeight:200, scrollLabel:'프로젝트 목록'},
+            h(TableHeader, null, h(TableRow, null, h(TableHeaderCell, {scope:'col'}, '프로젝트'))),
+            h(TableBody, null, Array.from({length:expanded ? 20 : 1}, (_, index) =>
+              h(TableRow, {key:index}, h(TableCell,null,'프로젝트 ' + (index + 1))))),
+            h(TableFooter, null, h(TableRow, null, h(TableCell, null, '합계')))));
+      }
+      createRoot(document.getElementById('table-example')).render(h(Example));`,resolveDir:resolve(__dirname,'..'),loader:'js'},
+    bundle:true,write:false,platform:'browser',format:'iife',logLevel:'silent',
+    alias:{'@idenflu/mono-react':resolve(__dirname,'../packages/idenflu-mono-react/dist/index.js')},
+    nodePaths:[resolve(__dirname,'../packages/idenflu-mono-react/node_modules')],
+  });
+  await page.addScriptTag({content:bundle.outputFiles[0].text});
+  const viewport = page.getByRole('region', {name:'프로젝트 목록',exact:true});
+  const vertical = page.getByRole('scrollbar').and(page.locator('[aria-orientation="vertical"]'));
+  const horizontal = page.getByRole('scrollbar').and(page.locator('[aria-orientation="horizontal"]'));
+  const toggle = page.getByRole('button', {name:'행 수 변경'});
+  await expect(viewport.getByRole('cell', {name:'프로젝트 1',exact:true})).toBeVisible();
+  await expect(vertical).toHaveCount(0);
+  await toggle.click();
+  await expect(vertical).toBeVisible();
+  await expect(horizontal).toBeVisible();
+  const header = viewport.locator('thead');
+  const footer = viewport.locator('tfoot');
+  const initial = await vertical.boundingBox();
+  const headerBounds = await header.boundingBox();
+  const footerBounds = await footer.boundingBox();
+  expect(Math.abs(initial.y - (headerBounds.y + headerBounds.height))).toBeLessThanOrEqual(1);
+  expect(Math.abs(initial.y + initial.height - footerBounds.y)).toBeLessThanOrEqual(1);
+
+  await vertical.press('End');
+  await expect.poll(() => viewport.evaluate(element => element.scrollHeight - element.clientHeight - element.scrollTop)).toBeLessThanOrEqual(1);
+  expect((await header.boundingBox()).y).toBeCloseTo(headerBounds.y, 0);
+  expect((await footer.boundingBox()).y).toBeCloseTo(footerBounds.y, 0);
+  const lastRow = await viewport.getByRole('row', {name:'프로젝트 20',exact:true}).boundingBox();
+  expect(lastRow.y + lastRow.height).toBeLessThanOrEqual(footerBounds.y + 1);
+  await viewport.evaluate(element => { element.scrollTop = 0; });
+  await expect(vertical).toHaveAttribute('aria-valuenow', '0');
+
+  await horizontal.press('End');
+  await expect.poll(() => viewport.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  expect((await header.boundingBox()).x).toBeCloseTo((await viewport.locator('tbody').boundingBox()).x, 0);
+  await toggle.click();
+  await expect(vertical).toHaveCount(0);
 });
 
 test('virtualized DataGrid fills a tall flex parent and can scroll to the final row', {tag:'@mobile'}, async ({page},testInfo) => {

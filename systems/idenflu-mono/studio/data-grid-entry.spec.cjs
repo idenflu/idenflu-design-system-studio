@@ -19,8 +19,8 @@ async function recordEntry(page,title,control){
             width:scroll.clientWidth,height:scroll.clientHeight,
             table:Math.round(grid.querySelector('table').getBoundingClientRect().width),
             native:scroll.hasAttribute('data-native-scrollbars'),
-            vertical:!!grid.querySelector('.data-grid-native-vertical'),
-            horizontal:!!grid.querySelector('.data-grid-native-horizontal'),
+            vertical:!!grid.querySelector('[role="scrollbar"][aria-orientation="vertical"]'),
+            horizontal:!!grid.querySelector('[role="scrollbar"][aria-orientation="horizontal"]'),
           });
         }
         if(window.__gridEntryFrames.length<12&&++attempts<60)requestAnimationFrame(sample);

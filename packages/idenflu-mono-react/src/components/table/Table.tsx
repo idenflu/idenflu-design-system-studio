@@ -1,36 +1,8 @@
 import * as React from 'react';
 import { classes } from '../../shared/classes';
+import { TableScrollbars } from './TableScrollbars';
 
 const TableContainerContext = React.createContext(false);
-
-function keepStickySectionsClear(viewport: HTMLDivElement) {
-  const table = viewport.firstElementChild as HTMLTableElement;
-  const view = viewport.ownerDocument.defaultView;
-  if (!view?.ResizeObserver) return;
-
-  // Reserve the pinned sections in the browser's focus scroll calculations.
-  const updatePadding = () => {
-    viewport.style.scrollPaddingTop = `${table.tHead?.getBoundingClientRect().height ?? 0}px`;
-    viewport.style.scrollPaddingBottom = `${table.tFoot?.getBoundingClientRect().height ?? 0}px`;
-  };
-  const resize = new view.ResizeObserver(updatePadding);
-  const observeSections = () => {
-    resize.disconnect();
-    if (table.tHead) resize.observe(table.tHead);
-    if (table.tFoot) resize.observe(table.tFoot);
-    updatePadding();
-  };
-  const sections = new view.MutationObserver(observeSections);
-  sections.observe(table, { childList: true });
-  observeSections();
-
-  return () => {
-    sections.disconnect();
-    resize.disconnect();
-    viewport.style.removeProperty('scroll-padding-top');
-    viewport.style.removeProperty('scroll-padding-bottom');
-  };
-}
 
 /** interactive shows row hover for rows that respond to the pointer. Mark selected rows with data-selected="true". */
 export interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
@@ -49,20 +21,24 @@ export const Table = React.forwardRef<HTMLTableElement, TableProps>(function Tab
 }, ref) {
   const hasContainer = React.useContext(TableContainerContext);
   const viewportRef = React.useRef<HTMLDivElement>(null);
+  const viewportId = React.useId();
   const scrollVertically = fillHeight || maxHeight !== undefined;
-  React.useEffect(() => {
-    if (scrollVertically && viewportRef.current) return keepStickySectionsClear(viewportRef.current);
-  }, [scrollVertically]);
 
   const table = <table {...props} ref={ref} data-density={density} data-interactive={interactive || undefined} className={classes('data-table', className)} />;
   const contents = hasContainer ? <TableContainerContext.Provider value={false}>{table}</TableContainerContext.Provider> : table;
 
   if (hasContainer && !scrollVertically) return contents;
 
-  return <div ref={viewportRef} className="table-scroll" data-fill-height={fillHeight || undefined} tabIndex={0}
-    data-scroll-vertically={scrollVertically || undefined} style={maxHeight === undefined ? undefined : { maxHeight }}
+  const viewport = <div ref={viewportRef} id={scrollVertically ? viewportId : undefined} className="table-scroll"
+    data-fill-height={fillHeight || undefined} data-scroll-vertically={scrollVertically || undefined} tabIndex={0}
     role={scrollLabel ? 'region' : undefined} aria-label={scrollLabel || undefined}>
     {contents}
+  </div>;
+  if (!scrollVertically) return viewport;
+
+  return <div className="table-viewport" data-fill-height={fillHeight || undefined} style={{ maxHeight }}>
+    {viewport}
+    <TableScrollbars enabled scrollRef={viewportRef} controls={viewportId} label={scrollLabel || '테이블'} />
   </div>;
 });
 

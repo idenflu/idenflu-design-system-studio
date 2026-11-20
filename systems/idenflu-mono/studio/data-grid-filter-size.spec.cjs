@@ -58,7 +58,7 @@ async function expectVirtualCoverage(grid) {
 async function expectScrollbarFitsHeader(grid) {
   await expect.poll(() => grid.evaluate(element => {
     const scroll = element.querySelector('.data-grid-scroll');
-    const scrollbar = element.querySelector('.data-grid-native-vertical');
+    const scrollbar = element.querySelector('[role="scrollbar"][aria-orientation="vertical"]');
     if (!scrollbar) return Number.MAX_VALUE;
     const viewport = scroll.getBoundingClientRect();
     const headerHeight = element.querySelector('thead').getBoundingClientRect().height;

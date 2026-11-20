@@ -14,7 +14,7 @@ import { DataGridCellEditor, downloadDataGridCsv } from './DataGridTools';
 import { downloadDataGridXlsx } from './data-grid-xlsx-download';
 import { dataGridFileName, type DataGridExportFormat } from './data-grid-file';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
-import { DataGridScrollbar } from './DataGridScrollbar';
+import { TableScrollbars } from '../table/TableScrollbars';
 import { getDataGridColumnWidthBounds as widthBounds, resolveDataGridColumnWidths } from './data-grid-sizing';
 import { resolveDataGridToolbarOrder, type DataGridToolbarItem } from './data-grid-toolbar';
 export type { DataGridVirtualizationOptions } from './data-grid-virtual';
@@ -491,7 +491,7 @@ export function DataGrid<T>({
       {exportError && <p className="field-error data-grid-export-error" role="alert">{exportError}</p>}
     </div>
 
-    <div className="data-grid-viewport" style={viewportMaxHeight === undefined ? undefined : {maxHeight:viewportMaxHeight}}>
+    <div className="table-viewport data-grid-viewport" style={viewportMaxHeight === undefined ? undefined : {maxHeight:viewportMaxHeight}}>
     <TableContainer id={`${id}-scroll`} ref={scroll} className="data-grid-scroll" label={`${label} 표`} aria-busy={loading} style={virtualEnabled ? {overflowAnchor:'none'} : undefined}>
       <Table density={density} interactive aria-rowcount={virtualEnabled ? headerRows + (blocked || !count ? 1 : filtered.length) : undefined} aria-colcount={virtualEnabled ? columnCount : undefined} className="data-grid-table" style={{width:visibleColumns.reduce((sum, column) => sum + columnWidth(column), selectable ? 52 : 0)}}>
         <caption className="sr-only">{label}</caption>
@@ -539,7 +539,7 @@ export function DataGrid<T>({
         </TableCell></TableRow> : undefined} />
       </Table>
     </TableContainer>
-    <DataGridScrollbar enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} viewportWidth={viewportWidth} controls={`${id}-scroll`} label={`${label} 세로 스크롤`} />
+    <TableScrollbars enabled={!blocked && count > 0} headerRef={header} scrollRef={scroll} prepareScrollRef={prepareScroll} viewportWidth={viewportWidth} controls={`${id}-scroll`} label={label} />
     </div>
     {footer !== undefined && footerStatus}
     {showFooter && <div className={`data-grid-footer${footer === undefined ? '' : ' data-grid-footer--custom'}`}>
