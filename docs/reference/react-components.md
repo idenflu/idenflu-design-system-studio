@@ -383,7 +383,7 @@ export function ProjectGrid() {
 | 영역 | 동작과 옵션 |
 | --- | --- |
 | 열 정의 | `id`·`header`·`accessor`가 필수입니다. `cell`로 표시를 바꿔도 검색·정렬·CSV는 accessor의 원본 값을 사용합니다. |
-| 검색 | 기본 제공. `searchable={false}`로 숨기고 `searchLabel`로 이름을 지정합니다. `query`·`defaultQuery`·`onQueryChange`로 상태를 연결합니다. |
+| 검색 | 기본 제공. `searchable={false}`로 숨기고 `searchLabel`로 이름을 지정합니다. `query`·`defaultQuery`·`onQueryChange`로 상태를 연결합니다. 열의 `searchAccessor`로 검색할 문자열을 추가할 수 있습니다. |
 | 필터 | 열에 `filter="text | number | select | multi-select"`를 지정합니다. 텍스트 포함·숫자 최솟값/최댓값·선택값 일치를 지원합니다. select·multi-select의 `filterOptions`는 `{value,label}[]`입니다. multi-select는 같은 열의 선택값을 OR로, 전체 검색과 다른 열의 필터는 AND로 적용합니다. 복수 필터에는 팝업 검색과 첫 항목·나머지 개수 요약을 제공합니다. |
 | 필터 상태 | `filters`·`defaultFilters`·`onFiltersChange`를 사용합니다. `DataGridFilters`는 열 ID를 키로 text/select의 문자열, multi-select의 `string[]` 또는 number의 `{min?:string,max?:string}`를 저장합니다. 빈 배열·키 생략은 전체 조회이며 마지막 항목 해제 시 빈 배열을 전달합니다. |
 | 컬럼 필터 토글 | `showColumnFilterToggle`은 기본 `false`이며 이때 필터 가능한 열의 필터 행과 조건을 항상 적용합니다. `true`이면 상단 `columnFilters` 토글을 표시하고 닫은 상태로 시작합니다. 켜면 필터 행과 조건을 적용하며, 끄면 숨기고 `onFiltersChange({})`로 초기화를 요청합니다. 비제어 필터는 비우고 제어 필터는 부모 상태에서 갱신합니다. |
@@ -400,7 +400,7 @@ export function ProjectGrid() {
 | 열 조작 | 표시 열을 숨길 수 있으며 최소 1개는 유지합니다. `showColumnVisibility={false}`로 UI를 숨기고 `defaultHiddenColumnIds`로 초기 표시를 지정합니다. |
 | 열 너비 | `width`는 기본 160px이며 `180`, `"180px"`, `"25%"`를 지원합니다. 백분율은 선택 체크박스 열(52px)을 제외한 표 영역 너비를 기준으로 계산합니다. `minWidth`·`maxWidth`는 px 단위이며 기본 96·600입니다. |
 | 유연한 너비 | 양수인 `flex`로 고정·백분율 열을 배치한 뒤 남은 공간을 비율대로 나눕니다. `flex: 2`는 `flex: 1`의 두 배를 배정받으며 최소·최대 너비를 우선합니다. 같은 열에 `width`가 있으면 `flex`가 우선합니다. |
-| 너비 조절 | 드래그 또는 열 경계에서 ←/→ 10px, Shift와 함께 1px, Home/End 최소/최대로 조절합니다. 조절한 열은 px 너비로 유지하며 경계 더블클릭 또는 Enter로 원래 `width`·`flex` 설정을 복구합니다. `resizable={false}`로 조절을 끕니다. |
+| 너비 조절 | 드래그 또는 열 경계에서 ←/→ 10px, Shift와 함께 1px, Home/End 최소/최대로 조절합니다. 조절한 열과 앞쪽 열은 px 너비로 유지하고, 뒤쪽의 가변 열이 남은 공간을 나눕니다. 경계를 더블클릭하거나 Enter를 눌러 원래 `width`·`flex` 설정을 복구합니다. `resizable={false}`로 조절을 끕니다. |
 | 열 고정 | `pinned="start"`로 왼쪽 식별 열을 고정합니다. 선택 열도 함께 고정되며 작은 화면에서는 본문을 가리지 않도록 고정을 해제합니다. `maxHeight`를 지정하면 그리드 내부 세로 스크롤과 고정 헤더를 사용할 수 있습니다. |
 | 외부 스크롤 초기화 | `scrollResetKey?: string \| number` 값을 바꾸면 가로·세로 스크롤을 처음으로 돌립니다. 외부 검색 조건 초기화와 연결할 수 있으며 밀도·열 너비 등 그리드 상태는 유지합니다. |
 | 편집 | 열의 `editable`은 boolean 또는 행별 판별 함수입니다. `editor="text | number"`, `validate(value,row)`로 검증합니다. `onCellEdit({row,rowId,columnId,value})`에서 부모 `rows`를 갱신해야 합니다. 전달하는 값은 문자열입니다. |
@@ -443,8 +443,6 @@ const columns: DataGridColumn<Project>[] = [
 제어형 속성은 부모 상태가 기준입니다. 콜백을 받은 뒤 해당 상태를 갱신하세요. 서버 저장이 필요하면 `onCellEdit`에서 저장 처리와 오류 안내를 연결하고, 성공한 값으로 `rows`를 갱신합니다. 내장 서버 저장·비동기 트랜잭션·재시도 큐는 제공하지 않습니다.
 
 열의 선택형 필터는 `Select`의 `popupStrategy="fixed"`를 사용해 짧은 목록이나 스크롤 영역에서 옵션이 잘리지 않도록 합니다. 일반 `Select`의 기본값은 `absolute`이며 필요한 화면에서 이 옵션을 지정할 수 있습니다.
-
-`searchAccessor`를 열에 지정하면 해당 문자열도 전체 검색에 사용합니다. 셀, 정렬, 열 필터, CSV·Excel 내보내기는 기존처럼 `accessor` 값을 사용합니다.
 
 이 버전은 **전달한 rows 전체를 브라우저에서 처리하는 데이터그리드**입니다. 가상 스크롤은 세로 방향의 DOM 렌더링을 줄이며, 전체 rows의 메모리와 검색·정렬 계산을 줄이는 서버 처리 기능은 아닙니다. 서버 페이지 이동, 열 가상화, 행 그룹화·피벗, 스프레드시트식 셀 범위 선택은 포함하지 않습니다.
 

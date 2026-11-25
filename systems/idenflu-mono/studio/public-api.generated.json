@@ -1109,6 +1109,10 @@
         "type": "boolean | undefined",
         "optional": true
       },
+      "searchAccessor": {
+        "type": "((row: T) => null | string | undefined) | undefined",
+        "optional": true
+      },
       "sortable": {
         "type": "boolean | undefined",
         "optional": true

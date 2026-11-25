@@ -113,6 +113,7 @@ const columnProps: readonly PropertyRow[] = [
   ['id','필수','열의 고유 ID입니다. 정렬·필터·숨김·편집·사용자 너비를 연결하는 키입니다.'],
   ['header','필수','헤더, 필터·편집 컨트롤의 이름과 CSV·XLSX 제목으로 사용합니다.'],
   ['accessor','필수','검색·필터·정렬·편집 초깃값·CSV·XLSX에 사용하는 원시 값입니다. 숫자 정렬과 XLSX 숫자 셀에는 number를 반환하세요.'],
+  ['searchAccessor','undefined','accessor와 함께 전체 검색에 쓸 추가 문자열을 반환합니다. 정렬·열 필터·CSV·XLSX는 accessor 값을 사용합니다.'],
   ['cell','undefined','화면에 표시할 셀만 바꿉니다. 생략하면 accessor의 값을 표시하고 null·undefined는 대시로 표시합니다.'],
   ['sortable','true','false이면 정렬 버튼을 표시하지 않고 이 열의 정렬 모델도 적용하지 않습니다.'],
   ['align',"'start'",'헤더와 셀의 텍스트 정렬입니다. 금액·수량에는 end를 사용합니다.'],
@@ -393,7 +394,7 @@ const filters: DataGridFilters = {
       <CodeExample title="복수 선택 필터와 상태 연결">{multiFilterExample}</CodeExample>
       <p className="studio-grid-reference-notes">복수 필터는 팝업 검색을 제공하며 선택값을 첫 항목과 나머지 개수로 요약합니다. 검색은 선택값을 바꾸지 않고, 마지막 항목을 해제하면 빈 배열을 전달해 전체 조회로 돌아갑니다. 필터 초기화·조건 초기화·컬럼 필터 끄기도 배열 조건을 함께 비웁니다.</p>
       <CodeExample title="px·%·flex를 함께 사용하는 열 너비">{sizingExample}</CodeExample>
-      <p className="studio-grid-reference-notes">최소 너비 합이 뷰포트보다 크면 가로로 스크롤합니다. 최대 너비 합이 작으면 빈 공간이 남을 수 있습니다. 사용자가 조절한 열은 px로 고정되고, 핸들의 더블클릭 또는 Enter로 width·flex의 원래 계산을 복구합니다.</p>
+      <p className="studio-grid-reference-notes">최소 너비 합이 뷰포트보다 크면 가로로 스크롤합니다. 최대 너비 합이 작으면 빈 공간이 남을 수 있습니다. 너비를 조절하면 그 열의 앞쪽 열이 현재 너비를 유지하고 뒤쪽의 가변 열은 남은 공간을 나눕니다. 핸들을 더블클릭하거나 Enter를 눌러 조절값을 지우면 함께 고정한 열도 원래 설정을 따릅니다.</p>
     </Section>
 
     <Section id="data-grid-events" title="이벤트와 부모 상태 연결" className="studio-grid-reference" description="콜백은 모두 선택 속성이며 기본값은 undefined입니다. 상태를 제어하면 콜백에서 다음 값을 부모 상태에 반영하세요.">
