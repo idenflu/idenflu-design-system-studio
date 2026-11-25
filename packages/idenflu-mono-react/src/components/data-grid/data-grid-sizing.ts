@@ -15,6 +15,39 @@ export function getDataGridColumnWidthBounds(column: SizedColumn) {
   return {min, max: Math.max(min, positiveInteger(column.maxWidth, 600))};
 }
 
+type LeadingWidths = readonly (readonly [string, number])[];
+
+export type DataGridColumnResizes = ReadonlyMap<string, {width:number; leadingWidths:LeadingWidths}>;
+
+export function resizeDataGridColumn(
+  resizes: DataGridColumnResizes, column: SizedColumn, startWidth: number,
+  value: number, leadingWidths: LeadingWidths,
+): DataGridColumnResizes {
+  const {min, max} = getDataGridColumnWidthBounds(column);
+  const width = Math.max(min, Math.min(max, Math.round(value)));
+  if (width === startWidth) return resizes;
+  const next = new Map(resizes);
+  next.delete(column.id);
+  next.set(column.id, {width, leadingWidths: leadingWidths.filter(([id]) => !resizes.has(id))});
+  return next;
+}
+
+export function getDataGridResizeOverrides(
+  resizes: DataGridColumnResizes, columns: readonly SizedColumn[],
+): Readonly<Record<string, number>> {
+  const visibleIds = new Set(columns.map(column => column.id));
+  const overrides: Record<string, number> = Object.create(null);
+  let leading: LeadingWidths = [];
+  // Only the most recent visible resize locks leading columns. Older explicit widths stay in effect.
+  for (const [id, {width, leadingWidths}] of resizes) {
+    if (!visibleIds.has(id)) continue;
+    overrides[id] = width;
+    leading = leadingWidths;
+  }
+  for (const [id, width] of leading) overrides[id] ??= width;
+  return overrides;
+}
+
 export function resolveDataGridColumnWidths(
   columns: readonly SizedColumn[], availableWidth?: number,
   overrides: Readonly<Record<string, number>> = {}, reservedWidth = 0,

@@ -294,6 +294,22 @@ test('sort models ignore unavailable, duplicate and non-sortable columns', async
   } finally {await f.dispose();}
 });
 
+test('DataGrid searches additional display text while keeping the underlying value', async () => {
+  const f = fixture();
+  try {
+    await f.render(h(DataGrid, {
+      label:'검색 대상', rows, getRowId:row => row.id,
+      columns:[{...columns[0],searchAccessor:row => `[${row.name}]`}, columns[1]],
+    }));
+    await input(control(f.node,'검색'),'[alpha]');
+    assert.deepEqual(names(f.node), ['Alpha']);
+    await input(control(f.node,'검색'),'Beta');
+    assert.deepEqual(names(f.node), ['Beta']);
+  } finally {
+    await f.dispose();
+  }
+});
+
 test('DataGrid searches underlying values, resets pagination and recovers from no results', async () => {
   const f = fixture(); const pages=[];
   try {

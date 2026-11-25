@@ -11,7 +11,7 @@ const bundle = await build({
   platform: 'node',
   format: 'esm',
 });
-const { resolveDataGridColumnWidths: widths, getDataGridColumnWidthBounds: bounds } =
+const { resolveDataGridColumnWidths: widths, getDataGridColumnWidthBounds: bounds, getDataGridResizeOverrides: overrides, resizeDataGridColumn: resize } =
   await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].contents).toString('base64')}`);
 
 test('fixed widths preserve defaults and px strings within column bounds', () => {
@@ -102,6 +102,48 @@ test('manual resize overrides freeze one column while other flex columns adapt',
   assert.deepEqual(widths(columns,1000,{resized:300}), [200,300,500]);
   assert.deepEqual(widths(columns,800,{resized:300}), [200,300,300]);
   assert.deepEqual(widths(columns,1000,{resized:900}), [200,600,200]);
+});
+
+test('resizing freezes the leading columns and shrinks the trailing flex columns to their minimum', () => {
+  const columns = [{id:'title',flex:2},{id:'partner',flex:1},{id:'customer',flex:1}];
+  const original = new Map();
+  assert.deepEqual(widths(columns,800), [400,200,200]);
+  const leading = [['title',400]];
+  const fitting = resize(original,columns[1],200,260,leading);
+  assert.deepEqual(widths(columns,800,overrides(fitting,columns)), [400,260,140]);
+  const overflow = resize(original,columns[1],200,350,leading);
+  assert.deepEqual(widths(columns,800,overrides(overflow,columns)), [400,350,96]);
+  const reset = new Map(overflow);
+  reset.delete('partner');
+  assert.deepEqual(widths(columns,800,overrides(reset,columns)), [400,200,200]);
+  assert.equal(resize(original,columns[1],200,200,leading),original);
+});
+
+test('resetting one resized column keeps independent width changes', () => {
+  const columns = [{id:'title',flex:2},{id:'partner',flex:1},{id:'customer',flex:1}];
+  const title = resize(new Map(),columns[0],400,350,[]);
+  const partner = resize(title,columns[1],225,250,[['title',350]]);
+  assert.deepEqual(widths(columns,800,overrides(partner,columns)), [350,250,200]);
+  const reset = new Map(partner);
+  reset.delete('title');
+  assert.deepEqual(widths(columns,800,overrides(reset,columns)), [367,250,183]);
+});
+
+test('resizing an earlier column releases old leading locks on its trailing flex columns', () => {
+  const columns = [{id:'title',flex:2},{id:'partner',flex:1},{id:'customer',flex:1}];
+  const customer = resize(new Map(),columns[2],200,220,[['title',400],['partner',200]]);
+  const title = resize(customer,columns[0],400,450,[]);
+  assert.deepEqual(widths(columns,800,overrides(title,columns)), [450,130,220]);
+  const adjustCustomer = resize(title,columns[2],220,230,[['title',450],['partner',130]]);
+  assert.deepEqual(widths(columns,800,overrides(adjustCustomer,columns)), [450,130,230]);
+});
+
+test('hiding the resized column releases leading widths until the column is shown again', () => {
+  const columns = [{id:'title',flex:2},{id:'partner',flex:1},{id:'customer',flex:1}];
+  const resizes = resize(new Map(),columns[1],200,260,[['title',400]]);
+  const visible = [columns[0],columns[2]];
+  assert.deepEqual(widths(visible,800,overrides(resizes,visible)), [533,267]);
+  assert.deepEqual(widths(columns,800,overrides(resizes,columns)), [400,260,140]);
 });
 
 test('percentage columns recalculate on viewport resize while px columns stay fixed', () => {

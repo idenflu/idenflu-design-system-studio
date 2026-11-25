@@ -15,7 +15,7 @@ import { downloadDataGridXlsx } from './data-grid-xlsx-download';
 import { dataGridFileName, type DataGridExportFormat } from './data-grid-file';
 import { DataGridBody, type DataGridVirtualizationOptions } from './data-grid-virtual';
 import { TableScrollbars } from '../table/TableScrollbars';
-import { getDataGridColumnWidthBounds as widthBounds, resolveDataGridColumnWidths } from './data-grid-sizing';
+import { getDataGridColumnWidthBounds as widthBounds, getDataGridResizeOverrides, resizeDataGridColumn, resolveDataGridColumnWidths, type DataGridColumnResizes } from './data-grid-sizing';
 import { resolveDataGridToolbarOrder, type DataGridToolbarItem } from './data-grid-toolbar';
 export type { DataGridVirtualizationOptions } from './data-grid-virtual';
 export type { DataGridToolbarItem } from './data-grid-toolbar';
@@ -27,6 +27,8 @@ export interface DataGridColumn<T> {
   id: string;
   header: string;
   accessor: (row: T) => string | number | null | undefined;
+  /** Additional searchable text alongside the accessor value. */
+  searchAccessor?: (row: T) => string | null | undefined;
   cell?: (row: T) => React.ReactNode;
   sortable?: boolean;
   align?: 'start' | 'center' | 'end';
@@ -193,7 +195,7 @@ export function DataGrid<T>({
   const [requestedPageSize, setPageSize] = useGridValue(controlledPageSize, defaultPageSize, onPageSizeChange);
   const [selected, setSelected] = useGridValue<readonly string[]>(selectedRowIds, defaultSelectedRowIds, values => onSelectedRowIdsChange?.([...values]));
   const [hidden, setHidden] = React.useState<readonly string[]>(defaultHiddenColumnIds);
-  const [widths, setWidths] = React.useState<Record<string, number>>({});
+  const [resizes, setResizes] = React.useState<DataGridColumnResizes>(() => new Map());
   const [editing, setEditing] = React.useState<{rowId:string; columnId:string} | null>(null);
   const [exporting, setExporting] = React.useState(false);
   const [exportError, setExportError] = React.useState('');
@@ -203,7 +205,10 @@ export function DataGrid<T>({
   const prepareScroll = React.useRef<((offset:number) => void) | null>(null);
   const [viewportWidth, setViewportWidth] = React.useState<number>();
   const restoreEditor = React.useRef<string | null>(null);
-  const drag = React.useRef<{id:string; startX:number; startWidth:number; direction:number} | null>(null);
+  const drag = React.useRef<{
+    id:string; startX:number; startWidth:number; direction:number;
+    resizes:DataGridColumnResizes; leadingWidths:Array<readonly [string, number]>;
+  } | null>(null);
   const virtualEnabled = virtualized !== false;
   const virtualMaxHeight = typeof maxHeight === 'number'
     ? Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : 480
@@ -223,7 +228,8 @@ export function DataGrid<T>({
       if (column.filter === 'multi-select' && Array.isArray(values) && values.length) multiFilters.set(column.id, new Set(values));
     }
     const matching = rows.filter(row => {
-      if (needle && !columns.some(column => searchableText(String(column.accessor(row) ?? '')).includes(needle))) return false;
+      if (needle && !columns.some(column => searchableText(String(column.accessor(row) ?? '')).includes(needle)
+        || searchableText(column.searchAccessor?.(row) ?? '').includes(needle))) return false;
       return columns.every(column => {
         const filter = appliedFilters[column.id];
         if (!column.filter || !filter || !hasFilter(filter)) return true;
@@ -278,23 +284,24 @@ export function DataGrid<T>({
   const headerRows = filterRowVisible ? 2 : 1;
   const keepRowIds = React.useMemo(() => [...new Set([editing?.rowId, focusedRowId].filter((value): value is string => value != null))], [editing?.rowId, focusedRowId]);
   const shownIds = React.useMemo(() => new Set(shownRows.map(getRowId)), [shownRows, getRowId]);
-  const resolvedWidths = React.useMemo(() => resolveDataGridColumnWidths(visibleColumns, viewportWidth, widths, selectable ? 52 : 0), [visibleColumns, viewportWidth, widths, selectable]);
+  const resolvedWidths = React.useMemo(
+    () => resolveDataGridColumnWidths(visibleColumns, viewportWidth, getDataGridResizeOverrides(resizes, visibleColumns), selectable ? 52 : 0),
+    [visibleColumns, viewportWidth, resizes, selectable],
+  );
   const widthById = new Map(visibleColumns.map((column, index) => [column.id, resolvedWidths[index]]));
   const columnWidth = (column: DataGridColumn<T>) => widthById.get(column.id)!;
   const pinnedOffsets = new Map<string, number>();
   let pinnedWidth = selectable ? 52 : 0;
   for (const column of visibleColumns) if (column.pinned === 'start') { pinnedOffsets.set(column.id, pinnedWidth); pinnedWidth += columnWidth(column); }
   const cellStyle = (column: DataGridColumn<T>): React.CSSProperties => ({textAlign:column.align || 'start', ...(column.pinned === 'start' ? {insetInlineStart:pinnedOffsets.get(column.id)} : {})});
-  const resize = (column: DataGridColumn<T>, value: number) => {
-    const bounds = widthBounds(column);
-    setWidths(previous => ({...previous, [column.id]:Math.max(bounds.min, Math.min(bounds.max, Math.round(value)))}));
-  };
+  const widthsBefore = (columnIndex: number) => visibleColumns.slice(0, columnIndex)
+    .map(column => [column.id, columnWidth(column)] as const);
   const resetWidth = (column: DataGridColumn<T>) => {
     drag.current = null;
-    setWidths(previous => {
-      if (!Object.prototype.hasOwnProperty.call(previous, column.id)) return previous;
-      const next = {...previous};
-      delete next[column.id];
+    setResizes(previous => {
+      if (!previous.has(column.id)) return previous;
+      const next = new Map(previous);
+      next.delete(column.id);
       return next;
     });
   };
@@ -510,13 +517,25 @@ export function DataGrid<T>({
               const step = event.shiftKey ? 1 : 10;
               if (['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) {
                 event.preventDefault(); event.stopPropagation();
-                resize(column, event.key === 'Home' ? widthBounds(column).min : event.key === 'End' ? widthBounds(column).max : columnWidth(column) + (event.key === 'ArrowLeft' ? -step : step));
+                const startWidth = columnWidth(column);
+                const bounds = widthBounds(column);
+                const width = event.key === 'Home' ? bounds.min : event.key === 'End' ? bounds.max : startWidth + (event.key === 'ArrowLeft' ? -step : step);
+                setResizes(previous => resizeDataGridColumn(previous, column, startWidth, width, widthsBefore(columnIndex)));
               }
             }} onPointerDown={event => {
               if (event.button !== 0) return;
               event.preventDefault(); event.currentTarget.focus(); event.currentTarget.setPointerCapture?.(event.pointerId);
-              drag.current = {id:column.id, startX:event.clientX, startWidth:columnWidth(column), direction:event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget).direction === 'rtl' ? -1 : 1};
-            }} onPointerMove={event => { if (drag.current?.id === column.id) resize(column, drag.current.startWidth + (event.clientX - drag.current.startX) * drag.current.direction); }} onPointerUp={event => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }} />}
+              drag.current = {
+                id:column.id, startX:event.clientX, startWidth:columnWidth(column), resizes,
+                leadingWidths:widthsBefore(columnIndex),
+                direction:event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget).direction === 'rtl' ? -1 : 1,
+              };
+            }} onPointerMove={event => {
+              const start = drag.current;
+              if (start?.id !== column.id) return;
+              const width = start.startWidth + (event.clientX - start.startX) * start.direction;
+              setResizes(resizeDataGridColumn(start.resizes, column, start.startWidth, width, start.leadingWidths));
+            }} onPointerUp={event => { drag.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { drag.current = null; }} onLostPointerCapture={() => { drag.current = null; }} />}
           </TableHeaderCell>; })}
         </TableRow>{filterRowVisible && <TableRow id={`${id}-filters`} className="data-grid-filter-row" data-size={toolbarSize} aria-rowindex={virtualEnabled ? 2 : undefined}>{selectable && <TableCell className="data-grid-select-cell" />}{visibleColumns.map(column => {
           const filter = filters[column.id];
