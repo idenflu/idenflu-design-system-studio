@@ -6,6 +6,7 @@ import { useValue } from '../../shared/use-value';
 import { useFormReset } from '../../shared/use-form-reset';
 import { InlineSelectTags } from './InlineSelectTags';
 import { useEscapeLayer } from '../../shared/escape-layer';
+import { clampPopupPosition, popupViewport } from '../../shared/popup-position';
 
 /** Values must be unique and stable; option icons are decorative. */
 export interface SelectOption { value: string; label: string; disabled?: boolean; description?: string; icon?: React.ReactNode }
@@ -67,7 +68,7 @@ function SelectCore({options, label, hideLabel = false, name, disabled, readOnly
   React.useImperativeHandle(buttonRef, () => trigger.current!, [presentation, searchable, multiple]);
   React.useImperativeHandle(inputRef, () => search.current!, [searchable, multiple]);
   const popupElement = React.useRef<HTMLDivElement>(null);
-  const [popupPosition, setPopupPosition] = React.useState<{top:number; left:number; width:number; maxHeight:number} | null>(null);
+  const [popupPosition, setPopupPosition] = React.useState<{top:number; left:number; minWidth:number; maxHeight:number} | null>(null);
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [active, setActive] = React.useState<string | null>(null);
@@ -115,9 +116,12 @@ function SelectCore({options, label, hideLabel = false, name, disabled, readOnly
       const below = Math.max(0, viewportHeight - rect.bottom - 14), above = Math.max(0, rect.top - 14);
       const opensAbove = below < desiredHeight && above > below;
       const maxHeight = Math.max(0, opensAbove ? above : below);
-      const width = Math.min(Math.max(1, rect.width), Math.max(1, viewportWidth - 16));
-      const next = {top:opensAbove ? Math.max(8, rect.top - 6 - Math.min(desiredHeight, maxHeight)) : rect.bottom + 6, left:Math.max(8, Math.min(rect.left, viewportWidth - width - 8)), width, maxHeight};
-      setPopupPosition(previous => previous && previous.top === next.top && previous.left === next.left && previous.width === next.width && previous.maxHeight === next.maxHeight ? previous : next);
+      const minWidth = Math.min(Math.max(1, rect.width), Math.max(1, viewportWidth - 16));
+      // The list grows to fit its options, so measure it with the next minimum width before clamping it to the viewport.
+      popup.style.minWidth = `${minWidth}px`;
+      const width = popup.getBoundingClientRect().width || minWidth;
+      const next = {top:opensAbove ? Math.max(8, rect.top - 6 - Math.min(desiredHeight, maxHeight)) : rect.bottom + 6, left:Math.max(8, Math.min(rect.left, viewportWidth - width - 8)), minWidth, maxHeight};
+      setPopupPosition(previous => previous && previous.top === next.top && previous.left === next.left && previous.minWidth === next.minWidth && previous.maxHeight === next.maxHeight ? previous : next);
     };
     update();
     win.addEventListener('resize', update);
@@ -127,6 +131,25 @@ function SelectCore({options, label, hideLabel = false, name, disabled, readOnly
     observer?.observe(control);
     return () => { win.removeEventListener('resize', update); win.removeEventListener('scroll', update, true); observer?.disconnect(); };
   }, [open, popupStrategy, searchable, multiple, presentation, query, visible.length]);
+
+  useClientLayoutEffect(() => {
+    const popup = popupElement.current, anchor = root.current, win = popup?.ownerDocument.defaultView;
+    if (!open || popupStrategy === 'fixed' || !popup || !anchor || !win) return;
+    const update = () => {
+      // Measure from the stylesheet position so a wider list can shift back inside the viewport.
+      popup.style.left = '';
+      const bounds = popup.getBoundingClientRect(), anchorBounds = anchor.getBoundingClientRect();
+      if (!bounds.width) return;
+      const rtl = win.getComputedStyle(anchor).direction === 'rtl';
+      const viewport = popupViewport(popup, win);
+      const left = clampPopupPosition(rtl ? anchorBounds.right - bounds.width : anchorBounds.left, viewport.left, viewport.right, bounds.width);
+      const scale = popup.offsetWidth ? bounds.width / popup.offsetWidth : 1;
+      if (Math.abs(left - bounds.left) >= 0.5) popup.style.left = `${(left - bounds.left) / (scale || 1)}px`;
+    };
+    update();
+    win.addEventListener('resize', update);
+    return () => { win.removeEventListener('resize', update); popup.style.left = ''; };
+  }, [open, popupStrategy, options, query, visible.length]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -185,7 +208,7 @@ function SelectCore({options, label, hideLabel = false, name, disabled, readOnly
   React.useEffect(() => {
     if (open && activeIndex >= 0) root.current?.ownerDocument.getElementById(`${id}-option-${activeIndex}`)?.scrollIntoView?.({ block: 'nearest' });
   }, [open, activeIndex, id]);
-  const popup = <div ref={popupElement} className="select-popup" data-popup-strategy={popupStrategy === 'fixed' ? 'fixed' : undefined} hidden={!open} style={popupStrategy === 'fixed' ? {position:'fixed', top:popupPosition?.top ?? 0, left:popupPosition?.left ?? 0, right:'auto', bottom:'auto', width:popupPosition?.width, maxHeight:popupPosition?.maxHeight, visibility:popupPosition ? 'visible' : 'hidden'} : undefined}>
+  const popup = <div ref={popupElement} className="select-popup" data-popup-strategy={popupStrategy === 'fixed' ? 'fixed' : undefined} hidden={!open} style={popupStrategy === 'fixed' ? {position:'fixed', top:popupPosition?.top ?? 0, left:popupPosition?.left ?? 0, right:'auto', bottom:'auto', minWidth:popupPosition?.minWidth, maxHeight:popupPosition?.maxHeight, visibility:popupPosition ? 'visible' : 'hidden'} : undefined}>
     {multiple && searchable && <div className="multi-search-field"><input ref={search} className="multi-search-input" type="search" role="combobox" aria-label={`${label} 검색`} aria-autocomplete="list" aria-expanded={open} aria-controls={listId} aria-activedescendant={open && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined} value={query} onChange={event => { const next = event.target.value; setQuery(next); setActive(options.find(option => !option.disabled && option.label.toLocaleLowerCase().includes(next.toLocaleLowerCase()))?.value ?? null); }} onKeyDown={onKeyDown} />{query && <button type="button" className="input-action" aria-label="검색어 지우기" onClick={() => { setQuery(''); setActive(options.find(option => !option.disabled)?.value ?? null); search.current?.focus(); }}><span className="ui-icon icon-x" aria-hidden="true" /></button>}</div>}
     <ul id={listId} className="select-options" role="listbox" aria-label={label} aria-multiselectable={multiple || undefined}>
       {visible.map(option => {

@@ -4,6 +4,10 @@
 
 ## 미배포
 
+### 수정
+
+- `Select`·`SearchSelect`·`MultiSelect`의 옵션 목록이 좁은 트리거에서도 옵션 라벨과 선택 체크가 들어가도록 넓어집니다. 넓어진 목록은 화면 안에 머물고, 폭이 부족하면 어절 단위로 줄바꿈합니다.
+
 ## 0.14.0 — 2026-11-25
 
 [게시 소스 `8ce5e51`](https://github.com/idenflu/idenflu-design-system-studio/commit/8ce5e511761e26862dc4d0957a7c260eb7c55d61) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/45611285128)
