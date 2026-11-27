@@ -15,11 +15,12 @@
 .select-trigger:disabled { background: var(--surface); color: var(--disabled-text); cursor: not-allowed; }
 .select-trigger:disabled .ui-icon { color: var(--disabled-text); }
 .custom-select.is-open > .select-trigger > .icon-keyboard-arrow-down { transform: rotate(180deg); }
-.select-popup { border-radius:var(--radius-control); position: absolute; top: calc(100% + 6px); right: 0; left: 0; z-index: var(--z-dropdown); padding: var(--space-1); border: 1px solid var(--border); background:var(--field-background); }
+.select-popup { border-radius:var(--radius-control); position: absolute; top: calc(100% + 6px); right: auto; left: 0; z-index: var(--z-dropdown); min-width: 100%; width: max-content; max-width: min(320px, calc(100vw - 24px)); padding: var(--space-1); border: 1px solid var(--border); background:var(--field-background); }
 .custom-select.opens-up .select-popup { top: auto; bottom: calc(100% + 6px); }
 .select-options { max-height: 256px; margin: 0; padding: 0; list-style: none; overflow-y: auto; overscroll-behavior: contain; }
 .select-option { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: var(--control-height); padding: calc((var(--control-height) - var(--line-height-control)) / 2) var(--control-px); color: var(--text); cursor: pointer; }
 .select-option > div { min-width: 0; }
+.option-label, .option-description { word-break: keep-all; overflow-wrap: anywhere; }
 .option-label { display: block; font-size:var(--font-size-body); line-height:var(--line-height-control); }
 .option-description { display: block; margin-top: calc(var(--space-unit) * 0.75); color: var(--text-secondary); font-size:var(--font-size-caption); line-height:var(--line-height-caption); }
 .select-option.is-active { background: var(--surface); }
