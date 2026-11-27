@@ -1,6 +1,6 @@
 # React 아이콘 참조
 
-`icons.svg`의 147개 심볼이 아이콘의 단일 원본입니다. Foundations의 아이콘 목록에서 이름과 개별 컴포넌트 이름을 검색할 수 있습니다.
+`icons.svg`의 173개 심볼이 아이콘의 단일 원본입니다. Foundations의 아이콘 목록에서 이름과 개별 컴포넌트 이름을 검색할 수 있습니다.
 
 ```tsx
 import { Icon } from '@idenflu/mono-react';
@@ -18,6 +18,18 @@ import '@idenflu/mono-react/styles.css';
 아이콘 원본을 수정한 후 패키지 디렉터리에서 `npm run generate:icons`를 실행하고 `npm run check:icons`로 생성 결과를 확인합니다. 생성된 컴포넌트와 마스크 CSS, 이름 타입은 직접 수정하지 않습니다. 형태 기준은 [아이콘 디자인 원칙](icon-design-principles.md)을 참고합니다.
 
 알림 상태에는 기존 `bell` 외에 `bell-dot`, `bell-check`를 사용할 수 있습니다.
+
+## 목록·설비·데이터·기기 아이콘 추가
+
+`list-expand`, `list-fold`, `dot`과 설비·물류의 `factory`, `truck`, `package`,
+`warehouse`, `gauge`, `thermometer`, `zap`, `activity`를 제공합니다. 데이터 흐름에는
+`trending-up`, `trending-down`, `cloud-upload`, `cloud-download`, `server`, `layers`,
+`power`, 기기에는 `phone`, `smartphone`, `monitor`, `mic`, `video`, `at-sign`,
+`qr-code`, `barcode`를 사용합니다.
+
+목록 펼치기·접기는 `line-height`와 같은 선 길이와 화살촉 크기를 사용합니다.
+`line-height`는 가운데 줄을 없애 메뉴 모양과 구분했습니다. 새로 고침은 기존
+`rotate`, 오류·차단·주의는 기존 `x-circle`·`ban`·`warning`을 사용합니다.
 
 ## 행 간격·설비 아이콘 추가
 

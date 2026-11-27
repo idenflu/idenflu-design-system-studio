@@ -1,6 +1,6 @@
 # 아이콘 확장 근거
 
-현재는 `icons.svg`를 단일 원본으로 하는 **Outline 145종**을 제공합니다.
+현재는 `icons.svg`를 단일 원본으로 하는 **Outline 173종**을 제공합니다.
 Filled와 기존 별칭은 제공하지 않습니다. 현재 사용법과 이름 정책은
 [아이콘 참조](../reference/icons.md), 형태 기준은
 [아이콘 디자인 원칙](../reference/icon-design-principles.md)을 따릅니다.
@@ -105,3 +105,32 @@ user-settings, 접근 허용은 기존 shield-check, 거부는 shield-off로 표
 4종 모두 24×24·1.5px·square·miter 규칙을 따른다. 컨베이어의 곡선은
 순환 벨트와 롤러를 식별하는 요소이며, 지지대 접합부에만 butt를 적용한다.
 기존 `columns`와 `filter-clear`도 표시 열·필터 초기화 동작에 재사용한다.
+
+## 목록·설비·데이터·기기 확장 · 2026-11-27
+
+[이슈 #2](https://github.com/idenflu/idenflu-design-system-studio/issues/2)의 목록 아이콘 3종과
+설비·데이터·기기 화면에 필요한 23종을 더해 26종을 추가하고 `line-height`를 수정했다.
+외부 카탈로그의 사용 빈도가 아닌 현재 설비·업무 화면의 용도를 기준으로 선정했다.
+
+| 용도 | 추가 이름 | 선정 근거 |
+| --- | --- | --- |
+| 목록·표시 | `list-expand`, `list-fold`, `dot` | 목록 전체 펼치기·접기와 단독 상태 점을 표시한다. |
+| 설비·물류 | `factory`, `truck`, `package`, `warehouse`, `gauge`, `thermometer`, `zap`, `activity` | 기존 `conveyor`·`wrench`와 함께 생산·운송·보관과 계측 값을 구분한다. |
+| 상태·데이터 흐름 | `trending-up`, `trending-down`, `cloud-upload`, `cloud-download`, `server`, `layers`, `power` | 추세와 클라우드 전송, 시스템 구성과 전원 상태를 나타낸다. |
+| 커뮤니케이션·기기 | `phone`, `smartphone`, `monitor`, `mic`, `video`, `at-sign`, `qr-code`, `barcode` | 연락 수단과 기기, 식별 코드 입력을 나타낸다. |
+
+후보였던 `refresh`는 기존 `rotate`와 의미가 겹쳐 `cloud-download`로 대체했다.
+`alert-octagon`은 오류 `x-circle`·차단 `ban`·주의 `warning`으로 구분한 상태 체계와
+의미가 겹쳐 제외했다. `line-height`는 가운데 줄을 없애 `menu`와 구분했다.
+
+26종 모두 24×24·1.5px·square·miter 규칙과 정사각형 18·원 20 키라인을 따르며,
+렌더링한 외곽이 24×24 캔버스를 벗어나지 않는 것을 확인했다. 원형은 기존과 같은
+r=9.25를 사용하고, 외부에 드러나는 선 끝은 square, 다른 선과 만나는 끝만 butt로 처리했다.
+`trending-*`의 대각선은 `external-link`처럼 화살촉 안쪽 모서리에서 끝나며,
+`list-expand`·`list-fold`는 `line-height`와 같은 선 길이와 화살촉 크기를 공유한다.
+`zap`은 예각의 miter가 세로 키라인을 넘지 않도록 높이를 조정했다.
+
+다음 두 가지는 원칙의 예외로 기록한다. `truck`의 바퀴는 겹침 간격을 두지 않고
+`sliders`의 손잡이처럼 차체 하단 선과 접합한다. `layers`는 관례적인 모티프인 비스듬히
+쌓은 판 모양을 유지한다. 크기별 권장 안내는 따로 두지 않으며, 14·16·18·20px에서
+기존 아이콘과 크기·밀도를 비교했다.

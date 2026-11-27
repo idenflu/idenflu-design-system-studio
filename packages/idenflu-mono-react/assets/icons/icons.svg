@@ -570,7 +570,7 @@
     stroke-linecap="square"
     stroke-linejoin="miter"
   >
-    <path d="M3.75 5.75h8M3.75 12h5.5M3.75 18.25h8" />
+    <path d="M3.75 5.75h8M3.75 18.25h8" />
     <path
       d="M15.75 7.25l2.5-2.5 2.5 2.5M15.75 16.75l2.5 2.5 2.5-2.5M18.25 5.5v13"
     />
@@ -782,5 +782,117 @@
   </symbol>
   <symbol id="scan-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
     <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M3 12h18" />
+  </symbol>
+  <symbol id="list-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M3.75 5.75h8M3.75 12h8M3.75 18.25h8" />
+    <path d="m15.75 8.25 2.5-2.5 2.5 2.5M15.75 15.75l2.5 2.5 2.5-2.5" />
+  </symbol>
+  <symbol id="list-fold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M3.75 5.75h8M3.75 12h8M3.75 18.25h8" />
+    <path d="m15.75 5.75 2.5 2.5 2.5-2.5M15.75 18.25l2.5-2.5 2.5 2.5" />
+  </symbol>
+  <symbol id="dot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+  </symbol>
+  <symbol id="factory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M3 20.25V3.75h4.5V11l4.5-3v3l4.5-3v3l4.5-3v12.25z" />
+    <path d="M7 16.25h1.5M11.25 16.25h1.5M15.5 16.25h1.5" />
+  </symbol>
+  <symbol id="truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M4.75 17.5h-2V5.25H14V17.5" stroke-linecap="butt" />
+    <path d="M8.25 17.5h7.5" stroke-linecap="butt" />
+    <path d="M14 9h4.25l3 4v4.5h-2" stroke-linecap="butt" />
+    <circle cx="6.5" cy="17.5" r="1.75" />
+    <circle cx="17.5" cy="17.5" r="1.75" />
+  </symbol>
+  <symbol id="package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <rect x="3.75" y="3.75" width="16.5" height="16.5" />
+    <path d="M9.5 3.75V10l2.5-1.5 2.5 1.5V3.75" stroke-linecap="butt" />
+    <path d="M14.5 16.5h2.5" />
+  </symbol>
+  <symbol id="warehouse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M2.75 9 12 3.75 21.25 9v11.25H2.75z" />
+    <path d="M7 20.25V12.5h10v7.75" stroke-linecap="butt" />
+    <path d="M7 16.25h10" stroke-linecap="butt" />
+  </symbol>
+  <symbol id="gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M4.56 19.5A9.25 9.25 0 1 1 19.44 19.5" />
+    <path d="m12 14 4-4" />
+    <circle cx="12" cy="14" r="1.25" fill="currentColor" stroke="none" />
+  </symbol>
+  <symbol id="thermometer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M10 14.13V5a2 2 0 0 1 4 0v9.13a3.5 3.5 0 1 1-4 0Z" />
+    <circle cx="12" cy="17" r="1.25" fill="currentColor" stroke="none" />
+  </symbol>
+  <symbol id="zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M13.25 4 5.25 13.2H11l-.25 6.8 8-9.2H13.5z" />
+  </symbol>
+  <symbol id="activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M2.75 12h4l3-6.5 5 13 3-6.5h3.5" />
+  </symbol>
+  <symbol id="trending-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M2.75 17.25 9 11l4 4 7.72-7.72" />
+    <path d="M15.25 6.75h6v6" />
+  </symbol>
+  <symbol id="trending-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M2.75 6.75 9 13l4-4 7.72 7.72" />
+    <path d="M15.25 17.25h6v-6" />
+  </symbol>
+  <symbol id="cloud-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M4.65 14.1A6.5 6.5 0 1 1 15.43 7.5H17A4.25 4.25 0 0 1 20.54 14.1" />
+    <path d="M12 21.25V11.5M8 15.5l4-4 4 4" />
+  </symbol>
+  <symbol id="cloud-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M4.65 14.1A6.5 6.5 0 1 1 15.43 7.5H17A4.25 4.25 0 0 1 20.54 14.1" />
+    <path d="M12 11v9.25M8 16.25l4 4 4-4" />
+  </symbol>
+  <symbol id="server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <rect x="3.75" y="3.75" width="16.5" height="6.25" />
+    <rect x="3.75" y="14" width="16.5" height="6.25" />
+    <circle cx="7.5" cy="6.88" r="1" fill="currentColor" stroke="none" />
+    <circle cx="7.5" cy="17.13" r="1" fill="currentColor" stroke="none" />
+  </symbol>
+  <symbol id="layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M12 4 20 8.25 12 12.5 4 8.25z" />
+    <path d="m4 12.25 8 4.25 8-4.25M4 16.25l8 4.25 8-4.25" />
+  </symbol>
+  <symbol id="power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M12 2.75v8.5" />
+    <path d="M6.05 4.91A9.25 9.25 0 1 0 17.95 4.91" />
+  </symbol>
+  <symbol id="phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M3 3h6v5.25L6.75 10A13 13 0 0 0 14 17.25L15.75 15H21v6h-1A17 17 0 0 1 3 4z" />
+  </symbol>
+  <symbol id="smartphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <rect x="6" y="2.75" width="12" height="18.5" />
+    <path d="M11 17.75h2" />
+  </symbol>
+  <symbol id="monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <rect x="2.75" y="3.75" width="18.5" height="12.5" />
+    <path d="M12 16.25v4" stroke-linecap="butt" />
+    <path d="M8 20.25h8" />
+  </symbol>
+  <symbol id="mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M9 6a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0z" />
+    <path d="M5.75 11a6.25 6.25 0 0 0 12.5 0" />
+    <path d="M12 17.25v4" stroke-linecap="butt" />
+    <path d="M9 21.25h6" />
+  </symbol>
+  <symbol id="video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <rect x="2.75" y="5.75" width="12.5" height="12.5" />
+    <path d="M15.25 10 21.25 6.5v11l-6-3.5" stroke-linecap="butt" />
+  </symbol>
+  <symbol id="at-sign" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <circle cx="12" cy="12" r="3.75" />
+    <path d="M15.75 8v5.25a2.75 2.75 0 0 0 5.5 0V12a9.25 9.25 0 1 0-3.7 7.4" />
+  </symbol>
+  <symbol id="qr-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <rect x="3.75" y="3.75" width="6" height="6" />
+    <rect x="14.25" y="3.75" width="6" height="6" />
+    <rect x="3.75" y="14.25" width="6" height="6" />
+    <path d="M6 6h1.5v1.5H6zM16.5 6H18v1.5h-1.5zM6 16.5h1.5V18H6zM13.5 13.5h2.25v2.25H13.5zM18.75 13.5H21v2.25h-2.25zM18.75 18.75H21V21h-2.25z" fill="currentColor" stroke="none" />
+  </symbol>
+  <symbol id="barcode" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M3.75 4.75v14.5M7.75 4.75v14.5M12.25 4.75v14.5M16.25 4.75v14.5M20.25 4.75v14.5" />
   </symbol>
 </svg>
