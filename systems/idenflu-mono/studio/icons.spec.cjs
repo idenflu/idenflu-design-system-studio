@@ -17,6 +17,24 @@ test('workflow icons retain readable size previews and stay within narrow pages'
   await search.fill('sun');await expect(page.locator('.react-studio-icons .icon-sun')).toHaveCount(1);
 });
 
+test('device and equipment icons render at every preview size and fill the equipment category',{tag:['@mobile','@theme']},async({page})=>{
+  await page.goto(url);
+  const additions=page.locator('#icon-device-additions');
+  const icons=additions.locator('.ui-icon');
+  await expect(icons).toHaveCount(26);
+  for(const size of [14,16,18,20]) {
+    await additions.getByRole('button',{name:`${size}px`,exact:true}).click();
+    const rendered=await icons.evaluateAll(nodes=>nodes.map(node=>{const box=node.getBoundingClientRect(),css=getComputedStyle(node);return {width:box.width,height:box.height,hasMask:css.maskImage!=='none',color:css.color,ink:css.backgroundColor};}));
+    for(const icon of rendered) {expect(icon.width).toBe(size);expect(icon.height).toBe(size);expect(icon.hasMask).toBe(true);expect(icon.ink).toBe(icon.color);}
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth)).toBe(false);
+  await page.getByRole('group',{name:'아이콘 분류',exact:true}).getByRole('button',{name:'설비·물류',exact:true}).click();
+  await expect(page.locator('.react-studio-icons button > span:nth-child(2)')).toHaveText(['conveyor','factory','gauge','package','power','thermometer','truck','warehouse','wrench','zap']);
+  await page.getByRole('group',{name:'아이콘 분류',exact:true}).getByRole('button',{name:'데이터·화면',exact:true}).click();
+  await page.getByRole('searchbox',{name:'아이콘 검색',exact:true}).fill('list-');
+  await expect(page.locator('.react-studio-icons button > span:nth-child(2)')).toHaveText(['list-checks','list-expand','list-fold']);
+});
+
 test('workflow examples cycle sort directions and let keyboard users pin and reset',{tag:'@mobile'},async({page})=>{
   await page.goto(url);
   const example=page.locator('#icon-workflow-examples');

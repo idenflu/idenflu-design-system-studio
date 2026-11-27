@@ -4,6 +4,15 @@
 
 ## 미배포
 
+### 추가
+
+- 아이콘 26종 추가: 목록 `list-expand`·`list-fold`·`dot`, 설비·물류 `factory`·`truck`·`package`·`warehouse`·`gauge`·`thermometer`·`zap`·`activity`, 데이터 흐름 `trending-up`·`trending-down`·`cloud-upload`·`cloud-download`·`server`·`layers`·`power`, 기기 `phone`·`smartphone`·`monitor`·`mic`·`video`·`at-sign`·`qr-code`·`barcode`
+- 아이콘 목록에 설비·물류 분류와 신규 아이콘의 크기별 미리보기 추가
+
+### 수정
+
+- `line-height` 아이콘의 가운데 줄을 제거해 메뉴 모양과 구분
+
 ## 0.14.0 — 2026-11-25
 
 [게시 소스 `8ce5e51`](https://github.com/idenflu/idenflu-design-system-studio/commit/8ce5e511761e26862dc4d0957a7c260eb7c55d61) · [게시 워크플로](https://github.com/idenflu/idenflu-design-system-studio/actions/runs/45611285128)

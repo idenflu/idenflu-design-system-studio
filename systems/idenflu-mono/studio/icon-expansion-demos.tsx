@@ -11,6 +11,12 @@ const groups:readonly {label:string;description:string;names:readonly IconName[]
   {label:'설정·화면',description:'상세 설정, 화면 확대·복원과 테마 전환',names:['sliders','maximize','minimize','sun','moon']},
 ];
 const previewSizes=[14,16,18,20] as const;
+const deviceGroups:readonly {label:string;description:string;icons:readonly {name:IconName;label:string}[]}[]=[
+  {label:'목록·표시',description:'목록 펼치기·접기와 상태 점',icons:[{name:'list-expand',label:'목록 펼치기'},{name:'list-fold',label:'목록 접기'},{name:'dot',label:'점·상태 표시'}]},
+  {label:'설비·물류',description:'생산·운송·보관과 설비 계측',icons:[{name:'factory',label:'공장·생산 시설'},{name:'truck',label:'운송·배송'},{name:'package',label:'포장·화물'},{name:'warehouse',label:'창고·재고'},{name:'gauge',label:'계기·부하'},{name:'thermometer',label:'온도'},{name:'zap',label:'전력·에너지'},{name:'activity',label:'가동·신호'}]},
+  {label:'상태·데이터 흐름',description:'추세, 클라우드 전송과 시스템 구성',icons:[{name:'trending-up',label:'증가 추세'},{name:'trending-down',label:'감소 추세'},{name:'cloud-upload',label:'클라우드 업로드'},{name:'cloud-download',label:'클라우드 다운로드'},{name:'server',label:'서버'},{name:'layers',label:'계층·레이어'},{name:'power',label:'전원'}]},
+  {label:'커뮤니케이션·기기',description:'연락 수단, 기기와 식별 코드',icons:[{name:'phone',label:'전화'},{name:'smartphone',label:'모바일 기기'},{name:'monitor',label:'모니터·화면'},{name:'mic',label:'마이크·음성'},{name:'video',label:'영상·화상 회의'},{name:'at-sign',label:'멘션·이메일 주소'},{name:'qr-code',label:'QR 코드'},{name:'barcode',label:'바코드'}]},
+];
 const equipmentIcons:readonly {name:IconName;label:string}[]=[
   {name:'rows-compact',label:'촘촘한 행 간격'},
   {name:'rows-comfortable',label:'기본 행 간격'},
@@ -24,6 +30,15 @@ export function IconExpansionDemos() {
   const [pinned,setPinned]=React.useState(false);
   const [message,setMessage]=React.useState('');
   return <>
+    <Section id="icon-device-additions" title="목록·설비·데이터·기기 아이콘 26종" description="목록 접기·펼치기, 설비·물류, 데이터 흐름과 기기를 나타냅니다. line-height는 가운데 줄을 없애 줄 간격만 표현합니다.">
+      <Segmented label="목록·설비·데이터·기기 아이콘 미리보기 크기" value={size} onValueChange={setSize} options={previewSizes.map(value=>({value:String(value),label:`${value}px`}))} />
+      <div className="studio-icon-expansion-groups" style={{'--preview-icon-size':`${size}px`} as React.CSSProperties}>
+        {deviceGroups.map(group=><section className="studio-icon-expansion-group" key={group.label} aria-label={group.label}>
+          <header><h3 className="react-studio-example-title">{group.label}</h3><p className="react-studio-caption">{group.description}</p></header>
+          <ul className="studio-icon-expansion-list">{group.icons.map(item=><li key={item.name}><Icon name={item.name} /><code>{item.name}</code><span className="react-studio-caption">{item.label}</span></li>)}</ul>
+        </section>)}
+      </div>
+    </Section>
     <Section id="icon-equipment-additions" title="행 간격·설비 아이콘 4종" description="데이터그리드의 행 간격과 컨베이어·점검 작업을 구분합니다.">
       <Segmented label="행 간격·설비 아이콘 미리보기 크기" value={size} onValueChange={setSize} options={previewSizes.map(value=>({value:String(value),label:`${value}px`}))} />
       <ul className="studio-icon-expansion-list" style={{'--preview-icon-size':`${size}px`} as React.CSSProperties}>{equipmentIcons.map(item=><li key={item.name}><Icon name={item.name} /><code>{item.name}</code><span className="react-studio-caption">{item.label}</span></li>)}</ul>
